@@ -201,6 +201,7 @@ function Assignment() {
           <ul className="w-full">
             {loading && <SubmissionLoader />}
             {!loading &&
+              !loadingDetail &&
               data.submissions.map((submission) => (
                 <Submission key={submission.id} submission={{ ...submission, user: submissionDetail.user }} />
               ))}
