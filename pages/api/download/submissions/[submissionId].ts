@@ -6,10 +6,12 @@ import { readFileSync } from "fs";
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     const { submissionId } = req.query;
-    const { data: { data } } = await axios({
-      method: 'post',
+    const {
+      data: { data },
+    } = await axios({
+      method: "post",
       headers: {
-        cookie: req.headers.cookie
+        cookie: req.headers.cookie,
       },
       url: `https://${process.env.API_URL}/v1/graphql`,
       data: {
@@ -24,18 +26,18 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
             }
           }
         `,
-        variables: { id: submissionId }
+        variables: { id: submissionId },
       },
     });
     const { stored_name, upload_name, created_at } = data.submission;
-    const buffer = readFileSync(`${process.env.NEXT_PUBLIC_UPLOAD_DIR}/`+stored_name);
-    res.setHeader('Content-Type','application/octet-stream');
-    res.setHeader('Content-Disposition',`attachment; filename=${(new Date(created_at)).getTime()}_${upload_name}`);
+    const buffer = readFileSync(`${process.env.NEXT_PUBLIC_UPLOAD_DIR}/` + stored_name);
+    res.setHeader("Content-Type", "application/octet-stream");
+    res.setHeader("Content-Disposition", `attachment; filename=${new Date(created_at).getTime()}_${upload_name}`);
     res.send(buffer);
   } catch (error: any) {
     return res.status(400).json({
-      status: 'error',
-      message: error.message
+      status: "error",
+      message: error.message,
     });
   }
 }
@@ -44,6 +46,6 @@ export default withSentry(handler);
 
 export const config = {
   api: {
-    externalResolver: true
-  }
-}
+    externalResolver: true,
+  },
+};

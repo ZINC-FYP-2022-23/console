@@ -1,5 +1,3 @@
 export function ShellExecStageReport() {
-  return (
-    <div></div>
-  )
+  return <div></div>;
 }

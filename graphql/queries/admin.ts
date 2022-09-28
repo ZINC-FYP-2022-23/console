@@ -25,7 +25,7 @@ export const GET_USERS = gql`
       }
     }
   }
-`
+`;
 
 export const GET_ALL_SUBMISSIONS_FOR_ASSIGNMENT = `
   query getSubmissionsForAssignmentConfig($assignmentConfigId: bigint!) {
@@ -54,7 +54,7 @@ export const GET_ALL_SUBMISSIONS_FOR_ASSIGNMENT = `
       }
     }
   }
-`
+`;
 
 export const GET_ALL_SUBMISSIONS_FOR_STUDENT_ASSIGNMENT = gql`
   query getSubmissionsFromStudentForAssignmentConfig($assignmentConfigId: bigint!, $userId: bigint!) {
@@ -68,13 +68,7 @@ export const GET_ALL_SUBMISSIONS_FOR_STUDENT_ASSIGNMENT = gql`
           }
         }
       }
-      submissions(
-        where: {
-          user_id: {
-            _eq: $userId
-          }
-        }
-      ) {
+      submissions(where: { user_id: { _eq: $userId } }) {
         stored_name
         upload_name
         user {
@@ -83,7 +77,7 @@ export const GET_ALL_SUBMISSIONS_FOR_STUDENT_ASSIGNMENT = gql`
       }
     }
   }
-`
+`;
 
 export const GET_COURSES = gql`
   query getCourses {
@@ -102,20 +96,12 @@ export const GET_COURSES = gql`
       sections {
         name
       }
-      students: users_aggregate(where: {
-        permission: {
-          _eq: 1
-        }
-      }){
+      students: users_aggregate(where: { permission: { _eq: 1 } }) {
         aggregate {
           count
         }
       }
-      teachingStaff: users(where: {
-        permission: {
-          _gt: 1
-        }
-      }) {
+      teachingStaff: users(where: { permission: { _gt: 1 } }) {
         user {
           initials
           name
@@ -123,7 +109,7 @@ export const GET_COURSES = gql`
       }
     }
   }
-`
+`;
 
 // export const GET_ASSIGNMENTS = gql`
 //   query getAssignments {

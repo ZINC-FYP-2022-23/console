@@ -5,20 +5,13 @@ import Link from "next/link";
 import { useDropzone } from "react-dropzone";
 import { SlideOver } from "../../../../../components/SlideOver";
 import { Modal } from "../../../../../components/Modal";
-import {
-  LayoutProvider,
-  useLayoutDispatch,
-  useLayoutState,
-} from "../../../../../contexts/layout";
+import { LayoutProvider, useLayoutDispatch, useLayoutState } from "../../../../../contexts/layout";
 import { Layout } from "../../../../../layout";
 import { initializeApollo } from "../../../../../lib/apollo";
 import { ReportSlideOver } from "../../../../../components/Report/index";
 import { StdioTestDetailView } from "../../../../../components/Report/StdioTestStageReport";
 import { ValgrindDetailView } from "../../../../../components/Report/ValgrindStageReport";
-import {
-  SUBMISSION_DETAIL,
-  SUBMISSION_SUBSCRIPTION,
-} from "../../../../../graphql/queries/user";
+import { SUBMISSION_DETAIL, SUBMISSION_SUBSCRIPTION } from "../../../../../graphql/queries/user";
 import { SubmissionLoader } from "../../../../../components/SubmissionLoader";
 import { Submission } from "../../../../../components/Submission";
 import { RegradingConfirmationDialog } from "../../../../../components/RegradingConfirmationDialog";
@@ -62,8 +55,7 @@ function Upload({ assignmentConfigId, userId }) {
           type: "showNotification",
           payload: {
             title: "Invalid file type",
-            message:
-              "Your submission contains file that are not supported, please try again",
+            message: "Your submission contains file that are not supported, please try again",
             success: false,
           },
         });
@@ -93,28 +85,21 @@ function Upload({ assignmentConfigId, userId }) {
           });
       }
     },
-    [assignmentConfigId, userId]
+    [assignmentConfigId, userId],
   );
   const { getRootProps, getInputProps } = useDropzone({
     onDrop,
-    accept:
-      ".h,.cpp,.rar,.zip,application/octet-stream,application/zip,application/x-zip,application/x-zip-compressed",
+    accept: ".h,.cpp,.rar,.zip,application/octet-stream,application/zip,application/x-zip,application/x-zip-compressed",
   });
   return (
-    <div
-      {...getRootProps()}
-      className="mt-4 flex-shrink-0 flex md:mt-0 md:ml-4"
-    >
+    <div {...getRootProps()} className="mt-4 flex-shrink-0 flex md:mt-0 md:ml-4">
       <span className="ml-3 shadow-sm rounded-md">
         <input {...getInputProps()} />
         <button
           type="button"
           className="inline-flex items-center px-4 py-2 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-cse-600 hover:bg-cse-500 focus:outline-none focus:shadow-outline-blue focus:border-cse-700 active:bg-cse-700 transition duration-150 ease-in-out"
         >
-          <FontAwesomeIcon
-            className="mr-2 text-white"
-            icon={["fad", "upload"]}
-          />
+          <FontAwesomeIcon className="mr-2 text-white" icon={["fad", "upload"]} />
           Submit
         </button>
       </span>
@@ -125,16 +110,13 @@ function Upload({ assignmentConfigId, userId }) {
 function Assignment() {
   const router = useRouter();
   const { courseId, assignmentConfigId, userId } = router.query;
-  const { data: submissionDetail, loading: loadingDetail } = useQuery(
-    SUBMISSION_DETAIL,
-    {
-      variables: {
-        userId: parseInt(userId as string, 10),
-        assignmentConfigId: parseInt(assignmentConfigId as string, 10),
-        courseId: parseInt(courseId as string, 10),
-      },
-    }
-  );
+  const { data: submissionDetail, loading: loadingDetail } = useQuery(SUBMISSION_DETAIL, {
+    variables: {
+      userId: parseInt(userId as string, 10),
+      assignmentConfigId: parseInt(assignmentConfigId as string, 10),
+      courseId: parseInt(courseId as string, 10),
+    },
+  });
   const { data, loading } = useSubscription(SUBMISSION_SUBSCRIPTION, {
     variables: {
       userId: parseInt(userId as string, 10),
@@ -187,8 +169,7 @@ function Assignment() {
                 </svg>
                 <Link href={`/courses/${courseId}`}>
                   <a className="text-gray-500 hover:text-gray-700 transition duration-150 ease-in-out">
-                    {!loadingDetail &&
-                      submissionDetail.assignmentConfig.assignment.name}
+                    {!loadingDetail && submissionDetail.assignmentConfig.assignment.name}
                   </a>
                 </Link>
                 <svg
@@ -203,20 +184,15 @@ function Assignment() {
                     clipRule="evenodd"
                   />
                 </svg>
-                <Link
-                  href={`/courses/${courseId}/assignments/${assignmentConfigId}/submissions?userId=${userId}`}
-                >
-                  <a className="text-gray-500 hover:text-gray-700 transition duration-150 ease-in-out">
-                    Submissions
-                  </a>
+                <Link href={`/courses/${courseId}/assignments/${assignmentConfigId}/submissions?userId=${userId}`}>
+                  <a className="text-gray-500 hover:text-gray-700 transition duration-150 ease-in-out">Submissions</a>
                 </Link>
               </nav>
             </div>
             <div className="mt-2 md:flex md:items-center md:justify-between">
               <div className="flex-1 min-w-0">
                 <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:leading-9 sm:truncate">
-                  {!loadingDetail && submissionDetail.user.name}&apos;s
-                  Submissions
+                  {!loadingDetail && submissionDetail.user.name}&apos;s Submissions
                 </h2>
               </div>
               <Upload userId={userId} assignmentConfigId={assignmentConfigId} />
@@ -226,10 +202,7 @@ function Assignment() {
             {loading && <SubmissionLoader />}
             {!loading &&
               data.submissions.map((submission) => (
-                <Submission
-                  key={submission.id}
-                  submission={{ ...submission, user: submissionDetail.user }}
-                />
+                <Submission key={submission.id} submission={{ ...submission, user: submissionDetail.user }} />
               ))}
           </ul>
         </main>

@@ -1,9 +1,9 @@
 import { gql } from "@apollo/client";
 
 export interface User {
-  id: number
-  itsc: string
-  name: string
+  id: number;
+  itsc: string;
+  name: string;
 }
 
 export const SIDEBAR = gql`
@@ -13,12 +13,7 @@ export const SIDEBAR = gql`
       itsc
       name
       initials
-      courses(where: {
-        permission: { _gt: 1 }
-        course: {
-          semester_id: { _eq: $semesterId }
-        }
-      }) {
+      courses(where: { permission: { _gt: 1 }, course: { semester_id: { _eq: $semesterId } } }) {
         course {
           id
           code
@@ -30,17 +25,12 @@ export const SIDEBAR = gql`
       name
     }
   }
-`
+`;
 
 export const GET_TEACHING_COURSES = gql`
   query getTeachingCourses($userId: bigint!, $semesterId: bigint!) {
     user(id: $userId) {
-      courses(where: {
-        permission: { _gt: 1 }
-        course: {
-          semester_id: { _eq: $semesterId }
-        }
-      }) {
+      courses(where: { permission: { _gt: 1 }, course: { semester_id: { _eq: $semesterId } } }) {
         course {
           id
           name
@@ -49,23 +39,13 @@ export const GET_TEACHING_COURSES = gql`
       }
     }
   }
-`
+`;
 
 export const GET_TEACHING_COURSE = gql`
   query getTeachingCourse($courseId: bigint!) {
     assignmentConfigs(
-      where: {
-        assignment: {
-          course_id: {
-            _eq: $courseId
-          }
-        }
-      }
-      order_by: {
-        assignment: {
-          name: asc
-        }
-      }
+      where: { assignment: { course_id: { _eq: $courseId } } }
+      order_by: { assignment: { name: asc } }
     ) {
       id
       affected_users {
@@ -84,9 +64,7 @@ export const GET_TEACHING_COURSE = gql`
           count
         }
       }
-      submissions_aggregate(
-        distinct_on: [user_id]
-      ) {
+      submissions_aggregate(distinct_on: [user_id]) {
         aggregate {
           count
         }
@@ -95,11 +73,7 @@ export const GET_TEACHING_COURSE = gql`
     course(id: $courseId) {
       name
       code
-      sections(
-        order_by: {
-          name: asc
-        }
-      ) {
+      sections(order_by: { name: asc }) {
         id
         name
         users {
@@ -111,20 +85,12 @@ export const GET_TEACHING_COURSE = gql`
           }
         }
       }
-      teachingStaffs: users(where: {
-        permission: {
-          _gt: 1
-        }
-      }) {
+      teachingStaffs: users(where: { permission: { _gt: 1 } }) {
         user {
           id
         }
       }
-      students: users(where: {
-        permission: {
-          _eq: 1
-        }
-      }) {
+      students: users(where: { permission: { _eq: 1 } }) {
         student: user {
           id
           itsc
@@ -134,15 +100,17 @@ export const GET_TEACHING_COURSE = gql`
       }
     }
   }
-`
+`;
 
-export const GET_NAME_BY_ASSIGNMENT_CONFIG_ID = gql`query getNameByAssignmentConfigId($id :bigint!){
-  assignmentConfig(id:$id){
-    assignment{
-      name
+export const GET_NAME_BY_ASSIGNMENT_CONFIG_ID = gql`
+  query getNameByAssignmentConfigId($id: bigint!) {
+    assignmentConfig(id: $id) {
+      assignment {
+        name
+      }
     }
   }
-}`
+`;
 
 export const GET_SUBMISSIONS_FOR_ASSIGNMENT_CONFIG = gql`
   query getSubmissionsForAssignmentConfig($id: bigint!) {
@@ -151,24 +119,12 @@ export const GET_SUBMISSIONS_FOR_ASSIGNMENT_CONFIG = gql`
         name
       }
       submissions(
-        where: {
-          extracted_path: {
-            _is_null: false
-          }
-        }
+        where: { extracted_path: { _is_null: false } }
         distinct_on: [user_id]
-        order_by: [
-          { user_id: asc }
-          { created_at: desc }
-        ]
+        order_by: [{ user_id: asc }, { created_at: desc }]
       ) {
         id
-        reports(
-          order_by: {
-            createdAt: desc
-          }
-          limit: 1
-        ) {
+        reports(order_by: { createdAt: desc }, limit: 1) {
           grade
         }
         user {
@@ -179,7 +135,7 @@ export const GET_SUBMISSIONS_FOR_ASSIGNMENT_CONFIG = gql`
       }
     }
   }
-`
+`;
 
 export const GET_REPORT = gql`
   query getReport($id: bigint!) {
@@ -194,7 +150,7 @@ export const GET_REPORT = gql`
       }
     }
   }
-`
+`;
 
 export const GET_STUDENTS_FOR_CONFIG = gql`
   subscription getCourseStudentsForConfig($id: bigint!) {
@@ -223,7 +179,7 @@ export const GET_STUDENTS_FOR_CONFIG = gql`
       }
     }
   }
-`
+`;
 
 // export const GET__STUDENTS_FOR_CONFIG = gql`
 //   query getSectionStudentsForConfig($id: bigint!) {
@@ -234,12 +190,7 @@ export const GET_STUDENTS_FOR_CONFIG = gql`
 export const GET_ASSIGNMENTS = gql`
   query getTeachingCourseAssignments($userId: bigint!, $semesterId: bigint!) {
     user(id: $userId) {
-      courses(where: {
-        permission: { _gt: 1 }
-        course: {
-          semester_id: { _eq: $semesterId }
-        }
-      }) {
+      courses(where: { permission: { _gt: 1 }, course: { semester_id: { _eq: $semesterId } } }) {
         course {
           id
           name
@@ -256,7 +207,7 @@ export const GET_ASSIGNMENTS = gql`
       }
     }
   }
-`
+`;
 
 export const GET_ASSIGNMENT = gql`
   query getAssignment($assignmentId: bigint!) {
@@ -271,7 +222,7 @@ export const GET_ASSIGNMENT = gql`
       }
     }
   }
-`
+`;
 
 export const GET_CONFIGS_FOR_ASSIGNMENT = gql`
   query getConfigsForAssignment($assignmentId: bigint!) {
@@ -297,7 +248,7 @@ export const GET_CONFIGS_FOR_ASSIGNMENT = gql`
       }
     }
   }
-`
+`;
 
 export const GET_PIPELINE_CONFIG_FOR_ASSIGNMENT = gql`
   query getPipelineConfigForAssignment($assignmentConfigId: bigint!) {
@@ -318,7 +269,7 @@ export const GET_PIPELINE_CONFIG_FOR_ASSIGNMENT = gql`
       releaseGradeAt
     }
   }
-`
+`;
 
 export const SUBMISSION_DETAIL = gql`
   query submissionDetail($userId: bigint!, $assignmentConfigId: bigint!, $courseId: bigint!) {
@@ -335,38 +286,27 @@ export const SUBMISSION_DETAIL = gql`
       }
     }
   }
-`
+`;
 
 export const SUBMISSION_SUBSCRIPTION = gql`
   subscription submissionsForAssignment($userId: bigint!, $assignmentConfigId: bigint!) {
     submissions(
-      order_by: [
-        {
-          created_at: desc
-        }
-      ]
-      where: {
-        user_id: { _eq: $userId }
-        assignment_config_id: { _eq: $assignmentConfigId }
-      }
+      order_by: [{ created_at: desc }]
+      where: { user_id: { _eq: $userId }, assignment_config_id: { _eq: $assignmentConfigId } }
     ) {
       id
       created_at
       upload_name
       extracted_path
       fail_reason
-      reports(order_by: [
-        {
-          createdAt: desc
-        }
-      ]) {
+      reports(order_by: [{ createdAt: desc }]) {
         id
         is_final
         createdAt
       }
     }
   }
-`
+`;
 
 export const GET_COURSE = gql`
   query getCourse($course: bigint!) {
@@ -375,16 +315,14 @@ export const GET_COURSE = gql`
       name
     }
   }
-`
+`;
 
 export const GET_INSTRUCTORS = gql`
-  query getSectionInstructor($assignmentId:bigint!){
-    assignments(where:{
-      id:{_eq:$assignmentId}
-    }){
-      course{
-        users(where:{permission:{_gt:1}}){
-          user{
+  query getSectionInstructor($assignmentId: bigint!) {
+    assignments(where: { id: { _eq: $assignmentId } }) {
+      course {
+        users(where: { permission: { _gt: 1 } }) {
+          user {
             id
             name
           }
@@ -392,4 +330,4 @@ export const GET_INSTRUCTORS = gql`
       }
     }
   }
-`
+`;

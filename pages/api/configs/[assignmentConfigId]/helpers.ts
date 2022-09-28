@@ -1,54 +1,54 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { withSentry } from "@sentry/nextjs";
 import { lstatSync, readdirSync, moveSync, removeSync } from "fs-extra";
-import dirTree from "directory-tree"
+import dirTree from "directory-tree";
 import formidable from "formidable-serverless";
 import AdmZip from "adm-zip";
-import fs from 'fs/promises'
-import dir from 'node-dir'
+import fs from "fs/promises";
+import dir from "node-dir";
 import path from "path";
 
 async function handleAddHelperFiles(req: NextApiRequest, res: NextApiResponse) {
-      // get base path from routing
-    // const { path: pathParam } = req.query
-    // const basePath = path.join(UPLOAD_DIR, ...pathParam)
-    const {assignmentConfigId} = req.query
-    const basePath = `${process.env.NEXT_PUBLIC_UPLOAD_DIR}/helpers/${assignmentConfigId}`
+  // get base path from routing
+  // const { path: pathParam } = req.query
+  // const basePath = path.join(UPLOAD_DIR, ...pathParam)
+  const { assignmentConfigId } = req.query;
+  const basePath = `${process.env.NEXT_PUBLIC_UPLOAD_DIR}/helpers/${assignmentConfigId}`;
 
-    // clear old upload (may make it configurable later)
-    // await fs.rm(basePath, { recursive: true, force: true })
-    // await fs.mkdir(basePath, { recursive: true })
+  // clear old upload (may make it configurable later)
+  // await fs.rm(basePath, { recursive: true, force: true })
+  // await fs.mkdir(basePath, { recursive: true })
 
-    const form = formidable({ multiples: true })
+  const form = formidable({ multiples: true });
 
-    try {
-        // parse form data
-        const data = await new Promise((resolve, reject) =>
-            form.parse(req, async (err, _, { files }) => {
-                if (err) {
-                    reject(err)
-                }
-                resolve(files)
-            })
-        )
-        
-        // handle single file case
-        // TODO: extract if that single file is a zip file
-        const arrayData = Array.isArray(data) ? data : [data]
+  try {
+    // parse form data
+    const data = await new Promise((resolve, reject) =>
+      form.parse(req, async (err, _, { files }) => {
+        if (err) {
+          reject(err);
+        }
+        resolve(files);
+      }),
+    );
 
-        // move files into appropriate directory
-        arrayData.forEach(async (file) => {
-            if (file && Object.keys(file).includes("name")){
-              const destPath = path.join(basePath, file.name)
-              await fs.mkdir(path.dirname(destPath), { recursive: true })
-              await fs.copyFile(file.path, destPath)
-            }
-        })
-        res.json(data)
-    } catch (err) {
-        res.status(500).json(err)
-        throw err
-    }
+    // handle single file case
+    // TODO: extract if that single file is a zip file
+    const arrayData = Array.isArray(data) ? data : [data];
+
+    // move files into appropriate directory
+    arrayData.forEach(async (file) => {
+      if (file && Object.keys(file).includes("name")) {
+        const destPath = path.join(basePath, file.name);
+        await fs.mkdir(path.dirname(destPath), { recursive: true });
+        await fs.copyFile(file.path, destPath);
+      }
+    });
+    res.json(data);
+  } catch (err) {
+    res.status(500).json(err);
+    throw err;
+  }
 }
 
 // async function handleAddHelperFiles(req: NextApiRequest, res: NextApiResponse) {
@@ -76,7 +76,7 @@ async function handleAddHelperFiles(req: NextApiRequest, res: NextApiResponse) {
 //           const temporaryResolvePath = `/tmp/helpers/${assignmentConfigId}`;
 //           zip.extractAllTo(temporaryResolvePath, true);
 //           const paths = readdirSync(temporaryResolvePath);
-//           const doesNotIncludeGradingPackageFolders = !paths.includes('provided') && !paths.includes('template') && !paths.includes('skeleton'); 
+//           const doesNotIncludeGradingPackageFolders = !paths.includes('provided') && !paths.includes('template') && !paths.includes('skeleton');
 //           removeSync(destination);
 //           moveSync(
 //             paths.length===1 && lstatSync(`${temporaryResolvePath}/${paths[0]}`).isDirectory() && doesNotIncludeGradingPackageFolders?
@@ -122,40 +122,42 @@ async function handleAddHelperFiles(req: NextApiRequest, res: NextApiResponse) {
 //   }
 // }
 
-function createFilesArray(tree, depth){
+function createFilesArray(tree, depth) {
   // base case checking
-  if(tree.children !== undefined){
-    if (tree.children.length == 0){
-      if(depth == 0)
-        return []
+  if (tree.children !== undefined) {
+    if (tree.children.length == 0) {
+      if (depth == 0) return [];
       else
-        return [{
-          path: tree.path,
-          type: tree.type
-        }]
+        return [
+          {
+            path: tree.path,
+            type: tree.type,
+          },
+        ];
     }
-  }else{
-    if(depth == 0)
-      return []
+  } else {
+    if (depth == 0) return [];
     else
-      return [{
-        path: tree.path,
-        type: tree.type
-      }]
+      return [
+        {
+          path: tree.path,
+          type: tree.type,
+        },
+      ];
   }
-  
-  var result:any = []
-  for (let i = 0; i< tree.children.length; i++){
-    result.push(...createFilesArray(tree.children[i], depth+1))
+
+  var result: any = [];
+  for (let i = 0; i < tree.children.length; i++) {
+    result.push(...createFilesArray(tree.children[i], depth + 1));
   }
 
   // check root and empty folder
   if (depth !== 0 && tree.type != "directory")
     result.push({
       path: tree.path,
-      type: tree.type
-    })
-  return result
+      type: tree.type,
+    });
+  return result;
 }
 
 async function handleGetHelperFiles(req: NextApiRequest, res: NextApiResponse) {
@@ -179,66 +181,65 @@ async function handleGetHelperFiles(req: NextApiRequest, res: NextApiResponse) {
         files: [],
         // tree: {}
       },
-    ]
-    
-    for (let i = 0; i < folders.length; i++){
-      const target = path+'/'+folders[i].name;
-      await fs.mkdir(target, { recursive: true })
-      const tree = dirTree(target, { exclude: /__MACOSX|.DS_Store/});
+    ];
+
+    for (let i = 0; i < folders.length; i++) {
+      const target = path + "/" + folders[i].name;
+      await fs.mkdir(target, { recursive: true });
+      const tree = dirTree(target, { exclude: /__MACOSX|.DS_Store/ });
       // if(tree){
       //   folders[i].tree = tree
       // }
       // let files = await dir.files(target, {sync:true});
       // const modifiedFiles = files.map(name => name.replace(target,''));
       // if (files){
-      folders[i].files = createFilesArray(tree,0)
+      folders[i].files = createFilesArray(tree, 0);
       // }
     }
 
     res.json({
-      result: folders
-    })
-  } catch(error) {
+      result: folders,
+    });
+  } catch (error) {
     throw error;
   }
 }
 
 async function handleDeleteHelperFiles(req: NextApiRequest, res: NextApiResponse) {
-  try{  
-    const {path, type} = req.query
+  try {
+    const { path, type } = req.query;
     // console.log(JSON.parse(req.body))
     // clear old upload (may make it configurable later)
-    if(type == "directory") {
+    if (type == "directory") {
       // @ts-ignore
-      await fs.rmdir(path)
-    }
-    else {
+      await fs.rmdir(path);
+    } else {
       // @ts-ignore
-      await fs.unlink(path)
+      await fs.unlink(path);
     }
-    res.json({message:'success'})
-  }catch(error){
+    res.json({ message: "success" });
+  } catch (error) {
     throw error;
   }
 }
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
-  console.log(`inside helper API, req is in type of ${req.method}`)
+  console.log(`inside helper API, req is in type of ${req.method}`);
   try {
-    switch(req.method?.toLowerCase()) {
-      case 'get':
+    switch (req.method?.toLowerCase()) {
+      case "get":
         return handleGetHelperFiles(req, res);
-      case 'post':
+      case "post":
         return handleAddHelperFiles(req, res);
-      case 'delete':
+      case "delete":
         return handleDeleteHelperFiles(req, res);
       default:
-        return res.status(400).send('bad request');
+        return res.status(400).send("bad request");
     }
   } catch (error: any) {
     return res.status(500).json({
-      status: 'error',
-      error: error.message
+      status: "error",
+      error: error.message,
     });
   }
 }
@@ -248,6 +249,6 @@ export default withSentry(handler);
 export const config = {
   api: {
     externalResolver: true,
-    bodyParser: false
-  }
-}
+    bodyParser: false,
+  },
+};

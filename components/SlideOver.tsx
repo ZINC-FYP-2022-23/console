@@ -2,7 +2,7 @@ import { useLayoutState } from "../contexts/layout";
 import { Transition } from "@headlessui/react";
 
 interface SlideOverProps {
-  children: React.ReactNode
+  children: React.ReactNode;
 }
 
 export function SlideOver({ children }: SlideOverProps) {
@@ -21,10 +21,10 @@ export function SlideOver({ children }: SlideOverProps) {
             leaveTo="translate-x-full"
             className="w-screen max-w-md pointer-events-auto"
           >
-            { children }
+            {children}
           </Transition>
         </section>
       </div>
     </div>
-  )
+  );
 }

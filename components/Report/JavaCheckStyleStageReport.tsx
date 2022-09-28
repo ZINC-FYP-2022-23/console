@@ -1,5 +1,3 @@
 export function JavaCheckStyleStageReport() {
-  return (
-    <div></div>
-  )
+  return <div></div>;
 }

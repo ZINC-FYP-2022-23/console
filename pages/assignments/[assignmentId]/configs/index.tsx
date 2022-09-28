@@ -9,48 +9,42 @@ import Collapse from "@kunukn/react-collapse";
 
 function AssignmentConfigs({ configs }) {
   const router = useRouter();
-  const assignmentId = parseInt(router.query.assignmentId as string, 10)
-  const dispatch = useLayoutDispatch()
+  const assignmentId = parseInt(router.query.assignmentId as string, 10);
+  const dispatch = useLayoutDispatch();
   return (
     <div className="mt-2 bg-white overflow-hidden sm:rounded-lg sm:shadow">
       <div className="bg-white px-4 py-5 border-b border-gray-200 sm:px-6">
-        <h3 className="text-lg leading-6 font-medium text-gray-900">
-          Configurations
-        </h3>
-        <p className="mt-1 text-sm leading-5 text-gray-500">
-          Configure various settings for the assignment
-        </p>
+        <h3 className="text-lg leading-6 font-medium text-gray-900">Configurations</h3>
+        <p className="mt-1 text-sm leading-5 text-gray-500">Configure various settings for the assignment</p>
       </div>
       <ul>
-        {
-          configs.map((config, index) => (
-            <li key={config.id} className={`${index===0?'':'border-t border-gray-200'}`}>
-              <Link href={`/assignments/${assignmentId}/configs/${config.id}`}>
-                <a className="block hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition duration-150 ease-in-out">
-                  <div className="px-4 py-4 sm:px-6">
-                    <div className="flex items-center justify-between">
-                      <div className="text-sm leading-5 font-medium text-cse-600 truncate">
-                        Configuration #{config.id}
-                      </div>
+        {configs.map((config, index) => (
+          <li key={config.id} className={`${index === 0 ? "" : "border-t border-gray-200"}`}>
+            <Link href={`/assignments/${assignmentId}/configs/${config.id}`}>
+              <a className="block hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition duration-150 ease-in-out">
+                <div className="px-4 py-4 sm:px-6">
+                  <div className="flex items-center justify-between">
+                    <div className="text-sm leading-5 font-medium text-cse-600 truncate">
+                      Configuration #{config.id}
                     </div>
                   </div>
-                </a>
-              </Link>
-            </li>
-          ))
-        }
+                </div>
+              </a>
+            </Link>
+          </li>
+        ))}
       </ul>
     </div>
-  )
+  );
 }
 
 function AssignmentConfiguration() {
   const router = useRouter();
-  const assignmentId = parseInt(router.query.assignmentId as string, 10)
+  const assignmentId = parseInt(router.query.assignmentId as string, 10);
   const { data, loading } = useQuery(GET_CONFIGS_FOR_ASSIGNMENT, {
     variables: {
-      assignmentId
-    }
+      assignmentId,
+    },
   });
 
   return (
@@ -63,8 +57,17 @@ function AssignmentConfiguration() {
                 <nav className="sm:hidden">
                   <Link href="/">
                     <a className="flex items-center text-sm leading-5 font-medium text-gray-500 hover:text-gray-700 transition duration-150 ease-in-out">
-                      <svg className="flex-shrink-0 -ml-1 mr-1 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
+                      <svg
+                        className="flex-shrink-0 -ml-1 mr-1 h-5 w-5 text-gray-400"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+                          clipRule="evenodd"
+                        />
                       </svg>
                       Back
                     </a>
@@ -74,17 +77,39 @@ function AssignmentConfiguration() {
                   <Link href="/">
                     <a className="text-gray-500 hover:text-gray-700 transition duration-150 ease-in-out">Assignments</a>
                   </Link>
-                  <svg className="flex-shrink-0 mx-2 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                  <svg
+                    className="flex-shrink-0 mx-2 h-5 w-5 text-gray-400"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                      clipRule="evenodd"
+                    />
                   </svg>
                   <Link href="/">
-                    <a className="text-gray-500 hover:text-gray-700 transition duration-150 ease-in-out">{data.assignment.course.code}</a>
+                    <a className="text-gray-500 hover:text-gray-700 transition duration-150 ease-in-out">
+                      {data.assignment.course.code}
+                    </a>
                   </Link>
-                  <svg className="flex-shrink-0 mx-2 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                  <svg
+                    className="flex-shrink-0 mx-2 h-5 w-5 text-gray-400"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                      clipRule="evenodd"
+                    />
                   </svg>
                   <Link href="/">
-                    <a className="text-gray-500 hover:text-gray-700 transition duration-150 ease-in-out">{data.assignment.name}</a>
+                    <a className="text-gray-500 hover:text-gray-700 transition duration-150 ease-in-out">
+                      {data.assignment.name}
+                    </a>
                   </Link>
                 </nav>
               </div>
@@ -119,7 +144,7 @@ function AssignmentConfiguration() {
         </div>
       </Layout>
     </LayoutProvider>
-  )
+  );
 }
 
 export async function getServerSideProps(ctx) {
@@ -128,14 +153,14 @@ export async function getServerSideProps(ctx) {
   await apolloClient.query({
     query: GET_CONFIGS_FOR_ASSIGNMENT,
     variables: {
-      assignmentId: parseInt(assignmentId, 10)
-    }
+      assignmentId: parseInt(assignmentId, 10),
+    },
   });
   return {
     props: {
       initialApolloState: apolloClient.cache.extract(),
     },
-  }
+  };
 }
 
 export default AssignmentConfiguration;

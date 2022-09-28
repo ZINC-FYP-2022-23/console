@@ -1,5 +1,3 @@
 export function ClangTidyStageReport() {
-  return (
-    <div></div>
-  )
+  return <div></div>;
 }

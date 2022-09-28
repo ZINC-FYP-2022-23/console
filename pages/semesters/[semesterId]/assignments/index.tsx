@@ -7,7 +7,7 @@ export async function getServerSideProps(ctx) {
     props: {
       initialApolloState: apolloClient.cache.extract(),
     },
-  }
+  };
 }
 
 export default AllAssignments;

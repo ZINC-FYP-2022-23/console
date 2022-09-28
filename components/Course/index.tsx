@@ -3,28 +3,25 @@ import { useQuery } from "@apollo/client";
 import { useZinc } from "../../contexts/zinc";
 import { GET_TEACHING_COURSES } from "../../graphql/queries/user";
 
-
 export function Courses() {
   const { activeSemester, user } = useZinc();
-  const { data, loading , error} = useQuery(GET_TEACHING_COURSES, {
+  const { data, loading, error } = useQuery(GET_TEACHING_COURSES, {
     variables: {
       userId: user,
-      semesterId: activeSemester
-    }
+      semesterId: activeSemester,
+    },
   });
   // console.log(data, error)
-  if(loading) {
+  if (loading) {
     return <div>loading</div>;
   }
-  return (
-    data.user.courses.map(({ course }) => (
-      <Link href={`/courses/${course.id}`} key={course.id}>
-        <a>
-          <CourseCard course={course} key={course.code}/>
-        </a>
-      </Link>
-    ))
-  )
+  return data.user.courses.map(({ course }) => (
+    <Link href={`/courses/${course.id}`} key={course.id}>
+      <a>
+        <CourseCard course={course} key={course.code} />
+      </a>
+    </Link>
+  ));
 }
 
 export function CourseCard({ course }) {
@@ -39,5 +36,5 @@ export function CourseCard({ course }) {
         </div>
       </div>
     </li>
-  )
+  );
 }

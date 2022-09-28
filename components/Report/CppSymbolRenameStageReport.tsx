@@ -1,5 +1,3 @@
 export function CppSymbolRenameStageReport() {
-  return (
-    <div></div>
-  )
+  return <div></div>;
 }

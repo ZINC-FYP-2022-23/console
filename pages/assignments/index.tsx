@@ -1,6 +1,6 @@
 import { Layout } from "../../layout";
-import { initializeApollo } from '../../lib/apollo';
-import { LayoutProvider } from '../../contexts/layout';
+import { initializeApollo } from "../../lib/apollo";
+import { LayoutProvider } from "../../contexts/layout";
 import { Assignments } from "../../components/Assignment";
 
 function AllAssignments() {
@@ -9,12 +9,12 @@ function AllAssignments() {
       <Layout title="Assignments">
         <div className="p-6 flex flex-col w-full overflow-y-auto">
           <div className="pb-5 border-b border-gray-200">
-            <Assignments/>
+            <Assignments />
           </div>
         </div>
       </Layout>
     </LayoutProvider>
-  )
+  );
 }
 
 export async function getServerSideProps(ctx) {
@@ -23,7 +23,7 @@ export async function getServerSideProps(ctx) {
     props: {
       initialApolloState: apolloClient.cache.extract(),
     },
-  }
+  };
 }
 
-export default AllAssignments
+export default AllAssignments;

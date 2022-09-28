@@ -1,6 +1,6 @@
 import { Layout } from "../../../layout";
-import { initializeApollo } from '../../../lib/apollo';
-import { LayoutProvider, useLayoutState } from '../../../contexts/layout';
+import { initializeApollo } from "../../../lib/apollo";
+import { LayoutProvider, useLayoutState } from "../../../contexts/layout";
 import { Assignments } from "../../../components/Assignment/Card";
 import { useQuery } from "@apollo/client";
 import { GET_TEACHING_COURSE } from "../../../graphql/queries/user";
@@ -15,24 +15,24 @@ import { CourseStudentSlideOverContent } from "../../../components/Students/Cour
 
 function CourseSlideOver() {
   const { coursePageSlideOver } = useLayoutState();
-  switch(coursePageSlideOver) {
-    case 'submissions':
-      return <AssignmentSlideOverContent/>
-    case 'student':
-      return <CourseStudentSlideOverContent/>
+  switch (coursePageSlideOver) {
+    case "submissions":
+      return <AssignmentSlideOverContent />;
+    case "student":
+      return <CourseStudentSlideOverContent />;
     default:
-      return <div></div>
+      return <div></div>;
   }
 }
 
 function Course() {
   const router = useRouter();
-  const courseId = router.query.courseId as string
+  const courseId = router.query.courseId as string;
   const { data, loading } = useQuery(GET_TEACHING_COURSE, {
     variables: {
-      courseId: parseInt(courseId, 10)
-    }
-  })
+      courseId: parseInt(courseId, 10),
+    },
+  });
 
   return (
     <LayoutProvider>
@@ -40,28 +40,28 @@ function Course() {
         <div className="p-6 flex flex-col overflow-y-scroll w-full">
           <div className="pb-5 border-b border-gray-200">
             <h3 className="text-lg leading-6 mb-6 font-medium text-gray-900">
-                {data.course.code} - { data.course.name }
+              {data.course.code} - {data.course.name}
             </h3>
             <div>
-              <Assignments assignmentConfigs={data.assignmentConfigs} sections={data.course.sections}/>
+              <Assignments assignmentConfigs={data.assignmentConfigs} sections={data.course.sections} />
             </div>
             <div className="mt-6">
-              <Sections sections={data.course.sections}/>
+              <Sections sections={data.course.sections} />
             </div>
             <div className="mt-6">
-              <Students students={data.course.students}/>
+              <Students students={data.course.students} />
             </div>
           </div>
         </div>
       </Layout>
       <SlideOver>
-        <CourseSlideOver/>
+        <CourseSlideOver />
       </SlideOver>
       <Modal size="regular">
-        <RegradingConfirmationDialog/>
+        <RegradingConfirmationDialog />
       </Modal>
     </LayoutProvider>
-  )
+  );
 }
 
 export async function getServerSideProps(ctx) {
@@ -70,15 +70,15 @@ export async function getServerSideProps(ctx) {
   await apolloClient.query({
     query: GET_TEACHING_COURSE,
     variables: {
-      courseId: parseInt(courseId, 10)
-    }
+      courseId: parseInt(courseId, 10),
+    },
   });
 
   return {
     props: {
       initialApolloState: apolloClient.cache.extract(),
     },
-  }
+  };
 }
 
-export default Course
+export default Course;

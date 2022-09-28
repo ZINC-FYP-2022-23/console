@@ -8,35 +8,40 @@ import { GET_ALL_SUBMISSIONS_FOR_ASSIGNMENT } from "../../../../graphql/queries/
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     const { assignmentConfigId } = req.query;
-    const { data: { data } } = await axios({
-      method: 'post',
+    const {
+      data: { data },
+    } = await axios({
+      method: "post",
       headers: {
-        cookie: req.headers.cookie
+        cookie: req.headers.cookie,
       },
       url: `https://${process.env.API_URL}/v1/graphql`,
       data: {
         query: GET_ALL_SUBMISSIONS_FOR_ASSIGNMENT,
-        variables: { 
-          assignmentConfigId
-        }
+        variables: {
+          assignmentConfigId,
+        },
       },
     });
     const zip = new AdmZip();
     const { submissions, assignment } = data.assignmentConfig;
-    for(const submission of submissions) {
+    for (const submission of submissions) {
       const targetEntry = `${process.env.NEXT_PUBLIC_UPLOAD_DIR}/${submission.stored_name}`;
       if (existsSync(targetEntry)) {
         zip.addFile(`${submission.user.itsc}/${submission.upload_name}`, readFileSync(targetEntry));
       }
     }
     const archive = zip.toBuffer();
-    res.setHeader('Content-Type','application/octet-stream');
-    res.setHeader('Content-Disposition',`attachment; filename=${`${assignment.course.code}_${assignment.course.semester.year}-${assignment.course.semester.term}`.toLowerCase()}_submissions_latest.zip`);
+    res.setHeader("Content-Type", "application/octet-stream");
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename=${`${assignment.course.code}_${assignment.course.semester.year}-${assignment.course.semester.term}`.toLowerCase()}_submissions_latest.zip`,
+    );
     res.send(archive);
   } catch (error: any) {
     return res.status(400).json({
-      status: 'error',
-      message: error.message
+      status: "error",
+      message: error.message,
     });
   }
 }
@@ -45,6 +50,6 @@ export default withSentry(handler);
 
 export const config = {
   api: {
-    externalResolver: true
-  }
-}
+    externalResolver: true,
+  },
+};

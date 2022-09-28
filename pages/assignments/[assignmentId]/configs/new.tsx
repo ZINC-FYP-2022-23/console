@@ -1,35 +1,33 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { ControlledEditor } from '@monaco-editor/react';
+import { ControlledEditor } from "@monaco-editor/react";
 import jsyaml from "js-yaml";
 import DatePicker from "react-datepicker";
-import { setHours, setMinutes, addDays} from "date-fns";
+import { setHours, setMinutes, addDays } from "date-fns";
 import { zonedTimeToUtc } from "date-fns-tz";
 import { initializeApollo } from "../../../../lib/apollo";
 import { LayoutProvider, useLayoutDispatch, useLayoutState } from "../../../../contexts/layout";
 import { Layout } from "../../../../layout";
 import { Modal } from "../../../../components/Modal";
-import { GET_ASSIGNMENT,  GET_INSTRUCTORS } from "../../../../graphql/queries/user";
+import { GET_ASSIGNMENT, GET_INSTRUCTORS } from "../../../../graphql/queries/user";
 import { useMutation, useQuery } from "@apollo/client";
 import { CREATE_ASSIGNMENT_CONFIG, UPDATE_ASSIGNMENTCONFIG_NOTI } from "../../../../graphql/mutations/user";
 import { useZinc } from "../../../../contexts/zinc";
 // import makeAnimated from 'react-select/animated';
 
-
 interface AssignmentConfig {
-  assignment_id: Number
-  showAt?: Date|null
-  startCollectionAt?: Date
-  dueAt?: Date
-  stopCollectionAt?: Date
-  releaseGradeAt?: Date
-  config_yaml: string
-  attemptLimits?: Number|null
-  gradeImmediately: boolean
-  showImmediateScores: boolean
+  assignment_id: Number;
+  showAt?: Date | null;
+  startCollectionAt?: Date;
+  dueAt?: Date;
+  stopCollectionAt?: Date;
+  releaseGradeAt?: Date;
+  config_yaml: string;
+  attemptLimits?: Number | null;
+  gradeImmediately: boolean;
+  showImmediateScores: boolean;
 }
-
 
 function AssignmentConfigCreateSuccessModalContent() {
   const router = useRouter();
@@ -41,7 +39,13 @@ function AssignmentConfigCreateSuccessModalContent() {
     <>
       <div className="px-4 pt-5">
         <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100">
-          <svg className="h-6 w-6 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg
+            className="h-6 w-6 text-green-600"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
           </svg>
         </div>
@@ -60,33 +64,34 @@ function AssignmentConfigCreateSuccessModalContent() {
         <span className="flex w-full rounded-md shadow-sm">
           <button
             onClick={() => {
-              dispatch({ type: 'closeModal' });
+              dispatch({ type: "closeModal" });
               router.push(`/assignments/${assignmentId}/configs/${assignmentConfigId}`);
             }}
             type="button"
-            className="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-indigo-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo transition ease-in-out duration-150 sm:text-sm sm:leading-5">
+            className="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-indigo-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo transition ease-in-out duration-150 sm:text-sm sm:leading-5"
+          >
             OK
           </button>
         </span>
       </div>
     </>
-  )
+  );
 }
 
 function AssignmentConfigCreation({ assignment }) {
   const router = useRouter();
-  const { validateAssignmentConfig} = useZinc();
+  const { validateAssignmentConfig } = useZinc();
   const dispatch = useLayoutDispatch();
   const initialConfig: AssignmentConfig = {
     assignment_id: parseInt(router.query.assignmentId as string, 10),
-    config_yaml: '',
+    config_yaml: "",
     showAt: null,
     startCollectionAt: new Date(),
     dueAt: setHours(setMinutes(addDays(new Date(), 7), 59), 23),
     stopCollectionAt: setHours(setMinutes(addDays(new Date(), 7), 59), 23),
     releaseGradeAt: setHours(setMinutes(addDays(new Date(), 7), 59), 23),
     gradeImmediately: false,
-    showImmediateScores: false
+    showImmediateScores: false,
   };
   const [assignmentConfig, setAssignmentConfig] = useState(initialConfig);
   // store all userID of instructors that would be receive the notification
@@ -98,7 +103,7 @@ function AssignmentConfigCreation({ assignment }) {
     try {
       // const yaml = jsyaml.load(assignmentConfig.config_yaml);
       // setAssignmentConfig({...assignmentConfig, config_yaml: jsyaml.dump(yaml)});
-      const { configError } = await validateAssignmentConfig(assignmentConfig.config_yaml, 'draft');
+      const { configError } = await validateAssignmentConfig(assignmentConfig.config_yaml, "draft");
       // const validResponse = await fetch(`/api/validateConfig`,{
       //   method: 'POST',
       //   body: JSON.stringify({
@@ -108,21 +113,25 @@ function AssignmentConfigCreation({ assignment }) {
       // });
       // const {configError} = await validResponse.json()
       // console.log(configError)
-      if(!configError) {
-        const {data} = await createAssignmentConfig({
+      if (!configError) {
+        const { data } = await createAssignmentConfig({
           variables: {
             input: {
               ...assignmentConfig,
-              showAt: assignmentConfig.showAt===null?null:zonedTimeToUtc(assignmentConfig.showAt!, 'Asia/Hong_Kong'),
-              startCollectionAt: assignmentConfig.startCollectionAt===null?null:zonedTimeToUtc(assignmentConfig.startCollectionAt!, 'Asia/Hong_Kong'),
-              dueAt: zonedTimeToUtc(assignmentConfig.dueAt!, 'Asia/Hong_Kong'),
-              stopCollectionAt: zonedTimeToUtc(assignmentConfig.stopCollectionAt!, 'Asia/Hong_Kong'),
-              releaseGradeAt: zonedTimeToUtc(assignmentConfig.releaseGradeAt!, 'Asia/Hong_Kong'),
-              configValidated: true
-            }
-          }
+              showAt:
+                assignmentConfig.showAt === null ? null : zonedTimeToUtc(assignmentConfig.showAt!, "Asia/Hong_Kong"),
+              startCollectionAt:
+                assignmentConfig.startCollectionAt === null
+                  ? null
+                  : zonedTimeToUtc(assignmentConfig.startCollectionAt!, "Asia/Hong_Kong"),
+              dueAt: zonedTimeToUtc(assignmentConfig.dueAt!, "Asia/Hong_Kong"),
+              stopCollectionAt: zonedTimeToUtc(assignmentConfig.stopCollectionAt!, "Asia/Hong_Kong"),
+              releaseGradeAt: zonedTimeToUtc(assignmentConfig.releaseGradeAt!, "Asia/Hong_Kong"),
+              configValidated: true,
+            },
+          },
         });
-        dispatch({ type: 'createAssignmentConfigSuccess', payload: data.createAssignmentConfig.id });
+        dispatch({ type: "createAssignmentConfigSuccess", payload: data.createAssignmentConfig.id });
 
         // // TODO: update user record of the Assignment Config id
         // notificationList.forEach(async (id: string) => {
@@ -158,11 +167,14 @@ function AssignmentConfigCreation({ assignment }) {
         // success
         // dispatch({ type: 'createAssignmentConfigSuccess', payload: data.createAssignmentConfig.id });
       } else {
-        dispatch({ type: 'showNotification', payload: { success: false, title: 'Config Error', message: JSON.stringify(configError)}});
+        dispatch({
+          type: "showNotification",
+          payload: { success: false, title: "Config Error", message: JSON.stringify(configError) },
+        });
       }
     } catch (error: any) {
       // console.log(error)
-      dispatch({ type: 'showNotification', payload: { success: false, title: 'Error', message: error.message}});
+      dispatch({ type: "showNotification", payload: { success: false, title: "Error", message: error.message } });
     }
   }
   // console.log(notificationList)
@@ -174,8 +186,17 @@ function AssignmentConfigCreation({ assignment }) {
             <nav className="sm:hidden">
               <Link href="/">
                 <a className="flex items-center text-sm leading-5 font-medium text-gray-500 hover:text-gray-700 transition duration-150 ease-in-out">
-                  <svg className="flex-shrink-0 -ml-1 mr-1 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
+                  <svg
+                    className="flex-shrink-0 -ml-1 mr-1 h-5 w-5 text-gray-400"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+                      clipRule="evenodd"
+                    />
                   </svg>
                   Back
                 </a>
@@ -185,17 +206,39 @@ function AssignmentConfigCreation({ assignment }) {
               <Link href="/">
                 <a className="text-gray-500 hover:text-gray-700 transition duration-150 ease-in-out">Assignments</a>
               </Link>
-              <svg className="flex-shrink-0 mx-2 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+              <svg
+                className="flex-shrink-0 mx-2 h-5 w-5 text-gray-400"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                  clipRule="evenodd"
+                />
               </svg>
               <Link href="/">
-                <a className="text-gray-500 hover:text-gray-700 transition duration-150 ease-in-out">{assignment.course.code}</a>
+                <a className="text-gray-500 hover:text-gray-700 transition duration-150 ease-in-out">
+                  {assignment.course.code}
+                </a>
               </Link>
-              <svg className="flex-shrink-0 mx-2 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+              <svg
+                className="flex-shrink-0 mx-2 h-5 w-5 text-gray-400"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                  clipRule="evenodd"
+                />
               </svg>
               <Link href="/">
-                <a className="text-gray-500 hover:text-gray-700 transition duration-150 ease-in-out">{assignment.name}</a>
+                <a className="text-gray-500 hover:text-gray-700 transition duration-150 ease-in-out">
+                  {assignment.name}
+                </a>
               </Link>
             </nav>
           </div>
@@ -207,7 +250,11 @@ function AssignmentConfigCreation({ assignment }) {
             </div>
             <div className="mt-4 flex-shrink-0 flex md:mt-0 md:ml-4">
               <span className="ml-3 shadow-sm rounded-md">
-                <button onClick={handleAssignmentConfigCreation} type="button" className="inline-flex items-center px-4 py-2 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-cse-600 hover:bg-cse-500 focus:outline-none focus:shadow-outline-cse focus:border-cse-700 active:bg-cse-700 transition duration-150 ease-in-out">
+                <button
+                  onClick={handleAssignmentConfigCreation}
+                  type="button"
+                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-cse-600 hover:bg-cse-500 focus:outline-none focus:shadow-outline-cse focus:border-cse-700 active:bg-cse-700 transition duration-150 ease-in-out"
+                >
                   Create
                 </button>
               </span>
@@ -217,15 +264,13 @@ function AssignmentConfigCreation({ assignment }) {
         <div className="mt-4 flex">
           <div className="bg-white overflow-hidden shadow rounded-lg flex-grow w-7/12">
             <div className="border-b border-gray-200 px-4 py-4 sm:px-6 flex items-center justify-between flex-wrap sm:flex-no-wrap">
-              <h3 className="text-lg leading-6 font-medium text-gray-900">
-                Config YAML
-              </h3>
+              <h3 className="text-lg leading-6 font-medium text-gray-900">Config YAML</h3>
             </div>
             <div className="px-2 py-5 sm:py-4 h-5/6">
               <ControlledEditor
-                onChange={(_ev, val) => setAssignmentConfig({...assignmentConfig, config_yaml: val!})}
+                onChange={(_ev, val) => setAssignmentConfig({ ...assignmentConfig, config_yaml: val! })}
                 options={{
-                  fontSize: 14
+                  fontSize: 14,
                 }}
                 language="yaml"
                 theme="light"
@@ -239,26 +284,39 @@ function AssignmentConfigCreation({ assignment }) {
                 <fieldset>
                   <legend className="text-base leading-6 font-medium text-gray-900">Policy</legend>
                   <div className="mt-4 flex justify-between items-center">
-                    <label htmlFor="attemptLimits" className="block text-sm font-medium leading-5 text-gray-700">Attempt Limits</label>
+                    <label htmlFor="attemptLimits" className="block text-sm font-medium leading-5 text-gray-700">
+                      Attempt Limits
+                    </label>
                     <input
                       id="attemptLimits"
                       type="number"
-                      onChange={(e) => setAssignmentConfig({...assignmentConfig, attemptLimits: parseInt(e.target.value, 10)||null })}
+                      onChange={(e) =>
+                        setAssignmentConfig({
+                          ...assignmentConfig,
+                          attemptLimits: parseInt(e.target.value, 10) || null,
+                        })
+                      }
                       placeholder="Unlimited"
-                      className="mt-1 form-input block w-1/2 py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5"/>
+                      className="mt-1 form-input block w-1/2 py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5"
+                    />
                   </div>
                   <div className="mt-4">
                     <div className="flex items-start">
                       <div className="flex items-center h-5">
                         <input
                           checked={assignmentConfig.gradeImmediately}
-                          onChange={(e) => setAssignmentConfig({...assignmentConfig, gradeImmediately: e.target.checked})}
+                          onChange={(e) =>
+                            setAssignmentConfig({ ...assignmentConfig, gradeImmediately: e.target.checked })
+                          }
                           id="gradeImmediately"
                           type="checkbox"
-                          className="form-checkbox h-4 w-4 text-cse-600 transition duration-150 ease-in-out"/>
+                          className="form-checkbox h-4 w-4 text-cse-600 transition duration-150 ease-in-out"
+                        />
                       </div>
                       <div className="ml-3 text-sm leading-5">
-                        <label htmlFor="gradeImmediately" className="font-medium text-gray-700">Grade Immediately</label>
+                        <label htmlFor="gradeImmediately" className="font-medium text-gray-700">
+                          Grade Immediately
+                        </label>
                         <p className="text-gray-500">Trigger grading based on submission event</p>
                       </div>
                     </div>
@@ -267,13 +325,18 @@ function AssignmentConfigCreation({ assignment }) {
                         <div className="flex items-center h-5">
                           <input
                             checked={assignmentConfig.showImmediateScores}
-                            onChange={(e) => setAssignmentConfig({...assignmentConfig, showImmediateScores: e.target.checked})}
+                            onChange={(e) =>
+                              setAssignmentConfig({ ...assignmentConfig, showImmediateScores: e.target.checked })
+                            }
                             id="showImmediateScores"
                             type="checkbox"
-                            className="form-checkbox h-4 w-4 text-cse-600 transition duration-150 ease-in-out"/>
+                            className="form-checkbox h-4 w-4 text-cse-600 transition duration-150 ease-in-out"
+                          />
                         </div>
                         <div className="ml-3 text-sm leading-5">
-                          <label htmlFor="showImmediateScores" className="font-medium text-gray-700">Reveal Grading Details</label>
+                          <label htmlFor="showImmediateScores" className="font-medium text-gray-700">
+                            Reveal Grading Details
+                          </label>
                           <p className="text-gray-500">Disclose all available grading information instantaneously</p>
                         </div>
                       </div>
@@ -293,14 +356,12 @@ function AssignmentConfigCreation({ assignment }) {
                           id="showAt"
                           showTimeSelect
                           selected={assignmentConfig.showAt}
-                          onChange={date => setAssignmentConfig({...assignmentConfig, showAt: date})}
-                          injectTimes={[
-                            setHours(setMinutes(new Date(), 59), 23)
-                          ]}
+                          onChange={(date) => setAssignmentConfig({ ...assignmentConfig, showAt: date })}
+                          injectTimes={[setHours(setMinutes(new Date(), 59), 23)]}
                           placeholderText="Assignment Announcement Date"
                           className="form-input block w-full sm:text-sm sm:leading-5 transition ease-in-out duration-150"
                           dateFormat="MMMM d, yyyy h:mm aa"
-                          />
+                        />
                       </div>
                     </div>
                     <div className="mt-4 flex flex-col space-y-2">
@@ -312,15 +373,13 @@ function AssignmentConfigCreation({ assignment }) {
                           id="startCollectionAt"
                           showTimeSelect
                           selected={assignmentConfig.startCollectionAt}
-                          onChange={date => setAssignmentConfig({...assignmentConfig, startCollectionAt: date})}
-                          injectTimes={[
-                            setHours(setMinutes(new Date(), 59), 23)
-                          ]}
+                          onChange={(date) => setAssignmentConfig({ ...assignmentConfig, startCollectionAt: date })}
+                          injectTimes={[setHours(setMinutes(new Date(), 59), 23)]}
                           maxDate={assignmentConfig.dueAt}
                           placeholderText="Assignment Collection Start Date"
                           className="form-input block w-full sm:text-sm sm:leading-5 transition ease-in-out duration-150"
                           dateFormat="MMMM d, yyyy h:mm aa"
-                          />
+                        />
                       </div>
                     </div>
                     <div className="mt-4 flex flex-col space-y-2">
@@ -332,21 +391,19 @@ function AssignmentConfigCreation({ assignment }) {
                           id="dueAt"
                           showTimeSelect
                           selected={assignmentConfig.dueAt}
-                          onChange={date => {
-                            if(date > assignmentConfig.stopCollectionAt!) {
-                              setAssignmentConfig({...assignmentConfig, dueAt:date, stopCollectionAt: date});
+                          onChange={(date) => {
+                            if (date > assignmentConfig.stopCollectionAt!) {
+                              setAssignmentConfig({ ...assignmentConfig, dueAt: date, stopCollectionAt: date });
                             } else {
-                              setAssignmentConfig({...assignmentConfig, dueAt:date });
+                              setAssignmentConfig({ ...assignmentConfig, dueAt: date });
                             }
                           }}
-                          injectTimes={[
-                            setHours(setMinutes(new Date(), 59), 23)
-                          ]}
+                          injectTimes={[setHours(setMinutes(new Date(), 59), 23)]}
                           minDate={assignmentConfig.startCollectionAt}
                           placeholderText="Assignment Grades Release Date"
                           className="form-input block w-full sm:text-sm sm:leading-5 transition ease-in-out duration-150"
                           dateFormat="MMMM d, yyyy h:mm aa"
-                          />
+                        />
                       </div>
                     </div>
                     <div className="mt-4 flex flex-col space-y-2">
@@ -358,40 +415,34 @@ function AssignmentConfigCreation({ assignment }) {
                           id="stopCollectionAt"
                           showTimeSelect
                           selected={assignmentConfig.stopCollectionAt}
-                          onChange={date => setAssignmentConfig({...assignmentConfig, stopCollectionAt: date})}
-                          injectTimes={[
-                            setHours(setMinutes(new Date(), 59), 23)
-                          ]}
+                          onChange={(date) => setAssignmentConfig({ ...assignmentConfig, stopCollectionAt: date })}
+                          injectTimes={[setHours(setMinutes(new Date(), 59), 23)]}
                           minDate={assignmentConfig.dueAt}
                           placeholderText="Assignment Collection Closing Date"
                           className="form-input block w-full sm:text-sm sm:leading-5 transition ease-in-out duration-150"
                           dateFormat="MMMM d, yyyy h:mm aa"
-                          />
+                        />
                       </div>
                     </div>
-                    {
-                      !assignmentConfig.showImmediateScores && (
-                        <div className="mt-4 flex flex-col space-y-2">
-                          <label htmlFor="releaseGradeAt" className="block text-sm font-medium leading-5 text-gray-900">
-                            Release Grade
-                          </label>
-                          <div className="relative rounded-md shadow-sm">
-                            <DatePicker
-                              id="releaseGradeAt"
-                              showTimeSelect
-                              selected={assignmentConfig.releaseGradeAt}
-                              onChange={date => setAssignmentConfig({...assignmentConfig, releaseGradeAt: date})}
-                              injectTimes={[
-                                setHours(setMinutes(new Date(), 59), 23)
-                              ]}
-                              placeholderText="Assignment Grades Release Date"
-                              className="form-input block w-full sm:text-sm sm:leading-5 transition ease-in-out duration-150"
-                              dateFormat="MMMM d, yyyy h:mm aa"
-                              />
-                          </div>
+                    {!assignmentConfig.showImmediateScores && (
+                      <div className="mt-4 flex flex-col space-y-2">
+                        <label htmlFor="releaseGradeAt" className="block text-sm font-medium leading-5 text-gray-900">
+                          Release Grade
+                        </label>
+                        <div className="relative rounded-md shadow-sm">
+                          <DatePicker
+                            id="releaseGradeAt"
+                            showTimeSelect
+                            selected={assignmentConfig.releaseGradeAt}
+                            onChange={(date) => setAssignmentConfig({ ...assignmentConfig, releaseGradeAt: date })}
+                            injectTimes={[setHours(setMinutes(new Date(), 59), 23)]}
+                            placeholderText="Assignment Grades Release Date"
+                            className="form-input block w-full sm:text-sm sm:leading-5 transition ease-in-out duration-150"
+                            dateFormat="MMMM d, yyyy h:mm aa"
+                          />
                         </div>
-                      )
-                    }
+                      </div>
+                    )}
                   </div>
                   {/* <legend className="mt-4 text-base leading-6 font-medium text-gray-900">Notification</legend>
                   <p className="text-sm leading-5 text-gray-500">Select the instructors to receive notification.</p>
@@ -419,46 +470,44 @@ function AssignmentConfigCreation({ assignment }) {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 function AssignmentConfiguration() {
   const router = useRouter();
   const { assignmentId } = router.query;
-  const {data, loading} = useQuery(GET_ASSIGNMENT, {
+  const { data, loading } = useQuery(GET_ASSIGNMENT, {
     variables: {
-      assignmentId: parseInt((assignmentId! as string), 10)
-    }
+      assignmentId: parseInt(assignmentId! as string, 10),
+    },
   });
   var instructorsList = useQuery(GET_INSTRUCTORS, {
     variables: {
-      assignmentId: parseInt((assignmentId! as string), 10)
-    }
+      assignmentId: parseInt(assignmentId! as string, 10),
+    },
   });
-  if(loading || instructorsList.loading){
-    return(<div>Loading</div>)
+  if (loading || instructorsList.loading) {
+    return <div>Loading</div>;
   }
-  instructorsList = instructorsList.data.assignments[0].course.users.map(({user})=>{
-    return{
+  instructorsList = instructorsList.data.assignments[0].course.users.map(({ user }) => {
+    return {
       label: user.name,
-      value: user.id
-    }
-  })
-  console.log(instructorsList)
+      value: user.id,
+    };
+  });
+  console.log(instructorsList);
 
-  
-  
   // console.log(instructorsList)
   return (
     <LayoutProvider>
       <Layout title="Assignment Configs">
-        <AssignmentConfigCreation assignment={data.assignment}/>
+        <AssignmentConfigCreation assignment={data.assignment} />
         <Modal size="regular">
-          <AssignmentConfigCreateSuccessModalContent/>
+          <AssignmentConfigCreateSuccessModalContent />
         </Modal>
       </Layout>
     </LayoutProvider>
-  )
+  );
 }
 
 export async function getServerSideProps(ctx) {
@@ -466,14 +515,14 @@ export async function getServerSideProps(ctx) {
   await apolloClient.query({
     query: GET_ASSIGNMENT,
     variables: {
-      assignmentId: parseInt(ctx.query.assignmentId, 10)
+      assignmentId: parseInt(ctx.query.assignmentId, 10),
     },
   });
   return {
     props: {
       initialApolloState: apolloClient.cache.extract(),
     },
-  }
+  };
 }
 
 export default AssignmentConfiguration;

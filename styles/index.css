@@ -32,15 +32,15 @@
   .quill {
     @apply shadow-sm rounded-md;
   }
-  
+
   .ql-toolbar.ql-snow {
     @apply rounded-t-md bg-gray-50;
   }
-  
+
   .ql-container.ql-snow {
     @apply rounded-b-md;
   }
-  
+
   .ql-editor {
     min-height: 320px;
   }
@@ -53,11 +53,14 @@
     @apply bg-gray-50;
   }
 
-  .react-datepicker__current-month, .react-datepicker-time__header, .react-datepicker-year-header {
+  .react-datepicker__current-month,
+  .react-datepicker-time__header,
+  .react-datepicker-year-header {
     @apply font-sans text-base font-normal text-gray-600;
   }
 
-  .react-datepicker__day, .react-datepicker__time-list-item {
+  .react-datepicker__day,
+  .react-datepicker__time-list-item {
     @apply font-sans text-sm text-gray-700;
   }
 
@@ -89,20 +92,28 @@
     @apply outline-none;
   }
 
-  .react-datepicker__time-container .react-datepicker__time .react-datepicker__time-box ul.react-datepicker__time-list li.react-datepicker__time-list-item--selected {
+  .react-datepicker__time-container
+    .react-datepicker__time
+    .react-datepicker__time-box
+    ul.react-datepicker__time-list
+    li.react-datepicker__time-list-item--selected {
     @apply bg-cse-600 font-sans text-sm text-white font-medium rounded-sm;
   }
 
-  .react-datepicker__time-container .react-datepicker__time .react-datepicker__time-box ul.react-datepicker__time-list li.react-datepicker__time-list-item--selected:hover {
+  .react-datepicker__time-container
+    .react-datepicker__time
+    .react-datepicker__time-box
+    ul.react-datepicker__time-list
+    li.react-datepicker__time-list-item--selected:hover {
     @apply bg-cse-400;
   }
 
-  .ais-Highlight-highlighted { 
-    @apply  font-semibold not-italic underline shadow-sm
+  .ais-Highlight-highlighted {
+    @apply font-semibold not-italic underline shadow-sm;
   }
 
-  .badge { 
-    @apply text-white px-2 rounded text-xs font-mono mx-1
+  .badge {
+    @apply text-white px-2 rounded text-xs font-mono mx-1;
   }
 }
 

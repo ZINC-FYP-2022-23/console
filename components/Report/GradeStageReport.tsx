@@ -1,5 +1,3 @@
 export function GradeStageReport() {
-  return (
-    <div></div>
-  )
+  return <div></div>;
 }

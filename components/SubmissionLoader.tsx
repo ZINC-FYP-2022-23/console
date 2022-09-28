@@ -37,5 +37,5 @@ export function SubmissionLoader() {
         </div>
       </div>
     </>
-  )
+  );
 }

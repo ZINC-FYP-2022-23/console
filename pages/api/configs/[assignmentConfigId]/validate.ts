@@ -12,24 +12,27 @@ subscriber.subscribe(topic);
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
-    if (req.method!.toLowerCase() === 'post') {
+    if (req.method!.toLowerCase() === "post") {
       const { yaml } = req.body;
       const id = uuidv4();
-      publisher.publish(`validateConfig`, JSON.stringify({
-        id,
-        config_yaml: yaml
-      }));
+      publisher.publish(
+        `validateConfig`,
+        JSON.stringify({
+          id,
+          config_yaml: yaml,
+        }),
+      );
       subscriber.on(`message`, (channel, message) => {
         const payload = JSON.parse(message);
-        if (channel===topic && payload.id===id) {
+        if (channel === topic && payload.id === id) {
           return res.json(payload);
         }
       });
     } else {
-      return res.status(400).send('bad request');
+      return res.status(400).send("bad request");
     }
   } catch (error) {
-    return res.status(500).json(error)
+    return res.status(500).json(error);
   }
 }
 
@@ -37,6 +40,6 @@ export default withSentry(handler);
 
 export const config = {
   api: {
-    externalResolver: true
-  }
-}
+    externalResolver: true,
+  },
+};

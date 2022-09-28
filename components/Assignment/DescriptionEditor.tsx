@@ -1,6 +1,6 @@
 import dynamic from "next/dynamic";
 
-export default dynamic(() => import('@mantine/rte'), {
+export default dynamic(() => import("@mantine/rte"), {
   // Disable during server side rendering
   ssr: false,
 

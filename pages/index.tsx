@@ -1,9 +1,9 @@
-import Head from 'next/head'
+import Head from "next/head";
 import { Layout } from "../layout";
-import { Courses } from '../components/Course';
-import { initializeApollo } from '../lib/apollo';
-import { LayoutProvider } from '../contexts/layout';
-import { Modal, ModalFooter } from '../components/Modal';
+import { Courses } from "../components/Course";
+import { initializeApollo } from "../lib/apollo";
+import { LayoutProvider } from "../contexts/layout";
+import { Modal, ModalFooter } from "../components/Modal";
 
 function Home() {
   return (
@@ -11,11 +11,9 @@ function Home() {
       <Layout title="Home">
         <div className="p-6 flex flex-col">
           <div className="pb-5 border-b border-gray-200">
-            <h3 className="text-lg leading-6 font-medium text-gray-900">
-              Courses
-            </h3>
+            <h3 className="text-lg leading-6 font-medium text-gray-900">Courses</h3>
             <ul className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              <Courses/>
+              <Courses />
             </ul>
           </div>
         </div>
@@ -25,7 +23,12 @@ function Home() {
           <div className="sm:flex sm:items-start">
             <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
               <svg className="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                />
               </svg>
             </div>
             <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
@@ -43,10 +46,15 @@ function Home() {
             </div>
           </div>
         </div>
-        <ModalFooter onConfirm={() => {console.log('hi')}} variant="cse"/>
+        <ModalFooter
+          onConfirm={() => {
+            console.log("hi");
+          }}
+          variant="cse"
+        />
       </Modal>
     </LayoutProvider>
-  )
+  );
 }
 
 export async function getServerSideProps(ctx) {
@@ -55,7 +63,7 @@ export async function getServerSideProps(ctx) {
     props: {
       initialApolloState: apolloClient.cache.extract(),
     },
-  }
+  };
 }
 
-export default Home
+export default Home;

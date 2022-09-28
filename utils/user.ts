@@ -1,16 +1,16 @@
 import axios from "axios";
 
 interface UserRoleFragment {
-  hasTeachingRole: boolean
-  isAdmin: boolean
+  hasTeachingRole: boolean;
+  isAdmin: boolean;
 }
 
 export async function getUserRole(id: number): Promise<UserRoleFragment> {
   try {
     const { data } = await axios({
-      method: 'post',
+      method: "post",
       headers: {
-        'X-Hasura-Admin-Secret': process.env.HASURA_GRAPHQL_ADMIN_SECRET
+        "X-Hasura-Admin-Secret": process.env.HASURA_GRAPHQL_ADMIN_SECRET,
       },
       url: `https://${process.env.API_URL}/v1/graphql`,
       data: {
@@ -21,21 +21,21 @@ export async function getUserRole(id: number): Promise<UserRoleFragment> {
                 isAdmin
               }
             }`,
-        variables: { id }
+        variables: { id },
       },
     });
     return data.data.user as UserRoleFragment;
   } catch (error) {
-    throw error
+    throw error;
   }
 }
 
 async function createUser(itsc: string, name: string): Promise<any> {
   try {
     const { data } = await axios({
-      method: 'post',
+      method: "post",
       headers: {
-        'X-Hasura-Admin-Secret': process.env.HASURA_GRAPHQL_ADMIN_SECRET
+        "X-Hasura-Admin-Secret": process.env.HASURA_GRAPHQL_ADMIN_SECRET,
       },
       url: `https://${process.env.API_URL}/v1/graphql`,
       data: {
@@ -48,12 +48,14 @@ async function createUser(itsc: string, name: string): Promise<any> {
               }
             ){ id }
           }`,
-        variables: { itsc, name }
+        variables: { itsc, name },
       },
     });
-    console.log(`[!] Created new user for itsc id: ${itsc}`)
-    console.log(data)
-    const { data: { createUser }} = data;
+    console.log(`[!] Created new user for itsc id: ${itsc}`);
+    console.log(data);
+    const {
+      data: { createUser },
+    } = data;
     return createUser.id;
   } catch (error) {
     throw error;
@@ -62,10 +64,12 @@ async function createUser(itsc: string, name: string): Promise<any> {
 
 export async function getUserData(itsc: string, name: string): Promise<any> {
   try {
-    const {data:{data}} = await axios({
-      method: 'post',
+    const {
+      data: { data },
+    } = await axios({
+      method: "post",
       headers: {
-        'X-Hasura-Admin-Secret': process.env.HASURA_GRAPHQL_ADMIN_SECRET
+        "X-Hasura-Admin-Secret": process.env.HASURA_GRAPHQL_ADMIN_SECRET,
       },
       url: `https://${process.env.API_URL}/v1/graphql`,
       data: {
@@ -88,13 +92,13 @@ export async function getUserData(itsc: string, name: string): Promise<any> {
                 id
               }
             }`,
-        variables: { itsc }
+        variables: { itsc },
       },
     });
-    console.log(data)
+    console.log(data);
     let userId;
-    let notification
-    if(data.users.length===0) {
+    let notification;
+    if (data.users.length === 0) {
       userId = await createUser(itsc, name);
     } else {
       userId = data.users[0].id;
@@ -102,7 +106,7 @@ export async function getUserData(itsc: string, name: string): Promise<any> {
     const [semester] = data.semesters;
     return {
       userId,
-      semesterId: semester.id
+      semesterId: semester.id,
     };
   } catch (error) {
     throw error;
@@ -110,12 +114,12 @@ export async function getUserData(itsc: string, name: string): Promise<any> {
 }
 
 export async function updateNotification(id: number, notification: string): Promise<any> {
-  console.log('inside')
+  console.log("inside");
   try {
     const response = await axios({
-      method: 'post',
+      method: "post",
       headers: {
-        'X-Hasura-Admin-Secret': process.env.HASURA_GRAPHQL_ADMIN_SECRET
+        "X-Hasura-Admin-Secret": process.env.HASURA_GRAPHQL_ADMIN_SECRET,
       },
       url: `https://${process.env.API_URL}/v1/graphql`,
       data: {
@@ -125,10 +129,10 @@ export async function updateNotification(id: number, notification: string): Prom
               notification
             }
           }`,
-        variables: {notification, id}
+        variables: { notification, id },
       },
     });
-    console.log(response)
+    console.log(response);
   } catch (error) {
     throw error;
   }
