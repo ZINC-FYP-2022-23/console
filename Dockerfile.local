@@ -1,0 +1,15 @@
+FROM node:lts-alpine
+ENV PORT 3000
+
+WORKDIR /usr/src/app
+
+# Installing dependencies
+COPY package.json yarn.lock .npmrc ./
+RUN yarn install
+
+# Copying source files
+COPY . .
+
+# Running the app
+EXPOSE 3000
+CMD ["yarn", "dev"]
