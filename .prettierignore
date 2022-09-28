@@ -1,0 +1,19 @@
+# List of files to be ignored by Prettier
+
+# Files
+*.yml
+*.config.js
+/*.json
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Folders
+build/
+coverage/
+dist/
+out/
+public/
+.next/
+.vercel/
+.vscode/
