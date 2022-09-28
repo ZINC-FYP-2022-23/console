@@ -3,6 +3,8 @@ import redis from "redis";
 import axios from "axios";
 import { auth, ConfigParams } from "express-openid-connect";
 import { getUserData } from "../utils/user";
+import { loadEnvConfig } from "@next/env";
+loadEnvConfig(process.cwd(), process.env.NODE_ENV !== "production");
 
 const SESSION_VALID_FOR = 1 * 60 * 60 * 1000;
 const client = redis.createClient(parseInt(process.env.REDIS_PORT!, 10),process.env.REDIS_HOST);

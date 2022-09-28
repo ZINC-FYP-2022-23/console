@@ -2,6 +2,7 @@ import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import next from "next";
 import oauth from "./oauth";
+import { loadEnvConfig } from "@next/env";
 
 declare module "express" {
   export interface Response {
@@ -10,6 +11,8 @@ declare module "express" {
 }
 
 const dev = process.env.NODE_ENV !== "production";
+loadEnvConfig(process.cwd(), dev);
+
 const app = next({ dev });
 const handle = app.getRequestHandler();
 const port = process.env.PORT || 3000;
