@@ -15,7 +15,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       headers: {
         cookie: req.headers.cookie,
       },
-      url: `https://${process.env.API_URL}/v1/graphql`,
+      url: `http://${process.env.API_URL}/v1/graphql`,
       data: {
         query: GET_ALL_SUBMISSIONS_FOR_ASSIGNMENT,
         variables: {

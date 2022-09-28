@@ -23,7 +23,29 @@ const port = process.env.PORT || 3000;
     const server = express();
     server.enable("trust proxy");
     server.use(cors());
-    server.use(oauth);
+    // server.use(oauth);
+
+    /**
+     * Temporary endpoint for local development. It mocks the `oauth` by generating
+     * some cookies with hard-coded value.
+     *
+     * TODO: Delete later.
+     */
+    server.get("/login", (_, res: Response) => {
+      const cookieOptions = {
+        maxAge: 999999999999,
+        httpOnly: true,
+        secure: true,
+        domain: "localhost",
+      };
+
+      res.cookie("semester", "2210", cookieOptions);
+      res.cookie("user", "6", cookieOptions);
+      res.cookie("itsc", "~teacher", cookieOptions);
+
+      res.redirect("/");
+    });
+
     server.get("/logout", (req: Request, res: Response) => {
       // @ts-ignore
       req.appSession!.destroy((err) => {

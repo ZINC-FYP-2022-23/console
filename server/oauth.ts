@@ -11,7 +11,7 @@ const client = redis.createClient(parseInt(process.env.REDIS_PORT!, 10), process
 
 const config: ConfigParams = {
   issuerBaseURL: process.env.OIDC_BASE_URL,
-  baseURL: `https://${process.env.HOSTNAME}`,
+  baseURL: `http://${process.env.HOSTNAME}`,
   clientID: process.env.OIDC_CLIENT_ID,
   clientSecret: process.env.OIDC_CLIENT_SECRET,
   secret: process.env.SESSION_SECRET,

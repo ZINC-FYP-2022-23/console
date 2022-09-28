@@ -11,7 +11,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
       headers: {
         "X-Hasura-Admin-Secret": process.env.HASURA_GRAPHQL_ADMIN_SECRET,
       },
-      url: `https://${process.env.API_URL}/v1/graphql`,
+      url: `http://${process.env.API_URL}/v1/graphql`,
       data: {
         query: `
             query getUserData($id: bigint!) {

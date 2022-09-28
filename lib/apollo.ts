@@ -8,7 +8,7 @@ const isBrowser = typeof window !== "undefined";
 
 function createApolloClient(cookie: string) {
   const httpLink = new HttpLink({
-    uri: `https://api.zinc.cse.ust.hk/v1/graphql`, // Server URL (must be absolute)
+    uri: `http://localhost:8080/v1/graphql`, // Server URL (must be absolute)
     credentials: "include", // Additional fetch() options like `credentials` or `headers`
     headers: {
       cookie,
@@ -16,7 +16,7 @@ function createApolloClient(cookie: string) {
   });
   const wsLink = isBrowser
     ? new WebSocketLink({
-        uri: `wss://api.zinc.cse.ust.hk/v1/graphql`,
+        uri: `ws://localhost:8080/v1/graphql`,
         options: {
           lazy: true,
           reconnect: true,
