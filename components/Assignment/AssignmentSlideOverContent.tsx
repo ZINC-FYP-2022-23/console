@@ -36,6 +36,12 @@ export function AssignmentSlideOverContent() {
     },
   });
 
+  // Clone the read-only submissions array so we can sort later
+  let submissions: any[] = [];
+  if (data) {
+    submissions = [...data.assignmentConfig.submissions];
+  }
+
   return (
     <div className="h-full flex flex-col bg-cool-gray-50 shadow-xl overflow-y-scroll">
       <header className="space-y-1 py-6 px-4 bg-cse-600 sm:px-6">
@@ -104,7 +110,7 @@ export function AssignmentSlideOverContent() {
           </div>
           <ul className="divide-y divide-gray-200 overflow-y-auto">
             {!loading &&
-              data.assignmentConfig.submissions
+              submissions
                 .sort((a, b) => (a.user.name > b.user.name ? 1 : -1))
                 .map((submission) => (
                   <IndividualSubmissionRow
