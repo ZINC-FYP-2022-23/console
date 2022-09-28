@@ -1,6 +1,6 @@
 import { withSentry } from "@sentry/nextjs";
 import type { NextApiRequest, NextApiResponse } from "next";
-import { copyFile } from "fs";
+import { copy } from "fs-extra";
 import formidable from "formidable-serverless";
 import axios from "axios";
 
@@ -80,13 +80,17 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           user_id: userId,
         };
         try {
-          copyFile(files.path, `${process.env.NEXT_PUBLIC_UPLOAD_DIR}/${destinationFilename}`, async (err) => {
+          copy(files.path, `${process.env.NEXT_PUBLIC_UPLOAD_DIR}/${destinationFilename}`, async (err: Error) => {
             if (!err) {
               await submit(req.headers.cookie!, submission);
               return res.json({
                 status: "success",
               });
             }
+            return res.status(500).json({
+              status: "error",
+              error: err,
+            });
           });
         } catch (error: any) {
           if (error.message.includes(`Cannot read property 'createSubmission' of undefined`)) {
