@@ -7,7 +7,8 @@
     "build": "next build && tsc --project tsconfig.server.json",
     "start": "NODE_ENV=production node dist/server/index.js",
     "lint": "next lint",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "prepare": "husky install"
   },
   "dependencies": {
     "@apollo/client": "^3.4.16",
@@ -87,6 +88,8 @@
     "eslint": "7.32.0",
     "eslint-config-next": "11.1.2",
     "file-selector": "^0.2.2",
+    "husky": "^8.0.1",
+    "lint-staged": "^13.0.3",
     "postcss": "^8.3.6",
     "postcss-preset-env": "^6.7.0",
     "prettier": "^2.7.1",
@@ -98,5 +101,15 @@
   "resolutions": {
     "@types/react": "^17.0.2",
     "@types/react-dom": "^17.0.2"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx,css}": [
+      "prettier --write"
+    ]
   }
 }
