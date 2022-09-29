@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { useDrag, useDrop, DndProvider } from "react-dnd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { HTML5Backend } from "react-dnd-html5-backend";
@@ -6,7 +6,7 @@ import Dropzone from "react-dropzone";
 import { useLayoutDispatch, useLayoutState } from "../contexts/layout";
 import axios from "axios";
 import { useFilesState, useFilesDispatch } from "../contexts/assignmentSupportingFiles";
-import { useFloating, shift, arrow, getScrollParents } from "@floating-ui/react-dom";
+import { useFloating } from "@floating-ui/react-dom";
 
 interface CachedFile {
   lastModified: number;
@@ -387,28 +387,7 @@ function AssignmentSupportingFilesUploader() {
   };
 
   return (
-    <div className="space-y-4 flex flex-col shadow-xl bg-cool-gray-50 pb-4 h-uploader">
-      <header className="space-y-1 py-6 bg-cse-600 sm:px-6">
-        <div className="flex items-center justify-between space-x-3">
-          <h2 className="text-lg leading-7 font-medium text-white">Complementary Files</h2>
-          <div className="h-7 flex items-center">
-            <button
-              onClick={() => dispatch({ type: "closeModal" })}
-              aria-label="Close panel"
-              className="text-cse-200 hover:text-white transition ease-in-out duration-150 focus:outline-none"
-            >
-              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-        </div>
-        <div>
-          <p className="text-sm leading-5 text-cse-300">
-            Manages assignment&apos;s grading required package / skeleton files
-          </p>
-        </div>
-      </header>
+    <>
       <div className="overflow-auto">
         <DndProvider backend={HTML5Backend}>
           <div className="flex flex-col justify-center items-center space-y-4">
@@ -442,7 +421,7 @@ function AssignmentSupportingFilesUploader() {
           Save
         </button>
       </div>
-    </div>
+    </>
   );
 }
 

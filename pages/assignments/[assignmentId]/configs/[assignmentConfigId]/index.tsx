@@ -6,12 +6,12 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { initializeApollo } from "../../../../../lib/apollo";
 import { LayoutProvider, useLayoutDispatch, useLayoutState } from "../../../../../contexts/layout";
 import { Layout } from "../../../../../layout";
-import { Modal } from "../../../../../components/Modal";
+import { Modal, ModalWithHeader } from "../../../../../components/Modal";
 import { ScheduleConfig } from "../../../../../components/Config/Schedule";
 import { GET_PIPELINE_CONFIG_FOR_ASSIGNMENT } from "../../../../../graphql/queries/user";
 import { UPDATE_PIPELINE_CONFIG } from "../../../../../graphql/mutations/user";
 import { useZinc } from "../../../../../contexts/zinc";
-import { ComplementaryFilesSlideOver, PolicyConfig } from "../../../../../components/Config/Policy";
+import { PolicyConfig } from "../../../../../components/Config/Policy";
 import { AssignedUsers, AssignedUsersSlideOver } from "../../../../../components/Config/Users";
 import { SlideOver } from "../../../../../components/SlideOver";
 import { useState } from "react";
@@ -42,11 +42,16 @@ function ModalContent() {
       );
     case "files":
       return (
-        <Modal size="lg">
+        <ModalWithHeader
+          size="lg"
+          title="Complementary Files"
+          subtitle="Manages assignment's grading required package / skeleton files"
+          rootClassNames="h-uploader"
+        >
           <FilesProvider>
             <AssignmentSupportingFilesUploader />
           </FilesProvider>
-        </Modal>
+        </ModalWithHeader>
       );
     default:
       return <div></div>;

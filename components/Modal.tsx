@@ -1,8 +1,22 @@
 import { Transition } from "@headlessui/react";
 import { useLayoutDispatch, useLayoutState } from "../contexts/layout";
 
+type ModalSize = "regular" | "lg";
+
 interface ModalProps {
   children: React.ReactNode;
+  size?: ModalSize;
+}
+
+interface ModalWithHeaderProps {
+  children: React.ReactNode;
+  title: string;
+  subtitle?: string;
+  size?: ModalSize;
+  /**
+   * Additional classes to add to the root div of the modal.
+   */
+  rootClassNames?: string;
 }
 
 interface ModalFooterProps {
@@ -36,7 +50,10 @@ export function ModalFooter({ variant, onConfirm }: ModalFooterProps) {
   );
 }
 
-export function Modal({ children, size = "regular" }) {
+/**
+ * An empty modal component.
+ */
+export function Modal({ children, size = "regular" }: ModalProps) {
   const { showModal } = useLayoutState();
   return (
     <Transition show={showModal}>
@@ -73,5 +90,41 @@ export function Modal({ children, size = "regular" }) {
         </div>
       </div>
     </Transition>
+  );
+}
+
+/**
+ * A modal component with a blue header.
+ */
+export function ModalWithHeader({ children, title, subtitle, size = "regular", rootClassNames }: ModalWithHeaderProps) {
+  const dispatch = useLayoutDispatch();
+  let rootDivClasses = "space-y-4 flex flex-col shadow-xl bg-cool-gray-50 pb-4";
+  if (rootClassNames) {
+    rootDivClasses += ` ${rootClassNames}`;
+  }
+
+  return (
+    <Modal size={size}>
+      <div className={rootDivClasses}>
+        <header className="space-y-1 py-6 bg-cse-600 sm:px-6">
+          <div className="flex items-center justify-between space-x-3">
+            <h2 className="text-lg leading-7 font-medium text-white">{title}</h2>
+            <div className="h-7 flex items-center">
+              <button
+                onClick={() => dispatch({ type: "closeModal" })}
+                aria-label="Close panel"
+                className="text-cse-200 hover:text-white transition ease-in-out duration-150 focus:outline-none"
+              >
+                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          </div>
+          {subtitle && <p className="text-sm leading-5 text-cse-300">{subtitle}</p>}
+        </header>
+        {children}
+      </div>
+    </Modal>
   );
 }
