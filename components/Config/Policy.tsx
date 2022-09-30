@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useLayoutDispatch, useLayoutState } from "../../contexts/layout";
 import { UPDATE_ASSIGNMENT_CONFIG } from "../../graphql/mutations/user";
 import { useZinc } from "../../contexts/zinc";
+import { Checkbox, TextInput } from "components/Input";
 
 export function PolicyConfig({ policy, onChange }) {
   const router = useRouter();
@@ -42,24 +43,22 @@ export function PolicyConfig({ policy, onChange }) {
         <label htmlFor="attemptLimits" className="block text-sm font-medium leading-5 text-gray-700">
           Attempt Limits
         </label>
-        <input
+        <TextInput
           id="attemptLimits"
           type="number"
           onChange={(e) => updatePolicy({ attemptLimits: e.target.value || null })}
           placeholder="Unlimited"
           value={policy.attemptLimits}
-          className="mt-1 form-input block w-1/2 py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5"
+          extraClassNames="w-1/2"
         />
       </div>
       <div className="mt-4">
         <div className="flex items-start">
           <div className="flex items-center h-5">
-            <input
+            <Checkbox
               checked={policy.gradeImmediately}
               onChange={(e) => updatePolicy({ gradeImmediately: e.target.checked })}
               id="gradeImmediately"
-              type="checkbox"
-              className="form-checkbox h-4 w-4 text-cse-600 transition duration-150 ease-in-out"
             />
           </div>
           <div className="ml-3 text-sm leading-5">
@@ -72,12 +71,10 @@ export function PolicyConfig({ policy, onChange }) {
         <div className="mt-4">
           <div className="flex items-start">
             <div className="flex items-center h-5">
-              <input
+              <Checkbox
                 checked={policy.showImmediateScores}
                 onChange={(e) => updatePolicy({ showImmediateScores: e.target.checked })}
                 id="showImmediateScores"
-                type="checkbox"
-                className="form-checkbox h-4 w-4 text-cse-600 transition duration-150 ease-in-out"
               />
             </div>
             <div className="ml-3 text-sm leading-5">

@@ -4,9 +4,9 @@ const defaultTheme = require('tailwindcss/defaultTheme')
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
-    './components/**/*.tsx',
-    './layout/**/*.tsx',
-    './pages/**/*.tsx',
+    './components/**/*.{js,ts,jsx,tsx}',
+    './layout/**/*.{js,ts,jsx,tsx}',
+    './pages/**/*.{js,ts,jsx,tsx}',
   ],
   theme: {
     extend: {
@@ -54,6 +54,7 @@ module.exports = {
     },
   },
   plugins: [
+    require('@tailwindcss/forms'),
     require('@tailwindcss/typography')
   ],
   safelist: [

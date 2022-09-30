@@ -2,7 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer components {
+/* After upgrading to Tailwind v3.1, the following styles are not successfully loading
+ * if they are wrapped with `@layer components`. Thus, `@layer components` is removed
+ * as a hot fix.
+ */
+
+/* @layer components { */
   .d2h-file-list-title {
     @apply hidden;
   }
@@ -115,7 +120,7 @@
   .badge {
     @apply text-white px-2 rounded text-xs font-mono mx-1;
   }
-}
+/* } */
 
 .collapse-css-transition {
   transition: height 280ms cubic-bezier(0.4, 0, 0.2, 1);

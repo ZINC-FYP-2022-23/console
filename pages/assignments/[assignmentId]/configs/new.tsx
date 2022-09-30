@@ -3,7 +3,6 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { ControlledEditor } from "@monaco-editor/react";
 import jsyaml from "js-yaml";
-import DatePicker from "react-datepicker";
 import { setHours, setMinutes, addDays } from "date-fns";
 import { zonedTimeToUtc } from "date-fns-tz";
 import { initializeApollo } from "../../../../lib/apollo";
@@ -14,6 +13,7 @@ import { GET_ASSIGNMENT, GET_INSTRUCTORS } from "../../../../graphql/queries/use
 import { useMutation, useQuery } from "@apollo/client";
 import { CREATE_ASSIGNMENT_CONFIG, UPDATE_ASSIGNMENTCONFIG_NOTI } from "../../../../graphql/mutations/user";
 import { useZinc } from "../../../../contexts/zinc";
+import { Checkbox, DateInput } from "components/Input";
 // import makeAnimated from 'react-select/animated';
 
 interface AssignmentConfig {
@@ -303,14 +303,12 @@ function AssignmentConfigCreation({ assignment }) {
                   <div className="mt-4">
                     <div className="flex items-start">
                       <div className="flex items-center h-5">
-                        <input
+                        <Checkbox
                           checked={assignmentConfig.gradeImmediately}
                           onChange={(e) =>
                             setAssignmentConfig({ ...assignmentConfig, gradeImmediately: e.target.checked })
                           }
                           id="gradeImmediately"
-                          type="checkbox"
-                          className="form-checkbox h-4 w-4 text-cse-600 transition duration-150 ease-in-out"
                         />
                       </div>
                       <div className="ml-3 text-sm leading-5">
@@ -323,14 +321,12 @@ function AssignmentConfigCreation({ assignment }) {
                     <div className="mt-4">
                       <div className="flex items-start">
                         <div className="flex items-center h-5">
-                          <input
+                          <Checkbox
                             checked={assignmentConfig.showImmediateScores}
                             onChange={(e) =>
                               setAssignmentConfig({ ...assignmentConfig, showImmediateScores: e.target.checked })
                             }
                             id="showImmediateScores"
-                            type="checkbox"
-                            className="form-checkbox h-4 w-4 text-cse-600 transition duration-150 ease-in-out"
                           />
                         </div>
                         <div className="ml-3 text-sm leading-5">
@@ -352,15 +348,11 @@ function AssignmentConfigCreation({ assignment }) {
                         Announce
                       </label>
                       <div className="relative rounded-md shadow-sm">
-                        <DatePicker
+                        <DateInput
                           id="showAt"
-                          showTimeSelect
                           selected={assignmentConfig.showAt}
                           onChange={(date) => setAssignmentConfig({ ...assignmentConfig, showAt: date })}
-                          injectTimes={[setHours(setMinutes(new Date(), 59), 23)]}
                           placeholderText="Assignment Announcement Date"
-                          className="form-input block w-full sm:text-sm sm:leading-5 transition ease-in-out duration-150"
-                          dateFormat="MMMM d, yyyy h:mm aa"
                         />
                       </div>
                     </div>
@@ -369,16 +361,12 @@ function AssignmentConfigCreation({ assignment }) {
                         Start Collection
                       </label>
                       <div className="relative rounded-md shadow-sm">
-                        <DatePicker
+                        <DateInput
                           id="startCollectionAt"
-                          showTimeSelect
                           selected={assignmentConfig.startCollectionAt}
-                          onChange={(date) => setAssignmentConfig({ ...assignmentConfig, startCollectionAt: date })}
-                          injectTimes={[setHours(setMinutes(new Date(), 59), 23)]}
+                          onChange={(date) => setAssignmentConfig({ ...assignmentConfig, startCollectionAt: date! })}
                           maxDate={assignmentConfig.dueAt}
                           placeholderText="Assignment Collection Start Date"
-                          className="form-input block w-full sm:text-sm sm:leading-5 transition ease-in-out duration-150"
-                          dateFormat="MMMM d, yyyy h:mm aa"
                         />
                       </div>
                     </div>
@@ -387,22 +375,19 @@ function AssignmentConfigCreation({ assignment }) {
                         Due
                       </label>
                       <div className="relative rounded-md shadow-sm">
-                        <DatePicker
+                        <DateInput
                           id="dueAt"
-                          showTimeSelect
                           selected={assignmentConfig.dueAt}
                           onChange={(date) => {
+                            if (!date) return;
                             if (date > assignmentConfig.stopCollectionAt!) {
                               setAssignmentConfig({ ...assignmentConfig, dueAt: date, stopCollectionAt: date });
                             } else {
                               setAssignmentConfig({ ...assignmentConfig, dueAt: date });
                             }
                           }}
-                          injectTimes={[setHours(setMinutes(new Date(), 59), 23)]}
                           minDate={assignmentConfig.startCollectionAt}
                           placeholderText="Assignment Grades Release Date"
-                          className="form-input block w-full sm:text-sm sm:leading-5 transition ease-in-out duration-150"
-                          dateFormat="MMMM d, yyyy h:mm aa"
                         />
                       </div>
                     </div>
@@ -411,16 +396,12 @@ function AssignmentConfigCreation({ assignment }) {
                         Stop Collection
                       </label>
                       <div className="relative rounded-md shadow-sm">
-                        <DatePicker
+                        <DateInput
                           id="stopCollectionAt"
-                          showTimeSelect
                           selected={assignmentConfig.stopCollectionAt}
-                          onChange={(date) => setAssignmentConfig({ ...assignmentConfig, stopCollectionAt: date })}
-                          injectTimes={[setHours(setMinutes(new Date(), 59), 23)]}
+                          onChange={(date) => setAssignmentConfig({ ...assignmentConfig, stopCollectionAt: date! })}
                           minDate={assignmentConfig.dueAt}
                           placeholderText="Assignment Collection Closing Date"
-                          className="form-input block w-full sm:text-sm sm:leading-5 transition ease-in-out duration-150"
-                          dateFormat="MMMM d, yyyy h:mm aa"
                         />
                       </div>
                     </div>
@@ -430,15 +411,11 @@ function AssignmentConfigCreation({ assignment }) {
                           Release Grade
                         </label>
                         <div className="relative rounded-md shadow-sm">
-                          <DatePicker
+                          <DateInput
                             id="releaseGradeAt"
-                            showTimeSelect
                             selected={assignmentConfig.releaseGradeAt}
-                            onChange={(date) => setAssignmentConfig({ ...assignmentConfig, releaseGradeAt: date })}
-                            injectTimes={[setHours(setMinutes(new Date(), 59), 23)]}
+                            onChange={(date) => setAssignmentConfig({ ...assignmentConfig, releaseGradeAt: date! })}
                             placeholderText="Assignment Grades Release Date"
-                            className="form-input block w-full sm:text-sm sm:leading-5 transition ease-in-out duration-150"
-                            dateFormat="MMMM d, yyyy h:mm aa"
                           />
                         </div>
                       </div>

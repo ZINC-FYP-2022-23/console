@@ -5,7 +5,6 @@ import { LayoutProvider, useLayoutDispatch } from "../../../contexts/layout";
 import { Layout } from "../../../layout";
 import { initializeApollo } from "../../../lib/apollo";
 import { GET_ASSIGNMENT } from "../../../graphql/queries/user";
-import Switch from "../../../components/Switch";
 import { DatePickerCalendar, useDateInput } from "react-nice-dates";
 import { format } from "date-fns";
 import { enGB } from "date-fns/locale";

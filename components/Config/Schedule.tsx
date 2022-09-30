@@ -1,11 +1,9 @@
 import { useMutation } from "@apollo/client";
 import { useRouter } from "next/router";
-import DatePicker from "react-datepicker";
-import { setHours, setMinutes } from "date-fns";
 import { utcToZonedTime, zonedTimeToUtc } from "date-fns-tz";
 import { useLayoutDispatch } from "../../contexts/layout";
 import { UPDATE_ASSIGNMENT_CONFIG } from "../../graphql/mutations/user";
-import { Modal } from "../Modal";
+import { DateInput } from "components/Input";
 
 const getLocalDate = (date: string) => {
   if (date) {
@@ -57,19 +55,16 @@ export function ScheduleConfig({ schedules, onChange }) {
             Announce
           </label>
           <div className="relative rounded-md shadow-sm">
-            <DatePicker
+            <DateInput
               id="showAt"
-              showTimeSelect
               selected={getLocalDate(schedules.showAt)}
               onChange={(date) =>
+                date &&
                 updateSchedule({
                   showAt: zonedTimeToUtc(date, "Asia/Hong_Kong"),
                 })
               }
-              injectTimes={[setHours(setMinutes(new Date(), 59), 23)]}
               placeholderText="Assignment Announcement Date"
-              className="form-input block w-full sm:text-sm sm:leading-5 transition ease-in-out duration-150"
-              dateFormat="MMMM d, yyyy h:mm aa"
             />
           </div>
         </div>
@@ -77,57 +72,31 @@ export function ScheduleConfig({ schedules, onChange }) {
           <label htmlFor="startCollectionAt" className="block text-sm font-medium leading-5 text-gray-900">
             Start Collection
           </label>
-          {/* <button onClick={()=>{
-            dispatch({ type: 'toggleModal' })
-          }}>
-            <input type="text" className="relative rounded-md shadow-sm w-full p-2" placeholder="Assignment Collection Start Dat" disabled ></input>
-          </button> */}
           <div className="relative rounded-md shadow-sm">
-            <DatePicker
+            <DateInput
               id="startCollectionAt"
-              showTimeSelect
               selected={getLocalDate(schedules.startCollectionAt)}
               onChange={(date) =>
+                date &&
                 updateSchedule({
                   startCollectionAt: zonedTimeToUtc(date, "Asia/Hong_Kong"),
                 })
               }
-              injectTimes={[setHours(setMinutes(new Date(), 59), 23)]}
               maxDate={getLocalDate(schedules.dueAt)}
               placeholderText="Assignment Collection Start Date"
-              className="form-input block w-full sm:text-sm sm:leading-5 transition ease-in-out duration-150"
-              dateFormat="MMMM d, yyyy h:mm aa"
             />
           </div>
-
-          {/* <Modal>
-            <div className="relative rounded-md shadow-sm">
-              <div>
-                testing data
-              </div>
-              <span className="mt-3 flex w-full rounded-md shadow-sm sm:mt-0 sm:col-start-1">
-          `    <button
-                  onClick={() => {
-                    dispatch({ type: 'closeModal' });
-                  }}
-                  type="button"
-                  className="inline-flex justify-center w-full rounded-md border border-gray-300 px-4 py-2 bg-white text-base leading-6 font-medium text-gray-700 shadow-sm hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue transition ease-in-out duration-150 sm:text-sm sm:leading-5">
-                  Back to Assignments Config
-                </button>
-              </span>`
-            </div>
-          </Modal> */}
         </div>
         <div className="mt-4 flex flex-col space-y-2">
           <label htmlFor="dueAt" className="block text-sm font-medium leading-5 text-gray-900">
             Due
           </label>
           <div className="relative rounded-md shadow-sm">
-            <DatePicker
+            <DateInput
               id="dueAt"
-              showTimeSelect
               selected={getLocalDate(schedules.dueAt)}
               onChange={(date) => {
+                if (!date) return;
                 if (date > getLocalDate(schedules.stopCollectionAt)!) {
                   updateSchedule({
                     dueAt: zonedTimeToUtc(date, "Asia/Hong_Kong"),
@@ -139,11 +108,8 @@ export function ScheduleConfig({ schedules, onChange }) {
                   });
                 }
               }}
-              injectTimes={[setHours(setMinutes(new Date(), 59), 23)]}
               minDate={getLocalDate(schedules.startCollectionAt)}
               placeholderText="Assignment Grades Release Date"
-              className="form-input block w-full sm:text-sm sm:leading-5 transition ease-in-out duration-150"
-              dateFormat="MMMM d, yyyy h:mm aa"
             />
           </div>
         </div>
@@ -152,20 +118,17 @@ export function ScheduleConfig({ schedules, onChange }) {
             Stop Collection
           </label>
           <div className="relative rounded-md shadow-sm">
-            <DatePicker
+            <DateInput
               id="stopCollectionAt"
-              showTimeSelect
               selected={getLocalDate(schedules.stopCollectionAt)}
               onChange={(date) =>
+                date &&
                 updateSchedule({
                   stopCollectionAt: zonedTimeToUtc(date, "Asia/Hong_Kong"),
                 })
               }
-              injectTimes={[setHours(setMinutes(new Date(), 59), 23)]}
               minDate={getLocalDate(schedules.dueAt)}
               placeholderText="Assignment Collection Closing Date"
-              className="form-input block w-full sm:text-sm sm:leading-5 transition ease-in-out duration-150"
-              dateFormat="MMMM d, yyyy h:mm aa"
             />
           </div>
         </div>
@@ -175,19 +138,16 @@ export function ScheduleConfig({ schedules, onChange }) {
               Release Grade
             </label>
             <div className="relative rounded-md shadow-sm">
-              <DatePicker
+              <DateInput
                 id="releaseGradeAt"
-                showTimeSelect
                 selected={getLocalDate(schedules.releaseGradeAt)}
                 onChange={(date) =>
+                  date &&
                   updateSchedule({
                     releaseGradeAt: zonedTimeToUtc(date, "Asia/Hong_Kong"),
                   })
                 }
-                injectTimes={[setHours(setMinutes(new Date(), 59), 23)]}
                 placeholderText="Assignment Grades Release Date"
-                className="form-input block w-full sm:text-sm sm:leading-5 transition ease-in-out duration-150"
-                dateFormat="MMMM d, yyyy h:mm aa"
               />
             </div>
           </div>
