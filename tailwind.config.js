@@ -1,7 +1,13 @@
+const colors = require('tailwindcss/colors')
 const defaultTheme = require('tailwindcss/defaultTheme')
 
+/** @type {import('tailwindcss').Config} */
 module.exports = {
-  purge: [],
+  content: [
+    './components/**/*.tsx',
+    './layout/**/*.tsx',
+    './pages/**/*.tsx',
+  ],
   theme: {
     extend: {
       height:{
@@ -11,6 +17,12 @@ module.exports = {
         "inner-lg" : "inset 0 5px 8px 0 rgba(0, 0, 0, 0.2)"
       },
       colors: {
+        // https://tailwindcss.com/docs/upgrade-guide#removed-color-aliases
+        green: colors.emerald,
+        yellow: colors.amber,
+        purple: colors.violet,
+        "cool-gray": colors.slate,
+        current: 'currentColor',
         cse: {
           '100': '#8FADE0',
           '200': '#6F95D8',
@@ -41,9 +53,10 @@ module.exports = {
       }
     },
   },
-  variants: {},
   plugins: [
-    require('@tailwindcss/ui'),
     require('@tailwindcss/typography')
   ],
+  safelist: [
+    { pattern: /section-*/ }
+  ]
 }
