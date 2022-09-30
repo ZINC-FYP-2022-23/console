@@ -1,13 +1,16 @@
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Dropdown, useDropdown } from "../Dropdown";
+import { useDropdown } from "../Dropdown";
 import ActiveLink from "./ActiveLink";
 import { useZinc } from "../../contexts/zinc";
 import SelectMenu from "../SemesterSelectMenu";
-import { createRef, Fragment, useState } from "react";
-import { Dialog, Menu, Transition } from "@headlessui/react";
+import { Fragment, useState } from "react";
+import { Menu, Transition } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/solid";
 
+/**
+ * No longer used.
+ */
 export function User() {
   const { toggleDropdown, display } = useDropdown();
   const { useSidebar } = useZinc();
@@ -45,13 +48,13 @@ export function UserDropdown() {
   const { useSidebar } = useZinc();
   const { loading, data } = useSidebar();
   return (
-    <div className="hidden md:block w-64 flex-shrink-0 px-4 py-3 bg-cse-800">
+    <div className="hidden md:block w-56 flex-shrink-0 px-4 py-3 bg-cse-800">
       <Menu>
         <Menu.Button className="w-full flex items-center focus:outline-none">
           <div className="w-8 h-8 bg-gray-300 rounded-full flex-shrink-0 text-sm text-blue-800 flex justify-center items-center">
             {data && data.user.initials}
           </div>
-          <span className="mr-2 text-sm font-medium text-white ml-4 truncate">{data && data.user.name}</span>
+          <span className="mr-1 text-xs font-medium text-white ml-3 truncate">{data && data.user.name}</span>
           <ChevronDownIcon className="ml-auto h-5 w-5 text-gray-400"></ChevronDownIcon>
         </Menu.Button>
         <Transition
@@ -151,7 +154,7 @@ export function Navigation() {
   const [showCourses, setShowCourses] = useState(false);
   console.log(error);
   return (
-    <div className="hidden md:block w-64 p-6 bg-gray-100 overflow-y-auto">
+    <div className="hidden md:block w-56 p-6 bg-gray-100 overflow-y-auto">
       <nav>
         {!loading && <SelectMenu semesters={data.semesters} />}
         <h2 className="mt-6 text-xs font-semibold text-gray-600 uppercase tracking-wider">Overview</h2>
@@ -197,6 +200,9 @@ export function Navigation() {
   );
 }
 
+/**
+ * Temporarily hidden since all functionalities in the toolbar is not implemented.
+ */
 export function Toolbar() {
   return (
     <div className="hidden md:flex items-center">

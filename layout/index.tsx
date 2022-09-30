@@ -47,7 +47,7 @@ export function Layout({ children, title }: LayoutProps) {
               </a>
             </nav>
             {/* <MobileMenuToggle/> */}
-            <Toolbar />
+            {/* <Toolbar /> */}
           </div>
         </header>
         <div className="flex-1 flex overflow-hidden">
