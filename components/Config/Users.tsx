@@ -41,7 +41,7 @@ function AssignedStudents({ assignmentConfigId, assignedUserIds, section }) {
       <ul className="bg-white rounded-lg m-3">
         {assignedStudents.map(({ user }) => (
           <li key={user.id} className="flex justify-between items-center px-2">
-            <span className="text-xs font-medium">{user.name || "Never Logged In"}</span>
+            <span className="text-xs font-medium">{user.name || user.itsc}</span>
             <span className="inline-flex rounded-lg shadow-sm">
               <button
                 onClick={() =>
@@ -98,7 +98,7 @@ function UnassignedStudents({ section, assignedUserIds, assignmentConfigId }) {
       <ul className="bg-white rounded-lg m-3 py-3">
         {unassignedStudents.map(({ user }) => (
           <li key={user.id} className="flex justify-between items-center px-2">
-            <span className="text-xs font-medium">{user.name || "Never Logged In"}</span>
+            <span className="text-xs font-medium">{user.name || user.itsc}</span>
             <span className="inline-flex rounded-lg shadow-sm">
               <button
                 onClick={() =>
