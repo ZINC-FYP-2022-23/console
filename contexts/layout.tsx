@@ -102,6 +102,13 @@ function layoutReducer(state: LayoutState, action: LayoutAction): LayoutState {
       return { ...state, notification: action.payload };
     case "assignmentSupportingFilesUploader":
       return { ...state, showModal: true, modalType: "files", assignmentConfigId: action.payload };
+    case "chooseAssignmentConfigEditor":
+      return {
+        ...state,
+        showModal: true,
+        assignmentId: action.payload.assignmentId,
+        assignmentConfigId: action.payload.assignmentConfigId,
+      };
     default:
       return state;
   }

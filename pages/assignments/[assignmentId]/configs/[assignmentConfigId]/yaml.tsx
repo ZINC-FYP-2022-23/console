@@ -205,7 +205,7 @@ function YAMLConfigEditor({ yamlString }) {
   );
 }
 
-function AssignmentConfiguration() {
+function AssignmentConfigurationYAML() {
   const router = useRouter();
   const { user } = useZinc();
   const assignmentConfigId = parseInt(router.query.assignmentConfigId as string, 10);
@@ -295,4 +295,4 @@ export async function getServerSideProps(ctx) {
   };
 }
 
-export default AssignmentConfiguration;
+export default AssignmentConfigurationYAML;

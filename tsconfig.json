@@ -21,7 +21,8 @@
     "skipLibCheck": true,
     "strict": true,
     "target": "esnext",
-    "incremental": true
+    "incremental": true,
+    "baseUrl": "."
   },
   "exclude": [
     "node_modules"

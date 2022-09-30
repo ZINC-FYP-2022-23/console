@@ -1,11 +1,11 @@
 import Link from "next/link";
 import { useQuery } from "@apollo/client";
 import { initializeApollo } from "../../../../lib/apollo";
-import { LayoutProvider, useLayoutDispatch } from "../../../../contexts/layout";
+import { LayoutProvider, useLayoutDispatch, useLayoutState } from "../../../../contexts/layout";
 import { Layout } from "../../../../layout";
 import { GET_CONFIGS_FOR_ASSIGNMENT } from "../../../../graphql/queries/user";
 import { useRouter } from "next/router";
-import Collapse from "@kunukn/react-collapse";
+import { Modal, ModalWithHeader } from "../../../../components/Modal";
 
 function AssignmentConfigs({ configs }) {
   const router = useRouter();
@@ -20,21 +20,50 @@ function AssignmentConfigs({ configs }) {
       <ul>
         {configs.map((config, index) => (
           <li key={config.id} className={`${index === 0 ? "" : "border-t border-gray-200"}`}>
-            <Link href={`/assignments/${assignmentId}/configs/${config.id}`}>
-              <a className="block hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition duration-150 ease-in-out">
-                <div className="px-4 py-4 sm:px-6">
-                  <div className="flex items-center justify-between">
-                    <div className="text-sm leading-5 font-medium text-cse-600 truncate">
-                      Configuration #{config.id}
-                    </div>
-                  </div>
-                </div>
-              </a>
-            </Link>
+            <button
+              onClick={() =>
+                dispatch({
+                  type: "chooseAssignmentConfigEditor",
+                  payload: {
+                    assignmentId,
+                    assignmentConfigId: config.id,
+                  },
+                })
+              }
+              className="block min-w-full hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition duration-150 ease-in-out"
+            >
+              <div className="px-4 py-4 sm:px-6 flex items-center justify-between">
+                <span className="text-sm leading-5 font-medium text-cse-600 truncate">Configuration #{config.id}</span>
+              </div>
+            </button>
           </li>
         ))}
       </ul>
     </div>
+  );
+}
+
+function ChooseConfigEditorModal() {
+  const { assignmentId, assignmentConfigId } = useLayoutState();
+  const baseUrl = `/assignments/${assignmentId}/configs/${assignmentConfigId}`;
+  return (
+    <ModalWithHeader title="Choose Editor Mode">
+      <div className="sm:px-6">
+        <p className="mb-5">TODO: Refine the UI</p>
+        <div className="flex gap-4">
+          <Link href={`${baseUrl}/gui`}>
+            <a className="px-4 py-2 border border-transparent text-sm leading-5 font-medium rounded-md text-cse-700 bg-blue-100 hover:bg-blue-50 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-blue-200 transition ease-in-out duration-150">
+              GUI Editor
+            </a>
+          </Link>
+          <Link href={`${baseUrl}/yaml`}>
+            <a className="px-4 py-2 border border-transparent text-sm leading-5 font-medium rounded-md text-cse-700 bg-blue-100 hover:bg-blue-50 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-blue-200 transition ease-in-out duration-150">
+              YAML Editor
+            </a>
+          </Link>
+        </div>
+      </div>
+    </ModalWithHeader>
   );
 }
 
@@ -142,6 +171,7 @@ function AssignmentConfiguration() {
             </div>
           </div>
         </div>
+        <ChooseConfigEditorModal />
       </Layout>
     </LayoutProvider>
   );

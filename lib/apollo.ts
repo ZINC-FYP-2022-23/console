@@ -1,9 +1,9 @@
 import { useMemo } from "react";
-import { ApolloClient, HttpLink, InMemoryCache, split } from "@apollo/client";
+import { ApolloClient, HttpLink, InMemoryCache, NormalizedCacheObject, split } from "@apollo/client";
 import { getMainDefinition } from "@apollo/client/utilities";
 import { WebSocketLink } from "@apollo/client/link/ws";
 
-let apolloClient;
+let apolloClient: ApolloClient<NormalizedCacheObject>;
 const isBrowser = typeof window !== "undefined";
 
 function createApolloClient(cookie: string) {
@@ -68,7 +68,7 @@ export function initializeApollo(cookie: string, initialState: any = null) {
   return _apolloClient;
 }
 
-export function useApollo(cookie, initialState) {
-  const store = useMemo(() => initializeApollo(cookie, initialState), [initialState]);
+export function useApollo(cookie: string, initialState: any) {
+  const store = useMemo(() => initializeApollo(cookie, initialState), [cookie, initialState]);
   return store;
 }
