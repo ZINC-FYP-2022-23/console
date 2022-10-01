@@ -1,33 +1,32 @@
-import Settings from "./Settings";
 import { load } from "js-yaml";
+import Settings from "./Settings";
+import Stage from "./Stage";
 
 /**
  * An assignment configuration.
  */
 class Config {
-  /**
-   * General configurations across the pipeline.
-   */
-  _settings: Settings;
+  constructor(
+    /**
+     * General configurations across the pipeline.
+     */
+    public _settings: Settings,
+
+    /**
+     * Stages of the pipeline.
+     */
+    public stages: Stage[],
+  ) {}
 
   /**
-   * Stages of the pipeline.
+   * Creates a `Config` instance from parsing the configuration YAML.
+   * @param yaml It's assumed that the YAML has already been validated by the grader.
    */
-  // TODO
-  stages: any;
-
-  constructor(settings: ParsedConfig["_settings"], stages: any) {
-    this._settings = new Settings(settings);
-    this.stages = stages;
-  }
-
-  /**
-   * Parse a config YAML into a `Config` instance.
-   * @param yaml The config YAML. Assumes that it has already been validated by the grader.
-   */
-  static parseYaml(yaml: string): Config {
-    const { _settings, ...stages } = load(yaml) as ParsedConfig;
-    return new Config(_settings, stages);
+  static fromYaml(yaml: string): Config {
+    const { _settings, ...stagesRaw } = load(yaml) as ParsedConfig;
+    const settings = Settings.fromYamlObject(_settings);
+    const stages = Object.entries(stagesRaw).map(([id, config]) => new Stage(id, config));
+    return new Config(settings, stages);
   }
 }
 

@@ -6,28 +6,36 @@ import { ParsedConfig } from "./Config";
  * {@link https://docs.zinc.ust.dev/user/model/Config.html#settings}
  */
 class Settings {
-  lang: SettingsLang;
-  use_template: SettingsUseTemplate | null;
-  template?: string[];
-  use_skeleton?: boolean;
-  use_provided?: boolean;
-  stage_wait_duration_secs?: number;
-  cpus?: number;
-  mem_gb?: number;
-  early_return_on_throw?: boolean;
-  enable_features?: SettingsFeatures;
+  constructor(
+    public lang: SettingsLang,
+    public use_template: SettingsUseTemplate | null,
+    public template?: string[],
+    public use_skeleton?: boolean,
+    public use_provided?: boolean,
+    public stage_wait_duration_secs?: number,
+    public cpus?: number,
+    public mem_gb?: number,
+    public early_return_on_throw?: boolean,
+    public enable_features?: SettingsFeatures,
+  ) {}
 
-  constructor(settings: ParsedConfig["_settings"]) {
-    this.lang = Settings.serializeLang(settings.lang);
-    this.use_template = settings.use_template;
-    this.template = settings.template;
-    this.use_skeleton = settings.use_skeleton;
-    this.use_provided = settings.use_provided;
-    this.stage_wait_duration_secs = settings.stage_wait_duration_secs;
-    this.cpus = settings.cpus;
-    this.mem_gb = settings.mem_gb;
-    this.early_return_on_throw = settings.early_return_on_throw;
-    this.enable_features = settings.enable_features;
+  /**
+   * Creates a `Settings` instance from an object representation of the `_settings` field in the
+   * configuration YAML.
+   */
+  static fromYamlObject(s: ParsedConfig["_settings"]): Settings {
+    return new Settings(
+      Settings.serializeLang(s.lang),
+      s.use_template,
+      s.template,
+      s.use_skeleton,
+      s.use_provided,
+      s.stage_wait_duration_secs,
+      s.cpus,
+      s.mem_gb,
+      s.early_return_on_throw,
+      s.enable_features,
+    );
   }
 
   /**

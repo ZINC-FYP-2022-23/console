@@ -18,7 +18,7 @@ function GUIAssignmentBuilder() {
   });
 
   if (data) {
-    const config = Config.parseYaml(data.assignmentConfig.config_yaml);
+    const config = Config.fromYaml(data.assignmentConfig.config_yaml);
     console.log(config);
   }
 
