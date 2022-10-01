@@ -55,7 +55,7 @@ function SelectMenu({ semesters = [] }: SemesterSelectMenuProps) {
             leave="transition ease-in duration-75"
             leaveFrom="transform opacity-100 scale-100"
             leaveTo="transform opacity-0 scale-95"
-            className="absolute mt-1 w-52 rounded-md bg-white shadow-lg"
+            className="absolute mt-1 w-44 rounded-md bg-white shadow-lg"
           >
             <Menu.Items
               as="ul"
