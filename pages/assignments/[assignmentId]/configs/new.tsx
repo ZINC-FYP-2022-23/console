@@ -2,7 +2,6 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { ControlledEditor } from "@monaco-editor/react";
-import jsyaml from "js-yaml";
 import { setHours, setMinutes, addDays } from "date-fns";
 import { zonedTimeToUtc } from "date-fns-tz";
 import { initializeApollo } from "../../../../lib/apollo";
@@ -14,7 +13,6 @@ import { useMutation, useQuery } from "@apollo/client";
 import { CREATE_ASSIGNMENT_CONFIG, UPDATE_ASSIGNMENTCONFIG_NOTI } from "../../../../graphql/mutations/user";
 import { useZinc } from "../../../../contexts/zinc";
 import { Checkbox, DateInput } from "components/Input";
-// import makeAnimated from 'react-select/animated';
 
 interface AssignmentConfig {
   assignment_id: Number;
@@ -98,21 +96,9 @@ function AssignmentConfigCreation({ assignment }) {
   // const [notificationList, setNotificationList] = useState([]);
   const [createAssignmentConfig, { loading }] = useMutation(CREATE_ASSIGNMENT_CONFIG);
   // const [updateAssignmentNoti] = useMutation(UPDATE_ASSIGNMENTCONFIG_NOTI);
-  // const animatedComponents = makeAnimated();
   async function handleAssignmentConfigCreation() {
     try {
-      // const yaml = jsyaml.load(assignmentConfig.config_yaml);
-      // setAssignmentConfig({...assignmentConfig, config_yaml: jsyaml.dump(yaml)});
       const { configError } = await validateAssignmentConfig(assignmentConfig.config_yaml, "draft");
-      // const validResponse = await fetch(`/api/validateConfig`,{
-      //   method: 'POST',
-      //   body: JSON.stringify({
-      //     id: assignmentConfig.assignment_id,
-      //     config_yaml: assignmentConfig.config_yaml
-      //   })
-      // });
-      // const {configError} = await validResponse.json()
-      // console.log(configError)
       if (!configError) {
         const { data } = await createAssignmentConfig({
           variables: {
@@ -421,25 +407,6 @@ function AssignmentConfigCreation({ assignment }) {
                       </div>
                     )}
                   </div>
-                  {/* <legend className="mt-4 text-base leading-6 font-medium text-gray-900">Notification</legend>
-                  <p className="text-sm leading-5 text-gray-500">Select the instructors to receive notification.</p>
-                  <div className="mt-2">
-                      <div className="relative rounded-md shadow-sm">
-                      <Select
-                        closeMenuOnSelect={false}
-                        components={animatedComponents}
-                        defaultValue={[]}
-                        isMulti
-                        options={instructors}
-                        className="text-sm"
-                        onChange={(list)=>{
-                          setNotificationList(list.map(element=>{
-                            return(element.value)
-                          }))
-                        }}
-                      />
-                      </div>
-                  </div> */}
                 </fieldset>
               </div>
             </div>
