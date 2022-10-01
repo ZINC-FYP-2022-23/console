@@ -1,11 +1,27 @@
+import { useQuery } from "@apollo/client";
 import Button from "components/Button";
 import { LayoutProvider } from "contexts/layout";
 import { GET_PIPELINE_CONFIG_FOR_ASSIGNMENT } from "graphql/queries/user";
 import { Layout } from "layout";
 import { initializeApollo } from "lib/apollo";
 import { GetServerSideProps } from "next";
+import { useRouter } from "next/router";
+import { Config } from "types";
 
 function GUIAssignmentBuilder() {
+  const router = useRouter();
+  const assignmentConfigId = parseInt(router.query.assignmentConfigId as string, 10);
+  const { data, loading } = useQuery(GET_PIPELINE_CONFIG_FOR_ASSIGNMENT, {
+    variables: {
+      assignmentConfigId,
+    },
+  });
+
+  if (data) {
+    const config = Config.parseYaml(data.assignmentConfig.config_yaml);
+    console.log(config);
+  }
+
   return (
     <LayoutProvider>
       <Layout title="Assignment Configs">
