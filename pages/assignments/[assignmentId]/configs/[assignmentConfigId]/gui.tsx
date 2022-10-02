@@ -1,70 +1,72 @@
 import { useQuery } from "@apollo/client";
-import Button from "components/Button";
+import GUIAssignmentBuilder from "components/GuiBuilder/GuiBuilder";
 import { LayoutProvider } from "contexts/layout";
 import { GET_PIPELINE_CONFIG_FOR_ASSIGNMENT } from "graphql/queries/user";
-import { Layout } from "layout";
 import { initializeApollo } from "lib/apollo";
 import { GetServerSideProps } from "next";
-import { useRouter } from "next/router";
-import { Config } from "types";
+import { AssignmentConfig, Config } from "types";
+import { createStore, StoreProvider } from "easy-peasy";
+import Store from "state/Config/Store";
+import { useMemo } from "react";
 
-function GUIAssignmentBuilder() {
-  const router = useRouter();
-  const assignmentConfigId = parseInt(router.query.assignmentConfigId as string, 10);
-  const { data, loading } = useQuery(GET_PIPELINE_CONFIG_FOR_ASSIGNMENT, {
+const store = createStore(Store);
+
+interface GUIAssignmentBuilderRootProps {
+  /** The `assignmentConfigId`. If it's `null`, it means we're creating a new assignment. */
+  configId: number | null;
+}
+
+function GUIAssignmentBuilderRoot({ configId }: GUIAssignmentBuilderRootProps) {
+  let config = useMemo(() => Config.empty(), []);
+  const { data } = useQuery<{ assignmentConfig: AssignmentConfig }>(GET_PIPELINE_CONFIG_FOR_ASSIGNMENT, {
     variables: {
-      assignmentConfigId,
+      assignmentConfigId: configId,
     },
   });
-
   if (data) {
-    const config = Config.fromYaml(data.assignmentConfig.config_yaml);
-    console.log(config);
+    config = Config.fromYaml(data.assignmentConfig.config_yaml);
   }
 
   return (
     <LayoutProvider>
-      <Layout title="Assignment Configs">
-        <div className="p-4 w-full flex flex-col">
-          {/* Top bar */}
-          <div className="mb-3 flex items-center justify-between">
-            <h1 className="font-bold text-gray-900 text-xl sm:text-2xl">Assignment Config</h1>
-            <div className="flex gap-2">
-              <Button
-                title="Create"
-                className="px-3 py-1 bg-green-500 text-white hover:bg-green-600"
-                onClick={() => {
-                  // TODO
-                }}
-              />
-            </div>
-          </div>
-          <div className="flex-1 flex flex-row gap-3">
-            <div className="w-4/6 flex flex-col gap-3">
-              <div className="h-1/2 bg-white rounded-md">Pipeline editor</div>
-              <div className="h-1/2 bg-white rounded-md">Stage settings</div>
-            </div>
-            <div className="w-2/6 bg-white rounded-md">General settings</div>
-          </div>
-        </div>
-      </Layout>
+      <StoreProvider store={store}>
+        <GUIAssignmentBuilder config={config} configId={configId} />
+      </StoreProvider>
     </LayoutProvider>
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const apolloClient = initializeApollo(ctx.req.headers.cookie!);
-  await apolloClient.query({
-    query: GET_PIPELINE_CONFIG_FOR_ASSIGNMENT,
-    variables: {
-      assignmentConfigId: parseInt(ctx.query.assignmentConfigId as string, 10),
-    },
-  });
+export const getServerSideProps: GetServerSideProps = async ({ req, query }) => {
+  const apolloClient = initializeApollo(req.headers.cookie!);
+  /**
+   * The `assignmentConfig` query param has two possible types of values:
+   *  - Numerical string (e.g. `"1"`) when loading an existing assignment config
+   *  - `"new"` when creating a new assignment config
+   */
+  let configId: string | number = query.assignmentConfigId as string;
+  const isNew = configId === "new";
+  if (!isNew) {
+    configId = parseInt(configId);
+    if (isNaN(configId)) {
+      return { notFound: true };
+    }
+    const { data } = await apolloClient.query({
+      query: GET_PIPELINE_CONFIG_FOR_ASSIGNMENT,
+      variables: {
+        assignmentConfigId: configId,
+      },
+    });
+    if (!data.assignmentConfig) {
+      return { notFound: true };
+    }
+  }
+
   return {
     props: {
       initialApolloState: apolloClient.cache.extract(),
+      configId: isNew ? null : configId,
     },
   };
 };
 
-export default GUIAssignmentBuilder;
+export default GUIAssignmentBuilderRoot;

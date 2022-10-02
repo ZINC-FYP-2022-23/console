@@ -13,9 +13,16 @@ export interface StoreModel {
   editingConfig?: Config;
 }
 
-export interface StoreActions {}
+export interface StoreActions {
+  initializeConfig: Action<StoreModel, Config>;
+}
 
-const Actions: StoreActions = {};
+const Actions: StoreActions = {
+  initializeConfig: action((state, payload) => {
+    state.initConfig = payload;
+    state.editingConfig = payload;
+  }),
+};
 
 const Store: StoreModel & StoreActions = {
   initConfig: undefined,

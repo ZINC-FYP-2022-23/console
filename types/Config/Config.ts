@@ -7,14 +7,9 @@ import Stage from "./Stage";
  */
 class Config {
   constructor(
-    /**
-     * General configurations across the pipeline.
-     */
+    /** General configurations across the pipeline. */
     public _settings: Settings,
-
-    /**
-     * Stages of the pipeline.
-     */
+    /** Stages of the pipeline. */
     public stages: Stage[],
   ) {}
 
@@ -27,6 +22,13 @@ class Config {
     const settings = Settings.fromYamlObject(_settings);
     const stages = Object.entries(stagesRaw).map(([id, config]) => new Stage(id, config));
     return new Config(settings, stages);
+  }
+
+  /**
+   * Creates an empty `Config` instance.
+   */
+  static empty(): Config {
+    return new Config(new Settings(), []);
   }
 }
 

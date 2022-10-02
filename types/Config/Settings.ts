@@ -7,8 +7,9 @@ import { ParsedConfig } from "./Config";
  */
 class Settings {
   constructor(
-    public lang: SettingsLang,
-    public use_template: SettingsUseTemplate | null,
+    /** Although this field is required, it can be `undefined` when the user hasn't chosen a language. */
+    public lang?: SettingsLang,
+    public use_template?: SettingsUseTemplate,
     public template?: string[],
     public use_skeleton?: boolean,
     public use_provided?: boolean,
