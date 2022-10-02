@@ -17,6 +17,7 @@
     "@babel/runtime": "^7.15.4",
     "@floating-ui/react-dom": "^0.4.3",
     "@fortawesome/fontawesome-svg-core": "^6.1.1",
+    "@fortawesome/free-solid-svg-icons": "^6.2.0",
     "@fortawesome/pro-duotone-svg-icons": "^6.1.1",
     "@fortawesome/pro-light-svg-icons": "^6.1.1",
     "@fortawesome/pro-regular-svg-icons": "^6.1.1",

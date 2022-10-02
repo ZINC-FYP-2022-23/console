@@ -3,6 +3,7 @@ import { parse } from "cookie";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { fad } from "@fortawesome/pro-duotone-svg-icons";
 import { far } from "@fortawesome/pro-regular-svg-icons";
+import { fas } from "@fortawesome/free-solid-svg-icons";
 import { useApollo } from "../lib/apollo";
 import { ZincProvider } from "../contexts/zinc";
 import "react-nice-dates/build/style.css";
@@ -14,7 +15,7 @@ import Unauthorized from "../pages/401";
 import toast from "react-hot-toast";
 import { Notification, NotificationBody } from "../components/Notification";
 
-library.add(fad, far);
+library.add(fad, far, fas);
 
 function ZincApp({ Component, pageProps, cookie, hasTeachingRole, isAdmin, user, itsc, semester }) {
   let initialApolloState = {};
