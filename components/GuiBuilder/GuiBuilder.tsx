@@ -3,6 +3,7 @@ import { Layout } from "layout";
 import { useEffect } from "react";
 import { useStoreActions, useStoreState } from "state/Config/Hooks";
 import { Config } from "types";
+import SettingsPanel from "./Settings/SettingsPanel";
 
 interface GUIAssignmentBuilderProps {
   configProp: Config;
@@ -27,26 +28,27 @@ function GUIAssignmentBuilder({ configProp, configId }: GUIAssignmentBuilderProp
             {isNewAssignment ? "New Assignment Config" : "Editing Config"}
           </h1>
           <div className="flex gap-2">
+            <Button className="bg-violet-500 text-white hover:bg-violet-600" onClick={() => console.log(generatedYaml)}>
+              Debug: Log YAML
+            </Button>
             <Button
-              title="Debug: Log YAML"
-              className="px-3 py-1 bg-violet-500 text-white hover:bg-violet-600"
-              onClick={() => console.log(generatedYaml)}
-            />
-            <Button
-              title={isNewAssignment ? "Create" : "Save"}
-              className="px-3 py-1 bg-green-500 text-white hover:bg-green-600"
+              className="bg-green-500 text-white hover:bg-green-600"
               onClick={() => {
                 // TODO
               }}
-            />
+            >
+              {isNewAssignment ? "Create" : "Save"}
+            </Button>
           </div>
         </div>
-        <div className="flex-1 flex flex-row gap-3">
+        <div className="flex-1 flex flex-row gap-3 overflow-y-hidden">
           <div className="w-4/6 flex flex-col gap-3">
             <div className="h-1/2 bg-white rounded-md shadow">Pipeline editor</div>
             <div className="h-1/2 bg-white rounded-md shadow">Stage settings</div>
           </div>
-          <div className="w-2/6 bg-white rounded-md shadow">General settings</div>
+          <div className="w-2/6 bg-white rounded-md shadow overflow-y-auto">
+            <SettingsPanel />
+          </div>
         </div>
       </div>
     </Layout>
