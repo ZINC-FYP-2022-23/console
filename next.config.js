@@ -6,7 +6,17 @@
 const { withSentryConfig } = require('@sentry/nextjs');
 
 const moduleExports = {
-  productionBrowserSourceMaps: true , 
+  productionBrowserSourceMaps: true,
+  async redirects() {
+    return [
+      {
+        // Use YAML editor by default
+        source: "/assignments/:assignmentId/configs/:assignmentConfigId",
+        destination: "/assignments/:assignmentId/configs/:assignmentConfigId/yaml",
+        permanent: true,
+      }
+    ]
+  }
 };
 
 const SentryWebpackPluginOptions = {
