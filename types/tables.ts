@@ -118,7 +118,7 @@ export type PipelineResult = {
   contextError?: string;
   scoreReports: GradeDetail;
   // TODO: Typing on stage reports
-  stageReports: object;
+  stageReports: any;
 };
 
 export type Report = {
@@ -132,7 +132,7 @@ export type Report = {
   pipeline_results: PipelineResult;
   remarks: object;
   // TODO: Typing on stage reports (same as `PipelineResult.stageReports`)
-  sanitizedReports: object;
+  sanitizedReports: any;
   show_at: string;
   submission: Submission;
   submission_id: number;
