@@ -1,0 +1,18 @@
+_settings:
+  lang: 'cpp/g++:8'
+  use_template: PATH
+  template: null
+  use_skeleton: true
+  use_provided: true
+  stage_wait_duration_secs: 10
+  cpus: null
+  mem_gb: null
+  early_return_on_throw: null
+  enable_features:
+    network: true
+compile:
+  input:
+    - '*.cpp'
+  output: a.out
+score:
+  normalizedTo: 100

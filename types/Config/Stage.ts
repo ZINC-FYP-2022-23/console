@@ -10,9 +10,9 @@ class Stage {
   /**
    * Configuration of the stage.
    */
-  config: object;
+  config: any;
 
-  constructor(id: string, config: object) {
+  constructor(id: string, config: any) {
     this.id = id;
     this.config = config;
   }
