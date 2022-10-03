@@ -6,10 +6,10 @@ import { initializeApollo } from "lib/apollo";
 import { GetServerSideProps } from "next";
 import { AssignmentConfig, Config } from "types";
 import { createStore, StoreProvider } from "easy-peasy";
-import Store from "state/Config/Store";
+import configStore from "state/Config/Store";
 import { useMemo } from "react";
 
-const store = createStore(Store);
+const store = createStore(configStore);
 
 interface GUIAssignmentBuilderRootProps {
   /** The `assignmentConfigId`. If it's `null`, it means we're creating a new assignment. */
@@ -30,7 +30,7 @@ function GUIAssignmentBuilderRoot({ configId }: GUIAssignmentBuilderRootProps) {
   return (
     <LayoutProvider>
       <StoreProvider store={store}>
-        <GUIAssignmentBuilder config={config} configId={configId} />
+        <GUIAssignmentBuilder configProp={config} configId={configId} />
       </StoreProvider>
     </LayoutProvider>
   );

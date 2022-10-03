@@ -26,7 +26,7 @@ class Settings {
    */
   static fromYamlObject(s: ParsedConfig["_settings"]): Settings {
     return new Settings(
-      Settings.serializeLang(s.lang),
+      SettingsLang.fromString(s.lang),
       s.use_template,
       s.template,
       s.use_skeleton,
@@ -40,32 +40,49 @@ class Settings {
   }
 
   /**
-   * Parses the `_settings.lang` string (e.g. `"cpp/g++:8"`) to a {@link SettingsLang} object.
+   * Converts to an object representation of the `_settings` field in the configuration YAML.
+   */
+  toYamlObject(): ParsedConfig["_settings"] {
+    const settings = { ...this, lang: this.lang?.toString() };
+    // Since js-yaml cannot parse fields with value `undefined`, we convert them to `null`
+    const settingsStr = JSON.stringify(settings, (_, v) => (v === undefined ? null : v));
+    return JSON.parse(settingsStr);
+  }
+}
+
+/**
+ * Class representation of the `_settings.lang` field.
+ *
+ * {@link https://docs.zinc.ust.dev/user/model/Config.html#settings-lang}
+ */
+export class SettingsLang {
+  // prettier-ignore
+  constructor(
+    public language: string,
+    public compiler: string | null,
+    public version: string,
+  ) {}
+
+  /**
+   * Creates an instance from the `_settings.lang` string (e.g. `"cpp/g++:8"`).
    * @param lang It's assumed to be correctly formatted.
    */
-  static serializeLang(lang: string): SettingsLang {
+  static fromString(lang: string): SettingsLang {
     const langRegex = /(.+?)(?:\/(.*))?:(.+)/g;
     const groups = langRegex.exec(lang);
     if (groups === null) {
       throw new Error("Invalid format for `_settings.lang` string");
     }
-    return {
-      language: groups[1],
-      compiler: groups[2] || null,
-      version: groups[3],
-    };
+    return new SettingsLang(groups[1], groups[2] || null, groups[3]);
   }
-}
 
-/**
- * Object representation of the `_settings.lang` field.
- *
- * {@link https://docs.zinc.ust.dev/user/model/Config.html#settings-lang}
- */
-export interface SettingsLang {
-  language: string;
-  compiler: string | null;
-  version: string;
+  /**
+   * De-serializes the instance to a string (e.g. `"cpp/g++:8"`).
+   */
+  toString(): string {
+    const { language, compiler, version } = this;
+    return `${language}${compiler ? `/${compiler}` : ""}:${version}`;
+  }
 }
 
 /**

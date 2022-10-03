@@ -1,22 +1,23 @@
 import Button from "components/Button";
 import { Layout } from "layout";
 import { useEffect } from "react";
-import { useStoreActions } from "state/Config/Hooks";
+import { useStoreActions, useStoreState } from "state/Config/Hooks";
 import { Config } from "types";
 
 interface GUIAssignmentBuilderProps {
-  config: Config;
+  configProp: Config;
   /** The `assignmentConfigId`. If it's `null`, it means we're creating a new assignment. */
   configId: number | null;
 }
 
-function GUIAssignmentBuilder({ config, configId }: GUIAssignmentBuilderProps) {
+function GUIAssignmentBuilder({ configProp, configId }: GUIAssignmentBuilderProps) {
   const isNewAssignment = configId === null;
   const initializeConfig = useStoreActions((actions) => actions.initializeConfig);
+  const generatedYaml = useStoreState((state) => state.generatedYaml);
 
   useEffect(() => {
-    initializeConfig(config);
-  }, [config, initializeConfig]);
+    initializeConfig(configProp);
+  }, [configProp, initializeConfig]);
 
   return (
     <Layout title="Assignment Configs">
@@ -27,7 +28,12 @@ function GUIAssignmentBuilder({ config, configId }: GUIAssignmentBuilderProps) {
           </h1>
           <div className="flex gap-2">
             <Button
-              title="Create"
+              title="Debug: Log YAML"
+              className="px-3 py-1 bg-violet-500 text-white hover:bg-violet-600"
+              onClick={() => console.log(generatedYaml)}
+            />
+            <Button
+              title={isNewAssignment ? "Create" : "Save"}
               className="px-3 py-1 bg-green-500 text-white hover:bg-green-600"
               onClick={() => {
                 // TODO

@@ -3,31 +3,36 @@
  *
  * {@link https://easy-peasy.vercel.app/ easy-peasy} is chosen as the state management library.
  */
-import { Action, action } from "easy-peasy";
+import { Action, action, Computed, computed } from "easy-peasy";
 import { Config } from "types";
 
-export interface StoreModel {
+export interface ConfigStoreModel {
   /** Initial configuration (e.g. when loaded from database) */
   initConfig?: Config;
   /** The config with proposed changes */
   editingConfig?: Config;
 }
 
-export interface StoreActions {
-  initializeConfig: Action<StoreModel, Config>;
+export interface ConfigStoreActions {
+  initializeConfig: Action<ConfigStoreModel, Config>;
+  generatedYaml: Computed<ConfigStoreModel, string>;
 }
 
-const Actions: StoreActions = {
+const Actions: ConfigStoreActions = {
   initializeConfig: action((state, payload) => {
     state.initConfig = payload;
     state.editingConfig = payload;
   }),
+
+  generatedYaml: computed((state) => {
+    return state.editingConfig?.toYaml() ?? "";
+  }),
 };
 
-const Store: StoreModel & StoreActions = {
+const configStore: ConfigStoreModel & ConfigStoreActions = {
   initConfig: undefined,
   editingConfig: undefined,
   ...Actions,
 };
 
-export default Store;
+export default configStore;

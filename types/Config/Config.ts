@@ -1,4 +1,4 @@
-import { load } from "js-yaml";
+import { dump, load } from "js-yaml";
 import Settings from "./Settings";
 import Stage from "./Stage";
 
@@ -22,6 +22,16 @@ class Config {
     const settings = Settings.fromYamlObject(_settings);
     const stages = Object.entries(stagesRaw).map(([id, config]) => new Stage(id, config));
     return new Config(settings, stages);
+  }
+
+  /**
+   * De-serializes to a YAML string.
+   */
+  toYaml() {
+    const _settings = this._settings.toYamlObject();
+    const stages = {};
+    this.stages.forEach((stage) => (stages[stage.id] = stage.config));
+    return dump({ _settings, ...stages });
   }
 
   /**
