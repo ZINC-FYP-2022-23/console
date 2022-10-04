@@ -3,6 +3,7 @@ import { Layout } from "layout";
 import { useEffect } from "react";
 import { useStoreActions, useStoreState } from "state/Config/Hooks";
 import { Config } from "types";
+import PipelineEditor from "./PipelineEditor/PipelineEditor";
 import SettingsPanel from "./Settings/SettingsPanel";
 
 interface GUIAssignmentBuilderProps {
@@ -49,7 +50,9 @@ function GUIAssignmentBuilder({ configProp, configId }: GUIAssignmentBuilderProp
         </div>
         <div className="flex-1 flex flex-row gap-3 overflow-y-hidden">
           <div className="w-4/6 flex flex-col gap-3">
-            <div className="h-1/2 bg-white rounded-md shadow">Pipeline editor</div>
+            <div className="h-1/2">
+              <PipelineEditor />
+            </div>
             <div className="h-1/2 bg-white rounded-md shadow">Stage settings</div>
           </div>
           <div className="w-2/6 bg-white rounded-md shadow overflow-y-auto">
