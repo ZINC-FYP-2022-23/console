@@ -14,11 +14,11 @@ interface GUIAssignmentBuilderProps {
 function GUIAssignmentBuilder({ configProp, configId }: GUIAssignmentBuilderProps) {
   const isNewAssignment = configId === null;
   const initializeConfig = useStoreActions((actions) => actions.initializeConfig);
-  const generatedYaml = useStoreState((state) => state.generatedYaml);
+  const editingConfig = useStoreState((state) => state.editingConfig);
 
   useEffect(() => {
-    initializeConfig(configProp);
-  }, [configProp, initializeConfig]);
+    initializeConfig({ config: configProp, id: configId });
+  }, [configProp, configId, initializeConfig]);
 
   return (
     <Layout title="Assignment Configs">
@@ -28,7 +28,13 @@ function GUIAssignmentBuilder({ configProp, configId }: GUIAssignmentBuilderProp
             {isNewAssignment ? "New Assignment Config" : "Editing Config"}
           </h1>
           <div className="flex gap-2">
-            <Button className="bg-violet-500 text-white hover:bg-violet-600" onClick={() => console.log(generatedYaml)}>
+            <Button className="bg-violet-500 text-white hover:bg-violet-600" onClick={() => console.log(editingConfig)}>
+              Debug: Log Config
+            </Button>
+            <Button
+              className="bg-violet-500 text-white hover:bg-violet-600"
+              onClick={() => console.log(editingConfig?.toYaml())}
+            >
               Debug: Log YAML
             </Button>
             <Button
