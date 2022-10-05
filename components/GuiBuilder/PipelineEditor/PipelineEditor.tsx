@@ -6,16 +6,18 @@ import "reactflow/dist/style.css";
 
 function AddStageButton() {
   return (
-    <Tooltip label="Add stage" position="bottom" withArrow transition="fade" transitionDuration={200}>
-      <button
-        className="h-11 w-11 absolute right-3 top-3 flex items-center justify-center bg-cse-700 text-white rounded-full drop-shadow z-10"
-        onClick={() => {
-          // TODO
-        }}
-      >
-        <FontAwesomeIcon icon={["fas", "plus"]} className="text-xl" />
-      </button>
-    </Tooltip>
+    <div className="absolute right-3 top-3 z-10">
+      <Tooltip label="Add stage" position="bottom" withArrow transition="fade" transitionDuration={200}>
+        <button
+          className="h-11 w-11 flex items-center justify-center bg-cse-700 text-white rounded-full drop-shadow"
+          onClick={() => {
+            // TODO
+          }}
+        >
+          <FontAwesomeIcon icon={["fas", "plus"]} className="text-xl" />
+        </button>
+      </Tooltip>
+    </div>
   );
 }
 
@@ -42,6 +44,7 @@ function PipelineEditor() {
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
         proOptions={{ account: "", hideAttribution: true }}
+        snapToGrid
         className="rounded-md shadow"
       >
         <Controls showInteractive={false} />
