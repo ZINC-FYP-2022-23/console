@@ -4,6 +4,7 @@ import { useQuery } from "@apollo/client";
 import * as Sentry from "@sentry/nextjs";
 import JSZip from "jszip";
 import { SIDEBAR } from "../graphql/queries/user";
+import { ConfigError } from "types";
 
 interface ZincContextState {
   user: number;
@@ -13,7 +14,14 @@ interface ZincContextState {
   isAdmin: boolean;
   submitFile: (files, assignmentConfigId, userId) => Promise<void>;
   uploadGradingPackage: (files, assignmentConfigId) => Promise<any>;
-  validateAssignmentConfig: (yaml, assignmentConfigId) => Promise<any>;
+  validateAssignmentConfig: (
+    yaml: string,
+    assignmentConfigId: string,
+  ) => Promise<{
+    id: string;
+    /** Stringified object of type {@link ConfigError}. */
+    configError?: string;
+  }>;
   triggerManualGrading: (configId: string, usersBeingGraded: Array<number>) => Promise<any>;
 }
 
@@ -121,7 +129,10 @@ export const ZincProvider = ({ children, user, itsc, semester, isAdmin }: ZincPr
     }
   };
 
-  const validateAssignmentConfig = async (yaml: string, assignmentConfigId: string) => {
+  const validateAssignmentConfig = async (
+    yaml: string,
+    assignmentConfigId: string,
+  ): Promise<{ id: string; configError?: string }> => {
     try {
       const response = await fetch(`/api/configs/${assignmentConfigId}/validate`, {
         method: "POST",
