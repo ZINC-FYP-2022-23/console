@@ -9,7 +9,7 @@ import SettingsAccordion from "./SettingsAccordion";
 /**
  * The settings panel at the right of the page.
  */
-function SettingsSidebar() {
+function SettingsPanel() {
   const configId = useStoreState((state) => state.configId);
   const isNewAssignment = configId === null;
 
@@ -55,4 +55,4 @@ function SettingsSidebar() {
   );
 }
 
-export default SettingsSidebar;
+export default SettingsPanel;

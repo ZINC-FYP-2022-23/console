@@ -1,12 +1,8 @@
 interface AcceptedLang {
-  language: string;
-  compiler?: string[];
-  /**
-   * Displayed name in the UI.
-   *
-   * If undefined, the display name will default to capitalized value of the `language` field.
-   */
-  displayName?: string;
+  /** The language and compiler under the format of `${language}[/${compiler}]`. */
+  lang: string;
+  /** Label to display in the UI. */
+  label: string;
 }
 
 /**
@@ -15,24 +11,12 @@ interface AcceptedLang {
  * {@link https://docs.zinc.ust.dev/user/model/Config.html#settings-lang}
  */
 export const ACCEPTED_LANG: AcceptedLang[] = [
-  {
-    language: "c",
-    compiler: ["gcc", "clang"],
-  },
-  {
-    language: "cpp",
-    compiler: ["g++", "clang++"],
-    displayName: "C++",
-  },
-  {
-    language: "java",
-  },
-  {
-    language: "python",
-    compiler: ["", "cuda"],
-  },
-  {
-    language: "qt5",
-    displayName: "C++ with Qt",
-  },
+  { lang: "c/gcc", label: "C (gcc)" },
+  { lang: "c/clang", label: "C (clang)" },
+  { lang: "cpp/g++", label: "C++ (g++)" },
+  { lang: "cpp/clang++", label: "C++ (clang++)" },
+  { lang: "java", label: "Java" },
+  { lang: "python", label: "Python" },
+  { lang: "python/cuda", label: "Python (CUDA)" },
+  { lang: "qt5", label: "C++ with Qt" },
 ];

@@ -26,7 +26,7 @@ function GUIAssignmentBuilder({ configProp, configId }: GUIAssignmentBuilderProp
       <div className="p-4 w-full flex flex-col">
         <div className="mb-3 flex items-center justify-between">
           <h1 className="font-bold text-gray-900 text-xl sm:text-2xl">
-            {isNewAssignment ? "New Assignment Config" : "Editing Config"}
+            {isNewAssignment ? "New Assignment Config" : `Editing Assignment Config #${configId}`}
           </h1>
           <div className="flex gap-2">
             <Button className="bg-violet-500 text-white hover:bg-violet-600" onClick={() => console.log(editingConfig)}>

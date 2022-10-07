@@ -4,6 +4,7 @@
  * {@link https://easy-peasy.vercel.app/ easy-peasy} is chosen as the state management library.
  */
 import { Action, action } from "easy-peasy";
+import { set } from "lodash";
 import cloneDeep from "lodash/cloneDeep";
 import { Config } from "types";
 
@@ -18,6 +19,8 @@ export interface ConfigStoreModel {
 
 export interface ConfigStoreActions {
   initializeConfig: Action<ConfigStoreModel, { config: Config; id: number | null }>;
+  /** Updates a field in `editingConfig` given its `path`. */
+  updateField: Action<ConfigStoreModel, { path: string; value: any }>;
 }
 
 const Actions: ConfigStoreActions = {
@@ -25,6 +28,10 @@ const Actions: ConfigStoreActions = {
     state.initConfig = payload.config;
     state.editingConfig = cloneDeep(payload.config);
     state.configId = payload.id;
+  }),
+
+  updateField: action((state, payload) => {
+    set(state.editingConfig, payload.path, payload.value);
   }),
 };
 

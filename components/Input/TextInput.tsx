@@ -18,9 +18,9 @@ function TextInput({ type = "text", extraClassNames = "", ...props }: TextInputP
   return (
     <input
       type={type}
-      className={`form-input block py-2 px-3 mt-1 rounded-md shadow-sm
+      className={`form-input block py-2 px-3 mt-1 text-sm leading-4 rounded-md shadow-sm
       border border-gray-300 focus:outline-none focus:ring focus:ring-blue-100 focus:border-blue-300
-      transition duration-150 ease-in-out sm:text-sm sm:leading-5 ${extraClassNames}`}
+      transition ease-in-out ${extraClassNames}`}
       {...props}
     />
   );

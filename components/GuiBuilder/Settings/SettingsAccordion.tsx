@@ -31,7 +31,7 @@ function SettingsAccordion({ title, children }: SettingsAccordionProps) {
               leaveFrom="transform max-h-screen"
               leaveTo="transform max-h-0"
             >
-              <Disclosure.Panel className="px-3 pt-2 pb-4 bg-white">{children}</Disclosure.Panel>
+              <Disclosure.Panel className="px-3 pt-3 pb-5 bg-white text-sm">{children}</Disclosure.Panel>
             </Transition>
           </>
         )}

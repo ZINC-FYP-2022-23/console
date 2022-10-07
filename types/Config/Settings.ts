@@ -7,17 +7,16 @@ import { ParsedConfig } from "./Config";
  */
 class Settings {
   constructor(
-    /** Although this field is required, it can be `undefined` when the user hasn't chosen a language. */
-    public lang?: SettingsLang,
+    public lang: SettingsLang = new SettingsLang("cpp", "g++", ""),
     public use_template?: SettingsUseTemplate,
     public template?: string[],
-    public use_skeleton?: boolean,
-    public use_provided?: boolean,
-    public stage_wait_duration_secs?: number,
-    public cpus?: number,
-    public mem_gb?: number,
-    public early_return_on_throw?: boolean,
-    public enable_features?: SettingsFeatures,
+    public use_skeleton: boolean = false,
+    public use_provided: boolean = false,
+    public stage_wait_duration_secs: number = 60,
+    public cpus: number = 2.0,
+    public mem_gb: number = 4.0,
+    public early_return_on_throw: boolean = false,
+    public enable_features: SettingsFeatures = new SettingsFeatures(true),
   ) {}
 
   /**
@@ -103,9 +102,12 @@ export enum SettingsUseTemplate {
 /**
  * The `_settings.enable_features` field.
  */
-export interface SettingsFeatures {
-  network?: boolean;
-  gpu_device?: SettingsGpuDevice[] | "ANY";
+class SettingsFeatures {
+  // prettier-ignore
+  constructor(
+    public network: boolean = true,
+    public gpu_device?: SettingsGpuDevice[] | "ANY"
+  ) {}
 }
 
 /**
