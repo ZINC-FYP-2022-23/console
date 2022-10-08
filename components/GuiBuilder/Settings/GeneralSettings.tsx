@@ -1,4 +1,4 @@
-import { SwitchGroup, TextInput } from "components/Input";
+import { Select, SwitchGroup, TextInput } from "components/Input";
 import { ACCEPTED_LANG } from "constants/Config/AcceptedLang";
 import { useState } from "react";
 import { useStoreActions, useStoreState } from "state/Config/Hooks";
@@ -29,10 +29,8 @@ function GeneralSettings() {
       <div>
         <h3 className="mb-3 font-semibold text-base">Language</h3>
         <div className="flex items-center gap-3">
-          <select
-            className="form-input mt-1 pr-8 grow rounded-md shadow-sm text-sm leading-4
-            border border-gray-300 focus:outline-none focus:ring focus:ring-blue-100 focus:border-blue-300
-            transition duration-150 ease-in-out"
+          <Select
+            extraClassNames="grow"
             onChange={(event) => {
               const values = event.target.value.split("/");
               const language = values[0];
@@ -47,7 +45,7 @@ function GeneralSettings() {
                 {label}
               </option>
             ))}
-          </select>
+          </Select>
           <span className="flex-none text-gray-500">version</span>
           <TextInput
             extraClassNames="grow w-20"
@@ -86,6 +84,7 @@ function GeneralSettings() {
             checked={false}
             onChange={(value) => {
               // TODO: Handle template helper files
+              console.log(value);
             }}
           />
         </div>
@@ -101,6 +100,14 @@ function GeneralSettings() {
             onChange={(value) => {
               setSettings({ ...settings, early_return_on_throw: value });
               updateField({ path: "_settings.early_return_on_throw", value });
+            }}
+          />
+          <SwitchGroup
+            label="Allow Internet access"
+            checked={settings.network}
+            onChange={(value) => {
+              setSettings({ ...settings, network: value });
+              updateField({ path: "_settings.enable_features.network", value });
             }}
           />
           <div className="flex flex-col gap-3">
@@ -164,14 +171,6 @@ function GeneralSettings() {
               </div>
             </div>
           </div>
-          <SwitchGroup
-            label="Allow Internet access"
-            checked={settings.network}
-            onChange={(value) => {
-              setSettings({ ...settings, network: value });
-              updateField({ path: "_settings.enable_features.network", value });
-            }}
-          />
           <div className="flex items-center gap-2">
             <label htmlFor="cpus" className="flex-none w-1/2">
               GPU device (TODO)
