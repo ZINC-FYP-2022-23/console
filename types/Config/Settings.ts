@@ -102,7 +102,7 @@ export enum SettingsUseTemplate {
 /**
  * The `_settings.enable_features` field.
  */
-class SettingsFeatures {
+export class SettingsFeatures {
   // prettier-ignore
   constructor(
     public network: boolean = true,
