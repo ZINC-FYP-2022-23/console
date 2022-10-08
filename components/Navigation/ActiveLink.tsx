@@ -8,9 +8,20 @@ interface ActiveLinkProps {
 
 function ActiveLink({ children, href }: ActiveLinkProps) {
   const router = useRouter();
-  const semesterPrefixedUrl = `${
-    router.query.semesterId && !href.includes("admin") ? `/semesters/${router.query.semesterId}${href}` : href
-  }`;
+
+  const semesterPrefixedUrl = (() => {
+    const { semesterId } = router.query;
+    const isAdmin = href.includes("admin");
+    const isCourses = href.includes("courses");
+
+    if (semesterId && isCourses) {
+      return `/semesters/${semesterId}`;
+    }
+    if (semesterId && !isAdmin) {
+      return `/semesters/${semesterId}${href}`;
+    }
+    return href;
+  })();
 
   const isActive = router.pathname === semesterPrefixedUrl;
   const baseClass =
