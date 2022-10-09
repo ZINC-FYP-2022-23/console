@@ -16,6 +16,7 @@ function GUIAssignmentBuilder({ configProp, configId }: GUIAssignmentBuilderProp
   const isNewAssignment = configId === null;
   const initializeConfig = useStoreActions((actions) => actions.initializeConfig);
   const editingConfig = useStoreState((state) => state.editingConfig);
+  const isEdited = useStoreState((state) => state.isEdited);
 
   useEffect(() => {
     initializeConfig({ config: configProp, id: configId });
@@ -38,7 +39,8 @@ function GUIAssignmentBuilder({ configProp, configId }: GUIAssignmentBuilderProp
             Debug: Log YAML
           </Button>
           <Button
-            className="bg-green-500 text-white hover:bg-green-600"
+            className="bg-green-500 text-white hover:bg-green-600 disabled:bg-gray-400 disabled:cursor-not-allowed"
+            disabled={!isNewAssignment && !isEdited}
             onClick={() => {
               // TODO
             }}

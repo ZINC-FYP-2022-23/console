@@ -1,30 +1,39 @@
-import { Settings, SettingsLang } from "../../../types/Config";
-import { parseLangString, settingsLangToString, settingsToYamlObj } from "../settings";
+import cloneDeep from "lodash/cloneDeep";
+import { Settings, SettingsGpuDevice, SettingsLang } from "../../../types/Config";
+import { isSettingsEqual, parseLangString, settingsLangToString, settingsToYamlObj } from "../settings";
+
+const settings: Settings = {
+  lang: {
+    language: "cpp",
+    compiler: "g++",
+    version: "8",
+  },
+  use_template: undefined,
+  template: undefined,
+  use_skeleton: true,
+  use_provided: true,
+  stage_wait_duration_secs: 10,
+  cpus: 2,
+  mem_gb: 4.5,
+  early_return_on_throw: false,
+  enable_features: {
+    network: true,
+    gpu_device: [SettingsGpuDevice.AMD, SettingsGpuDevice.INTEL],
+  },
+};
 
 describe("Settings utils", () => {
-  it("replaces undefined with null when converting to YAML object", () => {
-    const settings: Settings = {
-      lang: {
-        language: "cpp",
-        compiler: "g++",
-        version: "8",
-      },
-      use_template: undefined,
-      template: undefined,
-      use_skeleton: true,
-      use_provided: true,
-      stage_wait_duration_secs: 10,
-      cpus: 2,
-      mem_gb: 4,
-      early_return_on_throw: false,
-      enable_features: {
-        network: true,
-      },
-    };
+  describe("settingsToYamlObj()", () => {
+    it("replaces undefined with null when converting to YAML object", () => {
+      const output = settingsToYamlObj(settings);
+      expect(output.use_template).toBe(null);
+      expect(output.template).toBe(null);
+    });
 
-    const output = settingsToYamlObj(settings);
-    expect(output.use_template).toBe(null);
-    expect(output.template).toBe(null);
+    it("converts `lang` field to a string representation", () => {
+      const output = settingsToYamlObj(settings);
+      expect(output.lang).toBe("cpp/g++:8");
+    });
   });
 
   describe("SettingsLang", () => {
@@ -54,6 +63,18 @@ describe("Settings utils", () => {
         version: "17.0.2",
       };
       expect(settingsLangToString(java)).toBe("java:17.0.2");
+    });
+  });
+
+  describe("isSettingsEqual()", () => {
+    it("returns true for equal settings", () => {
+      const s2 = cloneDeep(settings);
+      // Test numerical string parsing and gpu_device sorting
+      s2.stage_wait_duration_secs = "10";
+      s2.mem_gb = "4.5";
+      s2.enable_features.gpu_device = [SettingsGpuDevice.INTEL, SettingsGpuDevice.AMD];
+
+      expect(isSettingsEqual(settings, s2)).toBe(true);
     });
   });
 });

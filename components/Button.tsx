@@ -5,6 +5,9 @@ type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   className?: string;
   /** Leading icon, if any. */
   icon?: React.ReactNode;
+  /** Disabled when `disabled` prop is true. */
+  onClick?: React.MouseEventHandler<HTMLButtonElement>;
+  disabled?: boolean;
 };
 
 /**
@@ -14,11 +17,12 @@ function Button({ children, onClick, className = "", icon, disabled = false, ...
   return (
     <button
       type="button"
-      onClick={onClick}
+      onClick={disabled ? () => {} : onClick}
       className={
         "px-4 py-1 flex items-center justify-center border border-transparent font-medium text-md rounded-md focus:outline-none transition ease-in-out duration-150 " +
         className
       }
+      disabled={disabled}
       {...props}
     >
       {icon && <span className="mr-3">{icon}</span>}

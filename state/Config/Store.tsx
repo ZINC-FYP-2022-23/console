@@ -4,10 +4,11 @@
  * {@link https://easy-peasy.vercel.app/ easy-peasy} is chosen as the state management library.
  */
 import { defaultConfig } from "constants/Config/defaults";
-import { Action, action } from "easy-peasy";
+import { Action, action, computed, Computed } from "easy-peasy";
 import { set } from "lodash";
 import cloneDeep from "lodash/cloneDeep";
 import type { Config } from "types";
+import { isConfigEqual } from "utils/Config";
 
 export interface ConfigStoreModel {
   /** The assignment config ID. It's `null` if we're creating a new assignment. */
@@ -22,6 +23,8 @@ export interface ConfigStoreActions {
   initializeConfig: Action<ConfigStoreModel, { config: Config; id: number | null }>;
   /** Updates a field in `editingConfig` given its `path`. */
   updateField: Action<ConfigStoreModel, { path: string; value: any }>;
+  /** Whether the config has been edited. */
+  isEdited: Computed<ConfigStoreModel, boolean>;
 }
 
 const Actions: ConfigStoreActions = {
@@ -34,6 +37,8 @@ const Actions: ConfigStoreActions = {
   updateField: action((state, payload) => {
     set(state.editingConfig, payload.path, payload.value);
   }),
+
+  isEdited: computed((state) => !isConfigEqual(state.initConfig, state.editingConfig)),
 };
 
 // NOTE: The store should ONLY use plain serializable objects, arrays, and primitives.

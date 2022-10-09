@@ -3,8 +3,9 @@
  */
 
 import { dump, load } from "js-yaml";
+import isEqual from "lodash/isEqual";
 import type { Config, ParsedConfig, Settings, Stage } from "types";
-import { parseLangString, settingsToYamlObj } from "./settings";
+import { isSettingsEqual, parseLangString, settingsToYamlObj } from "./settings";
 
 /**
  * Creates a {@link Config} object from parsing the configuration YAML.
@@ -25,4 +26,11 @@ export function configToYaml(config: Config): string {
   const stages = {};
   config.stages.forEach((stage) => (stages[stage.id] = stage.config));
   return dump({ _settings, ...stages });
+}
+
+/**
+ * Deep compares two `Config` objects.
+ */
+export function isConfigEqual(c1: Config, c2: Config): boolean {
+  return isSettingsEqual(c1._settings, c2._settings) && isEqual(c1.stages, c2.stages);
 }

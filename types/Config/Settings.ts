@@ -9,9 +9,10 @@ interface Settings {
   template?: string[];
   use_skeleton: boolean;
   use_provided: boolean;
-  stage_wait_duration_secs: number;
-  cpus: number;
-  mem_gb: number;
+  // NOTE: `number | string` = Either a number or a numerical string (e.g. `"60"`)
+  stage_wait_duration_secs: number | string;
+  cpus: number | string;
+  mem_gb: number | string;
   early_return_on_throw: boolean;
   enable_features: SettingsFeatures;
 }
