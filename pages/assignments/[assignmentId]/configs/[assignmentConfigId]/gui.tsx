@@ -10,6 +10,7 @@ import configStore from "state/Config/Store";
 import { useMemo } from "react";
 import { defaultConfig } from "constants/Config/defaults";
 import { parseConfigYaml } from "utils/Config";
+import { Layout } from "layout";
 
 const store = createStore(configStore);
 
@@ -31,9 +32,11 @@ function GUIAssignmentBuilderRoot({ configId }: GUIAssignmentBuilderRootProps) {
 
   return (
     <LayoutProvider>
-      <StoreProvider store={store}>
-        <GUIAssignmentBuilder configProp={config} configId={configId} />
-      </StoreProvider>
+      <Layout title="Assignment Config">
+        <StoreProvider store={store}>
+          <GUIAssignmentBuilder configProp={config} configId={configId} />
+        </StoreProvider>
+      </Layout>
     </LayoutProvider>
   );
 }

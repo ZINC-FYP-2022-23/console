@@ -1,5 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Button from "components/Button";
+import { memo } from "react";
 import { useStoreState } from "state/Config/Hooks";
 import GeneralSettings from "./GeneralSettings";
 import Policy from "./Policy";
@@ -55,4 +56,4 @@ function SettingsPanel() {
   );
 }
 
-export default SettingsPanel;
+export default memo(SettingsPanel);

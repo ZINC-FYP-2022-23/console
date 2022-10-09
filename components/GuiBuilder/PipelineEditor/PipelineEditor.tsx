@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Tooltip } from "@mantine/core";
-import { useCallback } from "react";
+import { memo, useCallback } from "react";
 import ReactFlow, { Controls, Background, useNodesState, useEdgesState, addEdge, BackgroundVariant } from "reactflow";
 import "reactflow/dist/style.css";
 
@@ -54,4 +54,4 @@ function PipelineEditor() {
   );
 }
 
-export default PipelineEditor;
+export default memo(PipelineEditor);
