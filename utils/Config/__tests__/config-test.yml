@@ -5,9 +5,9 @@ _settings:
   use_skeleton: true
   use_provided: true
   stage_wait_duration_secs: 10
-  cpus: null
-  mem_gb: null
-  early_return_on_throw: null
+  cpus: 2
+  mem_gb: 4
+  early_return_on_throw: false
   enable_features:
     network: true
 compile:

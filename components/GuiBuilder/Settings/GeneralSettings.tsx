@@ -1,8 +1,8 @@
 import { Checkbox, Select, SwitchGroup, TextInput } from "components/Input";
 import { ACCEPTED_LANG } from "constants/Config/AcceptedLang";
-import { useState } from "react";
 import { useStoreActions, useStoreState } from "state/Config/Hooks";
 import { SettingsFeatures, SettingsGpuDevice } from "types";
+import { settingsLangToString } from "utils/Config";
 
 interface GpuSelectOptions {
   label: string;
@@ -15,6 +15,16 @@ const gpuSelectOptions: GpuSelectOptions[] = [
   { label: "Choose vendors...", value: "choose" },
 ];
 
+const getGpuSelectValue = (gpu: SettingsFeatures["gpu_device"]): GpuSelectOptions["value"] => {
+  if (gpu === undefined) {
+    return "undefined";
+  } else if (gpu === "ANY") {
+    return "ANY";
+  } else {
+    return "choose";
+  }
+};
+
 const gpuVendorSelectOptions = [
   { label: "NVIDIA", value: SettingsGpuDevice.NVIDIA },
   { label: "AMD", value: SettingsGpuDevice.AMD },
@@ -24,21 +34,6 @@ const gpuVendorSelectOptions = [
 function GeneralSettings() {
   const _settings = useStoreState((state) => state.editingConfig._settings);
   const updateField = useStoreActions((actions) => actions.updateField);
-
-  // Subset of _settings. The fields below are all text input fields.
-  // This is required because if we pass `_settings` fields to the `value` prop of input fields directly
-  // (e.g. `value={_settings.cpus}`), the input field does not update when the user types in it.
-  const [settings, setSettings] = useState({
-    langVersion: _settings.lang?.version,
-    use_skeleton: _settings.use_skeleton,
-    use_provided: _settings.use_provided,
-    stage_wait_duration_secs: _settings.stage_wait_duration_secs.toString(),
-    cpus: _settings.cpus.toString(),
-    mem_gb: _settings.mem_gb.toString(),
-    early_return_on_throw: _settings.early_return_on_throw,
-    network: _settings.enable_features.network,
-    gpu_device: _settings.enable_features.gpu_device,
-  });
 
   // TODO: Numerical fields in `_settings` casted back to numbers, not strings
 
@@ -57,7 +52,7 @@ function GeneralSettings() {
               updateField({ path: "_settings.lang.language", value: language });
               updateField({ path: "_settings.lang.compiler", value: compiler });
             }}
-            defaultValue={_settings.lang?.toString().split(":")[0]}
+            defaultValue={settingsLangToString(_settings.lang).split(":")[0]}
           >
             {ACCEPTED_LANG.map(({ lang, label }) => (
               <option key={lang} value={lang}>
@@ -68,10 +63,9 @@ function GeneralSettings() {
           <span className="flex-none text-gray-500">version</span>
           <TextInput
             extraClassNames="grow w-20"
-            value={settings.langVersion}
+            value={_settings.lang.version}
             onChange={(event) => {
               const value = event.target.value;
-              setSettings({ ...settings, langVersion: value });
               updateField({ path: "_settings.lang.version", value });
             }}
           />
@@ -83,17 +77,15 @@ function GeneralSettings() {
         <div className="flex flex-col gap-5">
           <SwitchGroup
             label="Provide skeleton code to students"
-            checked={settings.use_skeleton}
+            checked={_settings.use_skeleton}
             onChange={(value) => {
-              setSettings({ ...settings, use_skeleton: value });
               updateField({ path: "_settings.use_skeleton", value });
             }}
           />
           <SwitchGroup
             label="Use driver programs for grading"
-            checked={settings.use_provided}
+            checked={_settings.use_provided}
             onChange={(value) => {
-              setSettings({ ...settings, use_provided: value });
               updateField({ path: "_settings.use_provided", value });
             }}
           />
@@ -115,17 +107,15 @@ function GeneralSettings() {
           <SwitchGroup
             label="Early return on error"
             description="Whether the pipeline will return when any stage returns non-zero exit code"
-            checked={settings.early_return_on_throw}
+            checked={_settings.early_return_on_throw}
             onChange={(value) => {
-              setSettings({ ...settings, early_return_on_throw: value });
               updateField({ path: "_settings.early_return_on_throw", value });
             }}
           />
           <SwitchGroup
             label="Allow Internet access"
-            checked={settings.network}
+            checked={_settings.enable_features.network}
             onChange={(value) => {
-              setSettings({ ...settings, network: value });
               updateField({ path: "_settings.enable_features.network", value });
             }}
           />
@@ -137,13 +127,12 @@ function GeneralSettings() {
               <div className="flex-1 flex items-center">
                 <TextInput
                   id="stage_wait_duration_secs"
-                  value={settings.stage_wait_duration_secs}
+                  value={_settings.stage_wait_duration_secs}
                   type="number"
                   min="0"
                   placeholder="60"
                   onChange={(event) => {
                     const value = event.target.value;
-                    setSettings({ ...settings, stage_wait_duration_secs: value });
                     updateField({ path: "_settings.stage_wait_duration_secs", value });
                   }}
                   extraClassNames="flex-1 w-10"
@@ -157,7 +146,7 @@ function GeneralSettings() {
               </label>
               <TextInput
                 id="cpus"
-                value={settings.cpus}
+                value={_settings.cpus}
                 type="number"
                 step=".1"
                 min="1"
@@ -165,7 +154,6 @@ function GeneralSettings() {
                 onChange={(event) => {
                   const value = event.target.value;
                   updateField({ path: "_settings.cpus", value });
-                  setSettings({ ...settings, cpus: value });
                 }}
                 extraClassNames="flex-1 w-10"
               />
@@ -177,7 +165,7 @@ function GeneralSettings() {
               <div className="flex-1 flex items-center">
                 <TextInput
                   id="mem_gb"
-                  value={settings.mem_gb}
+                  value={_settings.mem_gb}
                   type="number"
                   step=".1"
                   min="1"
@@ -185,7 +173,6 @@ function GeneralSettings() {
                   onChange={(event) => {
                     const value = event.target.value;
                     updateField({ path: "_settings.mem_gb", value });
-                    setSettings({ ...settings, mem_gb: value });
                   }}
                   extraClassNames="flex-1 w-10"
                 />
@@ -194,11 +181,11 @@ function GeneralSettings() {
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <label htmlFor="cpus" className="flex-none w-1/2">
+                <label htmlFor="gpus" className="flex-none w-1/2">
                   GPU device
                 </label>
                 <Select
-                  id="cpus"
+                  id="gpus"
                   extraClassNames="flex-1"
                   onChange={(event) => {
                     const value = event.target.value as GpuSelectOptions["value"];
@@ -214,9 +201,9 @@ function GeneralSettings() {
                         gpuDevice = [];
                         break;
                     }
-                    setSettings({ ...settings, gpu_device: gpuDevice });
                     updateField({ path: "_settings.enable_features.gpu_device", value: gpuDevice });
                   }}
+                  value={getGpuSelectValue(_settings.enable_features.gpu_device)}
                 >
                   {gpuSelectOptions.map((option) => (
                     <option key={option.value} value={option.value}>
@@ -225,23 +212,22 @@ function GeneralSettings() {
                   ))}
                 </Select>
               </div>
-              {Array.isArray(settings.gpu_device) && (
+              {Array.isArray(_settings.enable_features.gpu_device) && (
                 <div className="max-w-sm mt-4 mx-auto px-3 flex justify-between">
                   {gpuVendorSelectOptions.map(({ label, value }) => {
                     return (
                       <div key={value} className="flex items-center">
                         <Checkbox
                           id={value}
-                          checked={(settings.gpu_device as SettingsGpuDevice[]).includes(value)}
+                          checked={(_settings.enable_features.gpu_device as SettingsGpuDevice[]).includes(value)}
                           onChange={(event) => {
                             const checked = event.target.checked;
-                            const gpuDevices = [...(settings.gpu_device as SettingsGpuDevice[])];
+                            const gpuDevices = [...(_settings.enable_features.gpu_device as SettingsGpuDevice[])];
                             if (checked) {
                               gpuDevices.push(value);
                             } else {
                               gpuDevices.splice(gpuDevices.indexOf(value), 1);
                             }
-                            setSettings({ ...settings, gpu_device: gpuDevices });
                             updateField({ path: "_settings.enable_features.gpu_device", value: gpuDevices });
                           }}
                         />

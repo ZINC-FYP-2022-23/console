@@ -8,6 +8,8 @@ import { AssignmentConfig, Config } from "types";
 import { createStore, StoreProvider } from "easy-peasy";
 import configStore from "state/Config/Store";
 import { useMemo } from "react";
+import { defaultConfig } from "constants/Config/defaults";
+import { parseConfigYaml } from "utils/Config";
 
 const store = createStore(configStore);
 
@@ -17,14 +19,14 @@ interface GUIAssignmentBuilderRootProps {
 }
 
 function GUIAssignmentBuilderRoot({ configId }: GUIAssignmentBuilderRootProps) {
-  let config = useMemo(() => Config.empty(), []);
+  let config = useMemo(() => defaultConfig, []);
   const { data } = useQuery<{ assignmentConfig: AssignmentConfig }>(GET_PIPELINE_CONFIG_FOR_ASSIGNMENT, {
     variables: {
       assignmentConfigId: configId,
     },
   });
   if (data) {
-    config = Config.fromYaml(data.assignmentConfig.config_yaml);
+    config = parseConfigYaml(data.assignmentConfig.config_yaml);
   }
 
   return (

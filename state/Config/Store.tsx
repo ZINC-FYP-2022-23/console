@@ -3,10 +3,11 @@
  *
  * {@link https://easy-peasy.vercel.app/ easy-peasy} is chosen as the state management library.
  */
+import { defaultConfig } from "constants/Config/defaults";
 import { Action, action } from "easy-peasy";
 import { set } from "lodash";
 import cloneDeep from "lodash/cloneDeep";
-import { Config } from "types";
+import type { Config } from "types";
 
 export interface ConfigStoreModel {
   /** The assignment config ID. It's `null` if we're creating a new assignment. */
@@ -35,10 +36,13 @@ const Actions: ConfigStoreActions = {
   }),
 };
 
+// NOTE: The store should ONLY use plain serializable objects, arrays, and primitives.
+// Do NOT use ES6 classes, functions, Maps, Sets, etc. Otherwise, easy-peasy will have
+// trouble detecting changes in the store. See https://stackoverflow.com/q/74002866/11067496
 const configStore: ConfigStoreModel & ConfigStoreActions = {
   configId: null,
-  initConfig: Config.empty(),
-  editingConfig: Config.empty(),
+  initConfig: defaultConfig,
+  editingConfig: defaultConfig,
   ...Actions,
 };
 

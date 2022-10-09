@@ -3,6 +3,7 @@ import { Layout } from "layout";
 import { useEffect } from "react";
 import { useStoreActions, useStoreState } from "state/Config/Hooks";
 import { Config } from "types";
+import { configToYaml } from "utils/Config";
 import PipelineEditor from "./PipelineEditor/PipelineEditor";
 import SettingsPanel from "./Settings/SettingsPanel";
 
@@ -34,7 +35,7 @@ function GUIAssignmentBuilder({ configProp, configId }: GUIAssignmentBuilderProp
             </Button>
             <Button
               className="bg-violet-500 text-white hover:bg-violet-600"
-              onClick={() => console.log(editingConfig?.toYaml())}
+              onClick={() => console.log(configToYaml(editingConfig))}
             >
               Debug: Log YAML
             </Button>
