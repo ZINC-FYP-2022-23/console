@@ -1,9 +1,10 @@
 import Button from "components/Button";
 import { useEffect } from "react";
-import { useStoreActions, useStoreState } from "state/Config/Hooks";
+import { useStoreActions, useStoreState } from "state/GuiBuilder/Hooks";
 import { Config } from "types";
 import { configToYaml } from "utils/Config";
 import PipelineEditor from "./PipelineEditor/PipelineEditor";
+import AddStagePanel from "./Settings/AddStagePanel";
 import SettingsPanel from "./Settings/SettingsPanel";
 
 interface GUIAssignmentBuilderProps {
@@ -17,6 +18,7 @@ function GUIAssignmentBuilder({ configProp, configId }: GUIAssignmentBuilderProp
   const initializeConfig = useStoreActions((actions) => actions.initializeConfig);
   const editingConfig = useStoreState((state) => state.editingConfig);
   const isEdited = useStoreState((state) => state.isEdited);
+  const showAddStage = useStoreState((state) => state.layout.showAddStage);
 
   useEffect(() => {
     initializeConfig({ config: configProp, id: configId });
@@ -57,7 +59,7 @@ function GUIAssignmentBuilder({ configProp, configId }: GUIAssignmentBuilderProp
           <div className="h-1/2 bg-white rounded-md shadow">Stage settings</div>
         </div>
         <div className="w-2/6 bg-white rounded-md shadow overflow-y-auto">
-          <SettingsPanel />
+          {showAddStage ? <AddStagePanel /> : <SettingsPanel />}
         </div>
       </div>
     </div>

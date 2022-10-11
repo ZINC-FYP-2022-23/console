@@ -1,7 +1,7 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Button from "components/Button";
 import { memo } from "react";
-import { useStoreState } from "state/Config/Hooks";
+import { useStoreState } from "state/GuiBuilder/Hooks";
 import GeneralSettings from "./GeneralSettings";
 import Policy from "./Policy";
 import Scheduling from "./Scheduling";

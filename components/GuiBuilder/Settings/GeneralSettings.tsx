@@ -1,6 +1,6 @@
 import { Checkbox, Select, SwitchGroup, TextInput } from "components/Input";
 import { ACCEPTED_LANG } from "constants/Config/AcceptedLang";
-import { useStoreActions, useStoreState } from "state/Config/Hooks";
+import { useStoreActions, useStoreState } from "state/GuiBuilder/Hooks";
 import { SettingsFeatures, SettingsGpuDevice } from "types";
 import { settingsLangToString } from "utils/Config";
 
@@ -90,7 +90,7 @@ function GeneralSettings() {
             }}
           />
           <SwitchGroup
-            label="Use template helper files"
+            label="(TODO) Use template helper files"
             description="Files that students should submit"
             checked={false}
             onChange={(value) => {
