@@ -1,3 +1,4 @@
+import Accordion from "@components/Accordion";
 import Button from "@components/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useStoreState } from "@state/GuiBuilder/Hooks";
@@ -5,7 +6,6 @@ import { memo } from "react";
 import GeneralSettings from "./GeneralSettings";
 import Policy from "./Policy";
 import Scheduling from "./Scheduling";
-import SettingsAccordion from "./SettingsAccordion";
 
 /**
  * The settings panel at the right of the page.
@@ -42,15 +42,15 @@ function SettingsPanel() {
         </div>
       )}
       <div className="mb-4">
-        <SettingsAccordion title="General Settings">
+        <Accordion title="General Settings" extraClassNames={{ title: "text-xl" }}>
           <GeneralSettings />
-        </SettingsAccordion>
-        <SettingsAccordion title="Policy">
+        </Accordion>
+        <Accordion title="Policy" extraClassNames={{ title: "text-xl" }}>
           <Policy />
-        </SettingsAccordion>
-        <SettingsAccordion title="Scheduling">
+        </Accordion>
+        <Accordion title="Scheduling" extraClassNames={{ title: "text-xl" }}>
           <Scheduling />
-        </SettingsAccordion>
+        </Accordion>
       </div>
     </div>
   );

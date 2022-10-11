@@ -1,22 +1,33 @@
-import { Disclosure, Transition } from "@headlessui/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Disclosure, Transition } from "@headlessui/react";
 
 interface SettingsAccordionProps {
   title: string;
   children: React.ReactNode;
+  /** Whether the accordion is opened by default. */
+  defaultOpen?: boolean;
+  /** Classes to apply extra styling. */
+  extraClassNames?: {
+    buttonRoot?: string;
+    title?: string;
+  };
 }
 
 /**
- * Accordion component for the settings panel.
+ * An animated accordion component to hold expandible content.
  */
-function SettingsAccordion({ title, children }: SettingsAccordionProps) {
+function Accordion({ title, children, defaultOpen = false, extraClassNames }: SettingsAccordionProps) {
   return (
     <div className="border-b border-gray-300">
-      <Disclosure>
+      <Disclosure defaultOpen={defaultOpen}>
         {({ open }) => (
           <>
-            <Disclosure.Button className="w-full px-3 py-2 flex justify-between items-center bg-blue-50">
-              <span className="font-semibold text-xl">{title}</span>
+            <Disclosure.Button
+              className={`w-full px-3 py-2 flex justify-between items-center bg-blue-50 ${
+                extraClassNames?.buttonRoot ?? ""
+              }`}
+            >
+              <span className={`font-semibold ${extraClassNames?.title ?? ""}`}>{title}</span>
               <FontAwesomeIcon
                 icon={["fas", "caret-down"]}
                 className={`${open ? "rotate-180 transform" : ""} mr-2 transition-transform duration-200`}
@@ -40,4 +51,4 @@ function SettingsAccordion({ title, children }: SettingsAccordionProps) {
   );
 }
 
-export default SettingsAccordion;
+export default Accordion;
