@@ -22,7 +22,19 @@
     "strict": true,
     "target": "esnext",
     "incremental": true,
-    "baseUrl": "."
+    "baseUrl": ".",
+    "paths": {
+      "@components/*": ["components/*"],
+      "@constants/*": ["constants/*"],
+      "@contexts/*": ["contexts/*"],
+      "@graphql/*": ["graphql/*"],
+      "@layout": ["layout/"],
+      "@lib/*": ["lib/*"],
+      "@state/*": ["state/*"],
+      "@types": ["types/"],
+      "@types/*": ["types/*"],
+      "@utils/*": ["utils/*"]
+    }
   },
   "exclude": [
     "node_modules"
