@@ -2,7 +2,7 @@
  * @file Utilities for the `Stage` type.
  */
 
-import type { Stage } from "types";
+import type { Stage } from "@types";
 
 /**
  * Gets the type of the stage, such as `"StdioTest"`, `"Compile"`, etc.

@@ -1,9 +1,9 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Tooltip } from "@mantine/core";
+import { useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
 import { memo, useCallback } from "react";
-import ReactFlow, { Controls, Background, useNodesState, useEdgesState, addEdge, BackgroundVariant } from "reactflow";
+import ReactFlow, { addEdge, Background, BackgroundVariant, Controls, useEdgesState, useNodesState } from "reactflow";
 import "reactflow/dist/style.css";
-import { useStoreActions, useStoreState } from "state/GuiBuilder/Hooks";
 
 function AddStageButton() {
   const showAddStage = useStoreState((state) => state.layout.showAddStage);

@@ -1,4 +1,4 @@
-import { type Settings, type Stage } from "types";
+import type { Settings, Stage } from "@types";
 
 /**
  * An assignment configuration.

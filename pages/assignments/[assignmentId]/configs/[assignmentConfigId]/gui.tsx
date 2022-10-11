@@ -1,16 +1,16 @@
 import { useQuery } from "@apollo/client";
-import GUIAssignmentBuilder from "components/GuiBuilder/GuiBuilder";
-import { LayoutProvider } from "contexts/layout";
-import { GET_PIPELINE_CONFIG_FOR_ASSIGNMENT } from "graphql/queries/user";
-import { initializeApollo } from "lib/apollo";
-import { GetServerSideProps } from "next";
-import { AssignmentConfig } from "types";
+import GUIAssignmentBuilder from "@components/GuiBuilder/GuiBuilder";
+import { defaultConfig } from "@constants/Config/defaults";
+import { LayoutProvider } from "@contexts/layout";
+import { GET_PIPELINE_CONFIG_FOR_ASSIGNMENT } from "@graphql/queries/user";
+import { Layout } from "@layout";
+import { initializeApollo } from "@lib/apollo";
+import configStore from "@state/GuiBuilder/Store";
+import { AssignmentConfig } from "@types";
+import { parseConfigYaml } from "@utils/Config";
 import { createStore, StoreProvider } from "easy-peasy";
-import configStore from "state/GuiBuilder/Store";
+import { GetServerSideProps } from "next";
 import { useMemo } from "react";
-import { defaultConfig } from "constants/Config/defaults";
-import { parseConfigYaml } from "utils/Config";
-import { Layout } from "layout";
 
 const store = createStore(configStore);
 

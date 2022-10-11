@@ -3,12 +3,12 @@
  *
  * {@link https://easy-peasy.vercel.app/ easy-peasy} is chosen as the state management library.
  */
-import { defaultConfig } from "constants/Config/defaults";
+import { defaultConfig } from "@constants/Config/defaults";
+import type { Config } from "@types";
+import { isConfigEqual } from "@utils/Config";
 import { Action, action, computed, Computed } from "easy-peasy";
 import { set } from "lodash";
 import cloneDeep from "lodash/cloneDeep";
-import type { Config } from "types";
-import { isConfigEqual } from "utils/Config";
 
 export interface GuiBuilderStoreModel {
   /** The assignment config ID. It's `null` if we're creating a new assignment. */

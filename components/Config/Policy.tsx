@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useLayoutDispatch, useLayoutState } from "../../contexts/layout";
 import { UPDATE_ASSIGNMENT_CONFIG } from "../../graphql/mutations/user";
 import { useZinc } from "../../contexts/zinc";
-import { Checkbox, TextInput } from "components/Input";
+import { Checkbox, TextInput } from "@components/Input";
 
 export function PolicyConfig({ policy, onChange }) {
   const router = useRouter();

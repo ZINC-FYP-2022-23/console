@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import { utcToZonedTime, zonedTimeToUtc } from "date-fns-tz";
 import { useLayoutDispatch } from "../../contexts/layout";
 import { UPDATE_ASSIGNMENT_CONFIG } from "../../graphql/mutations/user";
-import { DateInput } from "components/Input";
+import { DateInput } from "@components/Input";
 
 const getLocalDate = (date: string) => {
   if (date) {

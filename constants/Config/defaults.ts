@@ -1,4 +1,4 @@
-import type { Config, Settings } from "types";
+import type { Config, Settings } from "@types";
 
 /**
  * Default values for the `_settings` field in an assignment config.

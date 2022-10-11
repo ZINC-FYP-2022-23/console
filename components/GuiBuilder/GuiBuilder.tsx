@@ -1,8 +1,8 @@
-import Button from "components/Button";
+import Button from "@components/Button";
+import { useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
+import { Config } from "@types";
+import { configToYaml } from "@utils/Config";
 import { useEffect } from "react";
-import { useStoreActions, useStoreState } from "state/GuiBuilder/Hooks";
-import { Config } from "types";
-import { configToYaml } from "utils/Config";
 import PipelineEditor from "./PipelineEditor/PipelineEditor";
 import AddStagePanel from "./Settings/AddStagePanel";
 import SettingsPanel from "./Settings/SettingsPanel";

@@ -4,7 +4,7 @@ import { useQuery } from "@apollo/client";
 import * as Sentry from "@sentry/nextjs";
 import JSZip from "jszip";
 import { SIDEBAR } from "../graphql/queries/user";
-import { ConfigError } from "types";
+import { ConfigError } from "@types";
 
 interface ZincContextState {
   user: number;

@@ -1,7 +1,7 @@
+import Button from "@components/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import Button from "components/Button";
+import { useStoreActions } from "@state/GuiBuilder/Hooks";
 import { memo } from "react";
-import { useStoreActions } from "state/GuiBuilder/Hooks";
 
 function AddStagePanel() {
   const toggleAddStage = useStoreActions((action) => action.toggleAddStage);

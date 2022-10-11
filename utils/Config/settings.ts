@@ -2,9 +2,9 @@
  * @file Utilities for the `Settings` type.
  */
 
+import type { ParsedConfig, Settings, SettingsLang } from "@types";
 import cloneDeep from "lodash/cloneDeep";
 import isEqual from "lodash/isEqual";
-import type { ParsedConfig, Settings, SettingsLang } from "types";
 
 /**
  * Converts to an object representation of the `_settings` field in the configuration YAML.

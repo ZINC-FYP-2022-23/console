@@ -1,8 +1,8 @@
-import { Checkbox, Select, SwitchGroup, TextInput } from "components/Input";
-import { ACCEPTED_LANG } from "constants/Config/AcceptedLang";
-import { useStoreActions, useStoreState } from "state/GuiBuilder/Hooks";
-import { SettingsFeatures, SettingsGpuDevice } from "types";
-import { settingsLangToString } from "utils/Config";
+import { Checkbox, Select, SwitchGroup, TextInput } from "@components/Input";
+import { ACCEPTED_LANG } from "@constants/Config/AcceptedLang";
+import { useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
+import { SettingsFeatures, SettingsGpuDevice } from "@types";
+import { settingsLangToString } from "@utils/Config";
 
 interface GpuSelectOptions {
   label: string;

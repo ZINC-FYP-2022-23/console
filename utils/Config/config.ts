@@ -2,9 +2,9 @@
  * @file Utilities for the `Config` type.
  */
 
+import type { Config, ParsedConfig, Settings, Stage } from "@types";
 import { dump, load } from "js-yaml";
 import isEqual from "lodash/isEqual";
-import type { Config, ParsedConfig, Settings, Stage } from "types";
 import { isSettingsEqual, parseLangString, settingsToYamlObj } from "./settings";
 
 /**
