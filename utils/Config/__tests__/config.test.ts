@@ -1,6 +1,7 @@
-import { readFileSync } from "fs";
-import { Config, SettingsUseTemplate, StageKind } from "../../../types/Config";
+import { Config, Settings, Stage, StageKind } from "@types";
 import { configToYaml, parseConfigYaml } from "../config";
+import * as settingsUtils from "../settings";
+import * as stageUtils from "../stage";
 
 describe("Config utils", () => {
   it("parses a YAML config", () => {
@@ -42,43 +43,39 @@ describe("Config utils", () => {
   });
 
   it("de-serializes to a YAML string", () => {
-    const config: Config = {
-      _settings: {
-        lang: {
-          language: "cpp",
-          compiler: "g++",
-          version: "8",
-        },
-        use_template: SettingsUseTemplate.PATH,
-        template: undefined,
-        use_skeleton: true,
-        use_provided: true,
-        stage_wait_duration_secs: 10,
-        cpus: 2,
-        mem_gb: 4,
-        early_return_on_throw: false,
-        enable_features: {
-          network: true,
-        },
+    const _settings: Settings = {
+      lang: {
+        language: "cpp",
+        compiler: "g++",
+        version: "8",
       },
-      stages: [
-        {
-          id: "compile",
-          name: "Compile",
-          kind: StageKind.PRE_LOCAL,
-          config: { input: ["*.cpp"], output: "a.out" },
-        },
-        {
-          id: "score",
-          name: "Score",
-          kind: StageKind.POST,
-          config: { normalizedTo: 100 },
-        },
-      ],
+      use_skeleton: true,
+      use_provided: true,
+      stage_wait_duration_secs: 10,
+      cpus: 2,
+      mem_gb: 4,
+      early_return_on_throw: false,
+      enable_features: {
+        network: true,
+      },
+    };
+    const stages: Stage[] = [
+      {
+        id: "compile",
+        name: "Compile",
+        kind: StageKind.PRE_LOCAL,
+        config: { input: ["*.cpp"], output: "a.out" },
+      },
+    ];
+    const config: Config = {
+      _settings,
+      stages,
     };
 
-    const expected = readFileSync("utils/Config/__tests__/config-test.yml").toString();
-    const output = configToYaml(config);
-    expect(output).toBe(expected);
+    const settingsToYamlMock = jest.spyOn(settingsUtils, "settingsToYamlObj");
+    const stagesToYamlMock = jest.spyOn(stageUtils, "stagesToYamlObj");
+    configToYaml(config);
+    expect(settingsToYamlMock).toBeCalledWith(_settings);
+    expect(stagesToYamlMock).toBeCalledWith(stages);
   });
 });
