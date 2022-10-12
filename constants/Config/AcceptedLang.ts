@@ -1,8 +1,8 @@
 interface AcceptedLang {
   /** The language and compiler under the format of `${language}[/${compiler}]`. */
-  lang: string;
+  readonly lang: string;
   /** Label to display in the UI. */
-  label: string;
+  readonly label: string;
 }
 
 /**

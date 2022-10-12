@@ -6,6 +6,7 @@ import type { Config, ParsedConfig, Settings, Stage } from "@types";
 import { dump, load } from "js-yaml";
 import isEqual from "lodash/isEqual";
 import { isSettingsEqual, parseLangString, settingsToYamlObj } from "./settings";
+import { parseStages, stagesToYamlObj } from "./stage";
 
 /**
  * Creates a {@link Config} object from parsing the configuration YAML.
@@ -14,7 +15,7 @@ import { isSettingsEqual, parseLangString, settingsToYamlObj } from "./settings"
 export function parseConfigYaml(yaml: string): Config {
   const { _settings: settingsRaw, ...stagesRaw } = load(yaml) as ParsedConfig;
   const _settings: Settings = { ...settingsRaw, lang: parseLangString(settingsRaw.lang) };
-  const stages: Stage[] = Object.entries(stagesRaw).map(([id, config]) => ({ id, config }));
+  const stages: Stage[] = parseStages(stagesRaw);
   return { _settings, stages };
 }
 
@@ -23,8 +24,7 @@ export function parseConfigYaml(yaml: string): Config {
  */
 export function configToYaml(config: Config): string {
   const _settings = settingsToYamlObj(config._settings);
-  const stages = {};
-  config.stages.forEach((stage) => (stages[stage.id] = stage.config));
+  const stages = stagesToYamlObj(config.stages);
   return dump({ _settings, ...stages });
 }
 

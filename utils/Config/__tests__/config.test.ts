@@ -1,5 +1,5 @@
 import { readFileSync } from "fs";
-import { Config, SettingsUseTemplate } from "../../../types/Config";
+import { Config, SettingsUseTemplate, StageKind } from "../../../types/Config";
 import { configToYaml, parseConfigYaml } from "../config";
 
 describe("Config utils", () => {
@@ -64,10 +64,14 @@ describe("Config utils", () => {
       stages: [
         {
           id: "compile",
+          name: "Compile",
+          kind: StageKind.PRE_LOCAL,
           config: { input: ["*.cpp"], output: "a.out" },
         },
         {
           id: "score",
+          name: "Score",
+          kind: StageKind.POST,
           config: { normalizedTo: 100 },
         },
       ],
