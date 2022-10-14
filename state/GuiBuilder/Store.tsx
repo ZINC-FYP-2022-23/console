@@ -4,11 +4,14 @@
  * {@link https://easy-peasy.vercel.app/ easy-peasy} is chosen as the state management library.
  */
 import { defaultConfig } from "@constants/Config/defaults";
+import { SupportedStage } from "@constants/Config/supportedStages";
 import type { Config } from "@types";
 import { isConfigEqual } from "@utils/Config";
 import { Action, action, computed, Computed } from "easy-peasy";
 import { set } from "lodash";
 import cloneDeep from "lodash/cloneDeep";
+
+/////////////// STORE DEFINITION ///////////////
 
 export interface GuiBuilderStoreModel {
   /** The assignment config ID. It's `null` if we're creating a new assignment. */
@@ -20,6 +23,9 @@ export interface GuiBuilderStoreModel {
 
   /** Page layout related states. */
   layout: GuiBuilderLayoutModel;
+
+  /** Data being dragged from Add Stage panel. */
+  dragging?: SupportedStage;
 }
 
 export interface GuiBuilderStoreActions {
@@ -30,12 +36,16 @@ export interface GuiBuilderStoreActions {
   isEdited: Computed<GuiBuilderStoreModel, boolean>;
 
   toggleAddStage: Action<GuiBuilderStoreModel>;
+
+  setDragging: Action<GuiBuilderStoreModel, SupportedStage | undefined>;
 }
 
 export interface GuiBuilderLayoutModel {
   /** Whether to show "Add New Stage" at right sidebar. */
   showAddStage: boolean;
 }
+
+/////////////// STORE IMPLEMENTATION ///////////////
 
 const Actions: GuiBuilderStoreActions = {
   initializeConfig: action((state, payload) => {
@@ -50,6 +60,10 @@ const Actions: GuiBuilderStoreActions = {
 
   toggleAddStage: action((state) => {
     state.layout.showAddStage = !state.layout.showAddStage;
+  }),
+
+  setDragging: action((state, payload) => {
+    state.dragging = payload;
   }),
 };
 

@@ -1,6 +1,6 @@
 import { StageKind } from "@types";
 
-export interface SupportedStages {
+export interface SupportedStage {
   /** Stage name (e.g. `"StdioTest"`, `"Compile"`). */
   readonly name: string;
   /** Label to be shown in the UI. */
@@ -14,7 +14,7 @@ export interface SupportedStages {
 /**
  * Pipeline stages supported by the GUI Assignment Builder.
  */
-const supportedStages: SupportedStages[] = [
+const supportedStages: SupportedStage[] = [
   {
     name: "Compile",
     label: "Compile",

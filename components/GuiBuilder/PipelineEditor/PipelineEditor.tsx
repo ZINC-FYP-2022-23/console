@@ -1,8 +1,17 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Tooltip } from "@mantine/core";
 import { useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
-import { memo, useCallback } from "react";
-import ReactFlow, { addEdge, Background, BackgroundVariant, Controls, useEdgesState, useNodesState } from "reactflow";
+import { memo, useCallback, useRef } from "react";
+import ReactFlow, {
+  addEdge,
+  Background,
+  BackgroundVariant,
+  Controls,
+  Node,
+  useEdgesState,
+  useNodesState,
+  useReactFlow,
+} from "reactflow";
 import "reactflow/dist/style.css";
 
 function AddStageButton() {
@@ -30,21 +39,28 @@ function AddStageButton() {
   );
 }
 
-const initialNodes = [
-  { id: "1", position: { x: 250, y: 100 }, data: { label: "Hello" } },
-  { id: "2", position: { x: 250, y: 200 }, data: { label: "World" } },
-];
+const GRID_SIZE = 15;
 
 /**
  * The node-based pipeline editor.
  */
 function PipelineEditor() {
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+  const reactFlowWrapper = useRef<HTMLDivElement>(null!);
+  const reactFlowInstance = useReactFlow();
+
+  const dragging = useStoreState((state) => state.dragging);
+
+  const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const onConnect = useCallback((params) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
 
   return (
-    <div className="h-full relative rounded-md shadow">
+    <div
+      className={`h-full relative rounded-md transition duration-200 ease-in-out ${
+        dragging ? "ring ring-blue-400" : ""
+      }`}
+      ref={reactFlowWrapper}
+    >
       <AddStageButton />
       <ReactFlow
         nodes={nodes}
@@ -53,11 +69,39 @@ function PipelineEditor() {
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
         proOptions={{ account: "", hideAttribution: true }}
+        snapGrid={[GRID_SIZE, GRID_SIZE]}
         snapToGrid
         className="rounded-md shadow"
+        onDragOver={(event) => {
+          event.preventDefault();
+          event.dataTransfer.dropEffect = "copy";
+        }}
+        onDrop={(event) => {
+          event.preventDefault();
+
+          // Check if the dropped element is a stage node. That's because the droppable area
+          // also accepts other items, such as a file.
+          const type = event.dataTransfer.getData("application/reactflow");
+          if (!type) {
+            return;
+          }
+
+          const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
+          const position = reactFlowInstance.project({
+            x: event.clientX - reactFlowBounds.left - 75,
+            y: event.clientY - reactFlowBounds.top - 20,
+          });
+          const newNode: Node = {
+            // TODO: Use UUID v4()
+            id: Math.random().toString(),
+            position,
+            data: { label: dragging!.label },
+          };
+          setNodes((nds) => nds.concat(newNode));
+        }}
       >
         <Controls showInteractive={false} />
-        <Background variant={BackgroundVariant.Dots} gap={15} className="bg-gray-50" />
+        <Background variant={BackgroundVariant.Dots} gap={GRID_SIZE} className="bg-gray-50" />
       </ReactFlow>
     </div>
   );

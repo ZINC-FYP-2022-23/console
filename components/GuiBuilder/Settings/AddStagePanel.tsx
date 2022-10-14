@@ -1,10 +1,11 @@
 import Accordion from "@components/Accordion";
 import Button from "@components/Button";
-import supportedStages, { SupportedStages } from "@constants/Config/supportedStages";
+import supportedStages from "@constants/Config/supportedStages";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useStoreActions } from "@state/GuiBuilder/Hooks";
 import { StageKind } from "@types";
 import { memo } from "react";
+import AddableStage from "../PipelineEditor/AddableStage";
 
 const stagesByCategory = [
   {
@@ -24,20 +25,6 @@ const stagesByCategory = [
     stages: supportedStages.filter((stage) => stage.kind === StageKind.POST || stage.kind === StageKind.CONSTANT),
   },
 ];
-
-function StageBlock({ stage }: { stage: SupportedStages }) {
-  return (
-    <div className="flex flex-col">
-      <div
-        className="px-5 py-3 self-start font-medium bg-white border border-gray-400 rounded-md hover:cursor-move"
-        draggable
-      >
-        {stage.label}
-      </div>
-      <p className="mt-1 text-xs text-gray-500">{stage.description}</p>
-    </div>
-  );
-}
 
 function AddStagePanel() {
   const toggleAddStage = useStoreActions((action) => action.toggleAddStage);
@@ -64,7 +51,7 @@ function AddStagePanel() {
         <Accordion key={category.title} title={category.title} extraClassNames={{ title: "text-lg" }}>
           <div className="mt-1 flex flex-col gap-5">
             {category.stages.map((stage) => (
-              <StageBlock key={stage.name} stage={stage} />
+              <AddableStage key={stage.name} stage={stage} />
             ))}
           </div>
         </Accordion>

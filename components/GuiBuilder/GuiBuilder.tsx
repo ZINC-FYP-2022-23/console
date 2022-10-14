@@ -3,6 +3,7 @@ import { useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
 import { Config } from "@types";
 import { configToYaml } from "@utils/Config";
 import { useEffect } from "react";
+import { ReactFlowProvider } from "reactflow";
 import PipelineEditor from "./PipelineEditor/PipelineEditor";
 import AddStagePanel from "./Settings/AddStagePanel";
 import SettingsPanel from "./Settings/SettingsPanel";
@@ -25,8 +26,8 @@ function GUIAssignmentBuilder({ configProp, configId }: GUIAssignmentBuilderProp
   }, [configProp, configId, initializeConfig]);
 
   return (
-    <div className="p-4 w-full flex flex-col">
-      <div className="mb-3 flex items-center justify-between">
+    <div className="p-4 pl-3 w-full flex flex-col">
+      <div className="ml-1 mb-2 flex items-center justify-between">
         <h1 className="font-bold text-gray-900 text-xl sm:text-2xl">
           {isNewAssignment ? "New Assignment Config" : `Editing Assignment Config #${configId}`}
         </h1>
@@ -51,10 +52,12 @@ function GUIAssignmentBuilder({ configProp, configId }: GUIAssignmentBuilderProp
           </Button>
         </div>
       </div>
-      <div className="flex-1 flex flex-row gap-3 overflow-y-hidden">
+      <div className="pt-1 pl-1 flex-1 flex flex-row gap-3 overflow-y-hidden">
         <div className="w-4/6 flex flex-col gap-3">
           <div className="h-1/2">
-            <PipelineEditor />
+            <ReactFlowProvider>
+              <PipelineEditor />
+            </ReactFlowProvider>
           </div>
           <div className="h-1/2 bg-white rounded-md shadow">Stage settings</div>
         </div>
