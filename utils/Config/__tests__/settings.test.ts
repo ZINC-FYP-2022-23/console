@@ -1,6 +1,6 @@
 import cloneDeep from "lodash/cloneDeep";
 import { Settings, SettingsGpuDevice, SettingsLang } from "../../../types/Config";
-import { isSettingsEqual, parseLangString, settingsLangToString, settingsToYamlObj } from "../settings";
+import { isSettingsEqual, parseLangString, settingsLangToString, settingsToYamlObj, tidySettings } from "../settings";
 
 const settings: Settings = {
   lang: {
@@ -33,6 +33,27 @@ describe("Settings utils", () => {
     it("converts `lang` field to a string representation", () => {
       const output = settingsToYamlObj(settings);
       expect(output.lang).toBe("cpp/g++:8");
+    });
+  });
+
+  describe("tidySettings()", () => {
+    it("tidies a settings object", () => {
+      const settingsUgly = cloneDeep(settings);
+      settingsUgly.cpus = "2";
+      settingsUgly.mem_gb = "4.5";
+      settingsUgly.stage_wait_duration_secs = "10";
+      settingsUgly.enable_features.gpu_device = [SettingsGpuDevice.INTEL, SettingsGpuDevice.AMD];
+
+      const settingsTidied = tidySettings(settingsUgly);
+      expect(settingsTidied).toEqual(settings);
+    });
+
+    it("does not modify the original settings object", () => {
+      const settingsUgly = cloneDeep(settings);
+      settingsUgly.cpus = "2";
+
+      tidySettings(settingsUgly);
+      expect(settingsUgly.cpus).toBe("2");
     });
   });
 
