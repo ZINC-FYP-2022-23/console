@@ -2,11 +2,17 @@ import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { SubmissionWindowStatus } from "../SubmissionWindowStatus";
 import { useLayoutDispatch } from "../../contexts/layout";
-import { useState } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import { DotsVerticalIcon } from "@heroicons/react/solid";
+import { AssignmentConfig, Section } from "@types";
+import { Tooltip } from "@mantine/core";
 
-export function Assignments({ assignmentConfigs, sections }) {
+interface AssignmentsProps {
+  assignmentConfigs: AssignmentConfig[];
+  sections: Section;
+}
+
+export function Assignments({ assignmentConfigs, sections }: AssignmentsProps) {
   return (
     <>
       <h2 className="text-gray-500 text-xs font-medium uppercase tracking-wide mb-4">Assignments / Labs / Projects</h2>
@@ -28,6 +34,9 @@ export function Assignments({ assignmentConfigs, sections }) {
               </th>
               <th className="px-6 py-3 bg-cool-gray-50 text-right text-xs leading-4 font-medium text-cool-gray-500 uppercase tracking-wider">
                 No. of Submission
+              </th>
+              <th className="px-6 py-3 bg-cool-gray-50 text-right text-xs leading-4 font-medium text-cool-gray-500 uppercase tracking-wider">
+                No. of Appeal
               </th>
               <th className="pr-6 py-3 border-b border-gray-200 bg-gray-50 text-right text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider"></th>
             </tr>
@@ -78,7 +87,6 @@ export function Assignments({ assignmentConfigs, sections }) {
 
 export function AssignmentRow({ config, sections }) {
   const dispatch = useLayoutDispatch();
-  const [showDropdown, setDropdown] = useState(false);
   const sectionsString = sections
     .filter(
       (section) =>
@@ -107,59 +115,19 @@ export function AssignmentRow({ config, sections }) {
       <td className="px-6 py-4 text-right whitespace-no-wrap text-sm leading-5 text-cool-gray-500">
         {config.submissions_aggregate.aggregate.count}/{config.affected_users_aggregate.aggregate.count}
       </td>
+      <td className="px-6 py-4 text-right whitespace-no-wrap text-sm leading-5 text-cool-gray-500">
+        <Tooltip
+          // TODO(Bryan): Replace with real values
+          label={`XXX Outstanding, YYY Total`}
+          transition="fade"
+          position="bottom"
+        >
+          {/* TODO(Bryan): Replace with real values */}
+          XXX/YYY
+        </Tooltip>
+      </td>
       <td className="pr-6">
         <div className="relative flex justify-end items-center">
-          {/* <button onClick={() => setDropdown(!showDropdown)} id="assignment-viewing-options" aria-haspopup={true} type="button" className="w-8 h-8 inline-flex items-center justify-center text-gray-400 rounded-full bg-transparent hover:text-gray-500 focus:outline-none focus:text-gray-500 focus:bg-gray-100 transition ease-in-out duration-150">
-            <svg className="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-              <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
-            </svg>
-          </button>
-          <Transition
-            show={showDropdown}
-            enter="transition ease-out duration-100"
-            enterFrom="transform opacity-0 scale-95"
-            enterTo="transform opacity-100 scale-100"
-            leave="transition ease-in duration-75"
-            leaveFrom="transform opacity-100 scale-100"
-            leaveTo="transform opacity-0 scale-95"
-            className="mx-3 origin-top-right absolute right-7 top-0 w-48 mt-1 rounded-md shadow-lg z-20"
-          >
-          <div className="z-10 rounded-md bg-white shadow-xs" role="menu" aria-orientation="vertical" aria-labelledby="assignment-viewing-options">
-            <div className="py-1">
-              <Link href={`/assignments/${config.assignment.id}/configs/${config.id}`}>
-                <a
-                  className="group flex items-center w-full px-4 py-2 text-sm leading-5 text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900" role="menuitem">
-                  <span className="w-5 h-5 mr-3 flex items-center">
-                    <FontAwesomeIcon icon={['fad', 'cog']} size="lg"/>
-                  </span>
-                  Reconfigure
-                </a>
-              </Link>
-              <button
-                onClick={() => {
-                  setDropdown(false)
-                  dispatch({ type: 'viewAssignmentSubmissions', payload: { configId: config.id, sections: sectionsString } })
-                }}
-                className="group flex items-center w-full px-4 py-2 text-sm leading-5 text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900" role="menuitem">
-                <span className="w-5 h-5 mr-3 flex items-center">
-                  <FontAwesomeIcon icon={['fad', 'archive']} size="lg"/>
-                </span>
-                Submissions
-              </button>
-              <button
-                onClick={() => {
-                  setDropdown(false)
-                  dispatch({ type: 'confirmRegrading', payload: { assignmentConfigId: config.id }})
-                }}
-                className="group flex items-center w-full px-4 py-2 text-sm leading-5 text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900" role="menuitem">
-                <span className="w-5 h-5 mr-3 flex items-center">
-                  <FontAwesomeIcon icon={['fad', 'redo-alt']} size="lg"/>
-                </span>
-                Regrade
-              </button>
-            </div>
-            </div>
-          </Transition> */}
           <Menu>
             <Menu.Button className="w-8 h-8 inline-flex items-center justify-center text-gray-400 rounded-full bg-transparent hover:text-gray-500 focus:outline-none focus:text-gray-500 focus:bg-gray-100 transition ease-in-out duration-150">
               <DotsVerticalIcon className="w-5 h-5"></DotsVerticalIcon>
@@ -171,7 +139,7 @@ export function AssignmentRow({ config, sections }) {
               leave="transition ease-in duration-75"
               leaveFrom="transform opacity-100 scale-100"
               leaveTo="transform opacity-0 scale-95"
-              className="mx-3 origin-top-right absolute right-7 top-0 w-48 mt-1 rounded-md shadow-lg z-20"
+              className="mx-3 origin-top-right absolute right-7 -top-19 w-48 mt-1 rounded-md shadow-lg z-20"
             >
               <Menu.Items className="z-10 rounded-md bg-white shadow-xs">
                 <Menu.Item>
@@ -202,6 +170,20 @@ export function AssignmentRow({ config, sections }) {
                       <FontAwesomeIcon icon={["fad", "archive"]} size="lg" />
                     </span>
                     Submissions
+                  </button>
+                </Menu.Item>
+                <Menu.Item>
+                  <button
+                    onClick={() => {
+                      // TODO(Bryan): Dispatch layout action to open appeal summary pop up
+                    }}
+                    className="group flex items-center w-full px-4 py-2 text-sm leading-5 text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900"
+                    role="menuitem"
+                  >
+                    <span className="w-5 h-5 mr-3 flex items-center">
+                      <FontAwesomeIcon icon={["fad", "message-question"]} size="lg" />
+                    </span>
+                    Appeals
                   </button>
                 </Menu.Item>
                 <Menu.Item>
