@@ -6,7 +6,29 @@ import toast, { Toaster } from "react-hot-toast";
 import { Notification, NotificationBody } from "../components/Notification";
 
 interface LayoutAction {
-  type: string;
+  type:
+    | "toggleModal"
+    | "toggleSlideOver"
+    | "toggleMobileMenu"
+    | "closeModal"
+    | "closeSlideOver"
+    | "closeMobileMenu"
+    | "showNotification"
+    | "setRegistrationToken"
+    | "dismissNotification"
+    | "assignmentCreated"
+    | "manageAssignedUsers"
+    | "viewStdioComparison"
+    | "viewValgrindReport"
+    | "viewReport"
+    | "viewAssignmentSubmissions"
+    | "viewAssignmentComplementaryFiles"
+    | "confirmRegrading"
+    | "configYAMLUpdate"
+    | "createAssignmentConfigSuccess"
+    | "updateNotification"
+    | "assignmentSupportingFilesUploader"
+    | "chooseAssignmentConfigEditor";
   payload?: any;
 }
 
@@ -20,17 +42,16 @@ interface LayoutState {
   assignmentConfig?: any;
   assignmentId?: number;
   notification?: any;
-  viewingConfigSegment?: string;
   stdioTestCase?: any;
   reportId?: string;
   valgrindTestCase?: any;
-  modalType?: string;
+  modalType?: "stdiotest" | "valgrind" | "regrading" | "yaml" | "files";
   gradingPayload?: any;
-  coursePageSlideOver?: string;
+  coursePageSlideOver?: "submissions";
   userId?: string;
   registrationToken?: string;
-  configSlideOver?: string;
-  viewingTaskAssignedGroups?: String;
+  configSlideOver?: "users" | "files";
+  viewingTaskAssignedGroups?: string;
 }
 
 function layoutReducer(state: LayoutState, action: LayoutAction): LayoutState {
@@ -66,12 +87,6 @@ function layoutReducer(state: LayoutState, action: LayoutAction): LayoutState {
       return { ...state, showNotification: false };
     case "assignmentCreated":
       return { ...state, showModal: true, assignmentId: action.payload };
-    case "configureSchedule":
-      return { ...state, showSlideOver: true, assignmentConfig: action.payload, viewingConfigSegment: "schedule" };
-    case "configureGeneral":
-      return { ...state, showSlideOver: true, assignmentConfig: action.payload, viewingConfigSegment: "general" };
-    case "configureYaml":
-      return { ...state, showModal: true, assignmentConfig: action.payload, viewingConfigSegment: "yaml" };
     case "manageAssignedUsers":
       return { ...state, showSlideOver: true, configSlideOver: "users" };
     case "viewStdioComparison":
@@ -88,8 +103,6 @@ function layoutReducer(state: LayoutState, action: LayoutAction): LayoutState {
         assignmentConfigId: action.payload.configId,
         viewingTaskAssignedGroups: action.payload.sections,
       };
-    case "viewCourseStudent":
-      return { ...state, showSlideOver: true, coursePageSlideOver: "student", userId: action.payload };
     case "viewAssignmentComplementaryFiles":
       return { ...state, showSlideOver: true, configSlideOver: "files", assignmentConfigId: action.payload };
     case "confirmRegrading":
