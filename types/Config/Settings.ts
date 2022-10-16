@@ -1,7 +1,8 @@
 /**
  * General configurations across the pipeline. Corresponds to the `_settings` field in the config YAML.
  *
- * {@link https://docs.zinc.ust.dev/user/model/Config.html#settings}
+ * Its shape is a bit different from {@link https://docs.zinc.ust.dev/user/model/Config.html#settings the one in Grader docs}.
+ * This is to facilitate the development of the GUI. See {@link SettingsRaw} for the raw shape.
  */
 interface Settings {
   lang: SettingsLang;
@@ -9,12 +10,33 @@ interface Settings {
   template?: string[];
   use_skeleton: boolean;
   use_provided: boolean;
-  // NOTE: `number | string` = Either a number or a numerical string (e.g. `"60"`)
-  stage_wait_duration_secs: number | string;
-  cpus: number | string;
-  mem_gb: number | string;
+  stage_wait_duration_secs: string;
+  cpus: string;
+  mem_gb: string;
   early_return_on_throw: boolean;
   enable_features: SettingsFeatures;
+}
+
+/**
+ * The shape of `_settings` from an input config YAML (e.g. loaded from database).
+ *
+ * During parsing of config YAML, the `SettingsRaw` object will be transformed to {@link Settings}.
+ * Its shape is based from {@link https://docs.zinc.ust.dev/user/model/Config.html#settings the one in the Grader docs}.
+ */
+export interface SettingsRaw {
+  lang: string;
+  use_template?: SettingsUseTemplate | null;
+  template?: string[] | null;
+  use_skeleton?: boolean | null;
+  use_provided?: boolean | null;
+  stage_wait_duration_secs?: number | null;
+  cpus?: number | null;
+  mem_gb?: number | null;
+  early_return_on_throw?: boolean | null;
+  enable_features?: {
+    network?: boolean | null;
+    gpu_device?: SettingsGpuDevice[] | "ANY" | null;
+  } | null;
 }
 
 /**

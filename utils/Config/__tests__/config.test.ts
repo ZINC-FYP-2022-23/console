@@ -51,9 +51,9 @@ describe("Config utils", () => {
       },
       use_skeleton: true,
       use_provided: true,
-      stage_wait_duration_secs: 10,
-      cpus: 2,
-      mem_gb: 4,
+      stage_wait_duration_secs: "10",
+      cpus: "2",
+      mem_gb: "4",
       early_return_on_throw: false,
       enable_features: {
         network: true,
@@ -72,10 +72,10 @@ describe("Config utils", () => {
       stages,
     };
 
-    const settingsToYamlMock = jest.spyOn(settingsUtils, "settingsToYamlObj");
+    const settingsToRawMock = jest.spyOn(settingsUtils, "settingsToSettingsRaw");
     const stagesToYamlMock = jest.spyOn(stageUtils, "stagesToYamlObj");
     configToYaml(config);
-    expect(settingsToYamlMock).toBeCalledWith(_settings);
+    expect(settingsToRawMock).toBeCalledWith(_settings);
     expect(stagesToYamlMock).toBeCalledWith(stages);
   });
 });

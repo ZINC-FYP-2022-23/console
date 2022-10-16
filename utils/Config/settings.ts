@@ -2,16 +2,45 @@
  * @file Utilities for the `Settings` type.
  */
 
-import type { ParsedConfig, Settings, SettingsLang } from "@types";
+import { defaultSettings } from "@constants/Config/defaults";
+import type { Settings, SettingsLang, SettingsRaw } from "@types";
 import cloneDeep from "lodash/cloneDeep";
 import isEqual from "lodash/isEqual";
 
 /**
- * Converts to an object representation of the `_settings` field in the configuration YAML.
+ * Converts a raw settings object to a {@link Settings} object.
+ * @param sr The raw settings object obtained from parsing the YAML's `_settings` field.
  */
-export function settingsToYamlObj(settings: Settings): ParsedConfig["_settings"] {
-  const tidiedSettings = tidySettings(settings);
-  const _settings = { ...tidiedSettings, lang: settingsLangToString(tidiedSettings.lang) };
+export function settingsRawToSettings(sr: SettingsRaw): Settings {
+  return {
+    lang: parseLangString(sr.lang),
+    use_template: sr.use_template ?? undefined,
+    template: sr.template ?? undefined,
+    use_skeleton: sr.use_skeleton ?? defaultSettings.use_skeleton,
+    use_provided: sr.use_provided ?? defaultSettings.use_provided,
+    stage_wait_duration_secs: sr.stage_wait_duration_secs?.toString() ?? "",
+    cpus: sr.cpus?.toString() ?? "",
+    mem_gb: sr.mem_gb?.toString() ?? "",
+    early_return_on_throw: sr.early_return_on_throw ?? defaultSettings.early_return_on_throw,
+    enable_features: {
+      network: sr.enable_features?.network ?? defaultSettings.enable_features.network,
+      gpu_device: sr.enable_features?.gpu_device ?? defaultSettings.enable_features.gpu_device,
+    },
+  };
+}
+
+/**
+ * Converts a {@link Settings} object to a raw settings object to be de-serialized to YAML.
+ */
+export function settingsToSettingsRaw(settings: Settings): SettingsRaw {
+  const s = tidySettings(settings);
+  const _settings: SettingsRaw = {
+    ...s,
+    lang: settingsLangToString(s.lang),
+    stage_wait_duration_secs: parseInt(s.stage_wait_duration_secs),
+    cpus: parseFloat(s.cpus),
+    mem_gb: parseFloat(s.mem_gb),
+  };
 
   // Recursively convert fields with value `undefined` to `null` as js-yaml cannot parse `undefined` fields
   const _settingsStr = JSON.stringify(_settings, (_, v) => (v === undefined ? null : v));
@@ -26,18 +55,8 @@ export function settingsToYamlObj(settings: Settings): ParsedConfig["_settings"]
 export function tidySettings(settings: Settings): Settings {
   const s = cloneDeep(settings);
 
-  // Convert to number for fields of type `number | string`
-  if (typeof s.stage_wait_duration_secs === "string") {
-    s.stage_wait_duration_secs = parseInt(s.stage_wait_duration_secs);
-  }
-  if (typeof s.cpus === "string") {
-    s.cpus = parseFloat(s.cpus);
-  }
-  if (typeof s.mem_gb === "string") {
-    s.mem_gb = parseFloat(s.mem_gb);
-  }
-
-  // Sort GPU devices array (if it is array)
+  // Sort arrays
+  s.template?.sort();
   if (Array.isArray(s.enable_features.gpu_device)) {
     s.enable_features.gpu_device.sort();
   }

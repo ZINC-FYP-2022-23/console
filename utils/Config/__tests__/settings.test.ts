@@ -1,6 +1,13 @@
 import cloneDeep from "lodash/cloneDeep";
-import { Settings, SettingsGpuDevice, SettingsLang } from "../../../types/Config";
-import { isSettingsEqual, parseLangString, settingsLangToString, settingsToYamlObj, tidySettings } from "../settings";
+import { Settings, SettingsGpuDevice, SettingsLang, SettingsRaw } from "../../../types/Config";
+import {
+  isSettingsEqual,
+  parseLangString,
+  settingsLangToString,
+  settingsRawToSettings,
+  settingsToSettingsRaw,
+  tidySettings,
+} from "../settings";
 
 const settings: Settings = {
   lang: {
@@ -12,9 +19,9 @@ const settings: Settings = {
   template: undefined,
   use_skeleton: true,
   use_provided: true,
-  stage_wait_duration_secs: 10,
-  cpus: 2,
-  mem_gb: 4.5,
+  stage_wait_duration_secs: "10",
+  cpus: "2",
+  mem_gb: "4.5",
   early_return_on_throw: false,
   enable_features: {
     network: true,
@@ -23,25 +30,55 @@ const settings: Settings = {
 };
 
 describe("Settings utils", () => {
-  describe("settingsToYamlObj()", () => {
-    it("replaces undefined with null when converting to YAML object", () => {
-      const output = settingsToYamlObj(settings);
-      expect(output.use_template).toBe(null);
-      expect(output.template).toBe(null);
+  describe("settingsRawToSettings()", () => {
+    it("converts a SettingsRaw object to Settings", () => {
+      const settingsRaw: SettingsRaw = {
+        lang: "cpp/g++:8",
+        cpus: 2.5,
+        mem_gb: null,
+      };
+      const expected: Settings = {
+        lang: {
+          language: "cpp",
+          compiler: "g++",
+          version: "8",
+        },
+        use_skeleton: false,
+        use_provided: false,
+        stage_wait_duration_secs: "",
+        cpus: "2.5",
+        mem_gb: "",
+        early_return_on_throw: false,
+        enable_features: { network: true },
+      };
+
+      expect(settingsRawToSettings(settingsRaw)).toEqual(expected);
+    });
+  });
+
+  describe("settingsToSettingsRaw()", () => {
+    it("converts `lang` to a string", () => {
+      const settingsRaw = settingsToSettingsRaw(settings);
+      expect(settingsRaw.lang).toBe("cpp/g++:8");
     });
 
-    it("converts `lang` field to a string representation", () => {
-      const output = settingsToYamlObj(settings);
-      expect(output.lang).toBe("cpp/g++:8");
+    it("converts undefined fields to null", () => {
+      const settingsRaw = settingsToSettingsRaw(settings);
+      expect(settingsRaw.use_template).toBeNull();
+      expect(settingsRaw.template).toBeNull();
+    });
+
+    it("converts numerical strings to numbers", () => {
+      const settingsRaw = settingsToSettingsRaw(settings);
+      expect(settingsRaw.stage_wait_duration_secs).toBe(10);
+      expect(settingsRaw.cpus).toBe(2);
+      expect(settingsRaw.mem_gb).toBe(4.5);
     });
   });
 
   describe("tidySettings()", () => {
     it("tidies a settings object", () => {
       const settingsUgly = cloneDeep(settings);
-      settingsUgly.cpus = "2";
-      settingsUgly.mem_gb = "4.5";
-      settingsUgly.stage_wait_duration_secs = "10";
       settingsUgly.enable_features.gpu_device = [SettingsGpuDevice.INTEL, SettingsGpuDevice.AMD];
 
       const settingsTidied = tidySettings(settingsUgly);
@@ -90,9 +127,7 @@ describe("Settings utils", () => {
   describe("isSettingsEqual()", () => {
     it("returns true for equal settings", () => {
       const s2 = cloneDeep(settings);
-      // Test numerical string parsing and gpu_device sorting
-      s2.stage_wait_duration_secs = "10";
-      s2.mem_gb = "4.5";
+      // Test gpu_device sorting
       s2.enable_features.gpu_device = [SettingsGpuDevice.INTEL, SettingsGpuDevice.AMD];
 
       expect(isSettingsEqual(settings, s2)).toBe(true);

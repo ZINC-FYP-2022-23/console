@@ -2,10 +2,10 @@
  * @file Utilities for the `Config` type.
  */
 
-import type { Config, ParsedConfig, Settings, Stage } from "@types";
+import type { Config, ParsedConfig, Stage } from "@types";
 import { dump, load } from "js-yaml";
 import isEqual from "lodash/isEqual";
-import { isSettingsEqual, parseLangString, settingsToYamlObj } from "./settings";
+import { isSettingsEqual, settingsRawToSettings, settingsToSettingsRaw } from "./settings";
 import { parseStages, stagesToYamlObj } from "./stage";
 
 /**
@@ -14,7 +14,7 @@ import { parseStages, stagesToYamlObj } from "./stage";
  */
 export function parseConfigYaml(yaml: string): Config {
   const { _settings: settingsRaw, ...stagesRaw } = load(yaml) as ParsedConfig;
-  const _settings: Settings = { ...settingsRaw, lang: parseLangString(settingsRaw.lang) };
+  const _settings = settingsRawToSettings(settingsRaw);
   const stages: Stage[] = parseStages(stagesRaw);
   return { _settings, stages };
 }
@@ -23,7 +23,7 @@ export function parseConfigYaml(yaml: string): Config {
  * De-serializes a {@link Config} object to a YAML string.
  */
 export function configToYaml(config: Config): string {
-  const _settings = settingsToYamlObj(config._settings);
+  const _settings = settingsToSettingsRaw(config._settings);
   const stages = stagesToYamlObj(config.stages);
   return dump({ _settings, ...stages });
 }

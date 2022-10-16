@@ -1,4 +1,4 @@
-import type { Settings, Stage } from "@types";
+import type { Settings, SettingsRaw, Stage } from "@types";
 
 /**
  * An assignment configuration.
@@ -15,7 +15,7 @@ interface Config {
  * transformed to {@link Config}.
  */
 export interface ParsedConfig {
-  _settings: Omit<Settings, "lang"> & { lang: string };
+  _settings: SettingsRaw;
   [key: string]: any;
 }
 
