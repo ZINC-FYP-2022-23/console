@@ -1,4 +1,4 @@
-import { Fragment, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { Menu, Transition } from "@headlessui/react";
 import { useZinc } from "../contexts/zinc";
@@ -16,15 +16,20 @@ interface SemesterSelectMenuProps {
 
 function SelectMenu({ semesters = [] }: SemesterSelectMenuProps) {
   const { currentSemester, activeSemester } = useZinc();
-  const [showMenu, setShowMenu] = useState(false);
-  const [dismissInterrupted, setDismissInterrupt] = useState(false);
   const router = useRouter();
-  const toggleSelectMenu = () => {
-    setTimeout(() => {
-      if (!dismissInterrupted) {
-        setShowMenu(!showMenu);
-      }
-    }, 10);
+
+  const getHref = (semesterId: number) => {
+    const isCurrentSem = semesterId === currentSemester;
+    const isAdmin = router.pathname.includes("admin");
+    const isCourses = router.pathname.includes("courses");
+    const isAssignment = router.pathname.includes("assignments");
+
+    if (isCourses || isAssignment) {
+      return `/semesters/${semesterId}`;
+    }
+    return isCurrentSem || isAdmin
+      ? `/${router.pathname.replace("/semesters/[semesterId]", "")}`
+      : `/semesters/${semesterId}${router.pathname.replace("/semesters/[semesterId]", "")}`;
   };
 
   return (
@@ -69,11 +74,7 @@ function SelectMenu({ semesters = [] }: SemesterSelectMenuProps) {
                 <MenuOption
                   key={semester.id}
                   title={semester.name}
-                  href={
-                    semester.id === currentSemester
-                      ? `/${router.pathname.replace("/semesters/[semesterId]", "")}`
-                      : `/semesters/${semester.id}${router.pathname.replace("/semesters/[semesterId]", "")}`
-                  }
+                  href={getHref(semester.id)}
                   selected={semester.id === activeSemester}
                 />
               ))}
@@ -104,7 +105,7 @@ function MenuOption({ title, selected, href }: MenuOptionProps) {
           highlighted ? "text-white bg-cse-600" : "text-gray-900"
         } cursor-pointer select-none relative py-2 pl-3 pr-9`}
       >
-        <Link href={href.includes("//") ? href.replace("//", "/") : href}>
+        <Link passHref href={href.includes("//") ? href.replace("//", "/") : href}>
           <span
             className={`${
               selected ? "font-semibold" : "font-normal"

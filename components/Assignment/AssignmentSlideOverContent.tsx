@@ -3,9 +3,10 @@ import { useQuery } from "@apollo/client";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { GET_SUBMISSIONS_FOR_ASSIGNMENT_CONFIG } from "../../graphql/queries/user";
-import { Transition } from "@headlessui/react";
+import { Menu, Transition } from "@headlessui/react";
 import { useState } from "react";
 import { useRouter } from "next/router";
+import DotsVerticalIcon from "@heroicons/react/solid/DotsVerticalIcon";
 
 function LoadingStudentSubmissionListItems() {
   return (
@@ -108,7 +109,7 @@ export function AssignmentSlideOverContent() {
               </nav>
             </div>
           </div>
-          <ul className="divide-y divide-gray-200 overflow-y-auto">
+          <ul className="divide-y divide-gray-200">
             {!loading &&
               submissions
                 .sort((a, b) => (a.user.name > b.user.name ? 1 : -1))
@@ -152,56 +153,45 @@ function IndividualSubmissionRow({ submission, assignmentConfigId }) {
           </div>
         </a>
         <div className="relative inline-block text-left">
-          <button
-            onClick={() => setDropdownState(!showDropdown)}
-            className="group relative w-8 h-8 inline-flex items-center justify-center focus:outline-none"
-            id="options-menu-0"
-            aria-haspopup="true"
-            aria-expanded="false"
-          >
-            <span className="flex items-center justify-center h-full w-full rounded-full group-focus:bg-gray-200 transition ease-in-out duration-150">
-              <svg
-                className="w-5 h-5 text-gray-400 group-hover:text-gray-500 group-focus:text-gray-500 transition ease-in-out duration-150"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
-              </svg>
-            </span>
-          </button>
-          <Transition
-            show={showDropdown}
-            enter="transition ease-out duration-100"
-            enterFrom="transform opacity-0 scale-95"
-            enterTo="transform opacity-100 scale-100"
-            leave="transition ease-in duration-75"
-            leaveFrom="transform opacity-100 scale-100"
-            leaveTo="transform opacity-0 scale-95"
-            className="origin-top-right absolute z-10 top-0 right-9 w-48 rounded-md shadow-lg"
-          >
-            <div className="rounded-md bg-white shadow-xs">
-              <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu-0">
-                <Link href={`/api/download/submissions/${submission.id}`}>
-                  <a
-                    className="block px-4 py-2 text-sm leading-5 text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900"
-                    role="menuitem"
+          <Menu>
+            <Menu.Button className="w-8 h-8 inline-flex items-center justify-center text-gray-400 rounded-full bg-transparent hover:text-gray-500 focus:outline-none focus:text-gray-500 focus:bg-gray-100 transition ease-in-out duration-150">
+              <DotsVerticalIcon className="w-5 h-5" />
+            </Menu.Button>
+            <Transition
+              enter="transition ease-out duration-100"
+              enterFrom="transform opacity-0 scale-95"
+              enterTo="transform opacity-100 scale-100"
+              leave="transition ease-in duration-75"
+              leaveFrom="transform opacity-100 scale-100"
+              leaveTo="transform opacity-0 scale-95"
+              className="origin-top-right absolute z-10 top-0 right-9 w-48 rounded-md shadow-lg"
+            >
+              <Menu.Items className="rounded-md bg-white shadow-xs">
+                <Menu.Item>
+                  <Link href={`/api/download/submissions/${submission.id}`}>
+                    <a
+                      className="block px-4 py-2 text-sm leading-5 text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900"
+                      role="menuitem"
+                    >
+                      Download
+                    </a>
+                  </Link>
+                </Menu.Item>
+                <Menu.Item>
+                  <Link
+                    href={`/courses/${courseId}/assignments/${assignmentConfigId}/submissions?userId=${submission.user.id}`}
                   >
-                    Download
-                  </a>
-                </Link>
-                <Link
-                  href={`/courses/${courseId}/assignments/${assignmentConfigId}/submissions?userId=${submission.user.id}`}
-                >
-                  <a
-                    className="block px-4 py-2 text-sm leading-5 text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900"
-                    role="menuitem"
-                  >
-                    Submission History
-                  </a>
-                </Link>
-              </div>
-            </div>
-          </Transition>
+                    <a
+                      className="block px-4 py-2 text-sm leading-5 text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900"
+                      role="menuitem"
+                    >
+                      Submission History
+                    </a>
+                  </Link>
+                </Menu.Item>
+              </Menu.Items>
+            </Transition>
+          </Menu>
         </div>
       </div>
     </li>

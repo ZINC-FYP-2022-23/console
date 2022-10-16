@@ -11,15 +11,12 @@ import { SlideOver } from "../../../components/SlideOver";
 import { AssignmentSlideOverContent } from "../../../components/Assignment/AssignmentSlideOverContent";
 import { Modal } from "../../../components/Modal";
 import { RegradingConfirmationDialog } from "../../../components/RegradingConfirmationDialog";
-import { CourseStudentSlideOverContent } from "../../../components/Students/CourseStudentSlideOverContent";
 
 function CourseSlideOver() {
   const { coursePageSlideOver } = useLayoutState();
   switch (coursePageSlideOver) {
     case "submissions":
       return <AssignmentSlideOverContent />;
-    case "student":
-      return <CourseStudentSlideOverContent />;
     default:
       return <div></div>;
   }
