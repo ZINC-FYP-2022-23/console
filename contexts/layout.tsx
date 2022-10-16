@@ -32,7 +32,7 @@ interface LayoutAction {
   payload?: any;
 }
 
-interface LayoutState {
+export interface LayoutState {
   showMobileMenu: boolean;
   showModal: boolean;
   showSlideOver: boolean;
@@ -46,12 +46,15 @@ interface LayoutState {
   reportId?: string;
   valgrindTestCase?: any;
   modalType?: "stdiotest" | "valgrind" | "regrading" | "yaml" | "files";
+  /** Tailwind class name to specify max width of slide over (e.g. `"max-w-lg"`) */
+  slideOverMaxWidth?: string;
   gradingPayload?: any;
   coursePageSlideOver?: "submissions";
   userId?: string;
   registrationToken?: string;
   configSlideOver?: "users" | "files";
   viewingTaskAssignedGroups?: string;
+  submissionDefaultTab?: "submissions" | "appeals";
 }
 
 function layoutReducer(state: LayoutState, action: LayoutAction): LayoutState {
@@ -99,9 +102,11 @@ function layoutReducer(state: LayoutState, action: LayoutAction): LayoutState {
       return {
         ...state,
         showSlideOver: true,
+        slideOverMaxWidth: "max-w-4xl",
         coursePageSlideOver: "submissions",
         assignmentConfigId: action.payload.configId,
         viewingTaskAssignedGroups: action.payload.sections,
+        submissionDefaultTab: action.payload?.defaultTab || "submissions",
       };
     case "viewAssignmentComplementaryFiles":
       return { ...state, showSlideOver: true, configSlideOver: "files", assignmentConfigId: action.payload };

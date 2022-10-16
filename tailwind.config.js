@@ -58,6 +58,7 @@ module.exports = {
     require('@tailwindcss/typography')
   ],
   safelist: [
-    { pattern: /section-*/ }
+    { pattern: /section-*/ },
+    { pattern: /max-w-*/ }
   ]
 }

@@ -123,7 +123,17 @@ export function AssignmentRow({ config, sections }) {
           position="bottom"
         >
           {/* TODO(Bryan): Replace with real values */}
-          XXX/YYY
+          <button
+            className="p-2 rounded-md hover:bg-gray-100 active:bg-gray-200 transition"
+            onClick={() => {
+              dispatch({
+                type: "viewAssignmentSubmissions",
+                payload: { configId: config.id, sections: sectionsString, defaultTab: "appeals" },
+              });
+            }}
+          >
+            XXX/YYY
+          </button>
         </Tooltip>
       </td>
       <td className="pr-6">
@@ -139,13 +149,13 @@ export function AssignmentRow({ config, sections }) {
               leave="transition ease-in duration-75"
               leaveFrom="transform opacity-100 scale-100"
               leaveTo="transform opacity-0 scale-95"
-              className="mx-3 origin-top-right absolute right-7 -top-19 w-48 mt-1 rounded-md shadow-lg z-20"
+              className="mx-3 origin-top-right absolute right-7 -top-12 w-48 mt-1 rounded-md shadow-lg z-20"
             >
               <Menu.Items className="z-10 rounded-md bg-white shadow-xs">
                 <Menu.Item>
                   <Link href={`/assignments/${config.assignment.id}/configs/${config.id}`}>
                     <a
-                      className="group flex items-center w-full px-4 py-2 text-sm leading-5 text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900"
+                      className="flex items-center w-full px-4 py-2 text-sm leading-5 text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900"
                       role="menuitem"
                     >
                       <span className="w-5 h-5 mr-3 flex items-center">
@@ -163,7 +173,7 @@ export function AssignmentRow({ config, sections }) {
                         payload: { configId: config.id, sections: sectionsString },
                       });
                     }}
-                    className="group flex items-center w-full px-4 py-2 text-sm leading-5 text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900"
+                    className="flex items-center w-full px-4 py-2 text-sm leading-5 text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900"
                     role="menuitem"
                   >
                     <span className="w-5 h-5 mr-3 flex items-center">
@@ -175,23 +185,9 @@ export function AssignmentRow({ config, sections }) {
                 <Menu.Item>
                   <button
                     onClick={() => {
-                      // TODO(Bryan): Dispatch layout action to open appeal summary pop up
-                    }}
-                    className="group flex items-center w-full px-4 py-2 text-sm leading-5 text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900"
-                    role="menuitem"
-                  >
-                    <span className="w-5 h-5 mr-3 flex items-center">
-                      <FontAwesomeIcon icon={["fad", "message-question"]} size="lg" />
-                    </span>
-                    Appeals
-                  </button>
-                </Menu.Item>
-                <Menu.Item>
-                  <button
-                    onClick={() => {
                       dispatch({ type: "confirmRegrading", payload: { assignmentConfigId: config.id } });
                     }}
-                    className="group flex items-center w-full px-4 py-2 text-sm leading-5 text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900"
+                    className="flex items-center w-full px-4 py-2 text-sm leading-5 text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900"
                     role="menuitem"
                   >
                     <span className="w-5 h-5 mr-3 flex items-center">
@@ -203,7 +199,7 @@ export function AssignmentRow({ config, sections }) {
                 <Menu.Item>
                   <Link href={`/api/download/grades?assignmentConfigId=${config.id}`}>
                     <a
-                      className="group flex items-center w-full px-4 py-2 text-sm leading-5 text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900"
+                      className="flex items-center w-full px-4 py-2 text-sm leading-5 text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900"
                       role="menuitem"
                     >
                       <span className="w-5 h-5 mr-3 flex items-center">
