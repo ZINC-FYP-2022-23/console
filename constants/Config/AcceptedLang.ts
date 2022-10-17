@@ -11,12 +11,12 @@ interface AcceptedLang {
  * {@link https://docs.zinc.ust.dev/user/model/Config.html#settings-lang}
  */
 export const ACCEPTED_LANG: AcceptedLang[] = [
-  { lang: "c/gcc", label: "C (gcc)" },
   { lang: "c/clang", label: "C (clang)" },
-  { lang: "cpp/g++", label: "C++ (g++)" },
+  { lang: "c/gcc", label: "C (gcc)" },
   { lang: "cpp/clang++", label: "C++ (clang++)" },
+  { lang: "cpp/g++", label: "C++ (g++)" },
+  { lang: "qt5", label: "C++ with Qt" },
   { lang: "java", label: "Java" },
   { lang: "python", label: "Python" },
   { lang: "python/cuda", label: "Python (CUDA)" },
-  { lang: "qt5", label: "C++ with Qt" },
 ];

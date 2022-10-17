@@ -1,8 +1,20 @@
 import { Checkbox, Select, SwitchGroup, TextInput } from "@components/Input";
 import { ACCEPTED_LANG } from "@constants/Config/AcceptedLang";
 import { useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
-import { SettingsFeatures, SettingsGpuDevice } from "@types";
+import { SettingsFeatures, SettingsGpuDevice, SettingsUseTemplate } from "@types";
 import { settingsLangToString } from "@utils/Config";
+import TextareaAutosize from "react-textarea-autosize";
+
+interface UseTemplateSelectOptions {
+  label: string;
+  value: "undefined" | SettingsUseTemplate;
+}
+
+const useTemplateSelectOptions: UseTemplateSelectOptions[] = [
+  { label: "None", value: "undefined" },
+  { label: "Text input", value: SettingsUseTemplate.FILENAMES },
+  { label: "File upload", value: SettingsUseTemplate.PATH },
+];
 
 interface GpuSelectOptions {
   label: string;
@@ -34,8 +46,6 @@ const gpuVendorSelectOptions = [
 function GeneralSettings() {
   const _settings = useStoreState((state) => state.editingConfig._settings);
   const updateField = useStoreActions((actions) => actions.updateField);
-
-  // TODO: Numerical fields in `_settings` casted back to numbers, not strings
 
   return (
     <div className="flex flex-col gap-8">
@@ -89,15 +99,48 @@ function GeneralSettings() {
               updateField({ path: "_settings.use_provided", value });
             }}
           />
-          <SwitchGroup
-            label="(TODO) Use template helper files"
-            description="Files that students should submit"
-            checked={false}
-            onChange={(value) => {
-              // TODO: Handle template helper files
-              console.log(value);
-            }}
-          />
+          <div>
+            <div className="flex items-center gap-2">
+              <div className="flex-none w-1/2">
+                <label htmlFor="use_template" className="flex-none w-1/2">
+                  Specify template files
+                </label>
+                <p className="mt-1 text-xs text-gray-500 leading-3">Files that students should submit</p>
+              </div>
+              <Select
+                id="use_template"
+                extraClassNames="w-full"
+                onChange={(event) => {
+                  const value = event.target.value as UseTemplateSelectOptions["value"];
+                  updateField({ path: "_settings.use_template", value: value === "undefined" ? undefined : value });
+                }}
+                value={_settings.use_template ?? "undefined"}
+              >
+                {useTemplateSelectOptions.map(({ label, value }) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
+              </Select>
+            </div>
+            {_settings.use_template === SettingsUseTemplate.FILENAMES && (
+              <div className="mt-4 mx-3">
+                <p className="mb-1 text-xs text-gray-500">
+                  Files to submit (separated with <strong>new line</strong>):
+                </p>
+                <TextareaAutosize
+                  className="form-input block w-full py-2 px-3 text-sm font-mono leading-5 resize-none rounded-md shadow-sm placeholder:text-gray-400 border border-gray-300 focus:outline-none focus:ring focus:ring-blue-100 focus:border-blue-300 transition ease-in-out"
+                  placeholder="example/foo.txt"
+                  value={_settings.template}
+                  onChange={(event) => {
+                    const value = event.target.value;
+                    updateField({ path: "_settings.template", value });
+                  }}
+                />
+              </div>
+            )}
+            {/* TODO(Anson): Remind user to upload files if "File Upload" is selected */}
+          </div>
         </div>
       </div>
       {/* Stage Settings */}
@@ -186,7 +229,7 @@ function GeneralSettings() {
                 </label>
                 <Select
                   id="gpus"
-                  extraClassNames="flex-1"
+                  extraClassNames="w-full"
                   onChange={(event) => {
                     const value = event.target.value as GpuSelectOptions["value"];
                     let gpuDevice: SettingsFeatures["gpu_device"];

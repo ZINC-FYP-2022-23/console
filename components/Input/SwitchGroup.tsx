@@ -29,7 +29,7 @@ function SwitchGroup({ label, checked, onChange, description }: SwitchGroupProps
         </Switch>
         <div className="flex flex-col">
           <Switch.Label>{label}</Switch.Label>
-          {description && <p className="text-xs text-gray-500">{description}</p>}
+          {description && <p className="mt-1 text-xs text-gray-500 leading-3">{description}</p>}
         </div>
       </Switch.Group>
     </div>

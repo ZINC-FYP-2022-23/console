@@ -7,7 +7,8 @@
 interface Settings {
   lang: SettingsLang;
   use_template?: SettingsUseTemplate;
-  template?: string[];
+  /** File names a student should submit, separated by new line (`\n`). */
+  template?: string;
   use_skeleton: boolean;
   use_provided: boolean;
   stage_wait_duration_secs: string;

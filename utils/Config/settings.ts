@@ -15,7 +15,8 @@ export function settingsRawToSettings(sr: SettingsRaw): Settings {
   return {
     lang: parseLangString(sr.lang),
     use_template: sr.use_template ?? undefined,
-    template: sr.template ?? undefined,
+    // Turn array of file names to a string separated by new line
+    template: sr.template?.reduce((prev, curr) => prev.concat("\n" + curr)) ?? undefined,
     use_skeleton: sr.use_skeleton ?? defaultSettings.use_skeleton,
     use_provided: sr.use_provided ?? defaultSettings.use_provided,
     stage_wait_duration_secs: sr.stage_wait_duration_secs?.toString() ?? "",
@@ -34,9 +35,17 @@ export function settingsRawToSettings(sr: SettingsRaw): Settings {
  */
 export function settingsToSettingsRaw(settings: Settings): SettingsRaw {
   const s = tidySettings(settings);
+
+  const templateTrimmed = s.template?.trim();
   const _settings: SettingsRaw = {
     ...s,
     lang: settingsLangToString(s.lang),
+    template: templateTrimmed
+      ? templateTrimmed
+          .split("\n")
+          .map((file) => file.trim())
+          .filter((file) => file !== "")
+      : undefined,
     stage_wait_duration_secs: parseInt(s.stage_wait_duration_secs),
     cpus: parseFloat(s.cpus),
     mem_gb: parseFloat(s.mem_gb),
@@ -56,7 +65,6 @@ export function tidySettings(settings: Settings): Settings {
   const s = cloneDeep(settings);
 
   // Sort arrays
-  s.template?.sort();
   if (Array.isArray(s.enable_features.gpu_device)) {
     s.enable_features.gpu_device.sort();
   }
@@ -86,7 +94,7 @@ export function parseLangString(lang: string): SettingsLang {
  */
 export function settingsLangToString(s: SettingsLang): string {
   const { language, compiler, version } = s;
-  return `${language}${compiler ? `/${compiler}` : ""}:${version}`;
+  return `${language}${compiler ? `/${compiler}` : ""}:${version.trim()}`;
 }
 
 /**

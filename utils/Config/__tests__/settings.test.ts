@@ -62,6 +62,12 @@ describe("Settings utils", () => {
       expect(settingsRaw.lang).toBe("cpp/g++:8");
     });
 
+    it("converts `template` to a string array", () => {
+      const _settings = { ...settings, template: "   foo.txt\n  \n bar.txt  " };
+      const settingsRaw = settingsToSettingsRaw(_settings);
+      expect(settingsRaw.template).toEqual(["foo.txt", "bar.txt"]);
+    });
+
     it("converts undefined fields to null", () => {
       const settingsRaw = settingsToSettingsRaw(settings);
       expect(settingsRaw.use_template).toBeNull();
@@ -94,7 +100,7 @@ describe("Settings utils", () => {
     });
   });
 
-  describe("SettingsLang", () => {
+  describe("parseLangString()", () => {
     it("parses the lang string", () => {
       const cpp = parseLangString("cpp/g++:8");
       expect(cpp.language).toBe("cpp");
@@ -106,12 +112,14 @@ describe("Settings utils", () => {
       expect(java.compiler).toBe(null);
       expect(java.version).toBe("17.0.2");
     });
+  });
 
+  describe("settingsLangToString()", () => {
     it("de-serializes to a string", () => {
       const cpp: SettingsLang = {
         language: "cpp",
         compiler: "g++",
-        version: "8",
+        version: "  8  ", // Test trimming
       };
       expect(settingsLangToString(cpp)).toBe("cpp/g++:8");
 
