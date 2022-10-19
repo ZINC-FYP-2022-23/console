@@ -3,12 +3,13 @@
  *
  * {@link https://easy-peasy.vercel.app/ easy-peasy} is chosen as the state management library.
  */
-import { defaultConfig } from "@constants/Config/defaults";
+import { defaultConfig, defaultPolicy } from "@constants/Config/defaults";
 import { SupportedStage } from "@constants/Config/supportedStages";
-import type { Config } from "@types";
+import type { Config, GradingPolicy } from "@types";
 import { isConfigEqual } from "@utils/Config";
 import { Action, action, computed, Computed } from "easy-peasy";
-import { set } from "lodash";
+import isEqual from "lodash/isEqual";
+import set from "lodash/set";
 import cloneDeep from "lodash/cloneDeep";
 
 /////////////// STORE DEFINITION ///////////////
@@ -16,10 +17,15 @@ import cloneDeep from "lodash/cloneDeep";
 export interface GuiBuilderStoreModel {
   /** The assignment config ID. It's `null` if we're creating a new assignment. */
   configId: number | null;
+
   /** Initial configuration (e.g. when loaded from database). It should be immutable after initialization. */
   initConfig: Config;
   /** The config with proposed changes. */
   editingConfig: Config;
+  /** Initial grading policy of the assignment. It should be immutable after initialization. */
+  initPolicy: GradingPolicy;
+  /** The grading policy with proposed changes */
+  editingPolicy: GradingPolicy;
 
   /** Page layout related states. */
   layout: GuiBuilderLayoutModel;
@@ -30,8 +36,11 @@ export interface GuiBuilderStoreModel {
 
 export interface GuiBuilderStoreActions {
   initializeConfig: Action<GuiBuilderStoreModel, { config: Config; id: number | null }>;
+  initializePolicy: Action<GuiBuilderStoreModel, GradingPolicy>;
   /** Updates a field in `editingConfig` given its `path`. */
   updateField: Action<GuiBuilderStoreModel, { path: string; value: any }>;
+  updatePolicy: Action<GuiBuilderStoreModel, GradingPolicy>;
+
   /** Whether the config has been edited. */
   isEdited: Computed<GuiBuilderStoreModel, boolean>;
 
@@ -53,10 +62,22 @@ const Actions: GuiBuilderStoreActions = {
     state.editingConfig = cloneDeep(payload.config);
     state.configId = payload.id;
   }),
+  initializePolicy: action((state, payload) => {
+    state.initPolicy = payload;
+    state.editingPolicy = { ...payload };
+  }),
   updateField: action((state, payload) => {
     set(state.editingConfig, payload.path, payload.value);
   }),
-  isEdited: computed((state) => !isConfigEqual(state.initConfig, state.editingConfig)),
+  updatePolicy: action((state, payload) => {
+    state.editingPolicy = payload;
+  }),
+
+  isEdited: computed((state) => {
+    const isConfigEdited = !isConfigEqual(state.initConfig, state.editingConfig);
+    const isPolicyEdited = !isEqual(state.initPolicy, state.editingPolicy);
+    return isConfigEdited || isPolicyEdited;
+  }),
 
   toggleAddStage: action((state) => {
     state.layout.showAddStage = !state.layout.showAddStage;
@@ -72,8 +93,11 @@ const Actions: GuiBuilderStoreActions = {
 // trouble detecting changes in the store. See https://stackoverflow.com/q/74002866/11067496
 const configStore: GuiBuilderStoreModel & GuiBuilderStoreActions = {
   configId: null,
+
   initConfig: defaultConfig,
   editingConfig: defaultConfig,
+  initPolicy: defaultPolicy,
+  editingPolicy: defaultPolicy,
 
   layout: {
     showAddStage: false,

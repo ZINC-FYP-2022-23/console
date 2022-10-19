@@ -1,4 +1,4 @@
-import type { Config, Settings } from "@types";
+import type { Config, GradingPolicy, Settings } from "@types";
 
 /**
  * Default values for the `_settings` field in an assignment config.
@@ -31,4 +31,10 @@ export const defaultSettings: Settings = {
 export const defaultConfig: Config = {
   _settings: defaultSettings,
   stages: [],
+};
+
+export const defaultPolicy: GradingPolicy = {
+  attemptLimits: null,
+  gradeImmediately: false,
+  showImmediateScores: false,
 };

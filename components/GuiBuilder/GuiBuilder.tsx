@@ -1,7 +1,7 @@
 import Button from "@components/Button";
 import { useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
-import { Config } from "@types";
-import { configToYaml } from "@utils/Config";
+import { AssignmentConfig } from "@types";
+import { configToYaml, parseConfigYaml } from "@utils/Config";
 import { useEffect } from "react";
 import { ReactFlowProvider } from "reactflow";
 import PipelineEditor from "./PipelineEditor/PipelineEditor";
@@ -9,21 +9,38 @@ import AddStagePanel from "./Settings/AddStagePanel";
 import SettingsPanel from "./Settings/SettingsPanel";
 
 interface GUIAssignmentBuilderProps {
-  configProp: Config;
-  /** The `assignmentConfigId`. If it's `null`, it means we're creating a new assignment. */
+  /**
+   * Config data queried from GraphQL if the assignment already exists. It's `undefined` when
+   * creating a new assignment.
+   */
+  data?: {
+    assignmentConfig: AssignmentConfig;
+  };
+  /** The `assignmentConfigId`. It's `null` when creating a new assignment. */
   configId: number | null;
 }
 
-function GUIAssignmentBuilder({ configProp, configId }: GUIAssignmentBuilderProps) {
+function GUIAssignmentBuilder({ data, configId }: GUIAssignmentBuilderProps) {
   const isNewAssignment = configId === null;
-  const initializeConfig = useStoreActions((actions) => actions.initializeConfig);
+
   const editingConfig = useStoreState((state) => state.editingConfig);
   const isEdited = useStoreState((state) => state.isEdited);
   const showAddStage = useStoreState((state) => state.layout.showAddStage);
+  const initializeConfig = useStoreActions((actions) => actions.initializeConfig);
+  const initializePolicy = useStoreActions((actions) => actions.initializePolicy);
 
+  // Initialize store
   useEffect(() => {
-    initializeConfig({ config: configProp, id: configId });
-  }, [configProp, configId, initializeConfig]);
+    if (data) {
+      const config = parseConfigYaml(data.assignmentConfig.config_yaml);
+      initializeConfig({ config, id: configId });
+      initializePolicy({
+        attemptLimits: data.assignmentConfig.attemptLimits ?? null,
+        gradeImmediately: data.assignmentConfig.gradeImmediately,
+        showImmediateScores: data.assignmentConfig.showImmediateScores,
+      });
+    }
+  }, [data, configId, initializeConfig, initializePolicy]);
 
   return (
     <div className="p-4 pl-3 w-full flex flex-col">

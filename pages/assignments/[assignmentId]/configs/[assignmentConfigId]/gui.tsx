@@ -1,16 +1,13 @@
 import { useQuery } from "@apollo/client";
 import GUIAssignmentBuilder from "@components/GuiBuilder/GuiBuilder";
-import { defaultConfig } from "@constants/Config/defaults";
 import { LayoutProvider } from "@contexts/layout";
 import { GET_PIPELINE_CONFIG_FOR_ASSIGNMENT } from "@graphql/queries/user";
 import { Layout } from "@layout";
 import { initializeApollo } from "@lib/apollo";
 import configStore from "@state/GuiBuilder/Store";
 import { AssignmentConfig } from "@types";
-import { parseConfigYaml } from "@utils/Config";
 import { createStore, StoreProvider } from "easy-peasy";
 import { GetServerSideProps } from "next";
-import { useMemo } from "react";
 
 const store = createStore(configStore);
 
@@ -20,21 +17,25 @@ interface GUIAssignmentBuilderRootProps {
 }
 
 function GUIAssignmentBuilderRoot({ configId }: GUIAssignmentBuilderRootProps) {
-  let config = useMemo(() => defaultConfig, []);
-  const { data } = useQuery<{ assignmentConfig: AssignmentConfig }>(GET_PIPELINE_CONFIG_FOR_ASSIGNMENT, {
+  const isNewAssignment = configId === null;
+  const { data, error } = useQuery<{ assignmentConfig: AssignmentConfig }>(GET_PIPELINE_CONFIG_FOR_ASSIGNMENT, {
     variables: {
       assignmentConfigId: configId,
     },
   });
-  if (data) {
-    config = parseConfigYaml(data.assignmentConfig.config_yaml);
+
+  // When creating a new assignment, the GraphQL query will always have error, which is expected behavior
+  // since `configId` is null. Hence, we handle query error only when modifying an existing assignment.
+  if (!isNewAssignment && error) {
+    // TODO(Anson): Better handling of error
+    console.error(error);
   }
 
   return (
     <LayoutProvider>
       <Layout title="Assignment Config">
         <StoreProvider store={store}>
-          <GUIAssignmentBuilder configProp={config} configId={configId} />
+          <GUIAssignmentBuilder data={data} configId={configId} />
         </StoreProvider>
       </Layout>
     </LayoutProvider>
@@ -61,7 +62,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, query }) => 
         assignmentConfigId: configId,
       },
     });
-    if (!data.assignmentConfig) {
+    if (data.assignmentConfig === null) {
       return { notFound: true };
     }
   }

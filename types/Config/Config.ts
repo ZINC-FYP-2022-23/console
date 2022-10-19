@@ -1,7 +1,7 @@
 import type { Settings, SettingsRaw, Stage } from "@types";
 
 /**
- * An assignment configuration.
+ * The grading pipeline configuration of an assignment. It models an assignment configuration YAML.
  */
 interface Config {
   /** General configurations across the pipeline. */
