@@ -11,7 +11,7 @@ const moduleExports = {
     return [
       {
         // Use YAML editor by default
-        source: "/assignments/:assignmentId/configs/:assignmentConfigId",
+        source: "/assignments/:assignmentId/configs/:assignmentConfigId(\\d{1,})",
         destination: "/assignments/:assignmentId/configs/:assignmentConfigId/yaml",
         permanent: true,
       }
