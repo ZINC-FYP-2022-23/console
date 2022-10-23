@@ -21,6 +21,7 @@ export type Assignment = {
 };
 
 export type AssignmentConfig = {
+  affected_users: AssignmentConfigUser[];
   assignment: Assignment;
   assignment_id: number;
   attemptLimits?: number;
@@ -126,7 +127,7 @@ export type Section = {
   id: number;
   name: string;
   updated_at: string;
-  users: User[];
+  users: SectionUser[];
 };
 
 export type SectionUser = {

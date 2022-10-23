@@ -1,5 +1,7 @@
 import { useSubscription, useMutation } from "@apollo/client";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useClickOutside } from "@mantine/hooks";
+import { AssignmentConfig, Section } from "@types";
 import { useRouter } from "next/router";
 import { useLayoutDispatch } from "../../contexts/layout";
 import {
@@ -29,8 +31,14 @@ export function AssignedUsers() {
   );
 }
 
-function AssignedStudents({ assignmentConfigId, assignedUserIds, section }) {
-  const assignedStudents = section.students.filter(({ user }) => assignedUserIds.includes(user.id));
+interface AssignedStudentsProps {
+  assignmentConfigId: number;
+  assignedUserIds: number[];
+  section: Section;
+}
+
+function AssignedStudents({ assignmentConfigId, assignedUserIds, section }: AssignedStudentsProps) {
+  const assignedStudents = section.users.filter(({ user }) => assignedUserIds.includes(user.id));
   const [removeTask, { loading: removing }] = useMutation(REMOVE_TASK_FROM_STUDENT);
 
   return (
@@ -65,10 +73,16 @@ function AssignedStudents({ assignmentConfigId, assignedUserIds, section }) {
   );
 }
 
-function UnassignedStudents({ section, assignedUserIds, assignmentConfigId }) {
+interface UnassignedStudents {
+  assignmentConfigId: number;
+  assignedUserIds: number[];
+  section: Section;
+}
+
+function UnassignedStudents({ section, assignedUserIds, assignmentConfigId }: UnassignedStudents) {
   const [assignTask, { loading: assigning }] = useMutation(ASSIGN_TASK_TO_STUDENT);
   const [bulkAssignTask, { loading: bulkAssigning }] = useMutation(BULK_ASSIGN_TASK_TO_STUDENTS);
-  const unassignedStudents = section.students.filter(({ user }) => !assignedUserIds.includes(user.id));
+  const unassignedStudents = section.users.filter(({ user }) => !assignedUserIds.includes(user.id));
 
   return (
     <div>
@@ -122,13 +136,19 @@ function UnassignedStudents({ section, assignedUserIds, assignmentConfigId }) {
   );
 }
 
-function CourseWideAssignStudents({ sections, assignmentConfigId }) {
+interface CourseWideAssignStudentsProps {
+  assignmentConfigId: number;
+  sections: Section[];
+}
+
+function CourseWideAssignStudents({ sections, assignmentConfigId }: CourseWideAssignStudentsProps) {
   const [bulkRemoveTask, { loading: bulkRemoving }] = useMutation(BULK_REMOVE_TASK_FROM_STUDENTS);
   const [bulkAssignTask, { loading: bulkAssigning }] = useMutation(BULK_ASSIGN_TASK_TO_STUDENTS);
   const userIds = sections
     .map((section) => {
-      return section.students.map(({ user }) => user.id);
+      return section.users.map(({ user }) => user.id);
     })
+    // @ts-ignore
     .flat();
 
   return (
@@ -178,15 +198,16 @@ function CourseWideAssignStudents({ sections, assignmentConfigId }) {
 export function AssignedUsersSlideOver() {
   const router = useRouter();
   const assignmentConfigId = parseInt(router.query.assignmentConfigId as string, 10);
-  const { data, loading } = useSubscription(GET_STUDENTS_FOR_CONFIG, {
+  const { data, loading } = useSubscription<{ assignmentConfig: AssignmentConfig }>(GET_STUDENTS_FOR_CONFIG, {
     variables: {
       id: assignmentConfigId,
     },
   });
   const dispatch = useLayoutDispatch();
+  const ref = useClickOutside(() => dispatch({ type: "closeSlideOver" }));
 
   return (
-    <div className="h-full flex flex-col bg-cool-gray-50 shadow-xl overflow-y-scroll">
+    <div ref={ref} className="h-full flex flex-col bg-cool-gray-50 shadow-xl overflow-y-scroll">
       <header className="space-y-1 py-6 px-4 bg-cse-600 sm:px-6">
         <div className="flex items-center justify-between space-x-3">
           <h2 className="text-lg leading-7 font-medium text-white">Assigned Students</h2>
@@ -203,13 +224,13 @@ export function AssignedUsersSlideOver() {
           </div>
         </div>
         <div>
-          <p className="text-sm leading-5 text-cse-300">Configure submission start date and deadline</p>
+          <p className="text-sm leading-5 text-cse-300">Assign students to this assignment</p>
         </div>
       </header>
       {!loading && (
         <CourseWideAssignStudents
           assignmentConfigId={assignmentConfigId}
-          sections={data.assignmentConfig.assignment.course.sections}
+          sections={data!.assignmentConfig.assignment.course.sections}
         />
       )}
       <div className="flex-1 flex flex-col justify-between">
@@ -221,7 +242,7 @@ export function AssignedUsersSlideOver() {
             </h2>
             <ul>
               {!loading &&
-                data.assignmentConfig.assignment.course.sections.map((section) => (
+                data!.assignmentConfig.assignment.course.sections.map((section) => (
                   <li key={section.id} className="bg-white overflow-hidden shadow rounded-lg">
                     <div className="px-4 py-4 sm:px-6">
                       <h2 className="font-medium text-sm text-gray-500 tracking-wider">{section.name}</h2>
@@ -229,13 +250,13 @@ export function AssignedUsersSlideOver() {
                     <div className="bg-gray-50 px-4 py-4 sm:p-3">
                       <AssignedStudents
                         assignmentConfigId={assignmentConfigId}
-                        assignedUserIds={data.assignmentConfig.affected_users.map(({ user_id }) => user_id)}
+                        assignedUserIds={data!.assignmentConfig.affected_users.map(({ user_id }) => user_id)}
                         section={section}
                       />
                       <UnassignedStudents
                         assignmentConfigId={assignmentConfigId}
                         section={section}
-                        assignedUserIds={data.assignmentConfig.affected_users.map(({ user_id }) => user_id)}
+                        assignedUserIds={data!.assignmentConfig.affected_users.map(({ user_id }) => user_id)}
                       />
                     </div>
                   </li>

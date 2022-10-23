@@ -1,5 +1,6 @@
 import Accordion from "@components/Accordion";
 import Button from "@components/Button";
+import { useLayoutDispatch } from "@contexts/layout";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useStoreState } from "@state/GuiBuilder/Hooks";
 import { memo } from "react";
@@ -11,6 +12,7 @@ import Scheduling from "./Scheduling";
  * The settings panel at the right of the page.
  */
 function SettingsPanel() {
+  const dispatch = useLayoutDispatch();
   const configId = useStoreState((state) => state.configId);
   const isNewAssignment = configId === null;
 
@@ -33,9 +35,7 @@ function SettingsPanel() {
           <Button
             className="w-full py-2 text-cse-700 font-medium text-sm bg-blue-100 hover:bg-blue-50 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-blue-200"
             icon={<FontAwesomeIcon icon={["fad", "sitemap"]} />}
-            onClick={() => {
-              // TODO
-            }}
+            onClick={() => dispatch({ type: "manageAssignedUsers" })}
           >
             Assigned Students
           </Button>
