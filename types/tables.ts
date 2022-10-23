@@ -31,12 +31,14 @@ export type AssignmentConfig = {
   dueAt: string;
   gradeImmediately: boolean;
   id: number;
+  /** Whether the current time is after `startCollectionAt`. It equals to false if `startCollectionAt` is null. */
   openForSubmission: boolean;
   releaseGradeAt?: string;
-  showAt: string;
+  showAt?: string;
   showImmediateScores: boolean;
-  startCollectionAt: string;
+  startCollectionAt?: string;
   stopCollectionAt: string;
+  /** Whether the current time is after `stopCollectionAt`. */
   submissionWindowPassed: boolean;
   updatedAt: string;
 };

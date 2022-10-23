@@ -3,10 +3,10 @@
  *
  * {@link https://easy-peasy.vercel.app/ easy-peasy} is chosen as the state management library.
  */
-import { defaultConfig, defaultPolicy } from "@constants/Config/defaults";
+import { defaultConfig, defaultPolicy, defaultSchedule } from "@constants/Config/defaults";
 import { SupportedStage } from "@constants/Config/supportedStages";
-import type { Config, GradingPolicy } from "@types";
-import { isConfigEqual } from "@utils/Config";
+import type { Config, GradingPolicy, Schedule } from "@types";
+import { isConfigEqual, isScheduleEqual } from "@utils/Config";
 import { Action, action, computed, Computed } from "easy-peasy";
 import isEqual from "lodash/isEqual";
 import set from "lodash/set";
@@ -26,6 +26,10 @@ export interface GuiBuilderStoreModel {
   initPolicy: GradingPolicy;
   /** The grading policy with proposed changes */
   editingPolicy: GradingPolicy;
+  /** Initial scheduling of the assignment. It should be immutable after initialization. */
+  initSchedule: Schedule;
+  /** The scheduling with proposed changes. */
+  editingSchedule: Schedule;
 
   /** Page layout related states. */
   layout: GuiBuilderLayoutModel;
@@ -37,9 +41,12 @@ export interface GuiBuilderStoreModel {
 export interface GuiBuilderStoreActions {
   initializeConfig: Action<GuiBuilderStoreModel, { config: Config; id: number | null }>;
   initializePolicy: Action<GuiBuilderStoreModel, GradingPolicy>;
+  initializeSchedule: Action<GuiBuilderStoreModel, Schedule>;
+
   /** Updates a field in `editingConfig` given its `path`. */
   updateField: Action<GuiBuilderStoreModel, { path: string; value: any }>;
   updatePolicy: Action<GuiBuilderStoreModel, GradingPolicy>;
+  updateSchedule: Action<GuiBuilderStoreModel, Schedule>;
 
   /** Whether the config has been edited. */
   isEdited: Computed<GuiBuilderStoreModel, boolean>;
@@ -66,17 +73,26 @@ const Actions: GuiBuilderStoreActions = {
     state.initPolicy = payload;
     state.editingPolicy = { ...payload };
   }),
+  initializeSchedule: action((state, payload) => {
+    state.initSchedule = payload;
+    state.editingSchedule = { ...payload };
+  }),
+
   updateField: action((state, payload) => {
     set(state.editingConfig, payload.path, payload.value);
   }),
   updatePolicy: action((state, payload) => {
     state.editingPolicy = payload;
   }),
+  updateSchedule: action((state, payload) => {
+    state.editingSchedule = payload;
+  }),
 
   isEdited: computed((state) => {
     const isConfigEdited = !isConfigEqual(state.initConfig, state.editingConfig);
     const isPolicyEdited = !isEqual(state.initPolicy, state.editingPolicy);
-    return isConfigEdited || isPolicyEdited;
+    const isScheduleEdited = !isScheduleEqual(state.initSchedule, state.editingSchedule);
+    return isConfigEdited || isPolicyEdited || isScheduleEdited;
   }),
 
   toggleAddStage: action((state) => {
@@ -98,6 +114,8 @@ const configStore: GuiBuilderStoreModel & GuiBuilderStoreActions = {
   editingConfig: defaultConfig,
   initPolicy: defaultPolicy,
   editingPolicy: defaultPolicy,
+  initSchedule: defaultSchedule,
+  editingSchedule: defaultSchedule,
 
   layout: {
     showAddStage: false,

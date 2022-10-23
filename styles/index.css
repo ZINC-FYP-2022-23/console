@@ -97,6 +97,15 @@
     @apply outline-none;
   }
 
+  .react-datepicker__day--disabled {
+    @apply text-gray-400 cursor-not-allowed;
+  }
+
+  .react-datepicker__day--keyboard-selected,
+  .react-datepicker__day--keyboard-selected:hover {
+    @apply bg-transparent;
+  }
+
   .react-datepicker__time-container
     .react-datepicker__time
     .react-datepicker__time-box
@@ -111,6 +120,13 @@
     ul.react-datepicker__time-list
     li.react-datepicker__time-list-item--selected:hover {
     @apply bg-cse-400;
+  }
+
+  .react-datepicker__time-container,
+  .react-datepicker__time-container
+    .react-datepicker__time
+    .react-datepicker__time-box {
+    @apply w-24;
   }
 
   .ais-Highlight-highlighted {

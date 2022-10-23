@@ -1,4 +1,5 @@
-import type { Config, GradingPolicy, Settings } from "@types";
+import type { Config, GradingPolicy, Schedule, Settings } from "@types";
+import { addDays, set } from "date-fns";
 
 /**
  * Default values for the `_settings` field in an assignment config.
@@ -37,4 +38,12 @@ export const defaultPolicy: GradingPolicy = {
   attemptLimits: null,
   gradeImmediately: false,
   showImmediateScores: false,
+};
+
+export const defaultSchedule: Schedule = {
+  showAt: "",
+  startCollectionAt: new Date().toISOString(),
+  dueAt: set(addDays(new Date(), 7), { hours: 23, minutes: 59 }).toISOString(),
+  stopCollectionAt: set(addDays(new Date(), 7), { hours: 23, minutes: 59 }).toISOString(),
+  releaseGradeAt: set(addDays(new Date(), 7), { hours: 23, minutes: 59 }).toISOString(),
 };

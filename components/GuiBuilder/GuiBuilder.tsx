@@ -28,6 +28,7 @@ function GUIAssignmentBuilder({ data, configId }: GUIAssignmentBuilderProps) {
   const showAddStage = useStoreState((state) => state.layout.showAddStage);
   const initializeConfig = useStoreActions((actions) => actions.initializeConfig);
   const initializePolicy = useStoreActions((actions) => actions.initializePolicy);
+  const initializeSchedule = useStoreActions((actions) => actions.initializeSchedule);
 
   // Initialize store
   useEffect(() => {
@@ -39,8 +40,15 @@ function GUIAssignmentBuilder({ data, configId }: GUIAssignmentBuilderProps) {
         gradeImmediately: data.assignmentConfig.gradeImmediately,
         showImmediateScores: data.assignmentConfig.showImmediateScores,
       });
+      initializeSchedule({
+        showAt: data.assignmentConfig.showAt ?? "",
+        startCollectionAt: data.assignmentConfig.startCollectionAt ?? "",
+        dueAt: data.assignmentConfig.dueAt,
+        stopCollectionAt: data.assignmentConfig.stopCollectionAt,
+        releaseGradeAt: data.assignmentConfig.releaseGradeAt ?? "",
+      });
     }
-  }, [data, configId, initializeConfig, initializePolicy]);
+  }, [data, configId, initializeConfig, initializePolicy, initializeSchedule]);
 
   return (
     <div className="p-4 pl-3 w-full flex flex-col">
