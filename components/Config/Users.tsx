@@ -144,12 +144,13 @@ interface CourseWideAssignStudentsProps {
 function CourseWideAssignStudents({ sections, assignmentConfigId }: CourseWideAssignStudentsProps) {
   const [bulkRemoveTask, { loading: bulkRemoving }] = useMutation(BULK_REMOVE_TASK_FROM_STUDENTS);
   const [bulkAssignTask, { loading: bulkAssigning }] = useMutation(BULK_ASSIGN_TASK_TO_STUDENTS);
-  const userIds = sections
+  let userIds = sections
     .map((section) => {
       return section.users.map(({ user }) => user.id);
     })
     // @ts-ignore
     .flat();
+  userIds = [...new Set(userIds)]; // Need to remove duplicate values
 
   return (
     <div className="relative py-6 px-4 sm:px-6">
