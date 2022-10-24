@@ -1,15 +1,35 @@
 import Button from "@components/Button";
 import { AssignedUsersSlideOver } from "@components/Config/Users";
 import { SlideOver } from "@components/SlideOver";
+import { Spinner } from "@components/Spinner";
 import { useLayoutState } from "@contexts/layout";
 import { useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
 import { AssignmentConfig } from "@types";
 import { configToYaml, parseConfigYaml } from "@utils/Config";
+import dynamic from "next/dynamic";
 import { useEffect } from "react";
 import { ReactFlowProvider } from "reactflow";
-import PipelineEditor from "./PipelineEditor/PipelineEditor";
-import AddStagePanel from "./Settings/AddStagePanel";
-import SettingsPanel from "./Settings/SettingsPanel";
+
+const Loading = () => (
+  <div className="h-full flex flex-col items-center justify-center bg-white rounded-md shadow">
+    <Spinner className="h-14 w-14 text-cse-500" />
+  </div>
+);
+
+const PipelineEditor = dynamic(() => import("./PipelineEditor/PipelineEditor"), {
+  ssr: false,
+  loading: () => <Loading />,
+});
+
+const AddStagePanel = dynamic(() => import("./Settings/AddStagePanel"), {
+  ssr: false,
+  loading: () => <Loading />,
+});
+
+const SettingsPanel = dynamic(() => import("./Settings/SettingsPanel"), {
+  ssr: false,
+  loading: () => <Loading />,
+});
 
 function SlideOverContent() {
   const { configSlideOver } = useLayoutState();

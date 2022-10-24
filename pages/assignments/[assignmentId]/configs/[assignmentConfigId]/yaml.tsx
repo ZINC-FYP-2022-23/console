@@ -147,7 +147,7 @@ function YAMLConfigEditor({ yamlString }) {
   async function updateYaml() {
     try {
       // const yaml = jsyaml.load(configYaml);
-      const { configError } = await validateAssignmentConfig(configYaml, assignmentConfigId);
+      const { configError } = await validateAssignmentConfig(configYaml, assignmentConfigId as string);
       if (!configError) {
         await updatePipelineConfig({
           variables: {
