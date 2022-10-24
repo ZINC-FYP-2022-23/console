@@ -5,14 +5,19 @@
  */
 import { defaultConfig, defaultPolicy, defaultSchedule } from "@constants/Config/defaults";
 import { SupportedStage } from "@constants/Config/supportedStages";
-import type { Config, GradingPolicy, Schedule } from "@types";
+import type { Config, GradingPolicy, Schedule, StageNodeData } from "@types";
 import { isConfigEqual, isScheduleEqual } from "@utils/Config";
 import { Action, action, computed, Computed } from "easy-peasy";
+import cloneDeep from "lodash/cloneDeep";
 import isEqual from "lodash/isEqual";
 import set from "lodash/set";
-import cloneDeep from "lodash/cloneDeep";
+import { applyEdgeChanges, applyNodeChanges, Edge, EdgeChange, Node, NodeChange } from "reactflow";
 
 /////////////// STORE DEFINITION ///////////////
+
+// NOTE: The store should ONLY use plain serializable objects, arrays, and primitives.
+// Do NOT use ES6 classes, functions, Maps, Sets, etc. Otherwise, easy-peasy will have
+// trouble detecting changes in the store. See https://stackoverflow.com/q/74002866/11067496
 
 export interface GuiBuilderStoreModel {
   /** The assignment config ID. It's `null` if we're creating a new assignment. */
@@ -31,11 +36,19 @@ export interface GuiBuilderStoreModel {
   /** The scheduling with proposed changes. */
   editingSchedule: Schedule;
 
-  /** Page layout related states. */
-  layout: GuiBuilderLayoutModel;
+  layout: {
+    /** Whether to show "Add New Stage" at right sidebar. */
+    showAddStage: boolean;
+  };
 
-  /** Data being dragged from Add Stage panel. */
-  dragging?: SupportedStage;
+  pipelineEditor: {
+    /** Data being dragged from Add Stage panel. */
+    dragging?: SupportedStage;
+    /** Pipeline stage nodes. */
+    stageNodes: Node<StageNodeData>[];
+    /** Edges that connect pipeline stage nodes. */
+    stageEdges: Edge[];
+  };
 }
 
 export interface GuiBuilderStoreActions {
@@ -51,14 +64,19 @@ export interface GuiBuilderStoreActions {
   /** Whether the config has been edited. */
   isEdited: Computed<GuiBuilderStoreModel, boolean>;
 
+  //////// Layout actions ////////
+
   toggleAddStage: Action<GuiBuilderStoreModel>;
 
-  setDragging: Action<GuiBuilderStoreModel, SupportedStage | undefined>;
-}
+  //////// Pipeline editor actions ////////
 
-export interface GuiBuilderLayoutModel {
-  /** Whether to show "Add New Stage" at right sidebar. */
-  showAddStage: boolean;
+  setDragging: Action<GuiBuilderStoreModel, SupportedStage | undefined>;
+  setStageNodes: Action<GuiBuilderStoreModel, Node<StageNodeData>[]>;
+  setStageEdges: Action<GuiBuilderStoreModel, Edge[]>;
+  /** Called on drag, select and remove of stage nodes. */
+  onStageNodesChange: Action<GuiBuilderStoreModel, NodeChange[]>;
+  /** Called on select and remove of stage edges. */
+  onStageEdgesChange: Action<GuiBuilderStoreModel, EdgeChange[]>;
 }
 
 /////////////// STORE IMPLEMENTATION ///////////////
@@ -95,18 +113,31 @@ const Actions: GuiBuilderStoreActions = {
     return isConfigEdited || isPolicyEdited || isScheduleEdited;
   }),
 
+  //////// Layout actions ////////
+
   toggleAddStage: action((state) => {
     state.layout.showAddStage = !state.layout.showAddStage;
   }),
 
+  //////// Pipeline editor actions ////////
+
   setDragging: action((state, payload) => {
-    state.dragging = payload;
+    state.pipelineEditor.dragging = payload;
+  }),
+  setStageNodes: action((state, payload) => {
+    state.pipelineEditor.stageNodes = payload;
+  }),
+  setStageEdges: action((state, payload) => {
+    state.pipelineEditor.stageEdges = payload;
+  }),
+  onStageNodesChange: action((state, payload) => {
+    state.pipelineEditor.stageNodes = applyNodeChanges(payload, state.pipelineEditor.stageNodes);
+  }),
+  onStageEdgesChange: action((state, payload) => {
+    state.pipelineEditor.stageEdges = applyEdgeChanges(payload, state.pipelineEditor.stageEdges);
   }),
 };
 
-// NOTE: The store should ONLY use plain serializable objects, arrays, and primitives.
-// Do NOT use ES6 classes, functions, Maps, Sets, etc. Otherwise, easy-peasy will have
-// trouble detecting changes in the store. See https://stackoverflow.com/q/74002866/11067496
 const configStore: GuiBuilderStoreModel & GuiBuilderStoreActions = {
   configId: null,
 
@@ -119,6 +150,11 @@ const configStore: GuiBuilderStoreModel & GuiBuilderStoreActions = {
 
   layout: {
     showAddStage: false,
+  },
+
+  pipelineEditor: {
+    stageNodes: [],
+    stageEdges: [],
   },
 
   ...Actions,

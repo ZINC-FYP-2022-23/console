@@ -1,15 +1,7 @@
-import { useStoreState } from "@state/GuiBuilder/Hooks";
-import { memo, useCallback, useRef } from "react";
-import ReactFlow, {
-  addEdge,
-  Background,
-  BackgroundVariant,
-  Controls,
-  Node,
-  useEdgesState,
-  useNodesState,
-  useReactFlow,
-} from "reactflow";
+import { useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
+import { StageNodeData } from "@types";
+import { memo, useRef } from "react";
+import ReactFlow, { addEdge, Background, BackgroundVariant, Controls, Node, useReactFlow } from "reactflow";
 import "reactflow/dist/style.css";
 import AddStageButton from "./AddStageButton";
 
@@ -22,11 +14,14 @@ function PipelineEditor() {
   const reactFlowWrapper = useRef<HTMLDivElement>(null!);
   const reactFlowInstance = useReactFlow();
 
-  const dragging = useStoreState((state) => state.dragging);
+  const dragging = useStoreState((state) => state.pipelineEditor.dragging);
+  const nodes = useStoreState((state) => state.pipelineEditor.stageNodes);
+  const edges = useStoreState((state) => state.pipelineEditor.stageEdges);
 
-  const [nodes, setNodes, onNodesChange] = useNodesState([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
-  const onConnect = useCallback((params) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
+  const setNodes = useStoreActions((actions) => actions.setStageNodes);
+  const setEdges = useStoreActions((actions) => actions.setStageEdges);
+  const onNodesChange = useStoreActions((actions) => actions.onStageNodesChange);
+  const onEdgesChange = useStoreActions((actions) => actions.onStageEdgesChange);
 
   return (
     <div
@@ -41,7 +36,9 @@ function PipelineEditor() {
         edges={edges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
-        onConnect={onConnect}
+        onConnect={(connection) => {
+          setEdges(addEdge(connection, edges));
+        }}
         proOptions={{ account: "", hideAttribution: true }}
         snapGrid={[GRID_SIZE, GRID_SIZE]}
         snapToGrid
@@ -65,13 +62,13 @@ function PipelineEditor() {
             x: event.clientX - reactFlowBounds.left - 75,
             y: event.clientY - reactFlowBounds.top - 20,
           });
-          const newNode: Node = {
+          const newNode: Node<StageNodeData> = {
             // TODO: Use UUID v4()
             id: Math.random().toString(),
             position,
             data: { label: dragging!.label },
           };
-          setNodes((nds) => nds.concat(newNode));
+          setNodes(nodes.concat(newNode));
         }}
       >
         <Controls showInteractive={false} />

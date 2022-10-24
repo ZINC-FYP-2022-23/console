@@ -31,7 +31,7 @@ const supportedStages: SupportedStage[] = [
     name: "FileStructureValidation",
     label: "File Structure Validation",
     kind: StageKind.PRE_GLOBAL,
-    description: "Checks if student submits the right files",
+    description: "Checks if the submitted filename tree follows specification",
   },
   {
     name: "Score",
