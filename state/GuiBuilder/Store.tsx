@@ -11,7 +11,16 @@ import { Action, action, computed, Computed } from "easy-peasy";
 import cloneDeep from "lodash/cloneDeep";
 import isEqual from "lodash/isEqual";
 import set from "lodash/set";
-import { applyEdgeChanges, applyNodeChanges, Edge, EdgeChange, Node, NodeChange } from "reactflow";
+import {
+  applyEdgeChanges,
+  applyNodeChanges,
+  Edge,
+  EdgeChange,
+  EdgeRemoveChange,
+  getConnectedEdges,
+  Node,
+  NodeChange,
+} from "reactflow";
 
 /////////////// STORE DEFINITION ///////////////
 
@@ -77,6 +86,8 @@ export interface GuiBuilderStoreActions {
   onStageNodesChange: Action<GuiBuilderStoreModel, NodeChange[]>;
   /** Called on select and remove of stage edges. */
   onStageEdgesChange: Action<GuiBuilderStoreModel, EdgeChange[]>;
+  /** Deletes a stage node given its ID. */
+  deleteStageNode: Action<GuiBuilderStoreModel, string>;
 }
 
 /////////////// STORE IMPLEMENTATION ///////////////
@@ -135,6 +146,21 @@ const Actions: GuiBuilderStoreActions = {
   }),
   onStageEdgesChange: action((state, payload) => {
     state.pipelineEditor.stageEdges = applyEdgeChanges(payload, state.pipelineEditor.stageEdges);
+  }),
+  deleteStageNode: action((state, payload) => {
+    const node = state.pipelineEditor.stageNodes.find((node) => node.id === payload)!;
+    const connectedEdges = getConnectedEdges([node], state.pipelineEditor.stageEdges);
+    const edgesToRemove: EdgeRemoveChange[] = connectedEdges.map((edge) => ({
+      id: edge.id,
+      type: "remove",
+    }));
+
+    // Remove the node and any edges connected to it
+    state.pipelineEditor.stageNodes = applyNodeChanges(
+      [{ id: node.id, type: "remove" }],
+      state.pipelineEditor.stageNodes,
+    );
+    state.pipelineEditor.stageEdges = applyEdgeChanges(edgesToRemove, state.pipelineEditor.stageEdges);
   }),
 };
 

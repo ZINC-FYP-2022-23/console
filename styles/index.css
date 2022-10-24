@@ -150,3 +150,20 @@
 .mantine-RichTextEditor-root ol {
   list-style-type: decimal;
 }
+
+/* React Flow - Pipeline Editor */
+.react-flow__handle.stage-node-handle {
+  @apply p-1 border-2 bg-cse-600;
+}
+
+.react-flow__handle-right.stage-node-handle {
+  @apply -right-[7px];
+}
+
+.react-flow__handle-left.stage-node-handle {
+  @apply -left-[7px];
+}
+
+path.react-flow__edge-path {
+  @apply stroke-[2.5px];
+}

@@ -93,12 +93,12 @@ function GUIAssignmentBuilder({ data, configId }: GUIAssignmentBuilderProps) {
         </div>
         <div className="pt-1 pl-1 flex-1 flex flex-row gap-3 overflow-y-hidden">
           <div className="w-4/6 flex flex-col gap-3">
-            <div className="h-1/2">
+            <div className="h-[45%]">
               <ReactFlowProvider>
                 <PipelineEditor />
               </ReactFlowProvider>
             </div>
-            <div className="h-1/2 bg-white rounded-md shadow">Stage settings</div>
+            <div className="h-[55%] bg-white rounded-md shadow">Stage settings</div>
           </div>
           <div className="w-2/6 bg-white rounded-md shadow overflow-y-auto">
             {showAddStage ? <AddStagePanel /> : <SettingsPanel />}

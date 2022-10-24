@@ -1,11 +1,31 @@
 import { useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
 import { StageNodeData } from "@types";
 import { memo, useRef } from "react";
-import ReactFlow, { addEdge, Background, BackgroundVariant, Controls, Node, useReactFlow } from "reactflow";
+import ReactFlow, {
+  addEdge,
+  Background,
+  BackgroundVariant,
+  Controls,
+  DefaultEdgeOptions,
+  MarkerType,
+  Node,
+  NodeTypes,
+  useReactFlow,
+} from "reactflow";
 import "reactflow/dist/style.css";
 import AddStageButton from "./AddStageButton";
+import StageNode from "./StageNode";
 
 const GRID_SIZE = 15;
+
+const nodeTypes: NodeTypes = {
+  stage: StageNode,
+};
+
+/** Options that newly added edges will get automatically. */
+const defaultEdgeOptions: DefaultEdgeOptions = {
+  markerEnd: { type: MarkerType.ArrowClosed },
+};
 
 /**
  * The node-based pipeline editor.
@@ -32,6 +52,7 @@ function PipelineEditor() {
     >
       <AddStageButton />
       <ReactFlow
+        nodeTypes={nodeTypes}
         nodes={nodes}
         edges={edges}
         onNodesChange={onNodesChange}
@@ -43,6 +64,7 @@ function PipelineEditor() {
         snapGrid={[GRID_SIZE, GRID_SIZE]}
         snapToGrid
         className="rounded-md shadow"
+        defaultEdgeOptions={defaultEdgeOptions}
         onDragOver={(event) => {
           event.preventDefault();
           event.dataTransfer.dropEffect = "copy";
@@ -66,7 +88,8 @@ function PipelineEditor() {
             // TODO: Use UUID v4()
             id: Math.random().toString(),
             position,
-            data: { label: dragging!.label },
+            data: { name: dragging!.name, label: dragging!.label },
+            type: "stage",
           };
           setNodes(nodes.concat(newNode));
         }}

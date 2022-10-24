@@ -6,5 +6,8 @@
  * Data stored by a stage node.
  */
 export type StageNodeData = {
-  label: string;
+  /** Stage name (e.g. `"StdioTest"`, `"Compile"`). */
+  readonly name: string;
+  /** Label of the stage to be shown. */
+  readonly label: string;
 };
