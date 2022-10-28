@@ -93,6 +93,8 @@ export interface GuiBuilderStoreActions {
   onStageConnect: Action<GuiBuilderStoreModel, Connection>;
   /** Deletes a stage node given its ID. */
   deleteStageNode: Action<GuiBuilderStoreModel, string>;
+  /** Deletes a stage edge given its ID. */
+  deleteStageEdge: Action<GuiBuilderStoreModel, string>;
 }
 
 /////////////// STORE IMPLEMENTATION ///////////////
@@ -166,6 +168,9 @@ const Actions: GuiBuilderStoreActions = {
     // Remove the node and any edges connected to it
     state.pipelineEditor.nodes = applyNodeChanges([{ id: node.id, type: "remove" }], state.pipelineEditor.nodes);
     state.pipelineEditor.edges = applyEdgeChanges(edgesToRemove, state.pipelineEditor.edges);
+  }),
+  deleteStageEdge: action((state, id) => {
+    state.pipelineEditor.edges = applyEdgeChanges([{ id, type: "remove" }], state.pipelineEditor.edges);
   }),
 };
 

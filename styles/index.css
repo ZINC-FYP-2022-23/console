@@ -163,7 +163,3 @@
 .react-flow__handle-left.stage-node-handle {
   @apply -left-[7px];
 }
-
-path.react-flow__edge-path {
-  @apply stroke-[2.5px];
-}

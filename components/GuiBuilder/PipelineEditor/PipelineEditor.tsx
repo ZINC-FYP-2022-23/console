@@ -6,6 +6,7 @@ import ReactFlow, {
   BackgroundVariant,
   Controls,
   DefaultEdgeOptions,
+  EdgeTypes,
   MarkerType,
   Node,
   NodeTypes,
@@ -13,6 +14,7 @@ import ReactFlow, {
 } from "reactflow";
 import "reactflow/dist/style.css";
 import AddStageButton from "./AddStageButton";
+import StageEdge from "./StageEdge";
 import StageNode from "./StageNode";
 
 const GRID_SIZE = 15;
@@ -21,8 +23,13 @@ const nodeTypes: NodeTypes = {
   stage: StageNode,
 };
 
+const edgeTypes: EdgeTypes = {
+  stage: StageEdge,
+};
+
 /** Options that newly added edges will get automatically. */
 const defaultEdgeOptions: DefaultEdgeOptions = {
+  type: "stage",
   markerEnd: { type: MarkerType.ArrowClosed },
 };
 
@@ -52,6 +59,7 @@ function PipelineEditor() {
       <AddStageButton />
       <ReactFlow
         nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
         nodes={nodes}
         edges={edges}
         onNodesChange={onNodesChange}
