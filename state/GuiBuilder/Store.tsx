@@ -6,7 +6,7 @@
 
 import { defaultConfig, defaultPolicy, defaultSchedule } from "@constants/Config/defaults";
 import { SupportedStage } from "@constants/Config/supportedStages";
-import type { Config, GradingPolicy, Schedule, StageNodeData } from "@types";
+import type { Config, GradingPolicy, Schedule, StageNode } from "@types";
 import { isConfigEqual, isScheduleEqual } from "@utils/Config";
 import { Action, action, computed, Computed } from "easy-peasy";
 import cloneDeep from "lodash/cloneDeep";
@@ -21,9 +21,10 @@ import {
   EdgeChange,
   EdgeRemoveChange,
   getConnectedEdges,
-  Node,
   NodeChange,
+  XYPosition,
 } from "reactflow";
+import { v4 as uuidv4 } from "uuid";
 
 /////////////// STORE DEFINITION ///////////////
 
@@ -57,7 +58,7 @@ export interface GuiBuilderStoreModel {
     /** Data being dragged from Add Stage panel. */
     dragging?: SupportedStage;
     /** Pipeline stage nodes. */
-    nodes: Node<StageNodeData>[];
+    nodes: StageNode[];
     /** Edges that connect pipeline stage nodes. */
     edges: Edge[];
   };
@@ -83,7 +84,7 @@ export interface GuiBuilderStoreActions {
   //////// Pipeline editor actions ////////
 
   setDragging: Action<GuiBuilderStoreModel, SupportedStage | undefined>;
-  setStageNodes: Action<GuiBuilderStoreModel, Node<StageNodeData>[]>;
+  setStageNodes: Action<GuiBuilderStoreModel, StageNode[]>;
   setStageEdges: Action<GuiBuilderStoreModel, Edge[]>;
   /** Called on drag, select and remove of stage nodes. */
   onStageNodesChange: Action<GuiBuilderStoreModel, NodeChange[]>;
@@ -91,6 +92,9 @@ export interface GuiBuilderStoreActions {
   onStageEdgesChange: Action<GuiBuilderStoreModel, EdgeChange[]>;
   /** Called when user connects two stage nodes. */
   onStageConnect: Action<GuiBuilderStoreModel, Connection>;
+
+  /** Called when a new stage is added. */
+  addStageNode: Action<GuiBuilderStoreModel, XYPosition>;
   /** Deletes a stage node given its ID. */
   deleteStageNode: Action<GuiBuilderStoreModel, string>;
   /** Deletes a stage edge given its ID. */
@@ -156,6 +160,16 @@ const Actions: GuiBuilderStoreActions = {
   }),
   onStageConnect: action((state, connection) => {
     state.pipelineEditor.edges = addEdge(connection, state.pipelineEditor.edges);
+  }),
+
+  addStageNode: action((state, position) => {
+    const newNode: StageNode = {
+      id: uuidv4(),
+      position,
+      data: { name: state.pipelineEditor.dragging!.name, label: state.pipelineEditor.dragging!.label },
+      type: "stage",
+    };
+    state.pipelineEditor.nodes = state.pipelineEditor.nodes.concat(newNode);
   }),
   deleteStageNode: action((state, id) => {
     const node = state.pipelineEditor.nodes.find((node) => node.id === id)!;
