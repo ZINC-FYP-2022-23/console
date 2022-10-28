@@ -2,7 +2,6 @@ import { useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
 import { StageNodeData } from "@types";
 import { memo, useRef } from "react";
 import ReactFlow, {
-  addEdge,
   Background,
   BackgroundVariant,
   Controls,
@@ -35,13 +34,13 @@ function PipelineEditor() {
   const reactFlowInstance = useReactFlow();
 
   const dragging = useStoreState((state) => state.pipelineEditor.dragging);
-  const nodes = useStoreState((state) => state.pipelineEditor.stageNodes);
-  const edges = useStoreState((state) => state.pipelineEditor.stageEdges);
+  const nodes = useStoreState((state) => state.pipelineEditor.nodes);
+  const edges = useStoreState((state) => state.pipelineEditor.edges);
 
   const setNodes = useStoreActions((actions) => actions.setStageNodes);
-  const setEdges = useStoreActions((actions) => actions.setStageEdges);
   const onNodesChange = useStoreActions((actions) => actions.onStageNodesChange);
   const onEdgesChange = useStoreActions((actions) => actions.onStageEdgesChange);
+  const onStageConnect = useStoreActions((actions) => actions.onStageConnect);
 
   return (
     <div
@@ -57,9 +56,7 @@ function PipelineEditor() {
         edges={edges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
-        onConnect={(connection) => {
-          setEdges(addEdge(connection, edges));
-        }}
+        onConnect={onStageConnect}
         proOptions={{ account: "", hideAttribution: true }}
         snapGrid={[GRID_SIZE, GRID_SIZE]}
         snapToGrid

@@ -3,6 +3,7 @@
  *
  * {@link https://easy-peasy.vercel.app/ easy-peasy} is chosen as the state management library.
  */
+
 import { defaultConfig, defaultPolicy, defaultSchedule } from "@constants/Config/defaults";
 import { SupportedStage } from "@constants/Config/supportedStages";
 import type { Config, GradingPolicy, Schedule, StageNodeData } from "@types";
@@ -12,8 +13,10 @@ import cloneDeep from "lodash/cloneDeep";
 import isEqual from "lodash/isEqual";
 import set from "lodash/set";
 import {
+  addEdge,
   applyEdgeChanges,
   applyNodeChanges,
+  Connection,
   Edge,
   EdgeChange,
   EdgeRemoveChange,
@@ -54,9 +57,9 @@ export interface GuiBuilderStoreModel {
     /** Data being dragged from Add Stage panel. */
     dragging?: SupportedStage;
     /** Pipeline stage nodes. */
-    stageNodes: Node<StageNodeData>[];
+    nodes: Node<StageNodeData>[];
     /** Edges that connect pipeline stage nodes. */
-    stageEdges: Edge[];
+    edges: Edge[];
   };
 }
 
@@ -86,6 +89,8 @@ export interface GuiBuilderStoreActions {
   onStageNodesChange: Action<GuiBuilderStoreModel, NodeChange[]>;
   /** Called on select and remove of stage edges. */
   onStageEdgesChange: Action<GuiBuilderStoreModel, EdgeChange[]>;
+  /** Called when user connects two stage nodes. */
+  onStageConnect: Action<GuiBuilderStoreModel, Connection>;
   /** Deletes a stage node given its ID. */
   deleteStageNode: Action<GuiBuilderStoreModel, string>;
 }
@@ -98,23 +103,23 @@ const Actions: GuiBuilderStoreActions = {
     state.editingConfig = cloneDeep(payload.config);
     state.configId = payload.id;
   }),
-  initializePolicy: action((state, payload) => {
-    state.initPolicy = payload;
-    state.editingPolicy = { ...payload };
+  initializePolicy: action((state, gradingPolicy) => {
+    state.initPolicy = gradingPolicy;
+    state.editingPolicy = { ...gradingPolicy };
   }),
-  initializeSchedule: action((state, payload) => {
-    state.initSchedule = payload;
-    state.editingSchedule = { ...payload };
+  initializeSchedule: action((state, schedule) => {
+    state.initSchedule = schedule;
+    state.editingSchedule = { ...schedule };
   }),
 
   updateField: action((state, payload) => {
     set(state.editingConfig, payload.path, payload.value);
   }),
-  updatePolicy: action((state, payload) => {
-    state.editingPolicy = payload;
+  updatePolicy: action((state, gradingPolicy) => {
+    state.editingPolicy = gradingPolicy;
   }),
-  updateSchedule: action((state, payload) => {
-    state.editingSchedule = payload;
+  updateSchedule: action((state, schedule) => {
+    state.editingSchedule = schedule;
   }),
 
   isEdited: computed((state) => {
@@ -132,35 +137,35 @@ const Actions: GuiBuilderStoreActions = {
 
   //////// Pipeline editor actions ////////
 
-  setDragging: action((state, payload) => {
-    state.pipelineEditor.dragging = payload;
+  setDragging: action((state, supportedStage) => {
+    state.pipelineEditor.dragging = supportedStage;
   }),
-  setStageNodes: action((state, payload) => {
-    state.pipelineEditor.stageNodes = payload;
+  setStageNodes: action((state, nodes) => {
+    state.pipelineEditor.nodes = nodes;
   }),
-  setStageEdges: action((state, payload) => {
-    state.pipelineEditor.stageEdges = payload;
+  setStageEdges: action((state, edges) => {
+    state.pipelineEditor.edges = edges;
   }),
-  onStageNodesChange: action((state, payload) => {
-    state.pipelineEditor.stageNodes = applyNodeChanges(payload, state.pipelineEditor.stageNodes);
+  onStageNodesChange: action((state, changes) => {
+    state.pipelineEditor.nodes = applyNodeChanges(changes, state.pipelineEditor.nodes);
   }),
-  onStageEdgesChange: action((state, payload) => {
-    state.pipelineEditor.stageEdges = applyEdgeChanges(payload, state.pipelineEditor.stageEdges);
+  onStageEdgesChange: action((state, changes) => {
+    state.pipelineEditor.edges = applyEdgeChanges(changes, state.pipelineEditor.edges);
   }),
-  deleteStageNode: action((state, payload) => {
-    const node = state.pipelineEditor.stageNodes.find((node) => node.id === payload)!;
-    const connectedEdges = getConnectedEdges([node], state.pipelineEditor.stageEdges);
+  onStageConnect: action((state, connection) => {
+    state.pipelineEditor.edges = addEdge(connection, state.pipelineEditor.edges);
+  }),
+  deleteStageNode: action((state, id) => {
+    const node = state.pipelineEditor.nodes.find((node) => node.id === id)!;
+    const connectedEdges = getConnectedEdges([node], state.pipelineEditor.edges);
     const edgesToRemove: EdgeRemoveChange[] = connectedEdges.map((edge) => ({
       id: edge.id,
       type: "remove",
     }));
 
     // Remove the node and any edges connected to it
-    state.pipelineEditor.stageNodes = applyNodeChanges(
-      [{ id: node.id, type: "remove" }],
-      state.pipelineEditor.stageNodes,
-    );
-    state.pipelineEditor.stageEdges = applyEdgeChanges(edgesToRemove, state.pipelineEditor.stageEdges);
+    state.pipelineEditor.nodes = applyNodeChanges([{ id: node.id, type: "remove" }], state.pipelineEditor.nodes);
+    state.pipelineEditor.edges = applyEdgeChanges(edgesToRemove, state.pipelineEditor.edges);
   }),
 };
 
@@ -179,8 +184,8 @@ const configStore: GuiBuilderStoreModel & GuiBuilderStoreActions = {
   },
 
   pipelineEditor: {
-    stageNodes: [],
-    stageEdges: [],
+    nodes: [],
+    edges: [],
   },
 
   ...Actions,
