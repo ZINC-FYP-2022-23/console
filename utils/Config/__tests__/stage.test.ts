@@ -2,6 +2,8 @@ import { StageChildren, StageDataMap, StageDependency, StageKind } from "@types"
 import * as uuid from "uuid";
 import { getStageType, isStageDependencyEqual, parseStages, stagesToYamlObj, transposeStages } from "../stage";
 
+jest.mock("uuid");
+
 const yamlObj = {
   diffWithSkeleton: {
     exclude_from_provided: true,
