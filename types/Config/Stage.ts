@@ -1,15 +1,39 @@
-/**
- * A pipeline stage in the assignment configuration.
- */
+/** A pipeline stage in the assignment configuration. */
 interface Stage {
   /** The stage's key in the config YAML (e.g. `"stdioTest"`, `"compile:main"`). */
-  id: string;
+  key: string;
   /** Stage name (e.g. `"StdioTest"`, `"Compile"`). */
-  name: string;
+  readonly name: string;
   /** Stage kind. */
-  kind: StageKind;
+  readonly kind: StageKind;
   /** Configuration of the stage. */
   config: any;
+}
+
+/** How a stage is dependent on other stages. */
+export interface StageDependency {
+  /** UUID of the stage. */
+  readonly id: string;
+  /**
+   * The UUIDs of its parent stages, i.e. other stages that this stage is dependent on.
+   * It's `null` if the stage is the root (i.e. first stage).
+   */
+  dependsOn: string[] | null;
+}
+
+/** Mapping of a stage's UUID to its data. */
+export type StageDataMap = { [id: string]: Stage };
+
+/**
+ * What stages shall be executed after the execution of a stage given its ID.
+ *
+ * It's a reversed representation of {@link StageDependency}.
+ */
+export interface StageChildren {
+  /** UUID of the stage. */
+  readonly id: string;
+  /** The direct children of the stage. */
+  children: string[];
 }
 
 /**

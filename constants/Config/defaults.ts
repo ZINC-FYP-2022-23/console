@@ -31,7 +31,8 @@ export const defaultSettings: Settings = {
  */
 export const defaultConfig: Config = {
   _settings: defaultSettings,
-  stages: [],
+  stageDeps: [],
+  stageData: {},
 };
 
 export const defaultPolicy: GradingPolicy = {

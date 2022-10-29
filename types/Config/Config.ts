@@ -1,4 +1,4 @@
-import type { Settings, SettingsRaw, Stage } from "@types";
+import type { Settings, SettingsRaw, StageDataMap, StageDependency } from "@types";
 
 /**
  * The grading pipeline configuration of an assignment. It models an assignment configuration YAML.
@@ -6,8 +6,13 @@ import type { Settings, SettingsRaw, Stage } from "@types";
 interface Config {
   /** General configurations across the pipeline. */
   _settings: Settings;
-  /** Stages of the pipeline. */
-  stages: Stage[];
+  /**
+   * How each stage is dependent on other stages. We can build a directed acyclic graph (DAG) from this array
+   * that shows stages dependencies.
+   */
+  stageDeps: StageDependency[];
+  /** A map of stage UUID to stage data. */
+  stageData: StageDataMap;
 }
 
 /**
