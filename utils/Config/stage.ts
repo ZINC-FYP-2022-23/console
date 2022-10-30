@@ -79,6 +79,26 @@ export function transposeStageDeps(stageDeps: StageDependencyMap): { [id: string
 }
 
 /**
+ * Deletes a stage from the stage dependency graph in place.
+ * @param target The UUID of the stage to be deleted.
+ * @param stageDeps The adjacency list of the stage dependency graph. This object will be **mutated**.
+ */
+export function deleteStageFromDeps(target: string, stageDeps: StageDependencyMap): void {
+  if (!(target in stageDeps)) {
+    console.warn(`Cannot delete stage of ID "${target}" because it does not exist.`);
+    return;
+  }
+
+  // Delete the target stage
+  delete stageDeps[target];
+
+  // Delete all edges pointing to the target stage
+  Object.entries(stageDeps).forEach(([id, dependsOn]) => {
+    stageDeps[id] = dependsOn.filter((depId) => depId !== target);
+  });
+}
+
+/**
  * Converts to an object representation of the stages in the config YAML.
  * @param stageDeps Assume that the stage dependency graph has the shape of a **linked list**.
  */

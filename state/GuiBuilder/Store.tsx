@@ -7,7 +7,7 @@
 import { defaultConfig, defaultPolicy, defaultSchedule } from "@constants/Config/defaults";
 import { SupportedStage } from "@constants/Config/supportedStages";
 import type { Config, GradingPolicy, Schedule, StageNode } from "@types";
-import { isConfigEqual, isScheduleEqual } from "@utils/Config";
+import { deleteStageFromDeps, isConfigEqual, isScheduleEqual } from "@utils/Config";
 import { Action, action, computed, Computed } from "easy-peasy";
 import cloneDeep from "lodash/cloneDeep";
 import isEqual from "lodash/isEqual";
@@ -95,9 +95,15 @@ export interface GuiBuilderStoreActions {
 
   /** Called when a new stage is added. */
   addStageNode: Action<GuiBuilderStoreModel, XYPosition>;
-  /** Deletes a stage node given its ID. */
+  /**
+   * Deletes a stage node given its ID. It's called when the user presses "Backspace" after selecting the
+   * stage node or presses the red delete icon button.
+   */
   deleteStageNode: Action<GuiBuilderStoreModel, string>;
-  /** Deletes a stage edge given its ID. */
+  /**
+   * Deletes a stage edge given its ID. It's called when the user presses "Backspace" after selecting the
+   * stage edge or presses the red delete icon button.
+   */
   deleteStageEdge: Action<GuiBuilderStoreModel, string>;
 }
 
@@ -160,31 +166,66 @@ const Actions: GuiBuilderStoreActions = {
   }),
   onStageConnect: action((state, connection) => {
     state.pipelineEditor.edges = addEdge(connection, state.pipelineEditor.edges);
+
+    if (connection.source && connection.target) {
+      // e.g. Connection of "A -> B" means "B" depends on "A"
+      // So in `stageDeps`: { "B": [], ... } --> { "B": ["A"], ... }
+      const targetDeps = state.editingConfig.stageDeps[connection.target];
+      state.editingConfig.stageDeps[connection.target] = [...targetDeps, connection.source];
+    }
   }),
 
   addStageNode: action((state, position) => {
+    const dragging = state.pipelineEditor.dragging;
+    if (!dragging) return;
+
+    const stageId = uuidv4();
+
+    // Update pipeline editor data
     const newNode: StageNode = {
-      id: uuidv4(),
+      id: stageId,
       position,
-      data: { name: state.pipelineEditor.dragging!.name, label: state.pipelineEditor.dragging!.label },
+      data: { name: dragging.name, label: dragging.label },
       type: "stage",
     };
     state.pipelineEditor.nodes = state.pipelineEditor.nodes.concat(newNode);
+
+    // Update `editingConfig`
+    state.editingConfig.stageDeps[stageId] = [];
+    state.editingConfig.stageData[stageId] = {
+      key: dragging.name.charAt(0).toLowerCase() + dragging.name.slice(1),
+      name: dragging.name,
+      kind: dragging.kind,
+      config: {}, // TODO(Anson): Add default config
+    };
   }),
   deleteStageNode: action((state, id) => {
-    const node = state.pipelineEditor.nodes.find((node) => node.id === id)!;
-    const connectedEdges = getConnectedEdges([node], state.pipelineEditor.edges);
-    const edgesToRemove: EdgeRemoveChange[] = connectedEdges.map((edge) => ({
-      id: edge.id,
-      type: "remove",
-    }));
+    // In pipeline editor, remove the node and all edges connected to it.
+    const node = state.pipelineEditor.nodes.find((node) => node.id === id);
+    if (node) {
+      const connectedEdges = getConnectedEdges([node], state.pipelineEditor.edges);
+      const edgesToRemove: EdgeRemoveChange[] = connectedEdges.map((edge) => ({
+        id: edge.id,
+        type: "remove",
+      }));
+      state.pipelineEditor.nodes = applyNodeChanges([{ id: node.id, type: "remove" }], state.pipelineEditor.nodes);
+      state.pipelineEditor.edges = applyEdgeChanges(edgesToRemove, state.pipelineEditor.edges);
+    }
 
-    // Remove the node and any edges connected to it
-    state.pipelineEditor.nodes = applyNodeChanges([{ id: node.id, type: "remove" }], state.pipelineEditor.nodes);
-    state.pipelineEditor.edges = applyEdgeChanges(edgesToRemove, state.pipelineEditor.edges);
+    // Delete stage data from `editingConfig`
+    delete state.editingConfig.stageData[id];
+    deleteStageFromDeps(id, state.editingConfig.stageDeps);
   }),
   deleteStageEdge: action((state, id) => {
+    // e.g. Delete edge "A -> B" in pipeline editor means remove "A" from "B"'s dependencies
+    // So in `stageDeps`: { "B": ["A"], ... } --> { "B": [], ... }
+    const source = state.pipelineEditor.edges.find((edge) => edge.id === id)!.source; // e.g. "A"
+    const target = state.pipelineEditor.edges.find((edge) => edge.id === id)!.target; // e.g. "B"
+
     state.pipelineEditor.edges = applyEdgeChanges([{ id, type: "remove" }], state.pipelineEditor.edges);
+
+    const targetDeps = state.editingConfig.stageDeps[target];
+    state.editingConfig.stageDeps[target] = targetDeps.filter((depId) => depId !== source);
   }),
 };
 

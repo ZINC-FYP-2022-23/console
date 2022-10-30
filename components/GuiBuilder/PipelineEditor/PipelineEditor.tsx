@@ -9,6 +9,8 @@ import ReactFlow, {
   EdgeTypes,
   MarkerType,
   NodeTypes,
+  OnEdgesDelete,
+  OnNodesDelete,
   ProOptions,
   useReactFlow,
 } from "reactflow";
@@ -61,9 +63,36 @@ function PipelineEditor() {
   const edges = useStoreState((state) => state.pipelineEditor.edges);
 
   const addStageNode = useStoreActions((actions) => actions.addStageNode);
+  const deleteStageEdge = useStoreActions((actions) => actions.deleteStageEdge);
+  const deleteStageNode = useStoreActions((actions) => actions.deleteStageNode);
   const onNodesChange = useStoreActions((actions) => actions.onStageNodesChange);
   const onEdgesChange = useStoreActions((actions) => actions.onStageEdgesChange);
   const onStageConnect = useStoreActions((actions) => actions.onStageConnect);
+
+  /**
+   * We pass this handler on top of `onNodesChange` to make sure that `state.editingConfig` is properly
+   * updated if the user presses "Backspace" to delete a selected node.
+   */
+  const onNodesDelete: OnNodesDelete = useCallback(
+    (nodes) => {
+      // TODO(Anson): Support multi-stage deletion
+      // After supporting, we can directly write `onNodesDelete={deleteStageNode}`.
+      deleteStageNode(nodes[0].id);
+    },
+    [deleteStageNode],
+  );
+
+  /**
+   * We pass this handler on top of `onEdgesChange` to make sure that `state.editingConfig` is properly
+   * updated if the user presses "Backspace" to delete a selected edge.
+   */
+  const onEdgesDelete: OnEdgesDelete = useCallback(
+    (edges) => {
+      // TODO(Anson): Support multi-edge deletion
+      deleteStageEdge(edges[0].id);
+    },
+    [deleteStageEdge],
+  );
 
   /** Handler for dropping a stage block to the React Flow editor. */
   const onDrop = useCallback(
@@ -102,12 +131,17 @@ function PipelineEditor() {
         edges={edges}
         defaultEdgeOptions={defaultEdgeOptions}
         onNodesChange={onNodesChange}
+        onNodesDelete={onNodesDelete}
         onEdgesChange={onEdgesChange}
+        onEdgesDelete={onEdgesDelete}
         onConnect={onStageConnect}
         onDragOver={onDragOver}
         onDrop={onDrop}
         snapGrid={[GRID_SIZE, GRID_SIZE]}
         snapToGrid
+        // TODO(Anson): Re-enable selection only if multi-deleting nodes/edges can update `editingConfig` properly.
+        selectionKeyCode={null}
+        multiSelectionKeyCode={null}
         proOptions={proOptions}
       >
         <Controls showInteractive={false} />

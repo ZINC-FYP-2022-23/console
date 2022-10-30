@@ -1,6 +1,13 @@
 import { StageDataMap, StageDependencyMap, StageKind } from "@types";
 import * as uuid from "uuid";
-import { getStageType, isStageDependencyEqual, parseStages, stagesToYamlObj, transposeStageDeps } from "../stage";
+import {
+  deleteStageFromDeps,
+  getStageType,
+  isStageDependencyEqual,
+  parseStages,
+  stagesToYamlObj,
+  transposeStageDeps,
+} from "../stage";
 
 jest.mock("uuid");
 
@@ -127,6 +134,67 @@ describe("Stage utils", () => {
       };
       const output = transposeStageDeps(stageDeps);
       expect(output).toEqual(expected);
+    });
+  });
+
+  describe("deleteStageFromDeps()", () => {
+    it("deletes a stage located at the middle of linked list", () => {
+      // C <- B <- A
+      const stageDeps: StageDependencyMap = {
+        A: ["B"],
+        B: ["C"],
+        C: [],
+      };
+      deleteStageFromDeps("B", stageDeps);
+      expect(stageDeps).toEqual({
+        A: [],
+        C: [],
+      });
+    });
+
+    it("deletes a stage located at the end of linked list", () => {
+      // C <- B <- A
+      const stageDeps: StageDependencyMap = {
+        A: ["B"],
+        B: ["C"],
+        C: [],
+      };
+      deleteStageFromDeps("C", stageDeps);
+      expect(stageDeps).toEqual({
+        A: ["B"],
+        B: [],
+      });
+    });
+
+    it("deletes a stage at the middle of a branched DAG", () => {
+      //     ┌─ B <─┐
+      // D <─┴─ C <─┴─ A
+      const stageDeps: StageDependencyMap = {
+        A: ["B", "C"],
+        B: ["D"],
+        C: ["D"],
+        D: [],
+      };
+      deleteStageFromDeps("C", stageDeps);
+      expect(stageDeps).toEqual({
+        A: ["B"],
+        B: ["D"],
+        D: [],
+      });
+    });
+
+    it("handles deleting a stage that does not exist", () => {
+      // B <- A
+      const stageDeps: StageDependencyMap = {
+        A: ["B"],
+        B: [],
+      };
+      const consoleWarnMock = jest.spyOn(console, "warn").mockImplementation();
+      deleteStageFromDeps("C", stageDeps);
+      expect(stageDeps).toEqual(stageDeps); // Remains unchanged
+      expect(consoleWarnMock).toHaveBeenCalled();
+
+      consoleWarnMock.mockRestore();
     });
   });
 
