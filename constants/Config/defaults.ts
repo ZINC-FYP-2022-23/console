@@ -31,7 +31,7 @@ export const defaultSettings: Settings = {
  */
 export const defaultConfig: Config = {
   _settings: defaultSettings,
-  stageDeps: [],
+  stageDeps: {},
   stageData: {},
 };
 

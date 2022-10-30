@@ -1,6 +1,6 @@
-import { StageChildren, StageDataMap, StageDependency, StageKind } from "@types";
+import { StageDataMap, StageDependencyMap, StageKind } from "@types";
 import * as uuid from "uuid";
-import { getStageType, isStageDependencyEqual, parseStages, stagesToYamlObj, transposeStages } from "../stage";
+import { getStageType, isStageDependencyEqual, parseStages, stagesToYamlObj, transposeStageDeps } from "../stage";
 
 jest.mock("uuid");
 
@@ -17,11 +17,11 @@ const yamlObj = {
   },
 };
 
-const stageDeps: StageDependency[] = [
-  { id: "mock-uuid-1", dependsOn: null },
-  { id: "mock-uuid-2", dependsOn: ["mock-uuid-1"] },
-  { id: "mock-uuid-3", dependsOn: ["mock-uuid-2"] },
-];
+const stageDeps: StageDependencyMap = {
+  "mock-uuid-1": [],
+  "mock-uuid-2": ["mock-uuid-1"],
+  "mock-uuid-3": ["mock-uuid-2"],
+};
 
 const stageData: StageDataMap = {
   "mock-uuid-1": {
@@ -90,42 +90,42 @@ describe("Stage utils", () => {
     });
   });
 
-  describe("transposeStages()", () => {
+  describe("transposeStageDeps()", () => {
     it("transposes a linked list graph", () => {
-      // 3 <- 2 <- 1
-      const stageDeps: StageDependency[] = [
-        { id: "1", dependsOn: ["2"] },
-        { id: "2", dependsOn: ["3"] },
-        { id: "3", dependsOn: null },
-      ];
-      // 3 -> 2 -> 1
-      const expected: StageChildren[] = [
-        { id: "1", children: [] },
-        { id: "2", children: ["1"] },
-        { id: "3", children: ["2"] },
-      ];
-      const output = transposeStages(stageDeps);
+      // C <- B <- A
+      const stageDeps: StageDependencyMap = {
+        A: ["B"],
+        B: ["C"],
+        C: [],
+      };
+      // C -> B -> A
+      const expected = {
+        A: [],
+        B: ["A"],
+        C: ["B"],
+      };
+      const output = transposeStageDeps(stageDeps);
       expect(output).toEqual(expected);
     });
 
     it("transposes a branched directed acyclic graph", () => {
-      //     ┌─ 2 <─┐
-      // 4 <─┴─ 3 <─┴─ 1
-      const stageDeps: StageDependency[] = [
-        { id: "1", dependsOn: ["2", "3"] },
-        { id: "2", dependsOn: ["4"] },
-        { id: "3", dependsOn: ["4"] },
-        { id: "4", dependsOn: null },
-      ];
-      //     ┌─> 2 ─┐
-      // 4 ──┴─> 3 ─┴─> 1
-      const expected: StageChildren[] = [
-        { id: "1", children: [] },
-        { id: "2", children: ["1"] },
-        { id: "3", children: ["1"] },
-        { id: "4", children: ["2", "3"] },
-      ];
-      const output = transposeStages(stageDeps);
+      //     ┌─ B <─┐
+      // D <─┴─ C <─┴─ A
+      const stageDeps: StageDependencyMap = {
+        A: ["B", "C"],
+        B: ["D"],
+        C: ["D"],
+        D: [],
+      };
+      //     ┌─> B ─┐
+      // D ──┴─> C ─┴─> A
+      const expected = {
+        A: [],
+        B: ["A"],
+        C: ["A"],
+        D: ["B", "C"],
+      };
+      const output = transposeStageDeps(stageDeps);
       expect(output).toEqual(expected);
     });
   });
@@ -135,17 +135,17 @@ describe("Stage utils", () => {
       expect(stagesToYamlObj(stageDeps, stageData)).toEqual(yamlObj);
     });
 
-    it("orders stage correctly when stage dependencies array is shuffled", () => {
-      const shuffledStageDeps: StageDependency[] = [
-        { id: "mock-uuid-2", dependsOn: ["mock-uuid-1"] },
-        { id: "mock-uuid-3", dependsOn: ["mock-uuid-2"] },
-        { id: "mock-uuid-1", dependsOn: null },
-      ];
+    it("orders stage correctly when key order of stage dependency map is shuffled", () => {
+      const shuffledStageDeps: StageDependencyMap = {
+        "mock-uuid-2": ["mock-uuid-1"],
+        "mock-uuid-3": ["mock-uuid-2"],
+        "mock-uuid-1": [],
+      };
       expect(stagesToYamlObj(shuffledStageDeps, stageData)).toEqual(yamlObj);
     });
 
     it("handles a single-staged pipeline", () => {
-      const stageDeps: StageDependency[] = [{ id: "mock-uuid-1", dependsOn: null }];
+      const stageDeps: StageDependencyMap = { "mock-uuid-1": [] };
       const stageData: StageDataMap = {
         "mock-uuid-1": {
           key: "diffWithSkeleton",
@@ -169,24 +169,24 @@ describe("Stage utils", () => {
   describe("isStageDependencyEqual()", () => {
     it("handles linked list dependency graphs", () => {
       // 1 <- 2 <- 3
-      const deps1: StageDependency[] = [
-        { id: "1", dependsOn: null },
-        { id: "2", dependsOn: ["1"] },
-        { id: "3", dependsOn: ["2"] },
-      ];
+      const deps1: StageDependencyMap = {
+        "1": [],
+        "2": ["1"],
+        "3": ["2"],
+      };
       // 1 <- 2 <- 3
-      const deps2: StageDependency[] = [
-        { id: "3", dependsOn: ["2"] },
-        { id: "2", dependsOn: ["1"] },
-        { id: "1", dependsOn: null },
-      ];
+      const deps2: StageDependencyMap = {
+        "3": ["2"],
+        "2": ["1"],
+        "1": [],
+      };
       // 1 <- 2 <- 3 <- 4
-      const deps3: StageDependency[] = [
-        { id: "1", dependsOn: null },
-        { id: "2", dependsOn: ["1"] },
-        { id: "3", dependsOn: ["2"] },
-        { id: "4", dependsOn: ["3"] },
-      ];
+      const deps3: StageDependencyMap = {
+        "1": [],
+        "2": ["1"],
+        "3": ["2"],
+        "4": ["3"],
+      };
 
       expect(isStageDependencyEqual(deps1, deps2)).toBe(true);
       expect(isStageDependencyEqual(deps1, deps3)).toBe(false);
@@ -195,28 +195,28 @@ describe("Stage utils", () => {
     it("handles branched directed acyclic dependency graphs", () => {
       //     ┌─ 2 <─┐
       // 4 <─┴─ 3 <─┴─ 1
-      const deps1: StageDependency[] = [
-        { id: "1", dependsOn: ["2", "3"] },
-        { id: "2", dependsOn: ["4"] },
-        { id: "3", dependsOn: ["4"] },
-        { id: "4", dependsOn: null },
-      ];
+      const deps1: StageDependencyMap = {
+        "1": ["2", "3"],
+        "2": ["4"],
+        "3": ["4"],
+        "4": [],
+      };
       //     ┌─ 2 <─┐
       // 4 <─┴─ 3 <─┴─ 1
-      const deps2: StageDependency[] = [
-        { id: "2", dependsOn: ["4"] },
-        { id: "4", dependsOn: null },
-        { id: "3", dependsOn: ["4"] },
-        { id: "1", dependsOn: ["3", "2"] },
-      ];
+      const deps2: StageDependencyMap = {
+        "2": ["4"],
+        "4": [],
+        "3": ["4"],
+        "1": ["3", "2"],
+      };
       //     ┌─ 2 <─┐
       // 1 <─┴─ 3 <─┴─ 4
-      const deps3: StageDependency[] = [
-        { id: "1", dependsOn: null },
-        { id: "2", dependsOn: ["4"] },
-        { id: "3", dependsOn: ["4"] },
-        { id: "4", dependsOn: ["2", "3"] },
-      ];
+      const deps3: StageDependencyMap = {
+        "1": [],
+        "2": ["1"],
+        "3": ["1"],
+        "4": ["2", "3"],
+      };
 
       expect(isStageDependencyEqual(deps1, deps2)).toBe(true);
       expect(isStageDependencyEqual(deps1, deps3)).toBe(false);

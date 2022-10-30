@@ -1,4 +1,4 @@
-import { Config, Settings, Stage, StageDataMap, StageDependency, StageKind } from "@types";
+import { Config, Settings, StageDataMap, StageDependencyMap, StageKind } from "@types";
 import { configToYaml, parseConfigYaml } from "../config";
 import * as settingsUtils from "../settings";
 import * as stageUtils from "../stage";
@@ -56,10 +56,10 @@ describe("Config utils", () => {
           network: true,
         },
       };
-      const stageDeps: StageDependency[] = [
-        { id: "mock-uuid-1", dependsOn: null },
-        { id: "mock-uuid-2", dependsOn: ["mock-uuid-1"] },
-      ];
+      const stageDeps: StageDependencyMap = {
+        "mock-uuid-1": [],
+        "mock-uuid-2": ["mock-uuid-1"],
+      };
       const stageData: StageDataMap = {
         "mock-uuid-1": {
           key: "compile",

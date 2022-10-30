@@ -10,31 +10,18 @@ interface Stage {
   config: any;
 }
 
-/** How a stage is dependent on other stages. */
-export interface StageDependency {
-  /** UUID of the stage. */
-  readonly id: string;
-  /**
-   * The UUIDs of its parent stages, i.e. other stages that this stage is dependent on.
-   * It's `null` if the stage is the root (i.e. first stage).
-   */
-  dependsOn: string[] | null;
+/**
+ * How stages depends on each other. The key is the UUID of a stage, and the value is an array of
+ * UUIDs of other stages that this stage depends on.
+ *
+ * It's an adjacency list that represents a directed acyclic graph (DAG) of how stages depends on each other.
+ */
+export interface StageDependencyMap {
+  [id: string]: string[];
 }
 
 /** Mapping of a stage's UUID to its data. */
 export type StageDataMap = { [id: string]: Stage };
-
-/**
- * What stages shall be executed after the execution of a stage given its ID.
- *
- * It's a reversed representation of {@link StageDependency}.
- */
-export interface StageChildren {
-  /** UUID of the stage. */
-  readonly id: string;
-  /** The direct children of the stage. */
-  children: string[];
-}
 
 /**
  * Classification of a stage. Corresponds to the `PipelineStage.Kind` enum in the "grader" repo.
