@@ -102,7 +102,7 @@ function layoutReducer(state: LayoutState, action: LayoutAction): LayoutState {
       return {
         ...state,
         showSlideOver: true,
-        slideOverMaxWidth: "max-w-4xl",
+        slideOverMaxWidth: "max-w-5xl",
         coursePageSlideOver: "submissions",
         assignmentConfigId: action.payload.configId,
         viewingTaskAssignedGroups: action.payload.sections,

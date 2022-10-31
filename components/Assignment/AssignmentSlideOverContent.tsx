@@ -1,4 +1,5 @@
 import { useQuery } from "@apollo/client";
+import AppealsTable from "@components/Appeal/AppealsTable";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Menu, Tab, Transition } from "@headlessui/react";
 import DotsVerticalIcon from "@heroicons/react/solid/DotsVerticalIcon";
@@ -104,7 +105,7 @@ export function AssignmentSlideOverContent() {
             <Tab.List className="mt-3 px-6 flex gap-6 text-sm border-b border-gray-200">
               <Tab
                 className={({ selected }) =>
-                  `pb-4 px-1 border-b-2 font-medium text-sm leading-5 focus:outline-none transition ${
+                  `pb-3 px-1 border-b-2 font-medium text-sm leading-5 focus:outline-none transition ${
                     selected
                       ? "border-cse-500 text-cse-600"
                       : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
@@ -115,7 +116,7 @@ export function AssignmentSlideOverContent() {
               </Tab>
               <Tab
                 className={({ selected }) =>
-                  `pb-4 px-1 border-b-2 font-medium text-sm leading-5 focus:outline-none transition ${
+                  `pb-3 px-1 border-b-2 font-medium text-sm leading-5 focus:outline-none transition ${
                     selected
                       ? "border-cse-500 text-cse-600"
                       : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
@@ -145,8 +146,7 @@ export function AssignmentSlideOverContent() {
               {/* "Appeal Cases" tab panel */}
               <Tab.Panel>
                 <div className="px-6 py-5">
-                  {/* TODO(Bryan): Add appeals table */}
-                  (TODO: Add table to show appeals)
+                  <AppealsTable />
                 </div>
               </Tab.Panel>
             </Tab.Panels>
