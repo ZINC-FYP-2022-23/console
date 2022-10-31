@@ -40,20 +40,18 @@ function StageEdge({ id, sourceX, sourceY, targetX, targetY, sourcePosition, tar
         onMouseLeave={() => setShowDeleteBtn(false)}
         requiredExtensions="http://www.w3.org/1999/xhtml"
       >
-        <body style={{ width: deleteBtnSize, height: deleteBtnSize }} className="flex items-center justify-center">
-          <button
-            style={{ width: deleteBtnSize, height: deleteBtnSize }}
-            className={`flex items-center justify-center bg-red-500 text-white cursor-pointer rounded-full hover:bg-red-700 transition ${
-              showDeleteBtn ? "opacity-1" : "opacity-0"
-            }`}
-            onClick={(event) => {
-              event.stopPropagation();
-              deleteStageEdge(id);
-            }}
-          >
-            <FontAwesomeIcon className="w-3 h-3" icon={["fas", "xmark"]} />
-          </button>
-        </body>
+        <button
+          style={{ width: deleteBtnSize, height: deleteBtnSize }}
+          className={`flex items-center justify-center bg-red-500 text-white cursor-pointer rounded-full hover:bg-red-700 transition ${
+            showDeleteBtn ? "opacity-1" : "opacity-0"
+          }`}
+          onClick={(event) => {
+            event.stopPropagation();
+            deleteStageEdge(id);
+          }}
+        >
+          <FontAwesomeIcon className="w-3 h-3" icon={["fas", "xmark"]} />
+        </button>
       </foreignObject>
     </>
   );
