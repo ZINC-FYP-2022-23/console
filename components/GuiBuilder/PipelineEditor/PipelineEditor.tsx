@@ -102,7 +102,7 @@ function PipelineEditor() {
       // Check if the dropped element is a stage node. That's because the droppable area
       // also accepts other items, such as a file.
       const type = event.dataTransfer.getData("application/reactflow");
-      if (!type) {
+      if (type !== "stage") {
         return;
       }
 

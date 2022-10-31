@@ -56,7 +56,7 @@ export interface GuiBuilderStoreModel {
 
   pipelineEditor: {
     /** Data being dragged from Add Stage panel. */
-    dragging?: SupportedStage;
+    dragging?: { stageName: string; stageData: SupportedStage };
     /** Pipeline stage nodes. */
     nodes: StageNode[];
     /** Edges that connect pipeline stage nodes. */
@@ -83,7 +83,7 @@ export interface GuiBuilderStoreActions {
 
   //////// Pipeline editor actions ////////
 
-  setDragging: Action<GuiBuilderStoreModel, SupportedStage | undefined>;
+  setDragging: Action<GuiBuilderStoreModel, { stageName: string; stageData: SupportedStage } | undefined>;
   setStageNodes: Action<GuiBuilderStoreModel, StageNode[]>;
   setStageEdges: Action<GuiBuilderStoreModel, Edge[]>;
   /** Called on drag, select and remove of stage nodes. */
@@ -185,7 +185,7 @@ const Actions: GuiBuilderStoreActions = {
     const newNode: StageNode = {
       id: stageId,
       position,
-      data: { name: dragging.name, label: dragging.label },
+      data: { name: dragging.stageName, label: dragging.stageData.label },
       type: "stage",
     };
     state.pipelineEditor.nodes = state.pipelineEditor.nodes.concat(newNode);
@@ -193,10 +193,10 @@ const Actions: GuiBuilderStoreActions = {
     // Update `editingConfig`
     state.editingConfig.stageDeps[stageId] = [];
     state.editingConfig.stageData[stageId] = {
-      key: dragging.name.charAt(0).toLowerCase() + dragging.name.slice(1),
-      name: dragging.name,
-      kind: dragging.kind,
-      config: {}, // TODO(Anson): Add default config
+      key: dragging.stageName.charAt(0).toLowerCase() + dragging.stageName.slice(1),
+      name: dragging.stageName,
+      kind: dragging.stageData.kind,
+      config: cloneDeep(dragging.stageData.defaultConfig),
     };
   }),
   deleteStageNode: action((state, id) => {

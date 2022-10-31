@@ -2,7 +2,7 @@
  * @file Utilities for the `Stage` type.
  */
 
-import supportedStages from "@constants/Config/supportedStages";
+import supportedStages, { SupportedStage } from "@constants/Config/supportedStages";
 import { StageDataMap, StageDependencyMap, StageKind } from "@types";
 import cloneDeep from "lodash/cloneDeep";
 import isEqual from "lodash/isEqual";
@@ -28,7 +28,7 @@ export function parseStages(stages: { [key: string]: any }): [StageDependencyMap
 
   Object.entries(stages).forEach(([key, config]) => {
     const stageName = getStageType(key);
-    const stage = supportedStages.find((stage) => stage.name === stageName);
+    const stage: SupportedStage | undefined = supportedStages[stageName];
     if (stage === undefined) {
       console.warn(`Stage ${stageName} is not supported by GUI Assignment Builder (parsing '${key}').`);
     }

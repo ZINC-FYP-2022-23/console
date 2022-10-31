@@ -1,5 +1,5 @@
 /** A pipeline stage in the assignment configuration. */
-interface Stage {
+interface Stage<TConfig = any> {
   /** The stage's key in the config YAML (e.g. `"stdioTest"`, `"compile:main"`). */
   key: string;
   /** Stage name (e.g. `"StdioTest"`, `"Compile"`). */
@@ -7,7 +7,7 @@ interface Stage {
   /** Stage kind. */
   readonly kind: StageKind;
   /** Configuration of the stage. */
-  config: any;
+  config: TConfig;
 }
 
 /**
@@ -42,38 +42,38 @@ export enum StageKind {
   POST = "POST",
 }
 
-export interface Compile extends Stage {
-  config: {
-    input: string[];
-    output?: string;
-    flags?: string[];
-    additional_packages?: string[];
-  };
+/** Configuration of each stage. The key is the stage name and the value is the configuration of the stage. */
+export interface StageConfig {
+  Compile: Compile;
+  DiffWithSkeleton: DiffWithSkeleton;
+  FileStructureValidation: FileStructureValidation;
+  Score: Score;
+  StdioTest: StdioTest;
 }
 
-export interface DiffWithSkeleton extends Stage {
-  config: {
-    exclude_from_provided: boolean;
-  };
+export interface Compile {
+  input: string[];
+  output?: string;
+  flags?: string[];
+  additional_packages?: string[];
 }
 
-export interface FileStructureValidation extends Stage {
-  config: {
-    ignore_in_submission?: string[];
-  };
+export interface DiffWithSkeleton {
+  exclude_from_provided: boolean;
 }
 
-export interface Score extends Stage {
-  config: {
-    normalizedTo?: number;
-    minScore?: number;
-    maxScore?: number;
-  };
+export interface FileStructureValidation {
+  ignore_in_submission?: string[];
 }
 
-export interface StdioTest extends Stage {
-  // TODO
-  config: any;
+export interface Score {
+  normalizedTo?: number;
+  minScore?: number;
+  maxScore?: number;
+}
+
+export interface StdioTest {
+  testCases: any[]; // TODO(Anson): Define type
 }
 
 export default Stage;

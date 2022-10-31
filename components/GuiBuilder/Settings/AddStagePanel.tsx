@@ -1,37 +1,47 @@
 import Accordion from "@components/Accordion";
 import Button from "@components/Button";
-import supportedStages from "@constants/Config/supportedStages";
+import supportedStages, { SupportedStage } from "@constants/Config/supportedStages";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useStoreActions } from "@state/GuiBuilder/Hooks";
 import { StageKind } from "@types";
 import { memo } from "react";
 import AddableStage from "../PipelineEditor/AddableStage";
 
-const stagesByCategory = [
-  {
-    title: "Pre-Compile",
-    stages: supportedStages.filter((stage) => stage.kind === StageKind.PRE_GLOBAL),
-  },
-  {
-    title: "Compile",
-    stages: supportedStages.filter((stage) => stage.kind === StageKind.PRE_LOCAL),
-  },
-  {
-    title: "Test Cases",
-    stages: supportedStages.filter((stage) => stage.kind === StageKind.GRADING),
-  },
-  {
-    title: "Misc Stages",
-    stages: supportedStages.filter((stage) => stage.kind === StageKind.POST || stage.kind === StageKind.CONSTANT),
-  },
-];
+const getCategoryByKind = (kind: StageKind) => {
+  switch (kind) {
+    case StageKind.PRE_GLOBAL:
+      return "Pre-Compile";
+    case StageKind.PRE_LOCAL:
+      return "Compile";
+    case StageKind.GRADING:
+      return "Test Cases";
+    case StageKind.POST:
+    case StageKind.CONSTANT:
+      return "Misc Stages";
+  }
+};
+
+const getStagesByCategory = () => {
+  const output: Record<string, { [stageName: string]: SupportedStage }> = {
+    "Pre-Compile": {},
+    Compile: {},
+    "Test Cases": {},
+    "Misc Stages": {},
+  };
+  Object.entries(supportedStages).forEach(([name, data]) => {
+    const category = getCategoryByKind(data.kind);
+    output[category][name] = data;
+  });
+  return output;
+};
 
 function AddStagePanel() {
   const toggleAddStage = useStoreActions((action) => action.toggleAddStage);
+  const stagesByCategory = getStagesByCategory();
 
   return (
     <div className="flex flex-col">
-      <div className="p-3 flex justify-between items-center border-b border-gray-300">
+      <div className="p-3 flex justify-between items-center sticky top-0 z-10 bg-white border-b border-gray-300">
         <h2 className="font-semibold text-xl">Add New Stage</h2>
         <Button
           className="border-green-600 text-green-600 hover:bg-green-50 active:bg-green-200"
@@ -47,11 +57,11 @@ function AddStagePanel() {
         </div>
         {/* TODO: Add search bar */}
       </div>
-      {stagesByCategory.map((category) => (
-        <Accordion key={category.title} title={category.title} extraClassNames={{ title: "text-lg" }}>
+      {Object.entries(stagesByCategory).map(([category, stages]) => (
+        <Accordion key={category} title={category} extraClassNames={{ title: "text-lg" }}>
           <div className="mt-1 flex flex-col gap-5">
-            {category.stages.map((stage) => (
-              <AddableStage key={stage.name} stage={stage} />
+            {Object.entries(stages).map(([name, data]) => (
+              <AddableStage key={name} stageName={name} stageData={data} />
             ))}
           </div>
         </Accordion>
