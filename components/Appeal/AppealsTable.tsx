@@ -1,11 +1,13 @@
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { AppealStatus } from "@types";
+import Link from "next/link";
 import AppealStatusBadge from "./AppealStatusBadge";
 
 // Temporary type to represent an appeal
 // We'll later define an "appeal" type in `types/tables.ts`
 type Appeal = {
   id: number;
-  date: string;
+  updatedAt: string;
   status: AppealStatus;
   name: string;
   sid: string;
@@ -17,7 +19,7 @@ type Appeal = {
 const dummyAppealData: Appeal[] = [
   {
     id: 1,
-    date: "2022-10-30 5:00PM",
+    updatedAt: "2022-10-30 5:00PM",
     status: AppealStatus.Outstanding,
     name: "LOREM, Ipsum",
     sid: "20609999",
@@ -26,7 +28,7 @@ const dummyAppealData: Appeal[] = [
   },
   {
     id: 2,
-    date: "2022-10-30 4:00PM",
+    updatedAt: "2022-10-30 4:00PM",
     status: AppealStatus.Completed,
     name: "CHAN, Tai Man Tom",
     sid: "20509999",
@@ -36,7 +38,7 @@ const dummyAppealData: Appeal[] = [
   },
   {
     id: 3,
-    date: "2022-10-30 3:00PM",
+    updatedAt: "2022-10-30 3:00PM",
     status: AppealStatus.Rejected,
     name: "CHEUNG, Siu Ming",
     sid: "20409999",
@@ -53,13 +55,14 @@ function AppealsTable() {
       <table className="min-w-full divide-y divide-cool-gray-200">
         <thead className="bg-cool-gray-100 text-xs leading-4 text-cool-gray-500 uppercase tracking-wider">
           <tr>
-            <th className="px-5 py-3 font-medium text-left">Date</th>
+            <th className="px-5 py-3 font-medium text-left">Last Updated</th>
             <th className="px-5 py-3 font-medium text-left">Status</th>
             <th className="px-5 py-3 font-medium text-left">Name</th>
             <th className="px-5 py-3 font-medium text-left">SID</th>
             <th className="px-5 py-3 font-medium text-left">Email</th>
             <th className="px-5 py-3 font-medium text-left">Original Score</th>
             <th className="px-5 py-3 font-medium text-left">Final Score</th>
+            <th className="pr-3 py-3 font-medium text-left"></th>
           </tr>
         </thead>
         <tbody className="bg-white text-sm text-cool-gray-700 divide-y divide-cool-gray-200">
@@ -75,7 +78,7 @@ function AppealsTable() {
 function AppealsTableRow({ appeal }: { appeal: Appeal }) {
   return (
     <tr>
-      <td className="px-5 py-3">{appeal.date}</td>
+      <td className="px-5 py-3">{appeal.updatedAt}</td>
       <td className="px-5 py-3">
         <AppealStatusBadge status={appeal.status} />
       </td>
@@ -88,6 +91,13 @@ function AppealsTableRow({ appeal }: { appeal: Appeal }) {
       </td>
       <td className="px-5 py-3">{appeal.originalScore}</td>
       <td className="px-5 py-3">{appeal.finalScore ?? "-"}</td>
+      <td className="pr-3 py-3">
+        <Link href={`/appeals/${appeal.id}`} passHref>
+          <a className="p-2 text-cool-gray-500 text-lg rounded-full hover:bg-cool-gray-100">
+            <FontAwesomeIcon icon={["fas", "arrow-right"]} />
+          </a>
+        </Link>
+      </td>
     </tr>
   );
 }
