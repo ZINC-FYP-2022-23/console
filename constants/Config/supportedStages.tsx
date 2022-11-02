@@ -1,4 +1,7 @@
+import { Spinner } from "@components/Spinner";
 import { StageConfig, StageKind } from "@types";
+import dynamic from "next/dynamic";
+import { ComponentType } from "react";
 
 export interface SupportedStage<TConfig = any> {
   /** Label to be shown in the UI. */
@@ -9,11 +12,23 @@ export interface SupportedStage<TConfig = any> {
   readonly description: string;
   /** Default configuration of the stage. */
   readonly defaultConfig: TConfig;
+  /**
+   * Stage settings panel component.
+   *
+   * It should be dynamically imported to reduce the bundle size.
+   */
+  readonly stageSettings: ComponentType<{}>;
 }
 
 export type SupportedStages = {
   [Stage in keyof StageConfig]: SupportedStage<StageConfig[Stage]>;
 };
+
+const StageSettingsLoading = () => (
+  <div className="my-20 flex flex-col items-center justify-center">
+    <Spinner className="h-14 w-14 text-cse-500" />
+  </div>
+);
 
 /**
  * Pipeline stages supported by the GUI Assignment Builder.
@@ -26,6 +41,9 @@ const supportedStages: SupportedStages = {
     defaultConfig: {
       input: [],
     },
+    stageSettings: dynamic(() => import("../../components/GuiBuilder/StageSettings/CompileSettings"), {
+      loading: () => <StageSettingsLoading />,
+    }),
   },
   DiffWithSkeleton: {
     label: "Diff With Skeleton",
@@ -34,6 +52,9 @@ const supportedStages: SupportedStages = {
     defaultConfig: {
       exclude_from_provided: true,
     },
+    stageSettings: dynamic(() => import("../../components/GuiBuilder/StageSettings/DiffWithSkeletonSettings"), {
+      loading: () => <StageSettingsLoading />,
+    }),
   },
   FileStructureValidation: {
     label: "File Structure Validation",
@@ -42,12 +63,18 @@ const supportedStages: SupportedStages = {
     defaultConfig: {
       ignore_in_submission: [],
     },
+    stageSettings: dynamic(() => import("../../components/GuiBuilder/StageSettings/FileStructureValidationSettings"), {
+      loading: () => <StageSettingsLoading />,
+    }),
   },
   Score: {
     label: "Score",
     kind: StageKind.POST,
     description: "Accumulates all scores from previous stages",
     defaultConfig: {},
+    stageSettings: dynamic(() => import("../../components/GuiBuilder/StageSettings/ScoreSettings"), {
+      loading: () => <StageSettingsLoading />,
+    }),
   },
   StdioTest: {
     label: "Standard I/O Test",
@@ -56,6 +83,9 @@ const supportedStages: SupportedStages = {
     defaultConfig: {
       testCases: [],
     },
+    stageSettings: dynamic(() => import("../../components/GuiBuilder/StageSettings/StdioTestSettings"), {
+      loading: () => <StageSettingsLoading />,
+    }),
   },
 };
 

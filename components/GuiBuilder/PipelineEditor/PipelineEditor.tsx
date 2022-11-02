@@ -1,5 +1,4 @@
 import { useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
-import { StageNode } from "@types";
 import { DragEvent, DragEventHandler, memo, useCallback, useRef } from "react";
 import ReactFlow, {
   Background,

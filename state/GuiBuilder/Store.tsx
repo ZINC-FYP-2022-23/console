@@ -83,6 +83,9 @@ export interface GuiBuilderStoreActions {
 
   //////// Pipeline editor actions ////////
 
+  /** Which stage is selected in the pipeline editor. */
+  selectedStage: Computed<GuiBuilderStoreModel, { id: string | null; name: string } | null>;
+
   setDragging: Action<GuiBuilderStoreModel, { stageName: string; stageData: SupportedStage } | undefined>;
   setStageNodes: Action<GuiBuilderStoreModel, StageNode[]>;
   setStageEdges: Action<GuiBuilderStoreModel, Edge[]>;
@@ -148,6 +151,19 @@ const Actions: GuiBuilderStoreActions = {
   }),
 
   //////// Pipeline editor actions ////////
+
+  selectedStage: computed((state) => {
+    const selectedNode = state.pipelineEditor.nodes.find((node) => node.selected);
+    if (selectedNode === undefined) {
+      return null;
+    }
+
+    const id = selectedNode.id;
+    return {
+      id,
+      name: state.editingConfig.stageData[id].name,
+    };
+  }),
 
   setDragging: action((state, supportedStage) => {
     state.pipelineEditor.dragging = supportedStage;

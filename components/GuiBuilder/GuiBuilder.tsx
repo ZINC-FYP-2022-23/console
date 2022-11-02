@@ -17,17 +17,18 @@ const Loading = () => (
 );
 
 const PipelineEditor = dynamic(() => import("./PipelineEditor/PipelineEditor"), {
-  ssr: false,
   loading: () => <Loading />,
 });
 
 const AddStagePanel = dynamic(() => import("./Settings/AddStagePanel"), {
-  ssr: false,
   loading: () => <Loading />,
 });
 
 const SettingsPanel = dynamic(() => import("./Settings/SettingsPanel"), {
-  ssr: false,
+  loading: () => <Loading />,
+});
+
+const StageSettingsPanel = dynamic(() => import("./StageSettings/StageSettings"), {
   loading: () => <Loading />,
 });
 
@@ -118,7 +119,9 @@ function GUIAssignmentBuilder({ data, configId }: GUIAssignmentBuilderProps) {
                 <PipelineEditor />
               </ReactFlowProvider>
             </div>
-            <div className="h-[55%] bg-white rounded-md shadow">Stage settings</div>
+            <div className="h-[55%] bg-white rounded-md shadow">
+              <StageSettingsPanel />
+            </div>
           </div>
           <div className="w-2/6 bg-white rounded-md shadow overflow-y-auto">
             {showAddStage ? <AddStagePanel /> : <SettingsPanel />}
