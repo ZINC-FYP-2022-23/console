@@ -1,4 +1,4 @@
-import { useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
+import { useReactFlowFitView, useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
 import { DragEvent, DragEventHandler, memo, useCallback, useRef } from "react";
 import ReactFlow, {
   Background,
@@ -14,7 +14,7 @@ import ReactFlow, {
   useReactFlow,
 } from "reactflow";
 import "reactflow/dist/style.css";
-import AddStageButton from "./AddStageButton";
+import FloatingActionButtons from "./FloatingActionButtons";
 import StageEdgeComponent from "./StageEdge";
 import StageNodeComponent from "./StageNode";
 
@@ -55,7 +55,7 @@ const onDragOver: DragEventHandler<HTMLDivElement> = (event) => {
  */
 function PipelineEditor() {
   const reactFlowWrapper = useRef<HTMLDivElement>(null!);
-  const reactFlowInstance = useReactFlow();
+  const { project } = useReactFlow();
 
   const dragging = useStoreState((state) => state.pipelineEditor.dragging);
   const nodes = useStoreState((state) => state.pipelineEditor.nodes);
@@ -67,6 +67,8 @@ function PipelineEditor() {
   const onNodesChange = useStoreActions((actions) => actions.onStageNodesChange);
   const onEdgesChange = useStoreActions((actions) => actions.onStageEdgesChange);
   const onStageConnect = useStoreActions((actions) => actions.onStageConnect);
+
+  useReactFlowFitView();
 
   /**
    * We pass this handler on top of `onNodesChange` to make sure that `state.editingConfig` is properly
@@ -106,13 +108,13 @@ function PipelineEditor() {
       }
 
       const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
-      const position = reactFlowInstance.project({
+      const position = project({
         x: event.clientX - reactFlowBounds.left - 75,
         y: event.clientY - reactFlowBounds.top - 20,
       });
       addStageNode(position);
     },
-    [addStageNode, reactFlowInstance],
+    [addStageNode, project],
   );
 
   return (
@@ -122,7 +124,7 @@ function PipelineEditor() {
       }`}
       ref={reactFlowWrapper}
     >
-      <AddStageButton />
+      <FloatingActionButtons />
       <ReactFlow
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}

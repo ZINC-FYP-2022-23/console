@@ -40,6 +40,7 @@
     "axios": "^0.21.1",
     "cookie": "^0.4.1",
     "cors": "^2.8.5",
+    "d3-dag": "^0.11.5",
     "date-fns": "^2.16.1",
     "date-fns-tz": "^1.0.12",
     "directory-tree": "^2.2.5",

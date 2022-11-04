@@ -8,6 +8,7 @@ import { defaultConfig, defaultPolicy, defaultSchedule } from "@constants/Config
 import { SupportedStage } from "@constants/Config/supportedStages";
 import type { Config, GradingPolicy, Schedule, StageNode } from "@types";
 import { deleteStageFromDeps, isConfigEqual, isScheduleEqual } from "@utils/Config";
+import { coordQuad, dagConnect, sugiyama } from "d3-dag";
 import { Action, action, computed, Computed } from "easy-peasy";
 import cloneDeep from "lodash/cloneDeep";
 import isEqual from "lodash/isEqual";
@@ -57,6 +58,8 @@ export interface GuiBuilderStoreModel {
   pipelineEditor: {
     /** Data being dragged from Add Stage panel. */
     dragging?: { stageName: string; stageData: SupportedStage };
+    /** Whether the editor should fit view to the nodes on the pane. */
+    shouldFitView: boolean;
     /** Pipeline stage nodes. */
     nodes: StageNode[];
     /** Edges that connect pipeline stage nodes. */
@@ -86,7 +89,11 @@ export interface GuiBuilderStoreActions {
   /** Which stage is selected in the pipeline editor. */
   selectedStage: Computed<GuiBuilderStoreModel, { id: string | null; name: string } | null>;
 
+  /** Layouts the graph in the pipeline editor. */
+  layoutPipeline: Action<GuiBuilderStoreModel>;
+
   setDragging: Action<GuiBuilderStoreModel, { stageName: string; stageData: SupportedStage } | undefined>;
+  setShouldFitView: Action<GuiBuilderStoreModel, boolean>;
   setStageNodes: Action<GuiBuilderStoreModel, StageNode[]>;
   setStageEdges: Action<GuiBuilderStoreModel, Edge[]>;
   /** Called on drag, select and remove of stage nodes. */
@@ -165,8 +172,46 @@ const Actions: GuiBuilderStoreActions = {
     };
   }),
 
+  layoutPipeline: action((state) => {
+    if (state.pipelineEditor.edges.length === 0) {
+      return;
+    }
+
+    // We use `d3-dag` (https://github.com/erikbrinkman/d3-dag) to layout the pipeline.
+    // This layout algorithm works on both linked list shaped graph and branched DAGs.
+
+    // Construct DAG from list of edges
+    const edges: [string, string][] = state.pipelineEditor.edges.map((edge) => [edge.source, edge.target]);
+    const dag = dagConnect()(edges);
+
+    /** Spacing between nodes in terms of `[horizontalGap, verticalGap]` */
+    const nodeSpacing = [120, 235] as const;
+
+    const layout = sugiyama() // "Sugiyama" is a layout style where nodes are arranged top-to-bottom in layers
+      .coord(coordQuad()) // Specify how to assign coordinates to nodes. `coordQuad()` looks most pleasing
+      .nodeSize((d) => (d === undefined ? [0, 0] : nodeSpacing)); // How much spacing between nodes
+
+    // Layout the DAG by mutating `dag` directly
+    layout(dag as any);
+
+    // Updates the coordinates of nodes
+    state.pipelineEditor.nodes = state.pipelineEditor.nodes.map((node) => {
+      let position = { x: node.position.x, y: node.position.y };
+      const dagNode = dag.descendants().find((d) => d.data.id === node.id);
+      if (dagNode) {
+        position = { x: dagNode.y!, y: -dagNode.x! }; // Rotate 90 degrees anti-clockwise
+      }
+      return { ...node, position };
+    });
+
+    state.pipelineEditor.shouldFitView = true; // since coords of nodes have changed
+  }),
+
   setDragging: action((state, supportedStage) => {
     state.pipelineEditor.dragging = supportedStage;
+  }),
+  setShouldFitView: action((state, shouldFitView) => {
+    state.pipelineEditor.shouldFitView = shouldFitView;
   }),
   setStageNodes: action((state, nodes) => {
     state.pipelineEditor.nodes = nodes;
@@ -262,6 +307,7 @@ const configStore: GuiBuilderStoreModel & GuiBuilderStoreActions = {
   pipelineEditor: {
     nodes: [],
     edges: [],
+    shouldFitView: false,
   },
 
   ...Actions,

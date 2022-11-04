@@ -11,7 +11,7 @@ function StageNode({ id, data, selected }: NodeProps<StageNodeData>) {
 
   return (
     <div
-      className={`px-5 py-3 max-w-[180px] relative font-medium text-center text leading-6 ${
+      className={`px-5 py-3 min-w-[140px] max-w-[175px] relative font-medium text-center text leading-6 ${
         selected ? "bg-blue-100 outline outline-2 outline-gray-900" : "bg-white"
       } border border-gray-400 rounded-md cursor-pointer hover:bg-blue-100 transition`}
     >
