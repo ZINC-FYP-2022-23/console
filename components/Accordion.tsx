@@ -1,11 +1,14 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Disclosure, Transition } from "@headlessui/react";
+import { MouseEventHandler } from "react";
 
 interface SettingsAccordionProps {
   title: string;
   children: React.ReactNode;
   /** Whether the accordion is opened by default. */
   defaultOpen?: boolean;
+  /** Handler for clicking the accordion button. */
+  onClick?: MouseEventHandler<HTMLButtonElement>;
   /** Classes to apply extra styling. */
   extraClassNames?: {
     buttonRoot?: string;
@@ -16,22 +19,31 @@ interface SettingsAccordionProps {
 /**
  * An animated accordion component to hold expandible content.
  */
-function Accordion({ title, children, defaultOpen = false, extraClassNames }: SettingsAccordionProps) {
+function Accordion({
+  title,
+  children,
+  defaultOpen = false,
+  onClick = () => {},
+  extraClassNames,
+}: SettingsAccordionProps) {
   return (
     <div className="border-b border-gray-300">
       <Disclosure defaultOpen={defaultOpen}>
         {({ open }) => (
           <>
-            <Disclosure.Button
-              className={`w-full px-3 py-2 flex justify-between items-center bg-blue-50 ${
-                extraClassNames?.buttonRoot ?? ""
-              }`}
-            >
-              <span className={`font-semibold ${extraClassNames?.title ?? ""}`}>{title}</span>
-              <FontAwesomeIcon
-                icon={["fas", "caret-down"]}
-                className={`${open ? "rotate-180 transform" : ""} mr-2 transition-transform duration-200`}
-              />
+            <Disclosure.Button as="div">
+              <button
+                onClick={onClick} // We don't put this prop on the Disclosure.Button because it's not working
+                className={`w-full px-3 py-2 flex justify-between items-center bg-blue-50 ${
+                  extraClassNames?.buttonRoot ?? ""
+                }`}
+              >
+                <span className={`font-semibold ${extraClassNames?.title ?? ""}`}>{title}</span>
+                <FontAwesomeIcon
+                  icon={["fas", "caret-down"]}
+                  className={`${open ? "rotate-180 transform" : ""} mr-2 transition-transform duration-200`}
+                />
+              </button>
             </Disclosure.Button>
             <Transition
               className="overflow-hidden"

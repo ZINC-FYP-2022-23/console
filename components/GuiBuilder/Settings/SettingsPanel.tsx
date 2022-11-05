@@ -2,7 +2,7 @@ import Accordion from "@components/Accordion";
 import Button from "@components/Button";
 import { useLayoutDispatch } from "@contexts/layout";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useStoreState } from "@state/GuiBuilder/Hooks";
+import { useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
 import { memo } from "react";
 import GeneralSettings from "./GeneralSettings";
 import Policy from "./Policy";
@@ -14,6 +14,8 @@ import Scheduling from "./Scheduling";
 function SettingsPanel() {
   const dispatch = useLayoutDispatch();
   const configId = useStoreState((state) => state.configId);
+  const accordion = useStoreState((state) => state.layout.accordion.settingsPanel);
+  const setAccordion = useStoreActions((action) => action.setAccordion);
   const isNewAssignment = configId === null;
 
   return (
@@ -42,13 +44,43 @@ function SettingsPanel() {
         </div>
       )}
       <div className="mb-4">
-        <Accordion title="General Settings" extraClassNames={{ title: "text-xl" }}>
+        <Accordion
+          title="General Settings"
+          defaultOpen={accordion.generalSettings}
+          onClick={() => {
+            setAccordion({
+              path: "settingsPanel.generalSettings",
+              value: !accordion.generalSettings,
+            });
+          }}
+          extraClassNames={{ title: "text-xl" }}
+        >
           <GeneralSettings />
         </Accordion>
-        <Accordion title="Policy" extraClassNames={{ title: "text-xl" }}>
+        <Accordion
+          title="Policy"
+          defaultOpen={accordion.policy}
+          onClick={() => {
+            setAccordion({
+              path: "settingsPanel.policy",
+              value: !accordion.policy,
+            });
+          }}
+          extraClassNames={{ title: "text-xl" }}
+        >
           <Policy />
         </Accordion>
-        <Accordion title="Scheduling" extraClassNames={{ title: "text-xl" }}>
+        <Accordion
+          title="Scheduling"
+          defaultOpen={accordion.scheduling}
+          onClick={() => {
+            setAccordion({
+              path: "settingsPanel.scheduling",
+              value: !accordion.scheduling,
+            });
+          }}
+          extraClassNames={{ title: "text-xl" }}
+        >
           <Scheduling />
         </Accordion>
       </div>

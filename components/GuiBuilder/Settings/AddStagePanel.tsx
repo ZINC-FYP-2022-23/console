@@ -2,31 +2,41 @@ import Accordion from "@components/Accordion";
 import Button from "@components/Button";
 import supportedStages, { SupportedStage } from "@constants/Config/supportedStages";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useStoreActions } from "@state/GuiBuilder/Hooks";
+import { useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
+import { AccordionState } from "@state/GuiBuilder/Store";
 import { StageKind } from "@types";
 import { memo } from "react";
 import AddableStage from "../PipelineEditor/AddableStage";
 
-const getCategoryByKind = (kind: StageKind) => {
+type AccordionKeys = keyof AccordionState["addNewStage"];
+
+const categoryLabel: Record<AccordionKeys, string> = {
+  preCompile: "Pre-Compile",
+  compile: "Compile",
+  testCases: "Test Cases",
+  miscStages: "Misc Stages",
+};
+
+const getCategoryByKind = (kind: StageKind): AccordionKeys => {
   switch (kind) {
     case StageKind.PRE_GLOBAL:
-      return "Pre-Compile";
+      return "preCompile";
     case StageKind.PRE_LOCAL:
-      return "Compile";
+      return "compile";
     case StageKind.GRADING:
-      return "Test Cases";
+      return "testCases";
     case StageKind.POST:
     case StageKind.CONSTANT:
-      return "Misc Stages";
+      return "miscStages";
   }
 };
 
 const getStagesByCategory = () => {
-  const output: Record<string, { [stageName: string]: SupportedStage }> = {
-    "Pre-Compile": {},
-    Compile: {},
-    "Test Cases": {},
-    "Misc Stages": {},
+  const output: Record<AccordionKeys, { [stageName: string]: SupportedStage }> = {
+    preCompile: {},
+    compile: {},
+    testCases: {},
+    miscStages: {},
   };
   Object.entries(supportedStages).forEach(([name, data]) => {
     const category = getCategoryByKind(data.kind);
@@ -36,7 +46,9 @@ const getStagesByCategory = () => {
 };
 
 function AddStagePanel() {
+  const accordion = useStoreState((state) => state.layout.accordion.addNewStage);
   const toggleAddStage = useStoreActions((action) => action.toggleAddStage);
+  const setAccordion = useStoreActions((action) => action.setAccordion);
   const stagesByCategory = getStagesByCategory();
 
   return (
@@ -58,7 +70,18 @@ function AddStagePanel() {
         {/* TODO: Add search bar */}
       </div>
       {Object.entries(stagesByCategory).map(([category, stages]) => (
-        <Accordion key={category} title={category} extraClassNames={{ title: "text-lg" }}>
+        <Accordion
+          key={category}
+          title={categoryLabel[category]}
+          defaultOpen={accordion[category]}
+          onClick={() => {
+            setAccordion({
+              path: `addNewStage.${category}`,
+              value: !accordion[category],
+            });
+          }}
+          extraClassNames={{ title: "text-lg" }}
+        >
           <div className="mt-1 flex flex-col gap-5">
             {Object.entries(stages).map(([name, data]) => (
               <AddableStage key={name} stageName={name} stageData={data} />

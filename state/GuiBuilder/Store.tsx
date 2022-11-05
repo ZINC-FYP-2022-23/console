@@ -53,6 +53,8 @@ export interface GuiBuilderStoreModel {
   layout: {
     /** Whether to show "Add New Stage" at right sidebar. */
     showAddStage: boolean;
+    /** Which accordion components are opened. */
+    accordion: AccordionState;
   };
 
   pipelineEditor: {
@@ -83,6 +85,14 @@ export interface GuiBuilderStoreActions {
   //////// Layout actions ////////
 
   toggleAddStage: Action<GuiBuilderStoreModel>;
+  setAccordion: Action<
+    GuiBuilderStoreModel,
+    {
+      /** Path to update the `accordions` state (e.g. `"settingsPanel.policy"`). */
+      path: string;
+      value: boolean;
+    }
+  >;
 
   //////// Pipeline editor actions ////////
 
@@ -130,6 +140,20 @@ export interface GuiBuilderStoreActions {
   deleteStageEdge: Action<GuiBuilderStoreModel, string>;
 }
 
+export interface AccordionState {
+  settingsPanel: {
+    generalSettings: boolean;
+    policy: boolean;
+    scheduling: boolean;
+  };
+  addNewStage: {
+    preCompile: boolean;
+    compile: boolean;
+    testCases: boolean;
+    miscStages: boolean;
+  };
+}
+
 /////////////// STORE IMPLEMENTATION ///////////////
 
 const Actions: GuiBuilderStoreActions = {
@@ -170,6 +194,9 @@ const Actions: GuiBuilderStoreActions = {
 
   toggleAddStage: action((state) => {
     state.layout.showAddStage = !state.layout.showAddStage;
+  }),
+  setAccordion: action((state, payload) => {
+    set(state.layout.accordion, payload.path, payload.value);
   }),
 
   //////// Pipeline editor actions ////////
@@ -356,6 +383,19 @@ const configStore: GuiBuilderStoreModel & GuiBuilderStoreActions = {
 
   layout: {
     showAddStage: false,
+    accordion: {
+      settingsPanel: {
+        generalSettings: false,
+        policy: false,
+        scheduling: false,
+      },
+      addNewStage: {
+        preCompile: false,
+        compile: false,
+        testCases: false,
+        miscStages: false,
+      },
+    },
   },
 
   pipelineEditor: {
