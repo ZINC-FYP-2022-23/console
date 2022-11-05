@@ -5,11 +5,11 @@
  */
 
 import { defaultConfig, defaultPolicy, defaultSchedule } from "@constants/Config/defaults";
-import { SupportedStage } from "@constants/Config/supportedStages";
+import supportedStages, { SupportedStage } from "@constants/Config/supportedStages";
 import type { Config, GradingPolicy, Schedule, StageNode } from "@types";
-import { deleteStageFromDeps, isConfigEqual, isScheduleEqual } from "@utils/Config";
+import { deleteStageFromDeps, isConfigEqual, isScheduleEqual, parseConfigYaml } from "@utils/Config";
 import { coordQuad, dagConnect, sugiyama } from "d3-dag";
-import { Action, action, computed, Computed } from "easy-peasy";
+import { Action, action, computed, Computed, thunkOn, ThunkOn } from "easy-peasy";
 import cloneDeep from "lodash/cloneDeep";
 import isEqual from "lodash/isEqual";
 import set from "lodash/set";
@@ -68,7 +68,7 @@ export interface GuiBuilderStoreModel {
 }
 
 export interface GuiBuilderStoreActions {
-  initializeConfig: Action<GuiBuilderStoreModel, { config: Config; id: number | null }>;
+  initializeConfig: Action<GuiBuilderStoreModel, { id: number | null; configYaml: string }>;
   initializePolicy: Action<GuiBuilderStoreModel, GradingPolicy>;
   initializeSchedule: Action<GuiBuilderStoreModel, Schedule>;
 
@@ -89,6 +89,19 @@ export interface GuiBuilderStoreActions {
   /** Which stage is selected in the pipeline editor. */
   selectedStage: Computed<GuiBuilderStoreModel, { id: string | null; name: string } | null>;
 
+  /**
+   * Automatically triggers {@link GuiBuilderStoreActions.layoutPipeline} after certain actions
+   * (see implementation for the exact actions) are dispatched.
+   */
+  triggerLayoutPipeline: ThunkOn<GuiBuilderStoreActions>;
+
+  /**
+   * Initializes nodes and edges to the pipeline editor according to the data in
+   * {@link GuiBuilderStoreModel.initConfig initConfig}.
+   *
+   * @remarks This function should be called after {@link GuiBuilderStoreActions.initializeConfig}.
+   */
+  initializePipeline: Action<GuiBuilderStoreModel>;
   /** Layouts the graph in the pipeline editor. */
   layoutPipeline: Action<GuiBuilderStoreModel>;
 
@@ -121,9 +134,11 @@ export interface GuiBuilderStoreActions {
 
 const Actions: GuiBuilderStoreActions = {
   initializeConfig: action((state, payload) => {
-    state.initConfig = payload.config;
-    state.editingConfig = cloneDeep(payload.config);
-    state.configId = payload.id;
+    const { id, configYaml } = payload;
+    const config = parseConfigYaml(configYaml);
+    state.initConfig = config;
+    state.editingConfig = cloneDeep(config);
+    state.configId = id;
   }),
   initializePolicy: action((state, gradingPolicy) => {
     state.initPolicy = gradingPolicy;
@@ -172,6 +187,45 @@ const Actions: GuiBuilderStoreActions = {
     };
   }),
 
+  triggerLayoutPipeline: thunkOn(
+    (actions) => [actions.initializePipeline],
+    (actions) => {
+      actions.layoutPipeline();
+    },
+  ),
+
+  initializePipeline: action((state) => {
+    // Populate nodes
+    state.pipelineEditor.nodes = Object.entries(state.initConfig.stageData).map(([id, stage]) => {
+      const stageMetadata: SupportedStage | undefined = supportedStages[stage.name];
+      const node: StageNode = {
+        id,
+        // `triggerLayoutPipeline()` will be called after `initializePipeline()`, which layouts the graph
+        // and updates the nodes' positions.
+        position: { x: 0, y: 0 },
+        data: {
+          name: stage.name,
+          label: stageMetadata?.label ?? stage.name,
+        },
+        type: "stage",
+      };
+      return node;
+    });
+
+    // Populate edges
+    Object.entries(state.initConfig.stageDeps).forEach(([id, deps]) => {
+      deps.forEach((depId) => {
+        const source = depId;
+        const target = id;
+        state.pipelineEditor.edges.push({
+          id: `reactflow__edge-${source}-${target}`,
+          source,
+          target,
+          type: "stage",
+        });
+      });
+    });
+  }),
   layoutPipeline: action((state) => {
     if (state.pipelineEditor.edges.length === 0) {
       return;

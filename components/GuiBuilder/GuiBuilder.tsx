@@ -5,7 +5,7 @@ import { Spinner } from "@components/Spinner";
 import { useLayoutState } from "@contexts/layout";
 import { useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
 import { AssignmentConfig } from "@types";
-import { configToYaml, parseConfigYaml } from "@utils/Config";
+import { configToYaml } from "@utils/Config";
 import dynamic from "next/dynamic";
 import { useEffect } from "react";
 import { ReactFlowProvider } from "reactflow";
@@ -63,12 +63,12 @@ function GUIAssignmentBuilder({ data, configId }: GUIAssignmentBuilderProps) {
   const initializeConfig = useStoreActions((actions) => actions.initializeConfig);
   const initializePolicy = useStoreActions((actions) => actions.initializePolicy);
   const initializeSchedule = useStoreActions((actions) => actions.initializeSchedule);
+  const initializePipeline = useStoreActions((actions) => actions.initializePipeline);
 
   // Initialize store
   useEffect(() => {
     if (data) {
-      const config = parseConfigYaml(data.assignmentConfig.config_yaml);
-      initializeConfig({ config, id: configId });
+      initializeConfig({ id: configId, configYaml: data.assignmentConfig.config_yaml });
       initializePolicy({
         attemptLimits: data.assignmentConfig.attemptLimits ?? null,
         gradeImmediately: data.assignmentConfig.gradeImmediately,
@@ -81,8 +81,9 @@ function GUIAssignmentBuilder({ data, configId }: GUIAssignmentBuilderProps) {
         stopCollectionAt: data.assignmentConfig.stopCollectionAt,
         releaseGradeAt: data.assignmentConfig.releaseGradeAt ?? "",
       });
+      initializePipeline();
     }
-  }, [data, configId, initializeConfig, initializePolicy, initializeSchedule]);
+  }, [data, configId, initializeConfig, initializePolicy, initializeSchedule, initializePipeline]);
 
   return (
     <>

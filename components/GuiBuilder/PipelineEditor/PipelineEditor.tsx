@@ -1,4 +1,5 @@
 import { useReactFlowFitView, useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
+import type { GuiBuilderStoreActions } from "@state/GuiBuilder/Store";
 import { DragEvent, DragEventHandler, memo, useCallback, useRef } from "react";
 import ReactFlow, {
   Background,
@@ -9,6 +10,7 @@ import ReactFlow, {
   MarkerType,
   NodeTypes,
   OnEdgesDelete,
+  OnInit,
   OnNodesDelete,
   ProOptions,
   useReactFlow,
@@ -55,7 +57,7 @@ const onDragOver: DragEventHandler<HTMLDivElement> = (event) => {
  */
 function PipelineEditor() {
   const reactFlowWrapper = useRef<HTMLDivElement>(null!);
-  const { project } = useReactFlow();
+  const { fitView, project } = useReactFlow();
 
   const dragging = useStoreState((state) => state.pipelineEditor.dragging);
   const nodes = useStoreState((state) => state.pipelineEditor.nodes);
@@ -69,6 +71,16 @@ function PipelineEditor() {
   const onStageConnect = useStoreActions((actions) => actions.onStageConnect);
 
   useReactFlowFitView();
+
+  /**
+   * Fit view when the React Flow editor is initialized.
+   *
+   * By the time this is called, {@link GuiBuilderStoreActions.initializePipeline} has already inserted
+   * nodes and edges in the editor.
+   */
+  const onInit: OnInit = useCallback(() => {
+    fitView({ padding: 0.2 });
+  }, [fitView]);
 
   /**
    * We pass this handler on top of `onNodesChange` to make sure that `state.editingConfig` is properly
@@ -131,6 +143,7 @@ function PipelineEditor() {
         nodes={nodes}
         edges={edges}
         defaultEdgeOptions={defaultEdgeOptions}
+        onInit={onInit}
         onNodesChange={onNodesChange}
         onNodesDelete={onNodesDelete}
         onEdgesChange={onEdgesChange}
