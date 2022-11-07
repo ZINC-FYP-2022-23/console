@@ -9,7 +9,7 @@ import supportedStages, { SupportedStage } from "@constants/Config/supportedStag
 import type { Config, GradingPolicy, Schedule, StageNode } from "@types";
 import { deleteStageFromDeps, isConfigEqual, isScheduleEqual, parseConfigYaml } from "@utils/Config";
 import { coordQuad, dagConnect, sugiyama } from "d3-dag";
-import { Action, action, computed, Computed, thunkOn, ThunkOn } from "easy-peasy";
+import { Action, action, computed, Computed, createStore, StoreProvider, thunkOn, ThunkOn } from "easy-peasy";
 import cloneDeep from "lodash/cloneDeep";
 import isEqual from "lodash/isEqual";
 import set from "lodash/set";
@@ -29,11 +29,15 @@ import { v4 as uuidv4 } from "uuid";
 
 /////////////// STORE DEFINITION ///////////////
 
-// NOTE: The store should ONLY use plain serializable objects, arrays, and primitives.
-// Do NOT use ES6 classes, functions, Maps, Sets, etc. Otherwise, easy-peasy will have
-// trouble detecting changes in the store. See https://stackoverflow.com/q/74002866/11067496
+export type GuiBuilderStoreModel = StoreStates & StoreActions;
+export type StoreActions = BaseActions & LayoutActions & PipelineEditorActions;
 
-export interface GuiBuilderStoreModel {
+/**
+ * @remarks It should **only** store plain serializable objects, arrays, and primitives. Do **not** use
+ * ES6 classes, functions, Maps, Sets, etc. Otherwise, easy-peasy will have trouble detecting changes
+ * in the store (See {@link https://stackoverflow.com/q/74002866/11067496 Stack Overflow}).
+ */
+export interface StoreStates {
   /** The assignment config ID. It's `null` if we're creating a new assignment. */
   configId: number | null;
 
@@ -69,7 +73,7 @@ export interface GuiBuilderStoreModel {
   };
 }
 
-export interface GuiBuilderStoreActions {
+export interface BaseActions {
   initializeConfig: Action<GuiBuilderStoreModel, { id: number | null; configYaml: string }>;
   initializePolicy: Action<GuiBuilderStoreModel, GradingPolicy>;
   initializeSchedule: Action<GuiBuilderStoreModel, Schedule>;
@@ -81,9 +85,10 @@ export interface GuiBuilderStoreActions {
 
   /** Whether the config has been edited. */
   isEdited: Computed<GuiBuilderStoreModel, boolean>;
+}
 
-  //////// Layout actions ////////
-
+/** Actions for {@link StoreStates.layout}. */
+export interface LayoutActions {
   toggleAddStage: Action<GuiBuilderStoreModel>;
   setAccordion: Action<
     GuiBuilderStoreModel,
@@ -93,23 +98,24 @@ export interface GuiBuilderStoreActions {
       value: boolean;
     }
   >;
+}
 
-  //////// Pipeline editor actions ////////
-
+/** Actions for {@link StoreStates.pipelineEditor}. */
+export interface PipelineEditorActions {
   /** Which stage is selected in the pipeline editor. */
   selectedStage: Computed<GuiBuilderStoreModel, { id: string | null; name: string } | null>;
 
   /**
-   * Automatically triggers {@link GuiBuilderStoreActions.layoutPipeline} after certain actions
+   * Automatically triggers {@link PipelineEditorActions.layoutPipeline} after certain actions
    * (see implementation for the exact actions) are dispatched.
    */
-  triggerLayoutPipeline: ThunkOn<GuiBuilderStoreActions>;
+  triggerLayoutPipeline: ThunkOn<GuiBuilderStoreModel>;
 
   /**
    * Initializes nodes and edges to the pipeline editor according to the data in
-   * {@link GuiBuilderStoreModel.initConfig initConfig}.
+   * {@link StoreStates.initConfig}.
    *
-   * @remarks This function should be called after {@link GuiBuilderStoreActions.initializeConfig}.
+   * @remarks This function should be called after {@link BaseActions.initializeConfig}.
    */
   initializePipeline: Action<GuiBuilderStoreModel>;
   /** Layouts the graph in the pipeline editor. */
@@ -117,8 +123,6 @@ export interface GuiBuilderStoreActions {
 
   setDragging: Action<GuiBuilderStoreModel, { stageName: string; stageData: SupportedStage } | undefined>;
   setShouldFitView: Action<GuiBuilderStoreModel, boolean>;
-  setStageNodes: Action<GuiBuilderStoreModel, StageNode[]>;
-  setStageEdges: Action<GuiBuilderStoreModel, Edge[]>;
   /** Called on drag, select and remove of stage nodes. */
   onStageNodesChange: Action<GuiBuilderStoreModel, NodeChange[]>;
   /** Called on select and remove of stage edges. */
@@ -156,7 +160,7 @@ export interface AccordionState {
 
 /////////////// STORE IMPLEMENTATION ///////////////
 
-const Actions: GuiBuilderStoreActions = {
+const baseActions: BaseActions = {
   initializeConfig: action((state, payload) => {
     const { id, configYaml } = payload;
     const config = parseConfigYaml(configYaml);
@@ -189,18 +193,18 @@ const Actions: GuiBuilderStoreActions = {
     const isScheduleEdited = !isScheduleEqual(state.initSchedule, state.editingSchedule);
     return isConfigEdited || isPolicyEdited || isScheduleEdited;
   }),
+};
 
-  //////// Layout actions ////////
-
+const layoutActions: LayoutActions = {
   toggleAddStage: action((state) => {
     state.layout.showAddStage = !state.layout.showAddStage;
   }),
   setAccordion: action((state, payload) => {
     set(state.layout.accordion, payload.path, payload.value);
   }),
+};
 
-  //////// Pipeline editor actions ////////
-
+const pipelineEditorActions: PipelineEditorActions = {
   selectedStage: computed((state) => {
     const selectedNode = state.pipelineEditor.nodes.find((node) => node.selected);
     if (selectedNode === undefined) {
@@ -294,12 +298,6 @@ const Actions: GuiBuilderStoreActions = {
   setShouldFitView: action((state, shouldFitView) => {
     state.pipelineEditor.shouldFitView = shouldFitView;
   }),
-  setStageNodes: action((state, nodes) => {
-    state.pipelineEditor.nodes = nodes;
-  }),
-  setStageEdges: action((state, edges) => {
-    state.pipelineEditor.edges = edges;
-  }),
   onStageNodesChange: action((state, changes) => {
     state.pipelineEditor.nodes = applyNodeChanges(changes, state.pipelineEditor.nodes);
   }),
@@ -371,7 +369,7 @@ const Actions: GuiBuilderStoreActions = {
   }),
 };
 
-const configStore: GuiBuilderStoreModel & GuiBuilderStoreActions = {
+const guiBuilderStore = createStore<GuiBuilderStoreModel>({
   configId: null,
 
   initConfig: defaultConfig,
@@ -404,7 +402,13 @@ const configStore: GuiBuilderStoreModel & GuiBuilderStoreActions = {
     shouldFitView: false,
   },
 
-  ...Actions,
-};
+  ...baseActions,
+  ...layoutActions,
+  ...pipelineEditorActions,
+});
 
-export default configStore;
+export function GuiBuilderStoreProvider({ children }: { children: React.ReactNode }) {
+  return <StoreProvider store={guiBuilderStore}>{children}</StoreProvider>;
+}
+
+export default guiBuilderStore;

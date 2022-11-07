@@ -4,12 +4,9 @@ import { LayoutProvider } from "@contexts/layout";
 import { GET_PIPELINE_CONFIG_FOR_ASSIGNMENT } from "@graphql/queries/user";
 import { Layout } from "@layout";
 import { initializeApollo } from "@lib/apollo";
-import configStore from "@state/GuiBuilder/Store";
+import { GuiBuilderStoreProvider } from "@state/GuiBuilder/Store";
 import { AssignmentConfig } from "@types";
-import { createStore, StoreProvider } from "easy-peasy";
 import { GetServerSideProps } from "next";
-
-const store = createStore(configStore);
 
 interface GUIAssignmentBuilderRootProps {
   /** The `assignmentConfigId`. If it's `null`, it means we're creating a new assignment. */
@@ -34,9 +31,9 @@ function GUIAssignmentBuilderRoot({ configId }: GUIAssignmentBuilderRootProps) {
   return (
     <LayoutProvider>
       <Layout title="Assignment Config">
-        <StoreProvider store={store}>
+        <GuiBuilderStoreProvider>
           <GUIAssignmentBuilder data={data} configId={configId} />
-        </StoreProvider>
+        </GuiBuilderStoreProvider>
       </Layout>
     </LayoutProvider>
   );
