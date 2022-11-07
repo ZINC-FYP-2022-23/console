@@ -5,26 +5,29 @@ import { GET_PIPELINE_CONFIG_FOR_ASSIGNMENT } from "@graphql/queries/user";
 import { Layout } from "@layout";
 import { initializeApollo } from "@lib/apollo";
 import { GuiBuilderStoreProvider } from "@state/GuiBuilder/Store";
-import { AssignmentConfig } from "@types";
+import { Assignment, AssignmentConfig } from "@types";
 import { GetServerSideProps } from "next";
 
 interface GUIAssignmentBuilderRootProps {
-  /** The `assignmentConfigId`. If it's `null`, it means we're creating a new assignment. */
-  configId: number | null;
+  /** The `assignmentConfigId`. If it's `-1`, it means we're creating a new assignment. */
+  configId: number;
+  /** The assignment ID. */
+  assignmentId: number;
 }
 
-function GUIAssignmentBuilderRoot({ configId }: GUIAssignmentBuilderRootProps) {
-  const isNewAssignment = configId === null;
-  const { data, error } = useQuery<{ assignmentConfig: AssignmentConfig }>(GET_PIPELINE_CONFIG_FOR_ASSIGNMENT, {
-    variables: {
-      assignmentConfigId: configId,
+function GUIAssignmentBuilderRoot({ configId, assignmentId }: GUIAssignmentBuilderRootProps) {
+  const { data, error } = useQuery<{ assignmentConfig: AssignmentConfig; assignment: Assignment }>(
+    GET_PIPELINE_CONFIG_FOR_ASSIGNMENT,
+    {
+      variables: {
+        assignmentConfigId: configId,
+        assignmentId,
+      },
     },
-  });
+  );
 
-  // When creating a new assignment, the GraphQL query will always have error, which is expected behavior
-  // since `configId` is null. Hence, we handle query error only when modifying an existing assignment.
-  if (!isNewAssignment && error) {
-    // TODO(Anson): Better handling of error
+  // TODO(Anson): Better handling of error
+  if (error) {
     console.error(error);
   }
 
@@ -47,27 +50,31 @@ export const getServerSideProps: GetServerSideProps = async ({ req, query }) => 
    *  - `"new"` when creating a new assignment config
    */
   let configId: string | number = query.assignmentConfigId as string;
+  let assignmentId: string | number = query.assignmentId as string;
+
   const isNew = configId === "new";
-  if (!isNew) {
-    configId = parseInt(configId);
-    if (isNaN(configId)) {
-      return { notFound: true };
-    }
-    const { data } = await apolloClient.query({
-      query: GET_PIPELINE_CONFIG_FOR_ASSIGNMENT,
-      variables: {
-        assignmentConfigId: configId,
-      },
-    });
-    if (data.assignmentConfig === null) {
-      return { notFound: true };
-    }
+  configId = isNew ? -1 : parseInt(configId);
+  assignmentId = parseInt(assignmentId);
+  if (isNaN(configId) || isNaN(assignmentId)) {
+    return { notFound: true };
+  }
+
+  const { data } = await apolloClient.query({
+    query: GET_PIPELINE_CONFIG_FOR_ASSIGNMENT,
+    variables: {
+      assignmentId,
+      assignmentConfigId: configId,
+    },
+  });
+  if (data.assignment === null || (!isNew && data.assignmentConfig === null)) {
+    return { notFound: true };
   }
 
   return {
     props: {
       initialApolloState: apolloClient.cache.extract(),
-      configId: isNew ? null : configId,
+      configId,
+      assignmentId,
     },
   };
 };

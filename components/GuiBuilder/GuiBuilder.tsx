@@ -4,7 +4,7 @@ import { SlideOver } from "@components/SlideOver";
 import { Spinner } from "@components/Spinner";
 import { useLayoutState } from "@contexts/layout";
 import { useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
-import { AssignmentConfig } from "@types";
+import { Assignment, AssignmentConfig } from "@types";
 import { configToYaml } from "@utils/Config";
 import dynamic from "next/dynamic";
 import { useEffect } from "react";
@@ -43,23 +43,23 @@ function SlideOverContent() {
 }
 
 interface GUIAssignmentBuilderProps {
-  /**
-   * Config data queried from GraphQL if the assignment already exists. It's `undefined` when
-   * creating a new assignment.
-   */
+  /** Config data queried from GraphQL. */
   data?: {
-    assignmentConfig: AssignmentConfig;
+    /** @remarks It's `null` when creating a new assignment. */
+    assignmentConfig: AssignmentConfig | null;
+    assignment: Assignment;
   };
-  /** The `assignmentConfigId`. It's `null` when creating a new assignment. */
-  configId: number | null;
+  /** The `assignmentConfigId`. It's `-1` when creating a new assignment. */
+  configId: number;
 }
 
 function GUIAssignmentBuilder({ data, configId }: GUIAssignmentBuilderProps) {
-  const isNewAssignment = configId === null;
+  const isNewAssignment = configId === -1;
 
   const editingConfig = useStoreState((state) => state.editingConfig);
   const isEdited = useStoreState((state) => state.isEdited);
   const showAddStage = useStoreState((state) => state.layout.showAddStage);
+  const setCourseId = useStoreActions((actions) => actions.setCourseId);
   const initializeConfig = useStoreActions((actions) => actions.initializeConfig);
   const initializePolicy = useStoreActions((actions) => actions.initializePolicy);
   const initializeSchedule = useStoreActions((actions) => actions.initializeSchedule);
@@ -67,7 +67,11 @@ function GUIAssignmentBuilder({ data, configId }: GUIAssignmentBuilderProps) {
 
   // Initialize store
   useEffect(() => {
-    if (data) {
+    if (data?.assignment) {
+      setCourseId(data.assignment.course.id);
+    }
+    // From existing assignment
+    if (data?.assignmentConfig) {
       initializeConfig({ id: configId, configYaml: data.assignmentConfig.config_yaml });
       initializePolicy({
         attemptLimits: data.assignmentConfig.attemptLimits ?? null,
@@ -83,7 +87,7 @@ function GUIAssignmentBuilder({ data, configId }: GUIAssignmentBuilderProps) {
       });
       initializePipeline();
     }
-  }, [data, configId, initializeConfig, initializePolicy, initializeSchedule, initializePipeline]);
+  }, [data, configId, setCourseId, initializeConfig, initializePolicy, initializeSchedule, initializePipeline]);
 
   return (
     <>

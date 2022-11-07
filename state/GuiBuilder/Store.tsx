@@ -40,6 +40,8 @@ export type StoreActions = BaseActions & LayoutActions & PipelineEditorActions;
 export interface StoreStates {
   /** The assignment config ID. It's `null` if we're creating a new assignment. */
   configId: number | null;
+  /** The ID of the course that this config belongs to. */
+  courseId: number;
 
   /** Initial configuration (e.g. when loaded from database). It should be immutable after initialization. */
   initConfig: Config;
@@ -74,6 +76,7 @@ export interface StoreStates {
 }
 
 export interface BaseActions {
+  setCourseId: Action<GuiBuilderStoreModel, number>;
   initializeConfig: Action<GuiBuilderStoreModel, { id: number | null; configYaml: string }>;
   initializePolicy: Action<GuiBuilderStoreModel, GradingPolicy>;
   initializeSchedule: Action<GuiBuilderStoreModel, Schedule>;
@@ -161,6 +164,9 @@ export interface AccordionState {
 /////////////// STORE IMPLEMENTATION ///////////////
 
 const baseActions: BaseActions = {
+  setCourseId: action((state, courseId) => {
+    state.courseId = courseId;
+  }),
   initializeConfig: action((state, payload) => {
     const { id, configYaml } = payload;
     const config = parseConfigYaml(configYaml);
@@ -371,6 +377,7 @@ const pipelineEditorActions: PipelineEditorActions = {
 
 const guiBuilderStore = createStore<GuiBuilderStoreModel>({
   configId: null,
+  courseId: 0,
 
   initConfig: defaultConfig,
   editingConfig: defaultConfig,
