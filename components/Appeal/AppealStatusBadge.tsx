@@ -15,7 +15,7 @@ const badgeColor = {
  * A badge showing the status of an appeal.
  */
 function AppealStatusBadge({ status }: AppealStatusBadgeProps) {
-  return <p className={`max-w-fit px-3 py-0.5 font-medium rounded-full ${badgeColor[status]}`}>{status}</p>;
+  return <p className={`max-w-fit w-max px-3 py-0.5 font-medium rounded-full ${badgeColor[status]}`}>{status}</p>;
 }
 
 export default AppealStatusBadge;
