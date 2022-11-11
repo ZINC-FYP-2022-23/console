@@ -13,13 +13,19 @@ const { compilerOptions } = require("./tsconfig")
  * https://nextjs.org/docs/testing#setting-up-jest-with-babel 
  */
 module.exports = {
+  setupFilesAfterEnv: ["jest-extended/all"],
+
   // Calls `jest.clearAllMocks()` before each test
   clearMocks: true,
 
   // on node 14.x coverage provider v8 offers good speed and more or less good report
   coverageProvider: 'v8',
   moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths, { prefix: '<rootDir>/' }),
-  testPathIgnorePatterns: ['<rootDir>/node_modules/', '<rootDir>/.next/'],
+  testPathIgnorePatterns: [
+    '<rootDir>/node_modules/',
+    '<rootDir>/.next/',
+    '<rootDir>/.*/__tests__/utils/',
+  ],
   testEnvironment: 'jsdom',
   transform: {
     // Use babel-jest to transpile tests with the next/babel preset

@@ -134,7 +134,18 @@ export interface PipelineEditorActions {
   onStageConnect: Action<GuiBuilderStoreModel, Connection>;
 
   /** Called when a new stage is added. */
-  addStageNode: Action<GuiBuilderStoreModel, XYPosition>;
+  addStageNode: Action<
+    GuiBuilderStoreModel,
+    {
+      position: XYPosition;
+      /**
+       * ID of an existing stage that the new stage wishes to be its child.
+       *
+       * e.g. If new stage `B` wants to be a child of `A` such that `A -> B`, then `A` is the parent.
+       */
+      parent?: string;
+    }
+  >;
   /**
    * Deletes a stage node given its ID. It's called when the user presses "Backspace" after selecting the
    * stage node or presses the red delete icon button.
@@ -166,7 +177,7 @@ export interface AccordionState {
 
 /////////////// STORE IMPLEMENTATION ///////////////
 
-const baseActions: BaseActions = {
+export const baseActions: BaseActions = {
   setCourseId: action((state, courseId) => {
     state.courseId = courseId;
   }),
@@ -204,7 +215,7 @@ const baseActions: BaseActions = {
   }),
 };
 
-const layoutActions: LayoutActions = {
+export const layoutActions: LayoutActions = {
   toggleAddStage: action((state) => {
     state.layout.showAddStage = !state.layout.showAddStage;
   }),
@@ -213,7 +224,7 @@ const layoutActions: LayoutActions = {
   }),
 };
 
-const pipelineEditorActions: PipelineEditorActions = {
+export const pipelineEditorActions: PipelineEditorActions = {
   selectedStage: computed((state) => {
     const selectedNode = state.pipelineEditor.nodes.find((node) => node.selected);
     if (selectedNode === undefined) {
@@ -324,13 +335,13 @@ const pipelineEditorActions: PipelineEditorActions = {
     }
   }),
 
-  addStageNode: action((state, position) => {
+  addStageNode: action((state, payload) => {
+    const { position, parent } = payload;
     const dragging = state.pipelineEditor.dragging;
     if (!dragging) return;
 
-    const stageId = uuidv4();
-
     // Update pipeline editor data
+    const stageId = uuidv4();
     const newNode: StageNode = {
       id: stageId,
       position,
@@ -347,6 +358,38 @@ const pipelineEditorActions: PipelineEditorActions = {
       kind: dragging.stageData.kind,
       config: cloneDeep(dragging.stageData.defaultConfig),
     };
+
+    // Insert new node into the linked list of stages
+    if (parent) {
+      // e.g. Existing graph is `A -> B` and new edge `N` has parent of `A`.
+      // Graph will change from `A -> B` to `A -> N -> B`
+      const oldEdge = state.pipelineEditor.edges.find((edge) => edge.source === parent); // A -> B
+
+      // Add `A -> N`
+      state.pipelineEditor.edges.push({
+        id: `reactflow__edge-${parent}-${stageId}`,
+        source: parent,
+        target: stageId,
+        type: "stage",
+      });
+      state.editingConfig.stageDeps[stageId].push(parent);
+
+      if (oldEdge) {
+        // Remove `A -> B`
+        state.pipelineEditor.edges = state.pipelineEditor.edges.filter((edge) => edge.id !== oldEdge.id);
+        state.editingConfig.stageDeps[oldEdge.target] = state.editingConfig.stageDeps[oldEdge.target].filter(
+          (depId) => depId !== oldEdge.source,
+        );
+        // Add `N -> B`
+        state.pipelineEditor.edges.push({
+          id: `reactflow__edge-${stageId}-${oldEdge.target}`,
+          source: stageId,
+          target: oldEdge.target,
+          type: "stage",
+        });
+        state.editingConfig.stageDeps[oldEdge.target].push(stageId);
+      }
+    }
   }),
   deleteStageNode: action((state, id) => {
     // In pipeline editor, remove the node and all edges connected to it.
@@ -398,7 +441,7 @@ const pipelineEditorActions: PipelineEditorActions = {
   }),
 };
 
-const guiBuilderStore = createStore<GuiBuilderStoreModel>({
+export const initialModel: GuiBuilderStoreModel = {
   configId: null,
   courseId: 0,
 
@@ -435,7 +478,9 @@ const guiBuilderStore = createStore<GuiBuilderStoreModel>({
   ...baseActions,
   ...layoutActions,
   ...pipelineEditorActions,
-});
+};
+
+const guiBuilderStore = createStore(initialModel);
 
 export function GuiBuilderStoreProvider({ children }: { children: React.ReactNode }) {
   return <StoreProvider store={guiBuilderStore}>{children}</StoreProvider>;

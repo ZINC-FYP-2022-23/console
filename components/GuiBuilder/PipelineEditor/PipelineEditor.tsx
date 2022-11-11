@@ -63,6 +63,7 @@ function PipelineEditor() {
   const nodes = useStoreState((state) => state.pipelineEditor.nodes);
   const edges = useStoreState((state) => state.pipelineEditor.edges);
 
+  const layoutPipeline = useStoreActions((actions) => actions.layoutPipeline);
   const addStageNode = useStoreActions((actions) => actions.addStageNode);
   const deleteStageEdge = useStoreActions((actions) => actions.deleteStageEdge);
   const deleteStageNode = useStoreActions((actions) => actions.deleteStageNode);
@@ -119,14 +120,32 @@ function PipelineEditor() {
         return;
       }
 
-      const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
-      const position = project({
-        x: event.clientX - reactFlowBounds.left - 75,
-        y: event.clientY - reactFlowBounds.top - 20,
-      });
-      addStageNode(position);
+      const target = event.target;
+      if (target instanceof Element) {
+        // Dropped on an existing stage node
+        if (typeof target.className === "string" && target.className.includes("stage-node")) {
+          // The wrapper element that wraps the `target` has a node ID attribute
+          const targetNodeId = target.closest(".react-flow__node")?.getAttribute("data-id");
+          if (targetNodeId) {
+            addStageNode({
+              position: { x: 0, y: 0 }, // Position will be updated in `layoutPipeline()`
+              parent: targetNodeId,
+            });
+            layoutPipeline();
+          }
+        }
+        // Dropped on an empty space outside a stage node
+        else {
+          const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
+          const position = project({
+            x: event.clientX - reactFlowBounds.left - 75,
+            y: event.clientY - reactFlowBounds.top - 20,
+          });
+          addStageNode({ position });
+        }
+      }
     },
-    [addStageNode, project],
+    [addStageNode, layoutPipeline, project],
   );
 
   return (
