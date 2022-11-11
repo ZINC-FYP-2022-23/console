@@ -1,5 +1,5 @@
 import { useReactFlowFitView, useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
-import type { GuiBuilderStoreActions } from "@state/GuiBuilder/Store";
+import StoreActions from "@state/GuiBuilder/Store";
 import { DragEvent, DragEventHandler, memo, useCallback, useRef } from "react";
 import ReactFlow, {
   Background,
@@ -75,7 +75,7 @@ function PipelineEditor() {
   /**
    * Fit view when the React Flow editor is initialized.
    *
-   * By the time this is called, {@link GuiBuilderStoreActions.initializePipeline} has already inserted
+   * By the time this is called, {@link StoreActions.initializePipeline} has already inserted
    * nodes and edges in the editor.
    */
   const onInit: OnInit = useCallback(() => {

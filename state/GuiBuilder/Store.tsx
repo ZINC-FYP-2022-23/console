@@ -106,7 +106,7 @@ export interface LayoutActions {
 /** Actions for {@link StoreStates.pipelineEditor}. */
 export interface PipelineEditorActions {
   /** Which stage is selected in the pipeline editor. */
-  selectedStage: Computed<GuiBuilderStoreModel, { id: string | null; name: string } | null>;
+  selectedStage: Computed<GuiBuilderStoreModel, { id: string; name: string } | null>;
 
   /**
    * Automatically triggers {@link PipelineEditorActions.layoutPipeline} after certain actions
@@ -145,6 +145,9 @@ export interface PipelineEditorActions {
    * stage edge or presses the red delete icon button.
    */
   deleteStageEdge: Action<GuiBuilderStoreModel, string>;
+
+  /** Duplicates the selected stage. */
+  duplicateStage: Action<GuiBuilderStoreModel>;
 }
 
 export interface AccordionState {
@@ -372,6 +375,26 @@ const pipelineEditorActions: PipelineEditorActions = {
 
     const targetDeps = state.editingConfig.stageDeps[target];
     state.editingConfig.stageDeps[target] = targetDeps.filter((depId) => depId !== source);
+  }),
+
+  duplicateStage: action((state) => {
+    if (state.selectedStage) {
+      const stageId = uuidv4();
+
+      const stageData = state.editingConfig.stageData[state.selectedStage.id];
+      const stageDataCopy = cloneDeep(stageData);
+      state.editingConfig.stageData[stageId] = stageDataCopy;
+      state.editingConfig.stageDeps[stageId] = [];
+
+      const selectedNode = state.pipelineEditor.nodes.find((node) => node.id === state.selectedStage!.id);
+      if (selectedNode) {
+        const newNode = cloneDeep(selectedNode);
+        newNode.id = stageId;
+        newNode.selected = false;
+        newNode.position.y += (newNode.height || 50) * 1.5; // Place the new node below the selected node
+        state.pipelineEditor.nodes.push(newNode);
+      }
+    }
   }),
 };
 
