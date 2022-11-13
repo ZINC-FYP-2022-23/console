@@ -1,6 +1,6 @@
 import { ApolloProvider } from "@apollo/client";
 import { parse } from "cookie";
-import { library, IconPack } from "@fortawesome/fontawesome-svg-core";
+import { config as faConfig, library, IconPack } from "@fortawesome/fontawesome-svg-core";
 import { fad } from "@fortawesome/pro-duotone-svg-icons";
 import { far } from "@fortawesome/pro-regular-svg-icons";
 import { fas } from "@fortawesome/free-solid-svg-icons";
@@ -14,7 +14,9 @@ import { getUserRole } from "../utils/user";
 import Unauthorized from "../pages/401";
 import toast from "react-hot-toast";
 import { Notification, NotificationBody } from "../components/Notification";
+import "@fortawesome/fontawesome-svg-core/styles.css";
 
+faConfig.autoAddCss = false;
 library.add(fad, far, fas as IconPack);
 
 function ZincApp({ Component, pageProps, cookie, hasTeachingRole, isAdmin, user, itsc, semester }) {

@@ -113,20 +113,14 @@ function AssignmentForm({ initialAssignmentState }: AssignmentFormProps) {
               Description
             </label>
             <AssignmentDescriptionEditor
-              modules={{
-                toolbar: [
-                  [{ header: "1" }, { header: "2" }, { font: [] }],
-                  [{ size: [] }],
-                  ["bold", "italic", "underline", "strike", "blockquote"],
-                  [{ list: "ordered" }, { list: "bullet" }, { indent: "-1" }, { indent: "+1" }],
-                  ["link", "image", "video"],
-                  ["clean"],
-                ],
-                clipboard: {
-                  // toggle to add extra line breaks when pasting HTML:
-                  matchVisual: false,
-                },
-              }}
+              id="rte"
+              controls={[
+                ["h1", "h2", "h3"],
+                ["bold", "italic", "underline", "strike"],
+                ["orderedList", "unorderedList"],
+                ["link", "code", "blockquote"],
+                ["clean"],
+              ]}
               value={assignment.description_html}
               onChange={(description) => setAssignment({ ...assignment, description_html: description, description })}
             />
