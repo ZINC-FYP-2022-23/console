@@ -42,7 +42,7 @@ function StageEdge({ id, sourceX, sourceY, targetX, targetY, sourcePosition, tar
       >
         <button
           style={{ width: deleteBtnSize, height: deleteBtnSize }}
-          className={`flex items-center justify-center bg-red-500 text-white cursor-pointer rounded-full hover:bg-red-700 transition ${
+          className={`w-5 h-5 flex items-center justify-center bg-red-500 text-white text-sm cursor-pointer rounded-full hover:bg-red-700 transition ${
             showDeleteBtn ? "opacity-1" : "opacity-0"
           }`}
           onClick={(event) => {
@@ -50,7 +50,7 @@ function StageEdge({ id, sourceX, sourceY, targetX, targetY, sourcePosition, tar
             deleteStageEdge(id);
           }}
         >
-          <FontAwesomeIcon className="w-3 h-3" icon={["fas", "xmark"]} />
+          <FontAwesomeIcon className="w-3 !h-3" icon={["fas", "xmark"]} />
         </button>
       </foreignObject>
     </>

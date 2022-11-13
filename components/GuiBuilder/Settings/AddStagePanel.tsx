@@ -1,5 +1,4 @@
 import Accordion from "@components/Accordion";
-import Button from "@components/Button";
 import supportedStages, { SupportedStage } from "@constants/Config/supportedStages";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
@@ -47,7 +46,6 @@ const getStagesByCategory = () => {
 
 function AddStagePanel() {
   const accordion = useStoreState((state) => state.layout.accordion.addNewStage);
-  const toggleAddStage = useStoreActions((action) => action.toggleAddStage);
   const setAccordion = useStoreActions((action) => action.setAccordion);
   const stagesByCategory = getStagesByCategory();
 
@@ -55,12 +53,6 @@ function AddStagePanel() {
     <div className="flex flex-col">
       <div className="p-3 flex justify-between items-center sticky top-0 z-10 bg-white border-b border-gray-300">
         <h2 className="font-semibold text-xl">Add New Stage</h2>
-        <Button
-          className="border-green-600 text-green-600 hover:bg-green-50 active:bg-green-200"
-          onClick={() => toggleAddStage()}
-        >
-          Finish
-        </Button>
       </div>
       <div className="p-3 flex flex-col border-b border-gray-300">
         <div className="flex items-center text-sm text-blue-500">

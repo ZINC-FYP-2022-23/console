@@ -43,12 +43,12 @@ const gpuVendorSelectOptions = [
   { label: "Intel", value: SettingsGpuDevice.INTEL },
 ];
 
-function GeneralSettings() {
+function PipelineSettings() {
   const _settings = useStoreState((state) => state.editingConfig._settings);
   const updateField = useStoreActions((actions) => actions.updateField);
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-8 text-sm">
       {/* Language */}
       <div>
         <h3 className="mb-3 font-semibold text-base">Language</h3>
@@ -125,7 +125,7 @@ function GeneralSettings() {
             </div>
             {_settings.use_template === SettingsUseTemplate.FILENAMES && (
               <div className="mt-4 mx-3">
-                <p className="mb-1 text-xs text-gray-500">
+                <p className="mb-1 text-gray-500">
                   Files to submit (separated with <strong>new line</strong>):
                 </p>
                 <TextareaAutosize
@@ -292,4 +292,4 @@ function GeneralSettings() {
   );
 }
 
-export default GeneralSettings;
+export default PipelineSettings;

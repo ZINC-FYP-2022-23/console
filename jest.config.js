@@ -20,7 +20,10 @@ module.exports = {
 
   // on node 14.x coverage provider v8 offers good speed and more or less good report
   coverageProvider: 'v8',
-  moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths, { prefix: '<rootDir>/' }),
+  moduleNameMapper: {
+    ...pathsToModuleNameMapper(compilerOptions.paths, { prefix: '<rootDir>/' }),
+    '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
+  },
   testPathIgnorePatterns: [
     '<rootDir>/node_modules/',
     '<rootDir>/.next/',

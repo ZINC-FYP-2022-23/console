@@ -4,6 +4,7 @@
  * {@link https://easy-peasy.vercel.app/ easy-peasy} is chosen as the state management library.
  */
 
+import guiBuilderSteps from "@components/GuiBuilder/Steps/GuiBuilderSteps";
 import { defaultConfig, defaultPolicy, defaultSchedule } from "@constants/Config/defaults";
 import supportedStages, { SupportedStage } from "@constants/Config/supportedStages";
 import type { Config, GradingPolicy, Schedule, StageNode } from "@types";
@@ -57,8 +58,8 @@ export interface StoreStates {
   editingSchedule: Schedule;
 
   layout: {
-    /** Whether to show "Add New Stage" at right sidebar. */
-    showAddStage: boolean;
+    /** Zero-based index of which step the user is in. */
+    step: number;
     /** Which accordion components are opened. */
     accordion: AccordionState;
   };
@@ -92,7 +93,7 @@ export interface BaseActions {
 
 /** Actions for {@link StoreStates.layout}. */
 export interface LayoutActions {
-  toggleAddStage: Action<GuiBuilderStoreModel>;
+  setStep: Action<GuiBuilderStoreModel, number>;
   setAccordion: Action<
     GuiBuilderStoreModel,
     {
@@ -162,11 +163,6 @@ export interface PipelineEditorActions {
 }
 
 export interface AccordionState {
-  settingsPanel: {
-    generalSettings: boolean;
-    policy: boolean;
-    scheduling: boolean;
-  };
   addNewStage: {
     preCompile: boolean;
     compile: boolean;
@@ -216,8 +212,12 @@ export const baseActions: BaseActions = {
 };
 
 export const layoutActions: LayoutActions = {
-  toggleAddStage: action((state) => {
-    state.layout.showAddStage = !state.layout.showAddStage;
+  setStep: action((state, step) => {
+    if (step < 0 || step >= guiBuilderSteps.length) {
+      console.warn(`Step number is out of range: ${step}`);
+      return;
+    }
+    state.layout.step = step;
   }),
   setAccordion: action((state, payload) => {
     set(state.layout.accordion, payload.path, payload.value);
@@ -453,13 +453,8 @@ export const initialModel: GuiBuilderStoreModel = {
   editingSchedule: defaultSchedule,
 
   layout: {
-    showAddStage: false,
+    step: 0,
     accordion: {
-      settingsPanel: {
-        generalSettings: false,
-        policy: false,
-        scheduling: false,
-      },
       addNewStage: {
         preCompile: false,
         compile: false,

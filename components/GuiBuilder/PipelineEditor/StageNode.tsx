@@ -43,18 +43,18 @@ function StageNode({ id, data, selected }: NodeProps<StageNodeData>) {
       className={`stage-node ${extraStyles(
         selected,
         isDragOver,
-      )} px-5 py-3 min-w-[140px] max-w-[175px] relative font-medium text-center text leading-6 border border-gray-400 rounded-md cursor-pointer hover:bg-blue-100 transition `}
+      )} px-5 py-3 min-w-[140px] max-w-[175px] relative text-center text leading-6 border border-gray-400 rounded-md cursor-pointer hover:bg-blue-100 transition `}
     >
       {/* TODO(Anson): Validate handle connection with `isValidConnection` */}
       <Handle className="!p-[5px] !border-2 !bg-cse-600 !-right-[7px]" type="source" position={Position.Right} />
       <Handle className="!p-[5px] !border-2 !bg-cse-600 !-left-[7px]" type="target" position={Position.Left} />
-      {data.label}
+      <span className="font-medium">{data.label}</span>
       {selected && (
         <button
           onClick={() => deleteStageNode(id)}
-          className="p-1 absolute -top-3 -right-3 flex items-center text-white bg-red-500 rounded-full hover:bg-red-700 transition"
+          className="w-5 h-5 absolute -top-3 -right-3 flex justify-center items-center text-sm text-white bg-red-500 rounded-full hover:bg-red-700 transition"
         >
-          <FontAwesomeIcon className="w-3 h-3" icon={["fas", "xmark"]} />
+          <FontAwesomeIcon className="w-3 !h-3" icon={["fas", "xmark"]} />
         </button>
       )}
     </div>

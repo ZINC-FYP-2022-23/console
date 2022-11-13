@@ -6,7 +6,7 @@ function Policy() {
   const updatePolicy = useStoreActions((actions) => actions.updatePolicy);
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-5 text-sm">
       <div className="flex items-center gap-2">
         <label htmlFor="attemptLimits" className="flex-none w-1/2">
           Attempt Limits

@@ -1,46 +1,9 @@
 import Button from "@components/Button";
-import { AssignedUsersSlideOver } from "@components/Config/Users";
-import { SlideOver } from "@components/SlideOver";
-import { Spinner } from "@components/Spinner";
-import { useLayoutState } from "@contexts/layout";
 import { useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
 import { Assignment, AssignmentConfig } from "@types";
-import { configToYaml } from "@utils/Config";
-import dynamic from "next/dynamic";
 import { useEffect } from "react";
-import { ReactFlowProvider } from "reactflow";
-
-const Loading = () => (
-  <div className="h-full flex flex-col items-center justify-center bg-white rounded-md shadow">
-    <Spinner className="h-14 w-14 text-cse-500" />
-  </div>
-);
-
-const PipelineEditor = dynamic(() => import("./PipelineEditor/PipelineEditor"), {
-  loading: () => <Loading />,
-});
-
-const AddStagePanel = dynamic(() => import("./Settings/AddStagePanel"), {
-  loading: () => <Loading />,
-});
-
-const SettingsPanel = dynamic(() => import("./Settings/SettingsPanel"), {
-  loading: () => <Loading />,
-});
-
-const StageSettingsPanel = dynamic(() => import("./StageSettings/StageSettings"), {
-  loading: () => <Loading />,
-});
-
-function SlideOverContent() {
-  const { configSlideOver } = useLayoutState();
-  switch (configSlideOver) {
-    case "users":
-      return <AssignedUsersSlideOver />;
-    default:
-      return <div />;
-  }
-}
+import guiBuilderSteps from "./Steps/GuiBuilderSteps";
+import Stepper from "./Steps/Stepper";
 
 interface GUIAssignmentBuilderProps {
   /** Config data queried from GraphQL. */
@@ -56,9 +19,8 @@ interface GUIAssignmentBuilderProps {
 function GUIAssignmentBuilder({ data, configId }: GUIAssignmentBuilderProps) {
   const isNewAssignment = configId === -1;
 
-  const editingConfig = useStoreState((state) => state.editingConfig);
   const isEdited = useStoreState((state) => state.isEdited);
-  const showAddStage = useStoreState((state) => state.layout.showAddStage);
+  const step = useStoreState((state) => state.layout.step);
   const setCourseId = useStoreActions((actions) => actions.setCourseId);
   const initializeConfig = useStoreActions((actions) => actions.initializeConfig);
   const initializePolicy = useStoreActions((actions) => actions.initializePolicy);
@@ -89,54 +51,26 @@ function GUIAssignmentBuilder({ data, configId }: GUIAssignmentBuilderProps) {
     }
   }, [data, configId, setCourseId, initializeConfig, initializePolicy, initializeSchedule, initializePipeline]);
 
+  const StepComponent = guiBuilderSteps[step].component;
+
   return (
-    <>
-      <div className="p-4 pl-3 w-full flex flex-col">
-        <div className="ml-1 mb-2 flex items-center justify-between">
-          <h1 className="font-bold text-gray-900 text-xl sm:text-2xl">
-            {isNewAssignment ? "New Assignment Config" : `Editing Assignment Config #${configId}`}
-          </h1>
-          <div className="flex gap-2">
-            <Button className="bg-violet-500 text-white hover:bg-violet-600" onClick={() => console.log(editingConfig)}>
-              Debug: Log Config
-            </Button>
-            <Button
-              className="bg-violet-500 text-white hover:bg-violet-600"
-              onClick={() => console.log(configToYaml(editingConfig))}
-            >
-              Debug: Log YAML
-            </Button>
-            <Button
-              className="bg-green-500 text-white hover:bg-green-600 disabled:bg-gray-400 disabled:cursor-not-allowed"
-              disabled={!isNewAssignment && !isEdited}
-              onClick={() => {
-                // TODO
-              }}
-            >
-              {isNewAssignment ? "Create" : "Save"}
-            </Button>
-          </div>
-        </div>
-        <div className="pt-1 pl-1 flex-1 flex flex-row gap-3 overflow-y-hidden">
-          <div className="w-4/6 flex flex-col gap-3">
-            <div className="h-[45%]">
-              <ReactFlowProvider>
-                <PipelineEditor />
-              </ReactFlowProvider>
-            </div>
-            <div className="h-[55%] bg-white rounded-md shadow">
-              <StageSettingsPanel />
-            </div>
-          </div>
-          <div className="w-2/6 bg-white rounded-md shadow overflow-y-auto">
-            {showAddStage ? <AddStagePanel /> : <SettingsPanel />}
-          </div>
-        </div>
+    <div className="p-4 w-full flex flex-col gap-5">
+      <div className="flex items-center">
+        <Stepper className="flex-1" />
+        <Button
+          className="ml-8 !text-lg bg-green-500 text-white hover:bg-green-600 disabled:bg-gray-400 disabled:cursor-not-allowed"
+          disabled={!isNewAssignment && !isEdited}
+          onClick={() => {
+            // TODO
+          }}
+        >
+          {isNewAssignment ? "Create" : "Save"}
+        </Button>
       </div>
-      <SlideOver>
-        <SlideOverContent />
-      </SlideOver>
-    </>
+      <div className="flex-1 overflow-y-hidden">
+        <StepComponent />
+      </div>
+    </div>
   );
 }
 

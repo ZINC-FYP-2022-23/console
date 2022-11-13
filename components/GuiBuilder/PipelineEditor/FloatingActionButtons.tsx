@@ -13,31 +13,7 @@ function FloatingActionButtons() {
     <div className="absolute right-3 top-3 flex gap-4 z-10">
       {selectedStage && <DuplicateStageButton />}
       <FormatPipelineButton />
-      <AddStageButton />
     </div>
-  );
-}
-
-function AddStageButton() {
-  const showAddStage = useStoreState((state) => state.layout.showAddStage);
-  const toggleAddStage = useStoreActions((action) => action.toggleAddStage);
-
-  return (
-    <Tooltip
-      label={showAddStage ? "Finish Add Stage" : "Add stage"}
-      position="bottom"
-      transition="fade"
-      transitionDuration={200}
-    >
-      <button
-        className={`h-11 w-11 flex items-center justify-center text-white rounded-full drop-shadow ${
-          showAddStage ? "bg-green-600" : "bg-cse-700"
-        }`}
-        onClick={() => toggleAddStage()}
-      >
-        <FontAwesomeIcon icon={["fas", showAddStage ? "check" : "plus"]} className="text-xl" />
-      </button>
-    </Tooltip>
   );
 }
 
@@ -47,7 +23,7 @@ function FormatPipelineButton() {
   return (
     <Tooltip label="Format the pipeline" position="bottom" transition="fade" transitionDuration={200}>
       <button
-        className="h-11 w-11 flex items-center justify-center bg-blue-100 text-cse-700 rounded-full drop-shadow active:bg-blue-200 transition"
+        className="h-11 w-11 flex items-center justify-center bg-cse-600 text-white rounded-full drop-shadow active:bg-cse-300 transition"
         onClick={() => layoutPipeline()}
       >
         <FontAwesomeIcon icon={["fad", "wand-magic-sparkles"]} className="text-xl" />

@@ -25,14 +25,10 @@ function StageSettings() {
         <div className="flex self-center">
           <h2 className="text-xl font-semibold">{supportedStage?.label ?? stageName}</h2>
           {supportedStage && (
-            <Tooltip
-              label={supportedStage.description}
-              transition="fade"
-              position="right"
-              withArrow
-              className="ml-2 p-1 flex self-center text-gray-500"
-            >
-              <FontAwesomeIcon icon={["far", "circle-info"]} />
+            <Tooltip label={supportedStage.description} transition="fade" position="right" withArrow>
+              <div className="ml-2 p-1 flex self-center text-gray-500">
+                <FontAwesomeIcon icon={["far", "circle-info"]} />
+              </div>
             </Tooltip>
           )}
         </div>
