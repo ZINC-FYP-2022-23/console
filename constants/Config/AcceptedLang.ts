@@ -15,7 +15,7 @@ export const ACCEPTED_LANG: AcceptedLang[] = [
   { lang: "c/gcc", label: "C (gcc)" },
   { lang: "cpp/clang++", label: "C++ (clang++)" },
   { lang: "cpp/g++", label: "C++ (g++)" },
-  { lang: "qt5", label: "C++ with Qt" },
+  { lang: "qt5", label: "C++ with Qt5" },
   { lang: "java", label: "Java" },
   { lang: "python", label: "Python" },
   { lang: "python/cuda", label: "Python (CUDA)" },

@@ -1,5 +1,6 @@
 import { createStyles, Stepper as StepperMantine } from "@mantine/core";
 import { useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
+import { memo } from "react";
 import defaultTheme from "tailwindcss/defaultTheme";
 import guiBuilderSteps from "./GuiBuilderSteps";
 
@@ -72,4 +73,4 @@ function Stepper({ className = "" }: StepperProps) {
   );
 }
 
-export default Stepper;
+export default memo(Stepper);

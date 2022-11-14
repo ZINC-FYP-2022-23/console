@@ -1,8 +1,11 @@
 import { Checkbox, Select, SwitchGroup, TextInput } from "@components/Input";
 import { ACCEPTED_LANG } from "@constants/Config/AcceptedLang";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { HoverCard, HoverCardProps } from "@mantine/core";
 import { useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
 import { SettingsFeatures, SettingsGpuDevice, SettingsUseTemplate } from "@types";
 import { settingsLangToString } from "@utils/Config";
+import { memo } from "react";
 import TextareaAutosize from "react-textarea-autosize";
 
 interface UseTemplateSelectOptions {
@@ -79,6 +82,7 @@ function PipelineSettings() {
               updateField({ path: "_settings.lang.version", value });
             }}
           />
+          <LangVersionTooltip />
         </div>
       </div>
       {/* Helper Files */}
@@ -101,11 +105,12 @@ function PipelineSettings() {
           />
           <div>
             <div className="flex items-center gap-2">
-              <div className="flex-none w-1/2">
-                <label htmlFor="use_template" className="flex-none w-1/2">
-                  Specify template files
-                </label>
-                <p className="mt-1 text-xs text-gray-500 leading-3">Files that students should submit</p>
+              <div className="flex-none w-1/2 flex items-center gap-1">
+                <div>
+                  <label htmlFor="use_template">Specify template files</label>
+                  <p className="mt-1 text-xs text-gray-500 leading-3">Files that students should submit</p>
+                </div>
+                <UseTemplateTooltip />
               </div>
               <Select
                 id="use_template"
@@ -148,15 +153,15 @@ function PipelineSettings() {
         <h3 className="mb-3 font-semibold text-base">Stage Settings</h3>
         <div className="flex flex-col gap-5">
           <SwitchGroup
-            label="Early return on error"
-            description="Whether the pipeline will return when any stage returns non-zero exit code"
+            label="Early return on error (Experimental)"
+            description="Whether the pipeline will abort when any stage returns non-zero exit code."
             checked={_settings.early_return_on_throw}
             onChange={(value) => {
               updateField({ path: "_settings.early_return_on_throw", value });
             }}
           />
           <SwitchGroup
-            label="Allow Internet access"
+            label="Allow Internet access for all stages"
             checked={_settings.enable_features.network}
             onChange={(value) => {
               updateField({ path: "_settings.enable_features.network", value });
@@ -164,9 +169,10 @@ function PipelineSettings() {
           />
           <div className="flex flex-col gap-3">
             <div className="flex items-center gap-2">
-              <label htmlFor="stage_wait_duration_secs" className="flex-none w-1/2">
-                Max. stage execution time
-              </label>
+              <div className="flex-none w-1/2 flex items-center gap-1">
+                <label htmlFor="stage_wait_duration_secs">Max. stage execution time</label>
+                <StageWaitDurationTooltip />
+              </div>
               <div className="flex-1 flex items-center">
                 <TextInput
                   id="stage_wait_duration_secs"
@@ -184,9 +190,10 @@ function PipelineSettings() {
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <label htmlFor="cpus" className="flex-none w-1/2">
-                CPUs
-              </label>
+              <div className="flex-none w-1/2 flex items-center gap-1">
+                <label htmlFor="cpus">CPUs</label>
+                <CpusTooltip />
+              </div>
               <TextInput
                 id="cpus"
                 value={_settings.cpus}
@@ -202,9 +209,10 @@ function PipelineSettings() {
               />
             </div>
             <div className="flex items-center gap-2">
-              <label htmlFor="mem_gb" className="flex-none w-1/2">
-                Memory
-              </label>
+              <div className="flex-none w-1/2 flex items-center gap-1">
+                <label htmlFor="mem_gb">Memory</label>
+                <MemoryTooltip />
+              </div>
               <div className="flex-1 flex items-center">
                 <TextInput
                   id="mem_gb"
@@ -224,9 +232,10 @@ function PipelineSettings() {
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <label htmlFor="gpus" className="flex-none w-1/2">
-                  GPU device
-                </label>
+                <div className="flex-none w-1/2 flex items-center gap-1">
+                  <label htmlFor="gpus">GPU device</label>
+                  <GpuTooltip />
+                </div>
                 <Select
                   id="gpus"
                   extraClassNames="w-full"
@@ -291,5 +300,138 @@ function PipelineSettings() {
     </div>
   );
 }
+
+interface InfoTooltipProps extends HoverCardProps {
+  /** Content of the tooltip card. */
+  children: React.ReactNode;
+}
+
+/** A tooltip component that shows a card on hover. */
+function InfoTooltip({ children, ...hoverCardProps }: InfoTooltipProps) {
+  return (
+    <HoverCard position="top" {...hoverCardProps}>
+      <HoverCard.Target>
+        <button className="p-2 text-lg leading-none text-blue-500">
+          <FontAwesomeIcon icon={["far", "circle-question"]} />
+        </button>
+      </HoverCard.Target>
+      <HoverCard.Dropdown className="py-2 text-justify bg-blue-50 border border-blue-300 drop-shadow-lg">
+        {children}
+      </HoverCard.Dropdown>
+    </HoverCard>
+  );
+}
+
+const LangVersionTooltip = memo(() => (
+  <InfoTooltip>
+    <p>
+      Refer to{" "}
+      <a
+        href="https://docs.zinc.ust.dev/user/writing-config-yaml.html#lang"
+        target="_blank"
+        rel="noreferrer"
+        className="underline text-blue-700"
+      >
+        the documentation
+      </a>{" "}
+      for the supported language versions.
+    </p>
+  </InfoTooltip>
+));
+LangVersionTooltip.displayName = "LangVersionTooltip";
+
+const UseTemplateTooltip = memo(() => {
+  const setStep = useStoreActions((actions) => actions.setStep);
+  return (
+    <InfoTooltip>
+      <ul className="px-3 list-disc">
+        <li>
+          <span className="font-semibold">None: </span>
+          No need to check what files students should submit
+        </li>
+        <li>
+          <span className="font-semibold">Text input: </span>
+          Input the names of the files to submit
+        </li>
+        <li>
+          <span className="font-semibold">File upload: </span>
+          Specify files to submit by{" "}
+          <button onClick={() => setStep(2)} className="underline text-blue-700">
+            uploading files
+          </button>{" "}
+        </li>
+      </ul>
+    </InfoTooltip>
+  );
+});
+UseTemplateTooltip.displayName = "UseTemplateTooltip";
+
+const StageWaitDurationTooltip = memo(() => (
+  <InfoTooltip width={380}>
+    <ul className="px-3 list-disc">
+      <li>A good estimate is to multiply how long the grading process takes on your local PC by 2~3 times.</li>
+      <li>Usually this value is &lt;120 secs. Only go above if your stages require it.</li>
+    </ul>
+  </InfoTooltip>
+));
+StageWaitDurationTooltip.displayName = "StageWaitDurationTooltip";
+
+const CpusTooltip = memo(() => (
+  <InfoTooltip width={350}>
+    <ul className="px-3 list-disc">
+      <li>How many cores each stage can use.</li>
+      <li>
+        Usually it&apos; s set to <code>1.0</code>, unless the pipeline contains stages which can exploit parallelism.
+      </li>
+    </ul>
+    <p className="mt-1">
+      Refer to{" "}
+      <a
+        href="https://docs.zinc.ust.dev/user/writing-config-yaml.html#cpus"
+        target="_blank"
+        rel="noreferrer"
+        className="underline text-blue-700"
+      >
+        the documentation
+      </a>{" "}
+      for more info.
+    </p>
+  </InfoTooltip>
+));
+CpusTooltip.displayName = "CpusTooltip";
+
+const MemoryTooltip = memo(() => (
+  <InfoTooltip width={360}>
+    <p>
+      Usually it&apos; s set to <code>1.0</code>, unless the pipeline contains stages which require more RAM.
+    </p>
+  </InfoTooltip>
+));
+MemoryTooltip.displayName = "MemoryTooltip";
+
+const GpuTooltip = memo(() => (
+  <InfoTooltip width={520}>
+    <ul className="px-3 list-disc">
+      <li>
+        <span className="font-semibold">None: </span>
+        Do not allocate any GPU.
+      </li>
+      <li>
+        <span className="font-semibold">Any GPU: </span>
+        Allocates any GPU available. Note that GPUs exposed as virtual machine devices (e.g. VMWare VGA controller) are
+        also considered as viable candidates.
+      </li>
+      <li>
+        <span className="font-semibold">Choose vendors...: </span>
+        Allocates a GPU from one of the specified vendor(s).
+        <ul className="ml-4 list-disc">
+          <li>e.g. Pick &apos;NVIDIA&apos; if your pipeline stage requires CUDA.</li>
+          <li>Requesting specific models of GPUs is not supported.</li>
+        </ul>
+      </li>
+    </ul>
+  </InfoTooltip>
+));
+GpuTooltip.displayName = "GpuTooltip";
 
 export default PipelineSettings;

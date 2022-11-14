@@ -31,7 +31,7 @@ function GeneralSettingsCard({ title, children, className }: GeneralSettingsCard
   return (
     <div className={`flex flex-col bg-white rounded-md shadow overflow-y-hidden ${className}`}>
       <h2 className="px-4 py-2 text-xl font-semibold bg-blue-50 border-b border-gray-300">{title}</h2>
-      <div className="flex-1 p-4 pb-5 overflow-y-auto">{children}</div>
+      <div className="flex-1 p-4 pb-6 overflow-y-auto">{children}</div>
     </div>
   );
 }
