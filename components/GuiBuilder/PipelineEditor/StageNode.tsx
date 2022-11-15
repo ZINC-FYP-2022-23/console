@@ -1,4 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Tooltip } from "@mantine/core";
 import { useStoreActions } from "@state/GuiBuilder/Hooks";
 import { StageNodeData } from "@types";
 import { DragEventHandler, useState } from "react";
@@ -30,6 +31,7 @@ const extraStyles = (isSelected: boolean, isDragOver: boolean) => {
 function StageNode({ id, data, selected }: NodeProps<StageNodeData>) {
   const [isDragOver, setIsDragOver] = useState(false);
   const deleteStageNode = useStoreActions((actions) => actions.deleteStageNode);
+  const duplicateStage = useStoreActions((action) => action.duplicateStage);
 
   return (
     <div
@@ -50,12 +52,24 @@ function StageNode({ id, data, selected }: NodeProps<StageNodeData>) {
       <Handle className="!p-[5px] !border-2 !bg-cse-600 !-left-[7px]" type="target" position={Position.Left} />
       <span className="font-medium">{data.label}</span>
       {selected && (
-        <button
-          onClick={() => deleteStageNode(id)}
-          className="w-5 h-5 absolute -top-3 -right-3 flex justify-center items-center text-sm text-white bg-red-500 rounded-full hover:bg-red-700 transition"
-        >
-          <FontAwesomeIcon className="w-3 !h-3" icon={["fas", "xmark"]} />
-        </button>
+        <div className="absolute left-[50%] -bottom-11 translate-x-[-50%] flex gap-5">
+          <Tooltip label="Duplicate stage" position="bottom" openDelay={500}>
+            <button
+              onClick={() => duplicateStage()}
+              className="w-8 h-8 flex justify-center items-center text-white bg-green-600 rounded-full hover:bg-green-800 transition"
+            >
+              <FontAwesomeIcon icon={["far", "copy"]} />
+            </button>
+          </Tooltip>
+          <Tooltip label="Delete stage" position="bottom" openDelay={500}>
+            <button
+              onClick={() => deleteStageNode(id)}
+              className="w-8 h-8 flex justify-center items-center text-white bg-red-500 rounded-full hover:bg-red-700 transition"
+            >
+              <FontAwesomeIcon icon={["far", "trash-can"]} />
+            </button>
+          </Tooltip>
+        </div>
       )}
     </div>
   );

@@ -436,6 +436,10 @@ export const pipelineEditorActions: PipelineEditorActions = {
         newNode.selected = false;
         newNode.position.y += (newNode.height || 50) * 1.5; // Place the new node below the selected node
         state.pipelineEditor.nodes.push(newNode);
+
+        // Select the newly duplicated stage
+        selectedNode.selected = false;
+        newNode.selected = true;
       }
     }
   }),
