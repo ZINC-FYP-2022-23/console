@@ -175,6 +175,7 @@ function PipelineEditor() {
         // TODO(Anson): Re-enable selection only if multi-deleting nodes/edges can update `editingConfig` properly.
         selectionKeyCode={null}
         multiSelectionKeyCode={null}
+        nodesFocusable={false}
         proOptions={proOptions}
       >
         <Controls showInteractive={false} />
