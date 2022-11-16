@@ -34,9 +34,7 @@ function Accordion({
             <Disclosure.Button as="div">
               <button
                 onClick={onClick} // We don't put this prop on the Disclosure.Button because it's not working
-                className={`w-full px-3 py-2 flex justify-between items-center bg-blue-50 ${
-                  extraClassNames?.buttonRoot ?? ""
-                }`}
+                className={`w-full px-3 py-2 flex justify-between items-center ${extraClassNames?.buttonRoot ?? ""}`}
               >
                 <span className={`font-semibold ${extraClassNames?.title ?? ""}`}>{title}</span>
                 <FontAwesomeIcon

@@ -62,6 +62,8 @@ export interface StoreStates {
     step: number;
     /** Which accordion components are opened. */
     accordion: AccordionState;
+    /** Whether the "Add New Stage" panel is collapsed. */
+    isAddStageCollapsed: boolean;
   };
 
   pipelineEditor: {
@@ -102,6 +104,7 @@ export interface LayoutActions {
       value: boolean;
     }
   >;
+  toggleAddStageCollapsed: Action<GuiBuilderStoreModel>;
 }
 
 /** Actions for {@link StoreStates.pipelineEditor}. */
@@ -221,6 +224,9 @@ export const layoutActions: LayoutActions = {
   }),
   setAccordion: action((state, payload) => {
     set(state.layout.accordion, payload.path, payload.value);
+  }),
+  toggleAddStageCollapsed: action((state) => {
+    state.layout.isAddStageCollapsed = !state.layout.isAddStageCollapsed;
   }),
 };
 
@@ -466,6 +472,7 @@ export const initialModel: GuiBuilderStoreModel = {
         miscStages: false,
       },
     },
+    isAddStageCollapsed: false,
   },
 
   pipelineEditor: {
