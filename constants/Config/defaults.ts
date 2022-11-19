@@ -1,5 +1,6 @@
 import type { Config, GradingPolicy, Schedule, Settings } from "@types";
 import { addDays, set } from "date-fns";
+import { v4 as uuidv4 } from "uuid";
 
 /**
  * Default values for the `_settings` field in an assignment config.
@@ -13,7 +14,7 @@ export const defaultSettings: Settings = {
     version: "",
   },
   use_template: undefined,
-  template: undefined,
+  template: [{ id: uuidv4(), name: "" }],
   use_skeleton: false,
   use_provided: false,
   stage_wait_duration_secs: "60",

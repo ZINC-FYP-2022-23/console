@@ -7,8 +7,12 @@
 interface Settings {
   lang: SettingsLang;
   use_template?: SettingsUseTemplate;
-  /** File names a student should submit, separated by new line (`\n`). */
-  template?: string;
+  template: {
+    /** UUID for the template file. It's randomly generated while serializing the YAML file. */
+    id: string;
+    /** Name of the template file. */
+    name: string;
+  }[];
   use_skeleton: boolean;
   use_provided: boolean;
   stage_wait_duration_secs: string;

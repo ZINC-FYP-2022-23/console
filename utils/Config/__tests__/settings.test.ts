@@ -1,5 +1,4 @@
-import cloneDeep from "lodash/cloneDeep";
-import { Settings, SettingsGpuDevice, SettingsLang, SettingsRaw } from "../../../types/Config";
+import { Settings, SettingsGpuDevice, SettingsLang, SettingsRaw, SettingsUseTemplate } from "../../../types/Config";
 import {
   isSettingsEqual,
   parseLangString,
@@ -8,32 +7,42 @@ import {
   settingsToSettingsRaw,
   tidySettings,
 } from "../settings";
+import * as uuid from "uuid";
 
-const settings: Settings = {
-  lang: {
-    language: "cpp",
-    compiler: "g++",
-    version: "8",
-  },
-  use_template: undefined,
-  template: undefined,
-  use_skeleton: true,
-  use_provided: true,
-  stage_wait_duration_secs: "10",
-  cpus: "2",
-  mem_gb: "4.5",
-  early_return_on_throw: false,
-  enable_features: {
-    network: true,
-    gpu_device: [SettingsGpuDevice.AMD, SettingsGpuDevice.INTEL],
-  },
-};
+jest.mock("uuid");
+
+function getMockSettings(): Settings {
+  return {
+    lang: {
+      language: "cpp",
+      compiler: "g++",
+      version: "8",
+    },
+    use_template: SettingsUseTemplate.FILENAMES,
+    template: [
+      { id: "mock-uuid-1", name: "foo.cpp" },
+      { id: "mock-uuid-2", name: "bar.cpp" },
+    ],
+    use_skeleton: true,
+    use_provided: true,
+    stage_wait_duration_secs: "10",
+    cpus: "2",
+    mem_gb: "4.5",
+    early_return_on_throw: false,
+    enable_features: {
+      network: true,
+      gpu_device: [SettingsGpuDevice.AMD, SettingsGpuDevice.INTEL],
+    },
+  };
+}
 
 describe("Settings utils", () => {
   describe("settingsRawToSettings()", () => {
     it("converts a SettingsRaw object to Settings", () => {
       const settingsRaw: SettingsRaw = {
         lang: "cpp/g++:8",
+        use_template: SettingsUseTemplate.FILENAMES,
+        template: ["foo.cpp", "bar.cpp"],
         cpus: 2.5,
         mem_gb: null,
       };
@@ -43,6 +52,11 @@ describe("Settings utils", () => {
           compiler: "g++",
           version: "8",
         },
+        use_template: SettingsUseTemplate.FILENAMES,
+        template: [
+          { id: "mock-uuid-1", name: "foo.cpp" },
+          { id: "mock-uuid-2", name: "bar.cpp" },
+        ],
         use_skeleton: false,
         use_provided: false,
         stage_wait_duration_secs: "",
@@ -52,30 +66,38 @@ describe("Settings utils", () => {
         enable_features: { network: true },
       };
 
+      jest.spyOn(uuid, "v4").mockReturnValueOnce("mock-uuid-1").mockReturnValueOnce("mock-uuid-2");
       expect(settingsRawToSettings(settingsRaw)).toEqual(expected);
     });
   });
 
   describe("settingsToSettingsRaw()", () => {
     it("converts `lang` to a string", () => {
-      const settingsRaw = settingsToSettingsRaw(settings);
+      const settingsRaw = settingsToSettingsRaw(getMockSettings());
       expect(settingsRaw.lang).toBe("cpp/g++:8");
     });
 
     it("converts `template` to a string array", () => {
-      const _settings = { ...settings, template: "   foo.txt\n  \n bar.txt  " };
-      const settingsRaw = settingsToSettingsRaw(_settings);
+      const settings = getMockSettings();
+      settings.template = [
+        { id: "mock-uuid-1", name: "foo.txt" },
+        { id: "mock-uuid-2", name: " bar.txt " },
+      ];
+
+      const settingsRaw = settingsToSettingsRaw(settings);
       expect(settingsRaw.template).toEqual(["foo.txt", "bar.txt"]);
     });
 
     it("converts undefined fields to null", () => {
+      const settings = getMockSettings();
+      settings.use_template = undefined;
+
       const settingsRaw = settingsToSettingsRaw(settings);
       expect(settingsRaw.use_template).toBeNull();
-      expect(settingsRaw.template).toBeNull();
     });
 
     it("converts numerical strings to numbers", () => {
-      const settingsRaw = settingsToSettingsRaw(settings);
+      const settingsRaw = settingsToSettingsRaw(getMockSettings());
       expect(settingsRaw.stage_wait_duration_secs).toBe(10);
       expect(settingsRaw.cpus).toBe(2);
       expect(settingsRaw.mem_gb).toBe(4.5);
@@ -83,20 +105,43 @@ describe("Settings utils", () => {
   });
 
   describe("tidySettings()", () => {
-    it("tidies a settings object", () => {
-      const settingsUgly = cloneDeep(settings);
-      settingsUgly.enable_features.gpu_device = [SettingsGpuDevice.INTEL, SettingsGpuDevice.AMD];
+    it("trims the language version string", () => {
+      const settings = getMockSettings();
+      settings.lang.version = "  8  ";
 
-      const settingsTidied = tidySettings(settingsUgly);
-      expect(settingsTidied).toEqual(settings);
+      const settingsTidied = tidySettings(settings);
+      expect(settingsTidied.lang.version).toBe("8");
+    });
+
+    it("tidies the `template` array", () => {
+      const settings = getMockSettings();
+      settings.template = [
+        { id: "mock-uuid-1", name: "  foo.txt" },
+        { id: "mock-uuid-2", name: "" },
+        { id: "mock-uuid-3", name: "bar.txt " },
+      ];
+
+      const settingsTidied = tidySettings(settings);
+      expect(settingsTidied.template).toEqual([
+        { id: "mock-uuid-1", name: "foo.txt" },
+        { id: "mock-uuid-3", name: "bar.txt" },
+      ]);
+    });
+
+    it("sorts the GPU devices array", () => {
+      const settings = getMockSettings();
+      settings.enable_features.gpu_device = [SettingsGpuDevice.INTEL, SettingsGpuDevice.AMD];
+
+      const settingsTidied = tidySettings(settings);
+      expect(settingsTidied.enable_features.gpu_device).toEqual([SettingsGpuDevice.AMD, SettingsGpuDevice.INTEL]);
     });
 
     it("does not modify the original settings object", () => {
-      const settingsUgly = cloneDeep(settings);
-      settingsUgly.cpus = "2";
+      const settingsUgly = getMockSettings();
+      settingsUgly.lang.version = "  8  ";
 
       tidySettings(settingsUgly);
-      expect(settingsUgly.cpus).toBe("2");
+      expect(settingsUgly.lang.version).toBe("  8  ");
     });
   });
 
@@ -119,7 +164,7 @@ describe("Settings utils", () => {
       const cpp: SettingsLang = {
         language: "cpp",
         compiler: "g++",
-        version: "  8  ", // Test trimming
+        version: "8",
       };
       expect(settingsLangToString(cpp)).toBe("cpp/g++:8");
 
@@ -134,11 +179,14 @@ describe("Settings utils", () => {
 
   describe("isSettingsEqual()", () => {
     it("returns true for equal settings", () => {
-      const s2 = cloneDeep(settings);
-      // Test gpu_device sorting
-      s2.enable_features.gpu_device = [SettingsGpuDevice.INTEL, SettingsGpuDevice.AMD];
-
-      expect(isSettingsEqual(settings, s2)).toBe(true);
+      const s1 = getMockSettings();
+      const s2 = getMockSettings();
+      // Test `template` comparison
+      s2.template = [
+        { id: "mock-uuid-11", name: " bar.cpp  " },
+        { id: "mock-uuid-12", name: " foo.cpp " },
+      ];
+      expect(isSettingsEqual(s1, s2)).toBe(true);
     });
   });
 });

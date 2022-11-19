@@ -46,6 +46,7 @@ describe("Config utils", () => {
           compiler: "g++",
           version: "8",
         },
+        template: [{ id: "mock-uuid-1", name: "" }],
         use_skeleton: true,
         use_provided: true,
         stage_wait_duration_secs: "10",

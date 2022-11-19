@@ -1,4 +1,5 @@
 import { Checkbox, Select, SwitchGroup, TextInput } from "@components/Input";
+import ListInput from "@components/Input/ListInput";
 import { ACCEPTED_LANG } from "@constants/Config/AcceptedLang";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { HoverCard, HoverCardProps } from "@mantine/core";
@@ -6,7 +7,7 @@ import { useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
 import { SettingsFeatures, SettingsGpuDevice, SettingsUseTemplate } from "@types";
 import { settingsLangToString } from "@utils/Config";
 import { memo } from "react";
-import TextareaAutosize from "react-textarea-autosize";
+import { v4 as uuidv4 } from "uuid";
 
 interface UseTemplateSelectOptions {
   label: string;
@@ -129,19 +130,38 @@ function PipelineSettings() {
               </Select>
             </div>
             {_settings.use_template === SettingsUseTemplate.FILENAMES && (
-              <div className="mt-4 mx-3">
-                <p className="mb-1 text-gray-500">
-                  Files to submit (separated with <strong>new line</strong>):
-                </p>
-                <TextareaAutosize
-                  className="form-input block w-full py-2 px-3 text-sm font-mono leading-5 resize-none rounded-md shadow-sm placeholder:text-gray-400 border border-gray-300 focus:outline-none focus:ring focus:ring-blue-100 focus:border-blue-300 transition ease-in-out"
-                  placeholder="example/foo.txt"
-                  value={_settings.template}
-                  onChange={(event) => {
-                    const value = event.target.value;
-                    updateField({ path: "_settings.template", value });
-                  }}
-                />
+              <div className="mt-4 ml-3">
+                <p className="mb-2 font-medium text-gray-500">Files to submit:</p>
+                <ListInput>
+                  {_settings.template.map((file, index) => (
+                    <ListInput.Item
+                      key={file.id}
+                      index={index}
+                      placeholder="e.g. example/hello.cpp"
+                      value={file.name}
+                      onChange={(event) => {
+                        const newTemplate = [..._settings.template];
+                        newTemplate[index].name = event.target.value;
+                        updateField({ path: "_settings.template", value: newTemplate });
+                      }}
+                      onEnterKeyPressed={() => {
+                        const newTemplate = [..._settings.template];
+                        newTemplate.splice(index + 1, 0, { id: uuidv4(), name: "" });
+                        updateField({ path: "_settings.template", value: newTemplate });
+                      }}
+                      onDelete={() => {
+                        const newTemplate = _settings.template.filter((f) => f.id !== file.id);
+                        updateField({ path: "_settings.template", value: newTemplate });
+                      }}
+                    />
+                  ))}
+                  <ListInput.AddButton
+                    onClick={() => {
+                      const newTemplate = [..._settings.template, { id: uuidv4(), name: "" }];
+                      updateField({ path: "_settings.template", value: newTemplate });
+                    }}
+                  />
+                </ListInput>
               </div>
             )}
             {/* TODO(Anson): Remind user to upload files if "File Upload" is selected */}

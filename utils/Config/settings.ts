@@ -6,6 +6,7 @@ import { defaultSettings } from "@constants/Config/defaults";
 import type { Settings, SettingsLang, SettingsRaw } from "@types";
 import cloneDeep from "lodash/cloneDeep";
 import isEqual from "lodash/isEqual";
+import { v4 as uuidv4 } from "uuid";
 
 /**
  * Converts a raw settings object to a {@link Settings} object.
@@ -15,8 +16,7 @@ export function settingsRawToSettings(sr: SettingsRaw): Settings {
   return {
     lang: parseLangString(sr.lang),
     use_template: sr.use_template ?? undefined,
-    // Turn array of file names to a string separated by new line
-    template: sr.template?.reduce((prev, curr) => prev.concat("\n" + curr)) ?? undefined,
+    template: sr.template?.map((t) => ({ id: uuidv4(), name: t })) ?? defaultSettings.template,
     use_skeleton: sr.use_skeleton ?? defaultSettings.use_skeleton,
     use_provided: sr.use_provided ?? defaultSettings.use_provided,
     stage_wait_duration_secs: sr.stage_wait_duration_secs?.toString() ?? "",
@@ -36,16 +36,10 @@ export function settingsRawToSettings(sr: SettingsRaw): Settings {
 export function settingsToSettingsRaw(settings: Settings): SettingsRaw {
   const s = tidySettings(settings);
 
-  const templateTrimmed = s.template?.trim();
   const _settings: SettingsRaw = {
     ...s,
     lang: settingsLangToString(s.lang),
-    template: templateTrimmed
-      ? templateTrimmed
-          .split("\n")
-          .map((file) => file.trim())
-          .filter((file) => file !== "")
-      : undefined,
+    template: s.template.map((t) => t.name),
     stage_wait_duration_secs: parseInt(s.stage_wait_duration_secs),
     cpus: parseFloat(s.cpus),
     mem_gb: parseFloat(s.mem_gb),
@@ -64,7 +58,8 @@ export function settingsToSettingsRaw(settings: Settings): SettingsRaw {
 export function tidySettings(settings: Settings): Settings {
   const s = cloneDeep(settings);
 
-  // Sort arrays
+  s.lang.version = s.lang.version.trim();
+  s.template = s.template.map((t) => ({ id: t.id, name: t.name.trim() })).filter((t) => t.name !== "");
   if (Array.isArray(s.enable_features.gpu_device)) {
     s.enable_features.gpu_device.sort();
   }
@@ -94,14 +89,18 @@ export function parseLangString(lang: string): SettingsLang {
  */
 export function settingsLangToString(s: SettingsLang): string {
   const { language, compiler, version } = s;
-  return `${language}${compiler ? `/${compiler}` : ""}:${version.trim()}`;
+  return `${language}${compiler ? `/${compiler}` : ""}:${version}`;
 }
 
 /**
  * Deep compares two `Settings` objects.
  */
 export function isSettingsEqual(s1: Settings, s2: Settings): boolean {
-  const _s1 = tidySettings(s1);
-  const _s2 = tidySettings(s2);
-  return isEqual(_s1, _s2);
+  const { template: template1, ..._s1 } = tidySettings(s1);
+  const { template: template2, ..._s2 } = tidySettings(s2);
+
+  const _template1 = template1.map((t) => t.name).sort();
+  const _template2 = template2.map((t) => t.name).sort();
+
+  return isEqual(_s1, _s2) && isEqual(_template1, _template2);
 }
