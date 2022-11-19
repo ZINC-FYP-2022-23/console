@@ -34,23 +34,25 @@ function StageNode({ id, data, selected }: NodeProps<StageNodeData>) {
   const duplicateStage = useStoreActions((action) => action.duplicateStage);
 
   return (
-    <div
-      onDragEnter={() => setIsDragOver(true)}
-      onDragLeave={() => setIsDragOver(false)}
-      onDragOver={onDragOver}
-      // PipelineEditor's `onDrop` will check whether the new stage block is dropped onto this stage node.
-      onDrop={() => setIsDragOver(false)}
-      // The `"stage-node"` class is for PipelineEditor's `onDrop` to check whether the new stage block is
-      // dropped onto a stage node.
-      className={`stage-node ${extraStyles(
-        selected,
-        isDragOver,
-      )} px-5 py-3 min-w-[140px] max-w-[175px] relative text-center text leading-6 border border-gray-400 rounded-md cursor-pointer hover:bg-blue-100 transition `}
-    >
-      {/* TODO(Anson): Validate handle connection with `isValidConnection` */}
-      <Handle className="!p-[5px] !border-2 !bg-cse-600 !-right-[7px]" type="source" position={Position.Right} />
-      <Handle className="!p-[5px] !border-2 !bg-cse-600 !-left-[7px]" type="target" position={Position.Left} />
-      <span className="font-medium">{data.label}</span>
+    <div className="relative">
+      <div
+        onDragEnter={() => setIsDragOver(true)}
+        onDragLeave={() => setIsDragOver(false)}
+        onDragOver={onDragOver}
+        // PipelineEditor's `onDrop` will check whether the new stage block is dropped onto this stage node.
+        onDrop={() => setIsDragOver(false)}
+        // The `"stage-node"` class is for PipelineEditor's `onDrop` to check whether the new stage block is
+        // dropped onto a stage node.
+        className={`stage-node ${extraStyles(
+          selected,
+          isDragOver,
+        )} px-5 py-3 min-w-[140px] max-w-[175px] relative text-center leading-6 border border-gray-400 rounded-md cursor-pointer hover:bg-blue-100 transition `}
+      >
+        {/* TODO(Anson): Validate handle connection with `isValidConnection` */}
+        <Handle className="!p-[5px] !border-2 !bg-cse-600 !-right-[7px]" type="source" position={Position.Right} />
+        <Handle className="!p-[5px] !border-2 !bg-cse-600 !-left-[7px]" type="target" position={Position.Left} />
+        <span className="font-medium pointer-events-none">{data.label}</span>
+      </div>
       {selected && (
         <div className="absolute left-[50%] -bottom-11 translate-x-[-50%] flex gap-5">
           <Tooltip label="Duplicate stage" position="bottom" openDelay={500}>
