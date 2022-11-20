@@ -7,7 +7,7 @@
 import guiBuilderSteps from "@components/GuiBuilder/Steps/GuiBuilderSteps";
 import { defaultConfig, defaultPolicy, defaultSchedule } from "@constants/Config/defaults";
 import supportedStages, { SupportedStage } from "@constants/Config/supportedStages";
-import type { Config, GradingPolicy, Schedule, StageNode } from "@types";
+import type { Config, GradingPolicy, Schedule, Stage, StageConfig, StageNode } from "@types";
 import { deleteStageFromDeps, isConfigEqual, isScheduleEqual, parseConfigYaml } from "@utils/Config";
 import { coordQuad, dagConnect, sugiyama } from "d3-dag";
 import { Action, action, computed, Computed, createStore, StoreProvider, thunkOn, ThunkOn } from "easy-peasy";
@@ -88,6 +88,9 @@ export interface BaseActions {
   updateField: Action<GuiBuilderStoreModel, { path: string; value: any }>;
   updatePolicy: Action<GuiBuilderStoreModel, GradingPolicy>;
   updateSchedule: Action<GuiBuilderStoreModel, Schedule>;
+
+  /** Updates the {@link Stage.config config} field of the selected stage. */
+  updateSelectedStageConfig: Action<GuiBuilderStoreModel, any>;
 
   /** Whether the config has been edited. */
   isEdited: Computed<GuiBuilderStoreModel, boolean>;
@@ -206,6 +209,15 @@ export const baseActions: BaseActions = {
     state.editingSchedule = schedule;
   }),
 
+  updateSelectedStageConfig: action((state, config) => {
+    const selectedStageId = state.selectedStage?.id;
+    if (selectedStageId === undefined) {
+      console.warn("No stage is selected while trying to update the selected stage's config.");
+      return;
+    }
+    state.editingConfig.stageData[selectedStageId].config = config;
+  }),
+
   isEdited: computed((state) => {
     const isConfigEdited = !isConfigEqual(state.initConfig, state.editingConfig);
     const isPolicyEdited = !isEqual(state.initPolicy, state.editingPolicy);
@@ -238,6 +250,11 @@ export const pipelineEditorActions: PipelineEditorActions = {
     }
 
     const id = selectedNode.id;
+    if (state.editingConfig.stageData[id] === undefined) {
+      console.warn(`Unable to find stage with ID ${id} in the stageData.`);
+      return null;
+    }
+
     return {
       id,
       name: state.editingConfig.stageData[id].name,

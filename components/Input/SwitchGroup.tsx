@@ -1,10 +1,10 @@
 import { Switch } from "@headlessui/react";
 
 interface SwitchGroupProps {
-  label: string;
+  label: string | React.ReactNode;
   checked: boolean;
   onChange: (value: boolean) => void;
-  description?: string;
+  description?: string | React.ReactNode;
 }
 
 /**
@@ -29,7 +29,11 @@ function SwitchGroup({ label, checked, onChange, description }: SwitchGroupProps
         </Switch>
         <div className="flex flex-col">
           <Switch.Label>{label}</Switch.Label>
-          {description && <p className="mt-1 text-xs text-gray-500 leading-3">{description}</p>}
+          {description && typeof description === "string" ? (
+            <p className="mt-1 text-xs text-gray-500 leading-3">{description}</p>
+          ) : (
+            description
+          )}
         </div>
       </Switch.Group>
     </div>

@@ -15,7 +15,7 @@ function PipelineStages() {
             <PipelineEditor />
           </ReactFlowProvider>
         </div>
-        <div className="h-[55%] bg-white rounded-md shadow">
+        <div className="h-[55%]">
           <StageSettings />
         </div>
       </div>

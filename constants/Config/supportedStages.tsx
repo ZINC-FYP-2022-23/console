@@ -48,7 +48,7 @@ const supportedStages: SupportedStages = {
   DiffWithSkeleton: {
     label: "Diff With Skeleton",
     kind: StageKind.PRE_GLOBAL,
-    description: "Compares submission against skeleton file",
+    description: "Diff submission against skeleton files",
     defaultConfig: {
       exclude_from_provided: true,
     },

@@ -20,8 +20,8 @@ function StageSettings() {
   const StageSettings = supportedStage?.stageSettings ?? UnsupportedStage;
 
   return (
-    <div className="w-full">
-      <div className="p-3 flex justify-between border-b border-gray-300">
+    <div className="h-full bg-white rounded-md shadow overflow-y-hidden">
+      <div className="px-3 py-2 flex justify-between bg-blue-50 border-b border-gray-300">
         <div className="flex self-center">
           <h2 className="text-xl font-semibold">{supportedStage?.label ?? stageName}</h2>
           {supportedStage && (
@@ -33,14 +33,16 @@ function StageSettings() {
           )}
         </div>
       </div>
-      <StageSettings />
+      <div className="overflow-y-auto">
+        <StageSettings />
+      </div>
     </div>
   );
 }
 
 function NoStageSelected() {
   return (
-    <div className="h-full px-5 flex flex-col gap-6 items-center justify-center">
+    <div className="h-full px-5 flex flex-col gap-6 items-center justify-center bg-white rounded-md shadow">
       <div className="flex items-center gap-3 text-lg text-blue-500">
         <FontAwesomeIcon icon={["far", "circle-question"]} />
         <p className="font-medium">To configure a stage, click the stage block in the pipeline editor.</p>
