@@ -56,7 +56,7 @@ function AddStagePanel() {
 
   return (
     <>
-      <div className="px-3 py-2 flex items-center justify-between border-b border-gray-300">
+      <div className="pl-2 pr-3 py-2 flex items-center justify-between border-b border-gray-300">
         <Tooltip label="Collapse panel">
           <button
             onClick={() => toggleAddStageCollapsed()}
@@ -114,13 +114,13 @@ export function AddStagePanelCollapsed() {
   const toggleAddStageCollapsed = useStoreActions((action) => action.toggleAddStageCollapsed);
 
   return (
-    <div className="p-2 flex flex-col">
-      <Tooltip label='Expand "Add New Stage" panel' position="left">
+    <div className="p-2 flex flex-col gap-4">
+      <Tooltip label="Add New Stage" position="left">
         <button
           onClick={() => toggleAddStageCollapsed()}
-          className="p-2 text-2xl leading-[0] text-gray-600 rounded-full transition hover:bg-gray-200"
+          className="p-2 text-2xl leading-[0] text-cse-600 rounded-full transition hover:bg-blue-100 active:bg-blue-200"
         >
-          <FontAwesomeIcon icon={["fad", "arrow-left-from-line"]} className="w-6 h-6" />
+          <FontAwesomeIcon icon={["fas", "add"]} className="w-6 h-6" />
         </button>
       </Tooltip>
     </div>
