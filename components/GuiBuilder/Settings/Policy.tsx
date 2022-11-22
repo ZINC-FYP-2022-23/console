@@ -1,5 +1,7 @@
 import { SwitchGroup, TextInput } from "@components/Input";
 import { useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
+import { memo } from "react";
+import InfoTooltip from "../Diagnostics/InfoTooltip";
 
 function Policy() {
   const policy = useStoreState((state) => state.editingPolicy);
@@ -8,9 +10,12 @@ function Policy() {
   return (
     <div className="flex flex-col gap-5 text-sm">
       <div className="flex items-center gap-2">
-        <label htmlFor="attemptLimits" className="flex-none w-1/2">
-          Attempt Limits
-        </label>
+        <div className="flex-none w-1/2 flex items-center gap-1">
+          <label htmlFor="attemptLimits" className="">
+            Attempt Limits
+          </label>
+          <AttemptLimitsTooltip />
+        </div>
         <TextInput
           id="attemptLimits"
           value={policy.attemptLimits?.toString() ?? ""}
@@ -34,7 +39,7 @@ function Policy() {
       />
       <SwitchGroup
         label="Reveal grading details"
-        description="Disclose all available grading information instantaneously"
+        description="Show all available grading information right after the submission is graded"
         checked={policy.showImmediateScores}
         onChange={(value) => {
           updatePolicy({ ...policy, showImmediateScores: value });
@@ -43,5 +48,12 @@ function Policy() {
     </div>
   );
 }
+
+const AttemptLimitsTooltip = memo(() => (
+  <InfoTooltip>
+    <p>To allow unlimited attempts, set the input box as empty.</p>
+  </InfoTooltip>
+));
+AttemptLimitsTooltip.displayName = "AttemptLimitsTooltip";
 
 export default Policy;

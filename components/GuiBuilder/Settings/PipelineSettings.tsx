@@ -1,13 +1,12 @@
 import { Checkbox, Select, SwitchGroup, TextInput } from "@components/Input";
 import ListInput from "@components/Input/ListInput";
 import { ACCEPTED_LANG } from "@constants/Config/AcceptedLang";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { HoverCard, HoverCardProps } from "@mantine/core";
 import { useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
 import { SettingsFeatures, SettingsGpuDevice, SettingsUseTemplate } from "@types";
 import { settingsLangToString } from "@utils/Config";
 import { memo } from "react";
 import { v4 as uuidv4 } from "uuid";
+import InfoTooltip from "../Diagnostics/InfoTooltip";
 
 interface UseTemplateSelectOptions {
   label: string;
@@ -28,7 +27,7 @@ interface GpuSelectOptions {
 const gpuSelectOptions: GpuSelectOptions[] = [
   { label: "None", value: "undefined" },
   { label: "Any GPU", value: "ANY" },
-  { label: "Choose vendors...", value: "choose" },
+  { label: "Choose vendors", value: "choose" },
 ];
 
 const getGpuSelectValue = (gpu: SettingsFeatures["gpu_device"]): GpuSelectOptions["value"] => {
@@ -106,11 +105,8 @@ function PipelineSettings() {
           />
           <div>
             <div className="flex items-center gap-2">
-              <div className="flex-none w-1/2 flex items-center gap-1">
-                <div>
-                  <label htmlFor="use_template">Specify template files</label>
-                  <p className="mt-1 text-xs text-gray-500 leading-3">Files that students should submit</p>
-                </div>
+              <div className="pr-2 flex-none w-1/2 flex items-center gap-1">
+                <label htmlFor="use_template">Specify files that students should submit</label>
                 <UseTemplateTooltip />
               </div>
               <Select
@@ -130,8 +126,8 @@ function PipelineSettings() {
               </Select>
             </div>
             {_settings.use_template === SettingsUseTemplate.FILENAMES && (
-              <div className="mt-4 ml-3">
-                <p className="mb-2 font-medium text-gray-500">Files to submit:</p>
+              <div className="mt-4 mx-3 p-3 bg-gray-50 rounded-lg drop-shadow">
+                <p className="mb-2 font-medium text-gray-600">Files to submit:</p>
                 <ListInput>
                   {_settings.template.map((file, index) => (
                     <ListInput.Item
@@ -164,7 +160,6 @@ function PipelineSettings() {
                 </ListInput>
               </div>
             )}
-            {/* TODO(Anson): Remind user to upload files if "File Upload" is selected */}
           </div>
         </div>
       </div>
@@ -174,7 +169,7 @@ function PipelineSettings() {
         <div className="flex flex-col gap-5">
           <SwitchGroup
             label="Early return on error (Experimental)"
-            description="Whether the pipeline will abort when any stage returns non-zero exit code."
+            description="Whether the pipeline will abort when any stage returns a non-zero exit code"
             checked={_settings.early_return_on_throw}
             onChange={(value) => {
               updateField({ path: "_settings.early_return_on_throw", value });
@@ -228,32 +223,10 @@ function PipelineSettings() {
                 extraClassNames="flex-1 w-10"
               />
             </div>
-            <div className="flex items-center gap-2">
-              <div className="flex-none w-1/2 flex items-center gap-1">
-                <label htmlFor="mem_gb">Memory</label>
-                <MemoryTooltip />
-              </div>
-              <div className="flex-1 flex items-center">
-                <TextInput
-                  id="mem_gb"
-                  value={_settings.mem_gb}
-                  type="number"
-                  step=".1"
-                  min="1"
-                  placeholder="4.0"
-                  onChange={(event) => {
-                    const value = event.target.value;
-                    updateField({ path: "_settings.mem_gb", value });
-                  }}
-                  extraClassNames="flex-1 w-10"
-                />
-                <span className="ml-3 flex-none text-gray-500">GB</span>
-              </div>
-            </div>
             <div>
               <div className="flex items-center gap-2">
                 <div className="flex-none w-1/2 flex items-center gap-1">
-                  <label htmlFor="gpus">GPU device</label>
+                  <label htmlFor="gpus">GPU</label>
                   <GpuTooltip />
                 </div>
                 <Select
@@ -285,60 +258,64 @@ function PipelineSettings() {
                 </Select>
               </div>
               {Array.isArray(_settings.enable_features.gpu_device) && (
-                <div className="max-w-sm mt-4 mx-auto px-3 flex justify-between">
-                  {gpuVendorSelectOptions.map(({ label, value }) => {
-                    return (
-                      <div key={value} className="flex items-center">
-                        <Checkbox
-                          id={value}
-                          checked={(_settings.enable_features.gpu_device as SettingsGpuDevice[]).includes(value)}
-                          onChange={(event) => {
-                            const checked = event.target.checked;
-                            const gpuDevices = [...(_settings.enable_features.gpu_device as SettingsGpuDevice[])];
-                            if (checked) {
-                              gpuDevices.push(value);
-                            } else {
-                              gpuDevices.splice(gpuDevices.indexOf(value), 1);
-                            }
-                            updateField({ path: "_settings.enable_features.gpu_device", value: gpuDevices });
-                          }}
-                        />
-                        <div className="ml-3 text-sm leading-5">
-                          <label htmlFor="nvidia" className="text-gray-700">
-                            {label}
-                          </label>
+                <div className="mt-4 mb-2 mx-3 p-3 bg-gray-50 rounded-lg drop-shadow">
+                  <p className="mb-3 font-medium text-gray-600">Choose GPU vendor(s):</p>
+                  <div className="max-w-sm mx-auto flex items-center justify-between">
+                    {gpuVendorSelectOptions.map(({ label, value }) => {
+                      return (
+                        <div key={value} className="flex items-center">
+                          <Checkbox
+                            id={value}
+                            checked={(_settings.enable_features.gpu_device as SettingsGpuDevice[]).includes(value)}
+                            onChange={(event) => {
+                              const checked = event.target.checked;
+                              const gpuDevices = [...(_settings.enable_features.gpu_device as SettingsGpuDevice[])];
+                              if (checked) {
+                                gpuDevices.push(value);
+                              } else {
+                                gpuDevices.splice(gpuDevices.indexOf(value), 1);
+                              }
+                              updateField({ path: "_settings.enable_features.gpu_device", value: gpuDevices });
+                            }}
+                          />
+                          <div className="ml-3 text-sm leading-5">
+                            <label htmlFor="nvidia" className="text-gray-700">
+                              {label}
+                            </label>
+                          </div>
                         </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
                 </div>
               )}
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="flex-none w-1/2 flex items-center gap-1">
+                <label htmlFor="mem_gb">Memory</label>
+                <MemoryTooltip />
+              </div>
+              <div className="flex-1 flex items-center">
+                <TextInput
+                  id="mem_gb"
+                  value={_settings.mem_gb}
+                  type="number"
+                  step=".1"
+                  min="1"
+                  placeholder="4.0"
+                  onChange={(event) => {
+                    const value = event.target.value;
+                    updateField({ path: "_settings.mem_gb", value });
+                  }}
+                  extraClassNames="flex-1 w-10"
+                />
+                <span className="ml-3 flex-none text-gray-500">GB</span>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-  );
-}
-
-interface InfoTooltipProps extends HoverCardProps {
-  /** Content of the tooltip card. */
-  children: React.ReactNode;
-}
-
-/** A tooltip component that shows a card on hover. */
-function InfoTooltip({ children, ...hoverCardProps }: InfoTooltipProps) {
-  return (
-    <HoverCard position="top" {...hoverCardProps}>
-      <HoverCard.Target>
-        <button className="p-2 text-lg leading-none text-blue-500">
-          <FontAwesomeIcon icon={["far", "circle-question"]} />
-        </button>
-      </HoverCard.Target>
-      <HoverCard.Dropdown className="py-2 text-justify bg-blue-50 border border-blue-300 drop-shadow-lg">
-        {children}
-      </HoverCard.Dropdown>
-    </HoverCard>
   );
 }
 
@@ -363,11 +340,11 @@ LangVersionTooltip.displayName = "LangVersionTooltip";
 const UseTemplateTooltip = memo(() => {
   const setStep = useStoreActions((actions) => actions.setStep);
   return (
-    <InfoTooltip>
+    <InfoTooltip width={520}>
       <ul className="px-3 list-disc">
         <li>
           <span className="font-semibold">None: </span>
-          No need to check what files students should submit
+          Does not check what files students should submit
         </li>
         <li>
           <span className="font-semibold">Text input: </span>
@@ -381,6 +358,14 @@ const UseTemplateTooltip = memo(() => {
           </button>{" "}
         </li>
       </ul>
+      <p className="mt-2">
+        To perform the actual checking, add the &quot;
+        <span className="font-semibold">File Structure Validation</span>&quot; stage in your{" "}
+        <button onClick={() => setStep(1)} className="underline text-blue-700">
+          grading pipeline
+        </button>
+        .
+      </p>
     </InfoTooltip>
   );
 });
@@ -397,7 +382,7 @@ const StageWaitDurationTooltip = memo(() => (
 StageWaitDurationTooltip.displayName = "StageWaitDurationTooltip";
 
 const CpusTooltip = memo(() => (
-  <InfoTooltip width={350}>
+  <InfoTooltip width={380}>
     <ul className="px-3 list-disc">
       <li>How many cores each stage can use.</li>
       <li>
@@ -421,7 +406,7 @@ const CpusTooltip = memo(() => (
 CpusTooltip.displayName = "CpusTooltip";
 
 const MemoryTooltip = memo(() => (
-  <InfoTooltip width={360}>
+  <InfoTooltip width={380}>
     <p>
       Usually it&apos; s set to <code>1.0</code>, unless the pipeline contains stages which require more RAM.
     </p>
@@ -442,7 +427,7 @@ const GpuTooltip = memo(() => (
         also considered as viable candidates.
       </li>
       <li>
-        <span className="font-semibold">Choose vendors...: </span>
+        <span className="font-semibold">Choose vendors: </span>
         Allocates a GPU from one of the specified vendor(s).
         <ul className="ml-4 list-disc">
           <li>e.g. Pick &apos;NVIDIA&apos; if your pipeline stage requires CUDA.</li>
