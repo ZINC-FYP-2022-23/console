@@ -4,9 +4,21 @@ import { LayoutProvider } from "@contexts/layout";
 import { GET_PIPELINE_CONFIG_FOR_ASSIGNMENT } from "@graphql/queries/user";
 import { Layout } from "@layout";
 import { initializeApollo } from "@lib/apollo";
+import { MantineProvider, MantineThemeOverride } from "@mantine/core";
 import { GuiBuilderStoreProvider } from "@state/GuiBuilder/Store";
 import { Assignment, AssignmentConfig } from "@types";
 import { GetServerSideProps } from "next";
+import defaultTheme from "tailwindcss/defaultTheme";
+
+/**
+ * Custom Mantine theme for the GUI Assignment Builder.
+ */
+const mantineTheme: MantineThemeOverride = {
+  colors: {
+    blue: ["#8FADE0", "#6F95D8", "#4F7ECF", "#3560C0", "#2C56A0", "#234580", "#1B3663", "#162B50", "#122340"],
+  },
+  fontFamily: `Inter var, ${defaultTheme.fontFamily.sans.join(", ")}`,
+};
 
 interface GUIAssignmentBuilderRootProps {
   /** The `assignmentConfigId`. If it's `-1`, it means we're creating a new assignment. */
@@ -34,9 +46,11 @@ function GUIAssignmentBuilderRoot({ configId, assignmentId }: GUIAssignmentBuild
   return (
     <LayoutProvider>
       <Layout title="Assignment Config">
-        <GuiBuilderStoreProvider>
-          <GUIAssignmentBuilder data={data} configId={configId} />
-        </GuiBuilderStoreProvider>
+        <MantineProvider theme={mantineTheme}>
+          <GuiBuilderStoreProvider>
+            <GUIAssignmentBuilder data={data} configId={configId} />
+          </GuiBuilderStoreProvider>
+        </MantineProvider>
       </Layout>
     </LayoutProvider>
   );

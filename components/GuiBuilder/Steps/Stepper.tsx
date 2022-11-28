@@ -1,13 +1,12 @@
 import { createStyles, Stepper as StepperMantine } from "@mantine/core";
 import { useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
 import { memo } from "react";
-import defaultTheme from "tailwindcss/defaultTheme";
 import guiBuilderSteps from "./GuiBuilderSteps";
 
-const useStyles = createStyles(() => ({
+const useStyles = createStyles((theme) => ({
   step: {
     padding: "6px 8px",
-    borderRadius: 8,
+    borderRadius: theme.radius.md,
     transition: "background-color 150ms ease",
     "&:hover": {
       backgroundColor: "#bfdbfe",
@@ -24,22 +23,9 @@ const useStyles = createStyles(() => ({
     marginLeft: 6,
     marginRight: 6,
   },
-  separatorActive: {
-    backgroundColor: "#1b3663",
-  },
   stepLabel: {
-    color: "#1f2937",
+    color: theme.colors.blue[8],
     lineHeight: 1.1,
-    fontFamily: `Inter var, ${defaultTheme.fontFamily.sans.join(", ")}`,
-  },
-  stepIcon: {
-    "&[data-completed]": {
-      backgroundColor: "#1b3663",
-      borderColor: "#1b3663",
-    },
-    "&[data-progress]": {
-      borderColor: "#1b3663",
-    },
   },
 }));
 
