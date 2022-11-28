@@ -1,8 +1,7 @@
-import Accordion from "@components/Accordion";
 import Button from "@components/Button";
 import supportedStages, { SupportedStage } from "@constants/Config/supportedStages";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Tooltip } from "@mantine/core";
+import { Accordion, createStyles, Tooltip } from "@mantine/core";
 import { useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
 import { AccordionState } from "@state/GuiBuilder/Store";
 import { StageKind } from "@types";
@@ -10,7 +9,7 @@ import { configToYaml } from "@utils/Config";
 import { memo } from "react";
 import AddableStage from "./PipelineEditor/AddableStage";
 
-type AccordionKeys = keyof AccordionState["addNewStage"];
+type AccordionKeys = AccordionState["addNewStage"][number];
 
 const categoryLabel: Record<AccordionKeys, string> = {
   preCompile: "Pre-Compile",
@@ -47,12 +46,39 @@ const getStagesByCategory = () => {
   return output;
 };
 
+/** Styles for the {@link https://mantine.dev/core/accordion Mantine Accordion} component. */
+const useStyles = createStyles((theme) => ({
+  item: {
+    backgroundColor: "#f3f4f6",
+  },
+  control: {
+    padding: "8px 12px",
+    ":hover": {
+      backgroundColor: "#f3f4f6",
+    },
+  },
+  label: {
+    fontSize: theme.fontSizes.lg,
+    fontWeight: 600,
+  },
+  content: {
+    padding: "16px 12px",
+    backgroundColor: "#ffffff",
+  },
+}));
+
 function AddStagePanel() {
+  const { classes } = useStyles();
+  const stagesByCategory = getStagesByCategory();
+
   const editingConfig = useStoreState((state) => state.editingConfig);
   const accordion = useStoreState((state) => state.layout.accordion.addNewStage);
   const setAccordion = useStoreActions((action) => action.setAccordion);
   const toggleAddStageCollapsed = useStoreActions((action) => action.toggleAddStageCollapsed);
-  const stagesByCategory = getStagesByCategory();
+
+  const expandAllAccordions = () => {
+    setAccordion({ path: "addNewStage", value: ["preCompile", "compile", "testCases", "miscStages"] });
+  };
 
   return (
     <>
@@ -74,9 +100,27 @@ function AddStagePanel() {
           </Button>
         </div>
       </div>
-      <div className="p-3 bg-blue-50 border-b border-gray-300">
+      <div className="p-3 pt-2 sticky top-0 z-10 bg-blue-50 border-b border-gray-300">
         <div className="flex justify-between items-center">
           <h2 className="font-semibold text-xl">Add New Stage</h2>
+          <div className="flex items-center gap-3">
+            <Tooltip label="Expand all">
+              <button
+                onClick={() => expandAllAccordions()}
+                className="p-2 text-xl leading-[0] text-cse-600 rounded-full transition hover:bg-blue-200 active:bg-blue-300"
+              >
+                <FontAwesomeIcon icon={["far", "up-right-and-down-left-from-center"]} />
+              </button>
+            </Tooltip>
+            <Tooltip label="Collapse all">
+              <button
+                onClick={() => setAccordion({ path: "addNewStage", value: [] })}
+                className="p-2 text-xl leading-[0] text-cse-600 rounded-full transition hover:bg-blue-200 active:bg-blue-300"
+              >
+                <FontAwesomeIcon icon={["far", "down-left-and-up-right-to-center"]} />
+              </button>
+            </Tooltip>
+          </div>
         </div>
         <div className="mt-3 flex items-center text-sm text-justify text-blue-500 leading-4">
           <FontAwesomeIcon icon={["far", "circle-question"]} className="mr-2" />
@@ -86,21 +130,21 @@ function AddStagePanel() {
       {Object.entries(stagesByCategory).map(([category, stages]) => (
         <Accordion
           key={category}
-          title={categoryLabel[category]}
-          defaultOpen={accordion[category]}
-          onClick={() => {
-            setAccordion({
-              path: `addNewStage.${category}`,
-              value: !accordion[category],
-            });
-          }}
-          extraClassNames={{ buttonRoot: "bg-gray-100", title: "text-lg" }}
+          multiple
+          value={accordion}
+          onChange={(value) => setAccordion({ path: "addNewStage", value })}
+          classNames={classes}
         >
-          <div className="my-4 flex flex-col gap-5 text-sm">
-            {Object.entries(stages).map(([name, data]) => (
-              <AddableStage key={name} stageName={name} stageData={data} />
-            ))}
-          </div>
+          <Accordion.Item value={category}>
+            <Accordion.Control>{categoryLabel[category]}</Accordion.Control>
+            <Accordion.Panel>
+              <div className="flex flex-col gap-5 text-sm">
+                {Object.entries(stages).map(([name, data]) => (
+                  <AddableStage key={name} stageName={name} stageData={data} />
+                ))}
+              </div>
+            </Accordion.Panel>
+          </Accordion.Item>
         </Accordion>
       ))}
     </>

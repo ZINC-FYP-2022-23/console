@@ -7,7 +7,7 @@
 import guiBuilderSteps from "@components/GuiBuilder/Steps/GuiBuilderSteps";
 import { defaultConfig, defaultPolicy, defaultSchedule } from "@constants/Config/defaults";
 import supportedStages, { SupportedStage } from "@constants/Config/supportedStages";
-import type { Config, GradingPolicy, Schedule, Stage, StageConfig, StageNode } from "@types";
+import type { Config, GradingPolicy, Schedule, Stage, StageNode } from "@types";
 import { deleteStageFromDeps, isConfigEqual, isScheduleEqual, parseConfigYaml } from "@utils/Config";
 import { coordQuad, dagConnect, sugiyama } from "d3-dag";
 import { Action, action, computed, Computed, createStore, StoreProvider, thunkOn, ThunkOn } from "easy-peasy";
@@ -102,9 +102,9 @@ export interface LayoutActions {
   setAccordion: Action<
     GuiBuilderStoreModel,
     {
-      /** Path to update the `accordions` state (e.g. `"settingsPanel.policy"`). */
-      path: string;
-      value: boolean;
+      /** Path to update the `accordion` state. */
+      path: keyof AccordionState;
+      value: string[];
     }
   >;
   toggleAddStageCollapsed: Action<GuiBuilderStoreModel>;
@@ -169,12 +169,8 @@ export interface PipelineEditorActions {
 }
 
 export interface AccordionState {
-  addNewStage: {
-    preCompile: boolean;
-    compile: boolean;
-    testCases: boolean;
-    miscStages: boolean;
-  };
+  /** Which accordion items are opened in Add New Stage panel. */
+  addNewStage: ("preCompile" | "compile" | "testCases" | "miscStages")[];
 }
 
 /////////////// STORE IMPLEMENTATION ///////////////
@@ -482,12 +478,7 @@ export const initialModel: GuiBuilderStoreModel = {
   layout: {
     step: 0,
     accordion: {
-      addNewStage: {
-        preCompile: false,
-        compile: false,
-        testCases: false,
-        miscStages: false,
-      },
+      addNewStage: [],
     },
     isAddStageCollapsed: false,
   },
