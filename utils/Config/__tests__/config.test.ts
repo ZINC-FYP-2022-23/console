@@ -1,4 +1,6 @@
-import { Config, Settings, StageDataMap, StageDependencyMap, StageKind } from "@types";
+import { defaultSettings } from "@constants/Config/defaults";
+import { Config, StageDataMap, StageDependencyMap, StageKind } from "@types";
+import cloneDeep from "lodash/cloneDeep";
 import { configToYaml, parseConfigYaml } from "../config";
 import * as settingsUtils from "../settings";
 import * as stageUtils from "../stage";
@@ -40,26 +42,8 @@ describe("Config utils", () => {
 
   describe("configToYaml()", () => {
     it("de-serializes config to a YAML string", () => {
-      const _settings: Settings = {
-        lang: {
-          language: "cpp",
-          compiler: "g++",
-          version: "8",
-        },
-        template: [{ id: "mock-uuid-1", name: "" }],
-        use_skeleton: true,
-        use_provided: true,
-        stage_wait_duration_secs: "10",
-        cpus: "2",
-        mem_gb: "4",
-        early_return_on_throw: false,
-        enable_features: {
-          network: true,
-        },
-      };
       const stageDeps: StageDependencyMap = {
         "mock-uuid-1": [],
-        "mock-uuid-2": ["mock-uuid-1"],
       };
       const stageData: StageDataMap = {
         "mock-uuid-1": {
@@ -68,15 +52,9 @@ describe("Config utils", () => {
           kind: StageKind.PRE_LOCAL,
           config: { input: ["*.cpp"], output: "a.out" },
         },
-        "mock-uuid-2": {
-          key: "score",
-          name: "Score",
-          kind: StageKind.POST,
-          config: { normalizedTo: 100.0 },
-        },
       };
       const config: Config = {
-        _settings,
+        _settings: defaultSettings,
         stageDeps,
         stageData,
       };
@@ -85,8 +63,28 @@ describe("Config utils", () => {
       const stagesToYamlMock = jest.spyOn(stageUtils, "stagesToYamlObj");
       configToYaml(config);
 
-      expect(settingsToRawMock).toBeCalledWith(_settings);
+      expect(settingsToRawMock).toBeCalledWith(defaultSettings);
       expect(stagesToYamlMock).toBeCalledWith(stageDeps, stageData);
+    });
+
+    it("converts undefined fields to null", () => {
+      const _settings = cloneDeep(defaultSettings);
+      _settings.use_template = undefined;
+      const stageDeps: StageDependencyMap = {
+        "mock-uuid-1": [],
+      };
+      const stageData: StageDataMap = {
+        "mock-uuid-1": {
+          key: "fileStructureValidation",
+          name: "FileStructureValidation",
+          kind: StageKind.PRE_GLOBAL,
+          config: { ignore_in_submission: undefined },
+        },
+      };
+
+      const output = configToYaml({ _settings, stageDeps, stageData });
+      expect(output).toMatch(/use_template: null/);
+      expect(output).toMatch(/ignore_in_submission: null/);
     });
   });
 });

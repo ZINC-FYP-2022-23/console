@@ -20,7 +20,7 @@ function StageSettings() {
   const StageSettings = supportedStage?.stageSettings ?? UnsupportedStage;
 
   return (
-    <div className="h-full bg-white rounded-md shadow overflow-y-hidden">
+    <div className="h-full flex flex-col bg-white rounded-md shadow overflow-y-hidden">
       <div className="px-3 py-2 flex justify-between bg-blue-50 border-b border-gray-300">
         <div className="flex self-center">
           <h2 className="text-xl font-semibold">{supportedStage?.label ?? stageName}</h2>

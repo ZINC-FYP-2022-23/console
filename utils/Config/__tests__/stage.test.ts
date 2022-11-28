@@ -1,4 +1,4 @@
-import { StageDataMap, StageDependencyMap, StageKind } from "@types";
+import { FileStructureValidation, StageDataMap, StageDependencyMap, StageKind } from "@types";
 import * as uuid from "uuid";
 import {
   deleteStageFromDeps,
@@ -6,6 +6,7 @@ import {
   isStageDependencyEqual,
   parseStages,
   stagesToYamlObj,
+  tidyStageDataConfigs,
   transposeStageDeps,
 } from "../stage";
 
@@ -288,6 +289,35 @@ describe("Stage utils", () => {
 
       expect(isStageDependencyEqual(deps1, deps2)).toBe(true);
       expect(isStageDependencyEqual(deps1, deps3)).toBe(false);
+    });
+  });
+
+  describe("tidyStageDataConfigs()", () => {
+    describe("FileStructureValidation", () => {
+      const createStageData = (config: FileStructureValidation): StageDataMap => ({
+        "mock-uuid-0": {
+          key: "fileStructureValidation",
+          name: "FileStructureValidation",
+          kind: StageKind.PRE_GLOBAL,
+          config,
+        },
+      });
+
+      it("trims and removes empty strings in ignore_in_submission", () => {
+        const stageData = createStageData({
+          ignore_in_submission: ["  a.txt", "", "b.txt  "],
+        });
+        const _stageData = tidyStageDataConfigs(stageData);
+        expect(_stageData["mock-uuid-0"].config.ignore_in_submission).toEqual(["a.txt", "b.txt"]);
+      });
+
+      it("converts empty ignore_in_submission array to undefined", () => {
+        const stageData = createStageData({
+          ignore_in_submission: [],
+        });
+        const _stageData = tidyStageDataConfigs(stageData);
+        expect(_stageData["mock-uuid-0"].config.ignore_in_submission).toBeUndefined();
+      });
     });
   });
 });

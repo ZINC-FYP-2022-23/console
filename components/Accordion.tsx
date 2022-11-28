@@ -9,6 +9,8 @@ interface SettingsAccordionProps {
   defaultOpen?: boolean;
   /** Handler for clicking the accordion button. */
   onClick?: MouseEventHandler<HTMLButtonElement>;
+  /** Location of the caret icon. */
+  iconLocation?: "left" | "right";
   /** Classes to apply extra styling. */
   extraClassNames?: {
     buttonRoot?: string;
@@ -24,6 +26,7 @@ function Accordion({
   children,
   defaultOpen = false,
   onClick = () => {},
+  iconLocation = "right",
   extraClassNames,
 }: SettingsAccordionProps) {
   return (
@@ -34,12 +37,14 @@ function Accordion({
             <Disclosure.Button as="div">
               <button
                 onClick={onClick} // We don't put this prop on the Disclosure.Button because it's not working
-                className={`w-full px-3 py-2 flex justify-between items-center ${extraClassNames?.buttonRoot ?? ""}`}
+                className={`w-full px-3 py-2 flex items-center ${
+                  iconLocation === "left" ? "flex-row-reverse justify-end gap-2" : "flex justify-between"
+                } ${extraClassNames?.buttonRoot ?? ""}`}
               >
                 <span className={`font-semibold ${extraClassNames?.title ?? ""}`}>{title}</span>
                 <FontAwesomeIcon
                   icon={["fas", "caret-down"]}
-                  className={`${open ? "rotate-180 transform" : ""} mr-2 transition-transform duration-200`}
+                  className={`${open ? "rotate-180 transform" : ""} mr-2 text-black transition-transform duration-200`}
                 />
               </button>
             </Disclosure.Button>
@@ -52,7 +57,7 @@ function Accordion({
               leaveFrom="transform max-h-screen"
               leaveTo="transform max-h-0"
             >
-              <Disclosure.Panel className="px-3 pt-3 pb-5 bg-white text-sm">{children}</Disclosure.Panel>
+              <Disclosure.Panel className="px-3 bg-white">{children}</Disclosure.Panel>
             </Transition>
           </>
         )}

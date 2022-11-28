@@ -15,7 +15,7 @@ export interface SupportedStage<TConfig = any> {
   /**
    * Stage settings panel component.
    *
-   * It should be dynamically imported to reduce the bundle size.
+   * It should be dynamically imported to reduce the initial bundle size.
    */
   readonly stageSettings: ComponentType<{}>;
 }
@@ -59,7 +59,7 @@ const supportedStages: SupportedStages = {
   FileStructureValidation: {
     label: "File Structure Validation",
     kind: StageKind.PRE_GLOBAL,
-    description: "Checks if the submitted filename tree follows specification",
+    description: "Checks if the submission follows the specified file structure",
     defaultConfig: {
       ignore_in_submission: [],
     },

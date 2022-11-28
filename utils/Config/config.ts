@@ -25,7 +25,10 @@ export function parseConfigYaml(yaml: string): Config {
 export function configToYaml(config: Config): string {
   const _settings = settingsToSettingsRaw(config._settings);
   const stages = stagesToYamlObj(config.stageDeps, config.stageData);
-  return dump({ _settings, ...stages });
+
+  // Recursively convert fields with value `undefined` to `null` as js-yaml cannot parse `undefined` fields
+  const outputObjString = JSON.stringify({ _settings, ...stages }, (_, v) => (v === undefined ? null : v));
+  return dump(JSON.parse(outputObjString));
 }
 
 /**

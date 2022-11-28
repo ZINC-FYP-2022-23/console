@@ -88,14 +88,6 @@ describe("Settings utils", () => {
       expect(settingsRaw.template).toEqual(["foo.txt", "bar.txt"]);
     });
 
-    it("converts undefined fields to null", () => {
-      const settings = getMockSettings();
-      settings.use_template = undefined;
-
-      const settingsRaw = settingsToSettingsRaw(settings);
-      expect(settingsRaw.use_template).toBeNull();
-    });
-
     it("converts numerical strings to numbers", () => {
       const settingsRaw = settingsToSettingsRaw(getMockSettings());
       expect(settingsRaw.stage_wait_duration_secs).toBe(10);

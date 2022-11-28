@@ -45,9 +45,7 @@ export function settingsToSettingsRaw(settings: Settings): SettingsRaw {
     mem_gb: parseFloat(s.mem_gb),
   };
 
-  // Recursively convert fields with value `undefined` to `null` as js-yaml cannot parse `undefined` fields
-  const _settingsStr = JSON.stringify(_settings, (_, v) => (v === undefined ? null : v));
-  return JSON.parse(_settingsStr);
+  return _settings;
 }
 
 /**

@@ -96,7 +96,7 @@ function AddStagePanel() {
           }}
           extraClassNames={{ buttonRoot: "bg-gray-100", title: "text-lg" }}
         >
-          <div className="mt-1 flex flex-col gap-5">
+          <div className="my-4 flex flex-col gap-5 text-sm">
             {Object.entries(stages).map(([name, data]) => (
               <AddableStage key={name} stageName={name} stageData={data} />
             ))}

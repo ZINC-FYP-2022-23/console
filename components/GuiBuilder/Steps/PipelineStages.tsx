@@ -15,7 +15,7 @@ function PipelineStages() {
             <PipelineEditor />
           </ReactFlowProvider>
         </div>
-        <div className="h-[55%]">
+        <div className="h-[55%] flex-none">
           <StageSettings />
         </div>
       </div>

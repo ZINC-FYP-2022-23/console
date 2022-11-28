@@ -3,7 +3,8 @@
  */
 
 import supportedStages, { SupportedStage } from "@constants/Config/supportedStages";
-import { StageDataMap, StageDependencyMap, StageKind } from "@types";
+import { FileStructureValidation, StageDataMap, StageDependencyMap, StageKind } from "@types";
+import { config } from "localforage";
 import cloneDeep from "lodash/cloneDeep";
 import isEqual from "lodash/isEqual";
 import { v4 as uuidv4 } from "uuid";
@@ -103,6 +104,8 @@ export function deleteStageFromDeps(target: string, stageDeps: StageDependencyMa
  * @param stageDeps Assume that the stage dependency graph has the shape of a **linked list**.
  */
 export function stagesToYamlObj(stageDeps: StageDependencyMap, stageData: StageDataMap): { [key: string]: any } {
+  const stageDataTidied = tidyStageDataConfigs(stageData);
+
   // Currently the grader executes each stage sequentially. Hence, `stageDeps` is a linked list.
   // By transposing the graph, we are "reversing" the linked list to get the order of execution.
   const executionOrderGraph = transposeStageDeps(stageDeps);
@@ -118,7 +121,7 @@ export function stagesToYamlObj(stageDeps: StageDependencyMap, stageData: StageD
   const output = {};
   let currentStageId = firstStageId;
   while (currentStageId) {
-    const currentStageData = stageData[currentStageId];
+    const currentStageData = stageDataTidied[currentStageId];
     output[currentStageData.key] = currentStageData.config;
 
     const numChildren = executionOrderGraph[currentStageId].length;
@@ -144,4 +147,25 @@ export function isStageDependencyEqual(deps1: StageDependencyMap, deps2: StageDe
     _deps2[id] = [...dependsOn].sort();
   }
   return isEqual(_deps1, _deps2);
+}
+
+/**
+ * Tidies up the config in each stage's data (e.g. remove empty fields). This facilitates de-serialization
+ * to YAML or comparison of two stage data in the future.
+ * @param stageData The stage data to be tidied up. This object will NOT be mutated.
+ * @returns A cloned copy of the `stageData` argument that's tidied up.
+ */
+export function tidyStageDataConfigs(stageData: StageDataMap): StageDataMap {
+  const s = cloneDeep(stageData);
+  Object.values(s).forEach((stage) => {
+    switch (stage.name) {
+      case "FileStructureValidation":
+        const config = stage.config as FileStructureValidation;
+        config.ignore_in_submission = config.ignore_in_submission?.length
+          ? config.ignore_in_submission.map((path) => path.trim()).filter((path) => path !== "")
+          : undefined;
+        break;
+    }
+  });
+  return s;
 }
