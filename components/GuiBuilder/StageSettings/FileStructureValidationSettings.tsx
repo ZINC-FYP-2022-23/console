@@ -1,9 +1,30 @@
-import Accordion from "@components/Accordion";
 import ListInput from "@components/Input/ListInput";
+import { createStyles, Accordion } from "@mantine/core";
 import { useSelectedStageConfig, useStoreActions } from "@state/GuiBuilder/Hooks";
 import { FileStructureValidation } from "@types";
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
+
+/** Styles for the {@link https://mantine.dev/core/accordion Mantine Accordion} component. */
+const useStyles = createStyles(() => ({
+  control: {
+    padding: "8px 12px 8px 8px",
+    ":hover": {
+      backgroundColor: "transparent",
+    },
+  },
+  label: {
+    color: "#3b82f6",
+    fontWeight: 600,
+  },
+  chevron: {
+    marginRight: "8px",
+  },
+  content: {
+    padding: "0px 12px 12px 40px",
+    backgroundColor: "#ffffff",
+  },
+}));
 
 function FileStructureValidation() {
   const [config, setConfig] = useSelectedStageConfig<FileStructureValidation>();
@@ -152,10 +173,18 @@ interface InfoAccordionProps {
   children: React.ReactNode;
 }
 
-const InfoAccordion = ({ title, children }: InfoAccordionProps) => (
-  <Accordion title={title} iconLocation="left" extraClassNames={{ buttonRoot: "text-blue-500" }}>
-    <div className="ml-7 mb-3 text-sm text-gray-600">{children}</div>
-  </Accordion>
-);
+const InfoAccordion = ({ title, children }: InfoAccordionProps) => {
+  const { classes } = useStyles();
+  return (
+    <Accordion chevronPosition="left" classNames={classes}>
+      <Accordion.Item value={title}>
+        <Accordion.Control>{title}</Accordion.Control>
+        <Accordion.Panel>
+          <div className="text-sm text-gray-600">{children}</div>
+        </Accordion.Panel>
+      </Accordion.Item>
+    </Accordion>
+  );
+};
 
 export default FileStructureValidation;
