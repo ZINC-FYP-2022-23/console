@@ -58,7 +58,7 @@ function StageNode({ id, data, selected }: NodeProps<StageNodeData>) {
           <Tooltip label="Duplicate stage" position="bottom" openDelay={500}>
             <button
               onClick={() => duplicateStage()}
-              className="w-8 h-8 flex justify-center items-center text-white bg-green-600 rounded-full hover:bg-green-800 transition"
+              className="w-8 h-8 flex justify-center items-center text-white bg-green-600 drop-shadow rounded-full hover:bg-green-800 transition"
             >
               <FontAwesomeIcon icon={["far", "copy"]} />
             </button>
@@ -66,7 +66,7 @@ function StageNode({ id, data, selected }: NodeProps<StageNodeData>) {
           <Tooltip label="Delete stage" position="bottom" openDelay={500}>
             <button
               onClick={() => deleteStageNode(id)}
-              className="w-8 h-8 flex justify-center items-center text-white bg-red-500 rounded-full hover:bg-red-700 transition"
+              className="w-8 h-8 flex justify-center items-center text-white bg-red-500 drop-shadow rounded-full hover:bg-red-700 transition"
             >
               <FontAwesomeIcon icon={["far", "trash-can"]} />
             </button>

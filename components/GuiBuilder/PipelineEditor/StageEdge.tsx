@@ -1,9 +1,8 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useStoreActions } from "@state/GuiBuilder/Hooks";
 import { useState } from "react";
-import { EdgeProps, getBezierPath } from "reactflow";
-
-const deleteBtnSize = 20;
+import { EdgeLabelRenderer, EdgeProps, getBezierPath } from "reactflow";
+import "reactflow/dist/style.css";
 
 /**
  * A custom React Flow edge that connects two stages in the grading pipeline.
@@ -23,7 +22,7 @@ function StageEdge({ id, sourceX, sourceY, targetX, targetY, sourcePosition, tar
 
   return (
     <>
-      {/* The transparent `path` below creates a "padding" around the stage edge to make it easier to click. */}
+      {/* This transparent `path` creates a "padding" around the stage edge for hovering. */}
       <path
         className="stroke-[50px] stroke-transparent fill-transparent"
         d={edgePath}
@@ -31,28 +30,24 @@ function StageEdge({ id, sourceX, sourceY, targetX, targetY, sourcePosition, tar
         onMouseLeave={() => setShowDeleteBtn(false)}
       />
       <path id={id} className="react-flow__edge-path !stroke-[3px]" d={edgePath} markerEnd={markerEnd} />
-      <foreignObject
-        width={deleteBtnSize}
-        height={deleteBtnSize}
-        x={labelX - deleteBtnSize / 2}
-        y={labelY - deleteBtnSize / 2}
-        onMouseEnter={() => setShowDeleteBtn(true)}
-        onMouseLeave={() => setShowDeleteBtn(false)}
-        requiredExtensions="http://www.w3.org/1999/xhtml"
-      >
+      <EdgeLabelRenderer>
         <button
-          style={{ width: deleteBtnSize, height: deleteBtnSize }}
-          className={`w-6 h-6 flex items-center justify-center bg-red-500 text-white text-sm cursor-pointer rounded-full hover:bg-red-700 transition ${
-            showDeleteBtn ? "opacity-1" : "opacity-0"
-          }`}
           onClick={(event) => {
             event.stopPropagation();
             deleteStageEdge(id);
           }}
+          onMouseEnter={() => setShowDeleteBtn(true)}
+          onMouseLeave={() => setShowDeleteBtn(false)}
+          style={{
+            transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
+          }}
+          className={`pointer-events-auto w-5 h-5 absolute flex items-center justify-center bg-red-500 text-white text-sm cursor-pointer rounded-full hover:bg-red-700 transition-[background-color,opacity] ${
+            showDeleteBtn ? "opacity-1" : "opacity-0"
+          }`}
         >
           <FontAwesomeIcon className="w-3 !h-3" icon={["fas", "xmark"]} />
         </button>
-      </foreignObject>
+      </EdgeLabelRenderer>
     </>
   );
 }
