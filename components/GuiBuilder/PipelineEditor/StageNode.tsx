@@ -28,9 +28,9 @@ const extraStyles = (isSelected: boolean, isDragOver: boolean) => {
 /**
  * A custom React Flow node that represents a stage in the grading pipeline.
  */
-function StageNode({ id, data, selected }: NodeProps<StageNodeData>) {
+function StageNode({ data, selected }: NodeProps<StageNodeData>) {
   const [isDragOver, setIsDragOver] = useState(false);
-  const deleteStageNode = useStoreActions((actions) => actions.deleteStageNode);
+  const setModal = useStoreActions((actions) => actions.setModal);
   const duplicateStage = useStoreActions((action) => action.duplicateStage);
 
   return (
@@ -65,7 +65,7 @@ function StageNode({ id, data, selected }: NodeProps<StageNodeData>) {
           </Tooltip>
           <Tooltip label="Delete stage" position="bottom" openDelay={500}>
             <button
-              onClick={() => deleteStageNode(id)}
+              onClick={() => setModal({ path: "deleteStage", value: true })}
               className="w-8 h-8 flex justify-center items-center text-white bg-red-500 drop-shadow rounded-full hover:bg-red-700 transition"
             >
               <FontAwesomeIcon icon={["far", "trash-can"]} />

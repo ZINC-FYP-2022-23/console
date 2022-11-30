@@ -1,6 +1,7 @@
 import { useStoreState } from "@state/GuiBuilder/Hooks";
 import { ReactFlowProvider } from "reactflow";
 import AddStagePanel, { AddStagePanelCollapsed } from "../AddStagePanel";
+import DeleteStageModal from "../PipelineEditor/DeleteStageModal";
 import PipelineEditor from "../PipelineEditor/PipelineEditor";
 import StageSettings from "../StageSettings/StageSettings";
 
@@ -22,6 +23,7 @@ function PipelineStages() {
       <div className={`${isAddStageCollapsed ? "" : "w-2/6"} bg-white rounded-md shadow overflow-y-auto`}>
         {isAddStageCollapsed ? <AddStagePanelCollapsed /> : <AddStagePanel />}
       </div>
+      <DeleteStageModal />
     </div>
   );
 }

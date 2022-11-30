@@ -62,6 +62,8 @@ export interface StoreStates {
     step: number;
     /** Which accordion components are opened. */
     accordion: AccordionState;
+    /** Which modals are opened. */
+    modal: ModalState;
     /** Whether the "Add New Stage" panel is collapsed. */
     isAddStageCollapsed: boolean;
   };
@@ -105,6 +107,14 @@ export interface LayoutActions {
       /** Path to update the `accordion` state. */
       path: keyof AccordionState;
       value: string[];
+    }
+  >;
+  setModal: Action<
+    GuiBuilderStoreModel,
+    {
+      /** Path to update the `accordion` state. */
+      path: keyof ModalState;
+      value: boolean;
     }
   >;
   toggleAddStageCollapsed: Action<GuiBuilderStoreModel>;
@@ -154,8 +164,7 @@ export interface PipelineEditorActions {
     }
   >;
   /**
-   * Deletes a stage node given its ID. It's called when the user presses "Backspace" after selecting the
-   * stage node or presses the red delete icon button.
+   * Deletes a stage node given its ID
    */
   deleteStageNode: Action<GuiBuilderStoreModel, string>;
   /**
@@ -171,6 +180,11 @@ export interface PipelineEditorActions {
 export interface AccordionState {
   /** Which accordion items are opened in Add New Stage panel. */
   addNewStage: ("preCompile" | "compile" | "testCases" | "miscStages")[];
+}
+
+export interface ModalState {
+  /** Delete stage confirmation modal in "Pipeline Stages" step. */
+  deleteStage: boolean;
 }
 
 /////////////// STORE IMPLEMENTATION ///////////////
@@ -232,6 +246,9 @@ export const layoutActions: LayoutActions = {
   }),
   setAccordion: action((state, payload) => {
     set(state.layout.accordion, payload.path, payload.value);
+  }),
+  setModal: action((state, payload) => {
+    state.layout.modal[payload.path] = payload.value;
   }),
   toggleAddStageCollapsed: action((state) => {
     state.layout.isAddStageCollapsed = !state.layout.isAddStageCollapsed;
@@ -479,6 +496,9 @@ export const initialModel: GuiBuilderStoreModel = {
     step: 0,
     accordion: {
       addNewStage: [],
+    },
+    modal: {
+      deleteStage: false,
     },
     isAddStageCollapsed: false,
   },
