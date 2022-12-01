@@ -47,8 +47,8 @@ describe("Config utils", () => {
       };
       const stageData: StageDataMap = {
         "mock-uuid-1": {
-          key: "compile",
           name: "Compile",
+          label: "",
           kind: StageKind.PRE_LOCAL,
           config: { input: ["*.cpp"], output: "a.out" },
         },
@@ -75,8 +75,8 @@ describe("Config utils", () => {
       };
       const stageData: StageDataMap = {
         "mock-uuid-1": {
-          key: "fileStructureValidation",
           name: "FileStructureValidation",
+          label: "",
           kind: StageKind.PRE_GLOBAL,
           config: { ignore_in_submission: undefined },
         },

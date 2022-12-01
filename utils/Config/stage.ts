@@ -4,18 +4,22 @@
 
 import supportedStages, { SupportedStage } from "@constants/Config/supportedStages";
 import { FileStructureValidation, StageDataMap, StageDependencyMap, StageKind } from "@types";
-import { config } from "localforage";
+import camelCase from "lodash/camelCase";
 import cloneDeep from "lodash/cloneDeep";
 import isEqual from "lodash/isEqual";
 import { v4 as uuidv4 } from "uuid";
 
 /**
- * Gets the type of the stage, such as `"StdioTest"`, `"Compile"`, etc.
- * @param id The stage id (e.g. `"compile:main"`)
+ * @param id The stage id (e.g. `"stdioTest:hidden"`)
+ * @example
+ * const output = getStageNameAndLabel("stdioTest:hidden");
+ * console.log(output); // ["StdioTest", "hidden"]
  */
-export function getStageType(id: string) {
-  const name = id.split(":")[0];
-  return name.charAt(0).toUpperCase() + name.slice(1);
+export function getStageNameAndLabel(id: string) {
+  const splitOutput = id.split(":");
+  const name = splitOutput[0].charAt(0).toUpperCase() + splitOutput[0].slice(1);
+  const label = splitOutput.length > 1 ? splitOutput[1] : "";
+  return [name, label] as const;
 }
 
 /**
@@ -28,7 +32,7 @@ export function parseStages(stages: { [key: string]: any }): [StageDependencyMap
   let prevStage: string | null = null;
 
   Object.entries(stages).forEach(([key, config]) => {
-    const stageName = getStageType(key);
+    const [stageName, stageLabel] = getStageNameAndLabel(key);
     const stage: SupportedStage | undefined = supportedStages[stageName];
     if (stage === undefined) {
       console.warn(`Stage ${stageName} is not supported by GUI Assignment Builder (parsing '${key}').`);
@@ -38,8 +42,8 @@ export function parseStages(stages: { [key: string]: any }): [StageDependencyMap
     // Order stages in the form of a linked list, so that a stage only depends on 1 other stage.
     stageDeps[stageId] = prevStage === null ? [] : [prevStage];
     stageData[stageId] = {
-      key,
       name: stageName,
+      label: stageLabel,
       kind: stage?.kind ?? StageKind.GRADING,
       config,
     };
@@ -122,7 +126,12 @@ export function stagesToYamlObj(stageDeps: StageDependencyMap, stageData: StageD
   let currentStageId = firstStageId;
   while (currentStageId) {
     const currentStageData = stageDataTidied[currentStageId];
-    output[currentStageData.key] = currentStageData.config;
+
+    let key = camelCase(currentStageData.name);
+    if (currentStageData.label !== "") {
+      key += `:${currentStageData.label}`;
+    }
+    output[key] = currentStageData.config;
 
     const numChildren = executionOrderGraph[currentStageId].length;
     if (numChildren === 0) {

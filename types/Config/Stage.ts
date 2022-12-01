@@ -1,9 +1,15 @@
 /** A pipeline stage in the assignment configuration. */
 interface Stage<TConfig = any> {
-  /** The stage's key in the config YAML (e.g. `"stdioTest"`, `"compile:main"`). */
-  key: string;
   /** Stage name (e.g. `"StdioTest"`, `"Compile"`). */
   readonly name: string;
+  /**
+   * Label to help users differentiate multiple stages of the same name. It is an empty string by default.
+   *
+   * When serializing the config to YAML, this field will be treated as the
+   * {@link https://docs.zinc.ust.dev/user/model/Config.html#advanced-usage-multiple-stages-of-same-type Stage ID}
+   * if its value is a non-empty string.
+   */
+  label: string;
   /** Stage kind. */
   readonly kind: StageKind;
   /** Configuration of the stage. */
@@ -21,7 +27,9 @@ export interface StageDependencyMap {
 }
 
 /** Mapping of a stage's UUID to its data. */
-export type StageDataMap = { [id: string]: Stage };
+export type StageDataMap = {
+  [id: string]: Stage;
+};
 
 /**
  * Classification of a stage. Corresponds to the `PipelineStage.Kind` enum in the "grader" repo.

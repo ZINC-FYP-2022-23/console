@@ -2,7 +2,7 @@ import { FileStructureValidation, StageDataMap, StageDependencyMap, StageKind } 
 import * as uuid from "uuid";
 import {
   deleteStageFromDeps,
-  getStageType,
+  getStageNameAndLabel,
   isStageDependencyEqual,
   parseStages,
   stagesToYamlObj,
@@ -33,24 +33,24 @@ const stageDeps: StageDependencyMap = {
 
 const stageData: StageDataMap = {
   "mock-uuid-1": {
-    key: "diffWithSkeleton",
     name: "DiffWithSkeleton",
+    label: "",
     kind: StageKind.PRE_GLOBAL,
     config: {
       exclude_from_provided: true,
     },
   },
   "mock-uuid-2": {
-    key: "fileStructureValidation",
     name: "FileStructureValidation",
+    label: "",
     kind: StageKind.PRE_GLOBAL,
     config: {
       ignore_in_submission: ["*.out"],
     },
   },
   "mock-uuid-3": {
-    key: "compile:all",
     name: "Compile",
+    label: "all",
     kind: StageKind.PRE_LOCAL,
     config: {
       input: ["*.cpp"],
@@ -60,10 +60,10 @@ const stageData: StageDataMap = {
 };
 
 describe("Stage utils", () => {
-  describe("getStageType()", () => {
-    it("gets the stage type", () => {
-      expect(getStageType("stdioTest")).toBe("StdioTest");
-      expect(getStageType("compile:main")).toBe("Compile");
+  describe("getStageNameAndLabel()", () => {
+    it("gets the stage name and label", () => {
+      expect(getStageNameAndLabel("compile")).toEqual(["Compile", ""]);
+      expect(getStageNameAndLabel("stdioTest:hidden")).toEqual(["StdioTest", "hidden"]);
     });
   });
 
@@ -217,8 +217,8 @@ describe("Stage utils", () => {
       const stageDeps: StageDependencyMap = { "mock-uuid-1": [] };
       const stageData: StageDataMap = {
         "mock-uuid-1": {
-          key: "diffWithSkeleton",
           name: "DiffWithSkeleton",
+          label: "",
           kind: StageKind.PRE_GLOBAL,
           config: {
             exclude_from_provided: true,
@@ -296,8 +296,8 @@ describe("Stage utils", () => {
     describe("FileStructureValidation", () => {
       const createStageData = (config: FileStructureValidation): StageDataMap => ({
         "mock-uuid-0": {
-          key: "fileStructureValidation",
           name: "FileStructureValidation",
+          label: "",
           kind: StageKind.PRE_GLOBAL,
           config,
         },

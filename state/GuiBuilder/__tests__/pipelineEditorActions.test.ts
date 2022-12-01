@@ -24,16 +24,16 @@ describe("GuiBuilder Store - PipelineEditorActions", () => {
           },
           stageData: {
             "stage-0": {
-              key: "diffWithSkeleton",
               name: "DiffWithSkeleton",
+              label: "",
               kind: StageKind.PRE_GLOBAL,
               config: {
                 exclude_from_provided: true,
               },
             },
             "stage-1": {
-              key: "compile:all",
               name: "Compile",
+              label: "all",
               kind: StageKind.PRE_LOCAL,
               config: {
                 input: ["*.cpp"],
@@ -74,6 +74,7 @@ describe("GuiBuilder Store - PipelineEditorActions", () => {
   describe("addStageNode()", () => {
     const expectedPipelineEditorNodes: StageNode[] = [
       ...getThreeStageModel().pipelineEditor.nodes,
+      // getThreeStageModel() is dragging a new "Score" stage
       {
         id: "stage-3",
         position: { x: 0, y: 0 },
@@ -84,8 +85,8 @@ describe("GuiBuilder Store - PipelineEditorActions", () => {
     const expectedStageData: StageDataMap = {
       ...getThreeStageModel().editingConfig.stageData,
       "stage-3": {
-        key: "score",
         name: "Score",
+        label: "",
         kind: StageKind.POST,
         config: {},
       },

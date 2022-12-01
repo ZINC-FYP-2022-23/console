@@ -385,8 +385,8 @@ export const pipelineEditorActions: PipelineEditorActions = {
     // Update `editingConfig`
     state.editingConfig.stageDeps[stageId] = [];
     state.editingConfig.stageData[stageId] = {
-      key: dragging.stageName.charAt(0).toLowerCase() + dragging.stageName.slice(1),
       name: dragging.stageName,
+      label: "",
       kind: dragging.stageData.kind,
       config: cloneDeep(dragging.stageData.defaultConfig),
     };
