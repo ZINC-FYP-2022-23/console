@@ -30,7 +30,10 @@ function DiffWithSkeleton() {
         <FontAwesomeIcon icon={["far", "circle-info"]} />
         <p>
           Skeleton files are specified in the{" "}
-          <button onClick={() => setStep(2)} className="border-b border-blue-600 text-blue-600 font-medium leading-5">
+          <button
+            onClick={() => setStep("upload")}
+            className="border-b border-blue-600 text-blue-600 font-medium leading-5"
+          >
             Upload Files
           </button>{" "}
           step.

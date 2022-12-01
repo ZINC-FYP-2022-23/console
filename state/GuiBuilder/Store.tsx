@@ -4,7 +4,7 @@
  * {@link https://easy-peasy.vercel.app/ easy-peasy} is chosen as the state management library.
  */
 
-import guiBuilderSteps from "@components/GuiBuilder/Steps/GuiBuilderSteps";
+import guiBuilderSteps, { GuiBuilderStep } from "@components/GuiBuilder/Steps/GuiBuilderSteps";
 import { defaultConfig, defaultPolicy, defaultSchedule } from "@constants/Config/defaults";
 import supportedStages, { SupportedStage } from "@constants/Config/supportedStages";
 import type { Config, GradingPolicy, Schedule, Stage, StageNode } from "@types";
@@ -100,7 +100,7 @@ export interface BaseActions {
 
 /** Actions for {@link StoreStates.layout}. */
 export interface LayoutActions {
-  setStep: Action<GuiBuilderStoreModel, number>;
+  setStep: Action<GuiBuilderStoreModel, GuiBuilderStep["slug"]>;
   setAccordion: Action<
     GuiBuilderStoreModel,
     {
@@ -237,12 +237,8 @@ export const baseActions: BaseActions = {
 };
 
 export const layoutActions: LayoutActions = {
-  setStep: action((state, step) => {
-    if (step < 0 || step >= guiBuilderSteps.length) {
-      console.warn(`Step number is out of range: ${step}`);
-      return;
-    }
-    state.layout.step = step;
+  setStep: action((state, stepSlug) => {
+    state.layout.step = guiBuilderSteps.findIndex((step) => step.slug === stepSlug);
   }),
   setAccordion: action((state, payload) => {
     set(state.layout.accordion, payload.path, payload.value);

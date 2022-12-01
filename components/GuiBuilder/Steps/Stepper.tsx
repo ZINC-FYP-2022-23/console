@@ -45,7 +45,7 @@ function Stepper({ className = "" }: StepperProps) {
   return (
     <StepperMantine
       active={step}
-      onStepClick={setStep}
+      onStepClick={(stepIndex) => setStep(guiBuilderSteps[stepIndex].slug)}
       iconSize={36}
       orientation="horizontal"
       classNames={classes}

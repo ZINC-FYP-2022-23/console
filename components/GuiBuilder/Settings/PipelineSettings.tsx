@@ -353,7 +353,7 @@ const UseTemplateTooltip = memo(() => {
         <li>
           <span className="font-semibold">File upload: </span>
           Specify files to submit by{" "}
-          <button onClick={() => setStep(2)} className="underline text-blue-700">
+          <button onClick={() => setStep("upload")} className="underline text-blue-700">
             uploading files
           </button>{" "}
         </li>
@@ -361,7 +361,7 @@ const UseTemplateTooltip = memo(() => {
       <p className="mt-2">
         To perform the actual checking, add the &quot;
         <span className="font-semibold">File Structure Validation</span>&quot; stage in your{" "}
-        <button onClick={() => setStep(1)} className="underline text-blue-700">
+        <button onClick={() => setStep("pipeline")} className="underline text-blue-700">
           grading pipeline
         </button>
         .

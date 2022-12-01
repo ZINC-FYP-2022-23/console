@@ -157,7 +157,7 @@ function FileStructureValidation() {
         <div className="space-y-2">
           <p>To specify the file structure that this stage will validate students&apos; submissions against, go to:</p>
           <p>
-            <button onClick={() => setStep(0)} className="underline text-blue-500">
+            <button onClick={() => setStep("settings")} className="underline text-blue-500">
               General Settings
             </button>{" "}
             &gt; Pipeline Settings &gt; Helper Files &gt; “Specify files that students should submit”

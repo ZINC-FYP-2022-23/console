@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import dynamic from "next/dynamic";
 
 export type GuiBuilderStep = {
+  slug: "settings" | "pipeline" | "upload" | "test" | "assign";
   label: string;
   icon: React.ReactNode;
   /**
@@ -24,6 +25,7 @@ const StepLoading = () => (
  */
 const guiBuilderSteps: GuiBuilderStep[] = [
   {
+    slug: "settings",
     label: "General Settings",
     icon: <FontAwesomeIcon icon={["fad", "gears"]} />,
     component: dynamic(() => import("./GeneralSettings"), {
@@ -31,6 +33,7 @@ const guiBuilderSteps: GuiBuilderStep[] = [
     }),
   },
   {
+    slug: "pipeline",
     label: "Pipeline Stages",
     icon: <FontAwesomeIcon icon={["fad", "pipe-section"]} />,
     component: dynamic(() => import("./PipelineStages"), {
@@ -38,6 +41,7 @@ const guiBuilderSteps: GuiBuilderStep[] = [
     }),
   },
   {
+    slug: "upload",
     label: "Upload Files",
     icon: <FontAwesomeIcon icon={["fad", "upload"]} />,
     component: dynamic(() => import("./UploadFiles"), {
@@ -45,6 +49,7 @@ const guiBuilderSteps: GuiBuilderStep[] = [
     }),
   },
   {
+    slug: "test",
     label: "Test Submission",
     icon: <FontAwesomeIcon icon={["fad", "flask"]} />,
     component: dynamic(() => import("./TestSubmission"), {
@@ -52,6 +57,7 @@ const guiBuilderSteps: GuiBuilderStep[] = [
     }),
   },
   {
+    slug: "assign",
     label: "Assign Students",
     icon: <FontAwesomeIcon icon={["fad", "sitemap"]} />,
     component: dynamic(() => import("./AssignStudents"), {
