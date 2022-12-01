@@ -19,7 +19,7 @@ function Button({ children, onClick, className = "", icon, disabled = false, ...
       type="button"
       onClick={disabled ? () => {} : onClick}
       className={
-        "px-4 py-1 flex items-center justify-center border border-transparent font-medium text-md rounded-md focus:outline-none transition ease-in-out duration-150 " +
+        "px-4 py-1 flex items-center justify-center border border-transparent font-medium text-md rounded-md transition ease-in-out duration-150 " +
         className
       }
       disabled={disabled}

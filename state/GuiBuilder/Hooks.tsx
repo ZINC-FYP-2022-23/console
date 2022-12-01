@@ -3,7 +3,7 @@
  */
 import { ActionCreator, createTypedHooks } from "easy-peasy";
 import { useEffect } from "react";
-import { useReactFlow } from "reactflow";
+import { useKeyPress, useReactFlow } from "reactflow";
 import { GuiBuilderStoreModel } from "./Store";
 
 /**
@@ -46,4 +46,28 @@ export function useReactFlowFitView() {
       setShouldFitView(false);
     }
   }, [fitView, shouldFitView, setShouldFitView]);
+}
+
+/**
+ * Handles custom keyboard shortcuts in the Pipeline Editor.
+ *  - `Backspace`: Delete selected node or edge.
+ */
+export function usePipelineEditorHotKeys() {
+  const deleteHotKeyPressed = useKeyPress("Backspace");
+
+  const nodes = useStoreState((state) => state.pipelineEditor.nodes);
+  const edges = useStoreState((state) => state.pipelineEditor.edges);
+  const setModal = useStoreActions((actions) => actions.setModal);
+  const deleteStageEdge = useStoreActions((actions) => actions.deleteStageEdge);
+
+  // Backspace: Delete selected node or edge
+  useEffect(() => {
+    if (deleteHotKeyPressed) {
+      const selectedNode = nodes.find((node) => node.selected);
+      const selectedEdge = edges.find((edge) => edge.selected);
+
+      if (selectedNode) setModal({ path: "deleteStage", value: true });
+      if (selectedEdge) deleteStageEdge(selectedEdge.id);
+    }
+  }, [deleteHotKeyPressed, nodes, edges, deleteStageEdge, setModal]);
 }

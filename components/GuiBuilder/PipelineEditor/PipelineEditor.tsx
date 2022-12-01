@@ -1,4 +1,4 @@
-import { useReactFlowFitView, useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
+import { usePipelineEditorHotKeys, useReactFlowFitView, useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
 import StoreActions from "@state/GuiBuilder/Store";
 import { DragEvent, DragEventHandler, memo, useCallback, useRef } from "react";
 import ReactFlow, {
@@ -70,6 +70,7 @@ function PipelineEditor() {
   const onStageConnect = useStoreActions((actions) => actions.onStageConnect);
 
   useReactFlowFitView();
+  usePipelineEditorHotKeys();
 
   /**
    * Fit view when the React Flow editor is initialized.
@@ -149,16 +150,15 @@ function PipelineEditor() {
         onInit={onInit}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
-        onEdgesDelete={onEdgesDelete}
         onConnect={onStageConnect}
         onDragOver={onDragOver}
         onDrop={onDrop}
         snapGrid={[GRID_SIZE, GRID_SIZE]}
         snapToGrid
-        deleteKeyCode={null} // TODO(Anson): Handle custom "Backspace" delete logic
+        deleteKeyCode={null} // Custom deletion logic is handled in `usePipelineEditorHotKeys()` instead
         selectionKeyCode={null} // Disable multi-selection since multi-delete is not yet supported by the store
         multiSelectionKeyCode={null}
-        nodesFocusable={false}
+        nodesFocusable={false} // Hotfix for https://github.com/wbkd/react-flow/issues/2524
         proOptions={proOptions}
       >
         <Controls showInteractive={false} />
