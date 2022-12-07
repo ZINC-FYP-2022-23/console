@@ -9,30 +9,17 @@ import {
   SortingState,
   useReactTable,
 } from "@tanstack/react-table";
-import { AppealStatus } from "@types";
+import { AppealStatus, Appeal } from "@types";
 import Link from "next/link";
 import { useState } from "react";
 import AppealStatusBadge from "./AppealStatusBadge";
-
-// Temporary type to represent an appeal
-// We'll later define an "appeal" type in `types/tables.ts`
-type Appeal = {
-  id: number;
-  updatedAt: string;
-  status: AppealStatus;
-  name: string;
-  sid: string;
-  email: string;
-  originalScore: number;
-  finalScore?: number;
-};
 
 // TODO(Bryan): Replace dummy data with real API call
 const dummyAppealData: Appeal[] = [
   {
     id: 1,
     updatedAt: "2022-10-30 4:00PM",
-    status: AppealStatus.Outstanding,
+    status: AppealStatus.Pending,
     name: "LOREM, Ipsum",
     sid: "20609999",
     email: "lorem@connect.ust.hk",
@@ -41,7 +28,7 @@ const dummyAppealData: Appeal[] = [
   {
     id: 2,
     updatedAt: "2022-10-30 5:00PM",
-    status: AppealStatus.Completed,
+    status: AppealStatus.Accept,
     name: "CHAN, Tai Man Tom",
     sid: "20509999",
     email: "ctm@connect.ust.hk",
@@ -51,7 +38,7 @@ const dummyAppealData: Appeal[] = [
   {
     id: 3,
     updatedAt: "2022-10-30 3:00PM",
-    status: AppealStatus.Rejected,
+    status: AppealStatus.Reject,
     name: "CHEUNG, Siu Ming",
     sid: "20409999",
     email: "cmm@connect.ust.hk",
