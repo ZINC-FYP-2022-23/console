@@ -1,20 +1,15 @@
-import AppealStatusBadge from "@components/Appeal/AppealStatusBadge";
-import { LayoutProvider, useLayoutState } from "@contexts/layout";
-import { Layout } from "@layout";
-import { AppealStatus, Appeal } from "@types";
-import { GetServerSideProps } from "next";
-import Link from "next/link";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Tab } from "@headlessui/react";
-import React, { useState } from "react";
-import { ReactGhLikeDiff } from "react-gh-like-diff";
-import { emit } from "process";
 import { AppealResult } from "@components/Appeal/AppealResult";
 import RichTextEditor from "@components/RichTextEditor";
-import Button from "@components/Button";
+import { LayoutProvider, useLayoutState } from "@contexts/layout";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Tab } from "@headlessui/react";
+import { Layout } from "@layout";
 import { Alert } from "@mantine/core";
-
-// TODO(Bryan): Create a Appeal Detail Page
+import { Appeal, AppealStatus } from "@types";
+import { GetServerSideProps } from "next";
+import Link from "next/link";
+import { useState } from "react";
+import { ReactGhLikeDiff } from "react-gh-like-diff";
 
 type IconProps = {
   name: String;
@@ -73,7 +68,14 @@ function MessagingTab({ messageList }: MessagingTabProps) {
 
   return (
     <div className="flex flex-col space-y-2">
-      <div className="content-end mb-2">
+      <div className="space-y-4">
+        {messageList.map((message: Message) => (
+          <div key={message.id}>
+            <SingleMessage message={message} />
+          </div>
+        ))}
+      </div>
+      <div className="mb-2 sticky bottom-0 object-bottom">
         {/* @ts-ignore */}
         <RichTextEditor
           id="rte"
@@ -84,13 +86,6 @@ function MessagingTab({ messageList }: MessagingTabProps) {
             ["h1", "h2", "h3", "unorderedList", "orderedList"],
           ]}
         />
-      </div>
-      <div className="space-y-4">
-        {messageList.map((message: Message) => (
-          <div key={message.id}>
-            <SingleMessage message={message} />
-          </div>
-        ))}
       </div>
     </div>
   );
@@ -119,10 +114,13 @@ function CodeComparisonTab({}: CodeComparisonTabProps) {
 type AppealDetailsProps = {
   courseId: number;
   appealInfo: Appeal | null;
+  fullScore: number;
   messageList: Message[];
 };
 
-function AppealDetails({ courseId, appealInfo, messageList }: AppealDetailsProps) {
+function AppealDetails({ courseId, appealInfo, fullScore, messageList }: AppealDetailsProps) {
+  const [appealStatus, setAppealStatus] = useState(appealInfo?.status);
+
   return (
     <LayoutProvider>
       <Layout title="Appeal Detail">
@@ -141,31 +139,63 @@ function AppealDetails({ courseId, appealInfo, messageList }: AppealDetailsProps
                 <div className="max-w-md mr-4 px-5 py-4 grid grid-cols-3 gap-4 bg-white text-gray-700 shadow rounded-md">
                   <p className="font-medium">Name:</p>
                   <p className="col-span-2">{appealInfo.name}</p>
-                  <p className="font-medium">SID:</p>
-                  <p className="col-span-2">{appealInfo.sid}</p>
-                  <p className="font-medium">Email:</p>
-                  <a href={`mailto:`} className="col-span-2 text-cse-400 underline hover:text-cse-700 transition">
-                    {appealInfo.email}
-                  </a>
+                  <p className="font-medium">ITSC:</p>
+                  <p className="col-span-2">{appealInfo.itsc}</p>
                   <p className="font-medium">Original Score:</p>
-                  <p className="col-span-2">{appealInfo.originalScore}</p>
+                  <p className="col-span-2">
+                    {appealInfo.originalScore} / {fullScore}
+                  </p>
                 </div>
                 {/* Appeal Status */}
                 <div className="w-auto px-5 py-4 bg-white text-gray-700 shadow rounded-md">
                   <p className="font-medium flex justify-self-center text-lg bold">Appeal Status:</p>
                   <br />
                   <div className="col-span-2">
-                    <AppealResult appealResult={appealInfo.status} />
+                    <AppealResult appealResult={appealStatus || AppealStatus.Pending} />
                   </div>
                   <br />
+                  {/* TODO(Bryan): Add GraphQL Query when Appeal Status is changed to update database */}
                   <div className="flex-row w-full grid grid-cols-3 gap-x-5 place-items-center">
-                    <a className="w-20 px-3 py-1.5 border text-center border-gray-300 text-sm leading-4 font-medium rounded-lg text-blue-700 bg-white hover:text-blue-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:text-blue-800 active:bg-gray-50 transition ease-in-out duration-150">
+                    <a
+                      className={`${
+                        appealStatus === AppealStatus.Accept
+                          ? "bg-green-600 text-white"
+                          : "bg-white text-blue-700 hover:text-blue-500 focus:border-blue-300 focus:shadow-outline-blue active:text-blue-800 active:bg-gray-50 transition ease-in-out duration-150"
+                      } w-20 px-3 py-1.5 border text-center border-gray-300 text-sm leading-4 font-medium rounded-lg focus:outline-none`}
+                      onClick={() => {
+                        if (appealStatus !== AppealStatus.Accept) {
+                          setAppealStatus(AppealStatus.Accept);
+                        }
+                      }}
+                    >
                       <FontAwesomeIcon icon={["far", "check"]} />
                     </a>
-                    <a className="w-20 px-3 py-1.5 border text-center border-gray-300 text-sm leading-4 font-medium rounded-lg text-blue-700 bg-white hover:text-blue-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:text-blue-800 active:bg-gray-50 transition ease-in-out duration-150">
+                    <a
+                      className={`${
+                        appealStatus === AppealStatus.Pending
+                          ? "bg-yellow-600 text-white"
+                          : "bg-white text-blue-700 hover:text-blue-500 focus:border-blue-300 focus:shadow-outline-blue active:text-blue-800 active:bg-gray-50 transition ease-in-out duration-150"
+                      } w-20 px-3 py-1.5 border text-center border-gray-300 text-sm leading-4 font-medium rounded-lg focus:outline-none`}
+                      onClick={() => {
+                        if (appealStatus !== AppealStatus.Pending) {
+                          setAppealStatus(AppealStatus.Pending);
+                        }
+                      }}
+                    >
                       <FontAwesomeIcon icon={["far", "question"]} />
                     </a>
-                    <a className="w-20 px-3 py-1.5 border text-center border-gray-300 text-sm leading-4 font-medium rounded-lg text-blue-700 bg-white hover:text-blue-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:text-blue-800 active:bg-gray-50 transition ease-in-out duration-150">
+                    <a
+                      className={`${
+                        appealStatus === AppealStatus.Reject
+                          ? "bg-red-600 text-white"
+                          : "bg-white text-blue-700 hover:text-blue-500 focus:border-blue-300 focus:shadow-outline-blue active:text-blue-800 active:bg-gray-50 transition ease-in-out duration-150"
+                      } w-20 px-3 py-1.5 border text-center border-gray-300 text-sm leading-4 font-medium rounded-lg focus:outline-none`}
+                      onClick={() => {
+                        if (appealStatus !== AppealStatus.Reject) {
+                          setAppealStatus(AppealStatus.Reject);
+                        }
+                      }}
+                    >
                       <FontAwesomeIcon icon={["far", "xmark"]} />
                     </a>
                   </div>
@@ -235,12 +265,12 @@ export const getServerSideProps: GetServerSideProps = async () => {
   const appealInfo: Appeal | null = {
     id: 2,
     name: "Peter Chan",
-    sid: "20512345",
-    email: "peter@connect.ust.hk",
+    itsc: "ptr",
     status: AppealStatus.Pending,
     updatedAt: "Today LOL",
     originalScore: 70,
   };
+  const fullScore: number = 100;
   const messageList: Message[] = [
     {
       id: 1,
@@ -256,10 +286,38 @@ export const getServerSideProps: GetServerSideProps = async () => {
       time: "15 Nov 2022, 20:59",
       content: "Dear Bryan, Nice to Meet You!",
     },
+    {
+      id: 3,
+      name: "Lo Kwok Yan Bryan",
+      type: "Student",
+      time: "14 Nov 2022, 18:11",
+      content: "Hi TA, I want to submit a grade appeal.",
+    },
+    {
+      id: 4,
+      name: "Gilbert Chan",
+      type: "Teaching Assistant",
+      time: "15 Nov 2022, 20:59",
+      content: "Okie, chekcing!",
+    },
+    {
+      id: 5,
+      name: "Lo Kwok Yan Bryan",
+      type: "Student",
+      time: "14 Nov 2022, 18:11",
+      content: "Thank you.",
+    },
+    {
+      id: 6,
+      name: "Gilbert Chan",
+      type: "Teaching Assistant",
+      time: "15 Nov 2022, 20:59",
+      content: "Still in process!",
+    },
   ];
 
   return {
-    props: { courseId, appealInfo, messageList },
+    props: { courseId, appealInfo, fullScore, messageList },
   };
 };
 
