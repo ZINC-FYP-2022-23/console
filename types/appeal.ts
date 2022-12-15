@@ -1,5 +1,3 @@
-import { NumberInputStylesNames } from "@mantine/core";
-
 export enum AppealStatus {
   Accept = "Accepted",
   Reject = "Rejected",
@@ -9,8 +7,7 @@ export enum AppealStatus {
 export type Appeal = {
   id: number;
   name: string;
-  sid: string;
-  email: string;
+  itsc: string;
   status: AppealStatus;
   updatedAt: string;
   originalScore: number;
