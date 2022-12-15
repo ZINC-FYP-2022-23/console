@@ -12,7 +12,6 @@ export function AppealResult({ appealResult }: { appealResult: AppealStatus }) {
           </div>
         </div>
       );
-      break;
     }
     case AppealStatus.Reject: {
       return (
@@ -23,7 +22,6 @@ export function AppealResult({ appealResult }: { appealResult: AppealStatus }) {
           </div>
         </div>
       );
-      break;
     }
     case AppealStatus.Pending: {
       return (
@@ -34,7 +32,6 @@ export function AppealResult({ appealResult }: { appealResult: AppealStatus }) {
           </div>
         </div>
       );
-      break;
     }
     default: {
       return (
@@ -42,7 +39,6 @@ export function AppealResult({ appealResult }: { appealResult: AppealStatus }) {
           <p className="text-lg">Error: AppealStatus Undefined</p>
         </div>
       );
-      break;
     }
   }
 }

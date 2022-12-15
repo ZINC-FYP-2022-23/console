@@ -21,8 +21,7 @@ const dummyAppealData: Appeal[] = [
     updatedAt: "2022-10-30 4:00PM",
     status: AppealStatus.Pending,
     name: "LOREM, Ipsum",
-    sid: "20609999",
-    email: "lorem@connect.ust.hk",
+    itsc: "lorem",
     originalScore: 70,
   },
   {
@@ -30,8 +29,7 @@ const dummyAppealData: Appeal[] = [
     updatedAt: "2022-10-30 5:00PM",
     status: AppealStatus.Accept,
     name: "CHAN, Tai Man Tom",
-    sid: "20509999",
-    email: "ctm@connect.ust.hk",
+    itsc: "ctm",
     originalScore: 80,
     finalScore: 100,
   },
@@ -40,8 +38,7 @@ const dummyAppealData: Appeal[] = [
     updatedAt: "2022-10-30 3:00PM",
     status: AppealStatus.Reject,
     name: "CHEUNG, Siu Ming",
-    sid: "20409999",
-    email: "cmm@connect.ust.hk",
+    itsc: "cmm",
     originalScore: 80,
     finalScore: 80,
   },
@@ -65,17 +62,9 @@ const columns: ColumnDef<Appeal, any>[] = [
     header: "Name",
     cell: (props) => props.getValue(),
   }),
-  columnHelper.accessor("sid", {
-    header: "SID",
+  columnHelper.accessor("itsc", {
+    header: "ITSC",
     cell: (props) => props.getValue(),
-  }),
-  columnHelper.accessor("email", {
-    header: "Email",
-    cell: (props) => (
-      <a href={`mailto:${props.getValue()}`} className="text-cse-300 underline hover:text-cse-600 transition">
-        {props.getValue()}
-      </a>
-    ),
   }),
   columnHelper.accessor("originalScore", {
     header: "Original Score",
