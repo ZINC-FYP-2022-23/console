@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Tooltip } from "@mantine/core";
-import { useStoreActions } from "@state/GuiBuilder/Hooks";
+import { useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
 import { StageNodeData } from "@types";
 import { DragEventHandler, useState } from "react";
 import { Handle, NodeProps, Position } from "reactflow";
@@ -28,10 +28,14 @@ const extraStyles = (isSelected: boolean, isDragOver: boolean) => {
 /**
  * A custom React Flow node that represents a stage in the grading pipeline.
  */
-function StageNode({ data, selected }: NodeProps<StageNodeData>) {
+function StageNode({ id, data, selected }: NodeProps<StageNodeData>) {
   const [isDragOver, setIsDragOver] = useState(false);
+  const stageData = useStoreState((state) => state.editingConfig.stageData);
+  const dragging = useStoreState((state) => state.pipelineEditor.dragging);
   const setModal = useStoreActions((actions) => actions.setModal);
   const duplicateStage = useStoreActions((action) => action.duplicateStage);
+
+  const stageLabel = stageData[id]?.label ?? "";
 
   return (
     <div className="relative">
@@ -46,12 +50,22 @@ function StageNode({ data, selected }: NodeProps<StageNodeData>) {
         className={`stage-node ${extraStyles(
           selected,
           isDragOver,
-        )} px-5 py-3 min-w-[140px] max-w-[175px] relative text-center leading-6 border border-gray-400 rounded-md cursor-pointer hover:bg-blue-100 transition `}
+        )} px-5 py-3 min-w-[140px] max-w-[175px] relative leading-6 border border-gray-400 rounded-md cursor-pointer hover:bg-blue-100 transition `}
       >
         {/* TODO(Anson): Validate handle connection with `isValidConnection` */}
         <Handle className="!p-[5px] !border-2 !bg-cse-600 !-right-[7px]" type="source" position={Position.Right} />
         <Handle className="!p-[5px] !border-2 !bg-cse-600 !-left-[7px]" type="target" position={Position.Left} />
-        <span className="font-medium pointer-events-none">{data.label}</span>
+        {/* When dragging a new stage on top of existing stage, adding "pointer-events-none" avoids firing `dragleave` event
+         * in the parent when mouse is over the below div. */}
+        <div className={`${dragging ? "pointer-events-none" : ""} flex flex-col items-center gap-2`}>
+          <p className="font-medium text-center leading-5">{data.label}</p>
+          {stageLabel !== "" && (
+            <div className="flex items-center gap-1 text-sm leading-none max-w-[140px]">
+              <FontAwesomeIcon icon={["fas", "tag"]} className="text-xs text-gray-500" />
+              <span className="text-gray-600 overflow-hidden text-ellipsis whitespace-nowrap">{stageLabel}</span>
+            </div>
+          )}
+        </div>
       </div>
       {selected && (
         <div className="absolute left-[50%] -bottom-11 translate-x-[-50%] flex gap-5">

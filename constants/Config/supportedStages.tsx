@@ -79,7 +79,7 @@ const supportedStages: SupportedStages = {
   StdioTest: {
     label: "Standard I/O Test",
     kind: StageKind.GRADING,
-    description: "Grades submissions against standard input/output using test cases",
+    description: "Grades against standard input/output using test cases",
     defaultConfig: {
       testCases: [],
     },

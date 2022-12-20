@@ -11,6 +11,7 @@ import type { Config, GradingPolicy, Schedule, Stage, StageNode } from "@types";
 import { deleteStageFromDeps, isConfigEqual, isScheduleEqual, parseConfigYaml } from "@utils/Config";
 import { coordQuad, dagConnect, sugiyama } from "d3-dag";
 import { Action, action, computed, Computed, createStore, StoreProvider, thunkOn, ThunkOn } from "easy-peasy";
+import camelCase from "lodash/camelCase";
 import cloneDeep from "lodash/cloneDeep";
 import isEqual from "lodash/isEqual";
 import set from "lodash/set";
@@ -91,11 +92,25 @@ export interface BaseActions {
   updatePolicy: Action<GuiBuilderStoreModel, GradingPolicy>;
   updateSchedule: Action<GuiBuilderStoreModel, Schedule>;
 
-  /** Updates the {@link Stage.config config} field of the selected stage. */
-  updateSelectedStageConfig: Action<GuiBuilderStoreModel, any>;
+  /** Updates a non-readonly field of the selected stage. */
+  updateSelectedStage: Action<
+    GuiBuilderStoreModel,
+    {
+      /**
+       * Path to update the selected stage data. It is equal to `keyof Stage` but `readonly` keys
+       * are filtered out.
+       */
+      path: "label" | "config";
+      value: any;
+    }
+  >;
 
   /** Whether the config has been edited. */
   isEdited: Computed<GuiBuilderStoreModel, boolean>;
+  /**
+   * Whether there exist 2 different stages with the same name (e.g. Compile) and same non-empty {@link Stage.label label}.
+   */
+  hasDuplicateNonEmptyLabels: Computed<GuiBuilderStoreModel, boolean>;
 }
 
 /** Actions for {@link StoreStates.layout}. */
@@ -123,7 +138,14 @@ export interface LayoutActions {
 /** Actions for {@link StoreStates.pipelineEditor}. */
 export interface PipelineEditorActions {
   /** Which stage is selected in the pipeline editor. */
-  selectedStage: Computed<GuiBuilderStoreModel, { id: string; name: string } | null>;
+  selectedStage: Computed<
+    GuiBuilderStoreModel,
+    {
+      id: string;
+      name: string;
+      label: string;
+    } | null
+  >;
 
   /**
    * Automatically triggers {@link PipelineEditorActions.layoutPipeline} after certain actions
@@ -185,6 +207,8 @@ export interface AccordionState {
 export interface ModalState {
   /** Delete stage confirmation modal in "Pipeline Stages" step. */
   deleteStage: boolean;
+  /** Help information for stage label input box in "Pipeline Stages" step. */
+  stageLabelInfo: boolean;
 }
 
 /////////////// STORE IMPLEMENTATION ///////////////
@@ -219,13 +243,14 @@ export const baseActions: BaseActions = {
     state.editingSchedule = schedule;
   }),
 
-  updateSelectedStageConfig: action((state, config) => {
+  updateSelectedStage: action((state, payload) => {
+    const { path, value } = payload;
     const selectedStageId = state.selectedStage?.id;
     if (selectedStageId === undefined) {
       console.warn("No stage is selected while trying to update the selected stage's config.");
       return;
     }
-    state.editingConfig.stageData[selectedStageId].config = config;
+    state.editingConfig.stageData[selectedStageId][path] = value;
   }),
 
   isEdited: computed((state) => {
@@ -233,6 +258,22 @@ export const baseActions: BaseActions = {
     const isPolicyEdited = !isEqual(state.initPolicy, state.editingPolicy);
     const isScheduleEdited = !isScheduleEqual(state.initSchedule, state.editingSchedule);
     return isConfigEdited || isPolicyEdited || isScheduleEdited;
+  }),
+  hasDuplicateNonEmptyLabels: computed((state) => {
+    const stageNamesToLabels: Record<string, string[]> = {};
+    for (const stage of Object.values(state.editingConfig.stageData)) {
+      if (stage.label === "") continue;
+      if (!(stage.name in stageNamesToLabels)) {
+        stageNamesToLabels[stage.name] = [stage.label];
+        continue;
+      }
+
+      if (stageNamesToLabels[stage.name].includes(stage.label)) {
+        return true;
+      }
+      stageNamesToLabels[stage.name].push(stage.label);
+    }
+    return false;
   }),
 };
 
@@ -259,14 +300,16 @@ export const pipelineEditorActions: PipelineEditorActions = {
     }
 
     const id = selectedNode.id;
-    if (state.editingConfig.stageData[id] === undefined) {
+    const selectedStageData: Stage<any> | undefined = state.editingConfig.stageData[id];
+    if (selectedStageData === undefined) {
       console.warn(`Unable to find stage with ID ${id} in the stageData.`);
       return null;
     }
 
     return {
       id,
-      name: state.editingConfig.stageData[id].name,
+      name: selectedStageData.name,
+      label: selectedStageData.label,
     };
   }),
 
@@ -458,6 +501,7 @@ export const pipelineEditorActions: PipelineEditorActions = {
 
       const stageData = state.editingConfig.stageData[state.selectedStage.id];
       const stageDataCopy = cloneDeep(stageData);
+      stageDataCopy.label = camelCase(stageDataCopy.label + "Copy");
       state.editingConfig.stageData[stageId] = stageDataCopy;
       state.editingConfig.stageDeps[stageId] = [];
 
@@ -495,6 +539,7 @@ export const initialModel: GuiBuilderStoreModel = {
     },
     modal: {
       deleteStage: false,
+      stageLabelInfo: false,
     },
     isAddStageCollapsed: false,
   },

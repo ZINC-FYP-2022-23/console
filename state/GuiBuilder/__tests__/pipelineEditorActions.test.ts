@@ -196,7 +196,7 @@ describe("GuiBuilder Store - PipelineEditorActions", () => {
       const model: GuiBuilderStoreModel = {
         ...getThreeStageModel(),
         // Mock that we're duplicating 3rd stage
-        selectedStage: computed(() => ({ id: "stage-2", name: "Compile" })),
+        selectedStage: computed(() => ({ id: "stage-2", name: "Compile", label: "all" })),
       };
       const store = createStore(model);
       store.getActions().duplicateStage();
@@ -213,7 +213,7 @@ describe("GuiBuilder Store - PipelineEditorActions", () => {
       });
       expect(store.getState().editingConfig.stageData).toEqual({
         ...model.editingConfig.stageData,
-        "stage-3": model.editingConfig.stageData["stage-2"],
+        "stage-3": { ...model.editingConfig.stageData["stage-2"], label: "allCopy" },
       });
     });
   });

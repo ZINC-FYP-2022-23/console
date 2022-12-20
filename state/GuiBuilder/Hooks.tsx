@@ -21,15 +21,16 @@ export const useStoreState = typedHooks.useStoreState;
 export function useSelectedStageConfig<TConfig = any>() {
   const selectedStage = useStoreState((state) => state.selectedStage);
   const stageData = useStoreState((state) => state.editingConfig.stageData);
-  const updateSelectedStageConfig: ActionCreator<TConfig> = useStoreActions(
-    (actions) => actions.updateSelectedStageConfig,
-  );
+  const updateSelectedStage = useStoreActions((actions) => actions.updateSelectedStage);
 
   if (selectedStage === null) {
     throw new Error("No stage is selected while trying to use useSelectedStageConfig()");
   }
   const config = stageData[selectedStage.id].config as TConfig;
-  return [config, updateSelectedStageConfig] as const;
+  const updateFunction = (config: TConfig) => {
+    updateSelectedStage({ path: "config", value: config });
+  };
+  return [config, updateFunction] as const;
 }
 
 /**

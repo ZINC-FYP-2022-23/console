@@ -1,7 +1,8 @@
-import { Config, GradingPolicy, Schedule } from "@types";
+import { Config, GradingPolicy, Schedule, StageKind } from "@types";
 import * as configUtils from "@utils/Config/config";
 import { computed, createStore } from "easy-peasy";
-import { GuiBuilderStoreModel } from "../Store";
+import cloneDeep from "lodash/cloneDeep";
+import { GuiBuilderStoreModel, initialModel } from "../Store";
 import { getThreeStageModel } from "./utils/storeTestUtils";
 
 describe("GuiBuilder Store - BaseActions", () => {
@@ -58,32 +59,104 @@ describe("GuiBuilder Store - BaseActions", () => {
     });
   });
 
-  describe("updateSelectedStageConfig()", () => {
-    it("updates the selected stage's config", () => {
+  describe("updateSelectedStage()", () => {
+    it("updates the config of the selected stage", () => {
       const model: GuiBuilderStoreModel = {
         ...getThreeStageModel(),
         // Mock that we've selected 3rd stage
-        selectedStage: computed(() => ({ id: "stage-2", name: "Compile" })),
+        selectedStage: computed(() => ({ id: "stage-2", name: "Compile", label: "" })),
       };
       const store = createStore(model);
       const newConfig = { input: ["hi.cpp"], output: "hi.out" };
-      store.getActions().updateSelectedStageConfig(newConfig);
+      store.getActions().updateSelectedStage({ path: "config", value: newConfig });
 
       expect(store.getState().editingConfig.stageData["stage-2"].config).toEqual(newConfig);
+    });
+
+    it("updates the label of the selected stage", () => {
+      const model: GuiBuilderStoreModel = {
+        ...getThreeStageModel(),
+        // Mock that we've selected 3rd stage
+        selectedStage: computed(() => ({ id: "stage-2", name: "Compile", label: "" })),
+      };
+      const store = createStore(model);
+      const newLabel = "all";
+      store.getActions().updateSelectedStage({ path: "label", value: newLabel });
+
+      expect(store.getState().editingConfig.stageData["stage-2"].label).toEqual(newLabel);
     });
 
     it("does nothing if there are no selected stages", () => {
       const model: GuiBuilderStoreModel = {
         ...getThreeStageModel(),
-        // Mock that there are no selected stages
-        selectedStage: computed(() => null),
+        selectedStage: computed(() => null), // Mock that there are no selected stages
       };
       const store = createStore(model);
       const newConfig = { hello: "world" };
       jest.spyOn(console, "warn").mockImplementationOnce(() => {});
-      store.getActions().updateSelectedStageConfig(newConfig);
+      store.getActions().updateSelectedStage({ path: "config", value: newConfig });
 
       expect(store.getState().editingConfig.stageData).toStrictEqual(model.editingConfig.stageData);
+    });
+  });
+
+  describe("hasDuplicateNonEmptyLabels", () => {
+    it("returns false if there are no duplicate non-empty labels", () => {
+      const model = cloneDeep(initialModel);
+      model.editingConfig.stageData = {
+        "stage-0": {
+          name: "DiffWithSkeleton",
+          label: "",
+          kind: StageKind.PRE_GLOBAL,
+          config: {},
+        },
+        "stage-1": {
+          name: "FileStructureValidation",
+          label: "",
+          kind: StageKind.PRE_GLOBAL,
+          config: {},
+        },
+        "stage-2": {
+          name: "Compile",
+          label: "test",
+          kind: StageKind.PRE_LOCAL,
+          config: {},
+        },
+        "stage-3": {
+          name: "Score",
+          label: "test", // OK to have same label as stage-2 because their stage names are different
+          kind: StageKind.GRADING,
+          config: {},
+        },
+      };
+      const store = createStore(model);
+      expect(store.getState().hasDuplicateNonEmptyLabels).toBe(false);
+    });
+
+    it("returns true if two stages of the same name have the same non-empty label", () => {
+      const model = cloneDeep(initialModel);
+      model.editingConfig.stageData = {
+        "stage-0": {
+          name: "DiffWithSkeleton",
+          label: "test",
+          kind: StageKind.PRE_GLOBAL,
+          config: {},
+        },
+        "stage-1": {
+          name: "Compile",
+          label: "",
+          kind: StageKind.PRE_LOCAL,
+          config: {},
+        },
+        "stage-2": {
+          name: "DiffWithSkeleton",
+          label: "test", // duplicate label with stage-0, which has same stage name
+          kind: StageKind.PRE_GLOBAL,
+          config: {},
+        },
+      };
+      const store = createStore(model);
+      expect(store.getState().hasDuplicateNonEmptyLabels).toBe(true);
     });
   });
 });
