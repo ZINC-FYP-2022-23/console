@@ -77,14 +77,12 @@ function FileStructureValidation() {
       <div className="mt-8 border-b border-gray-300" />
       <InfoAccordion title="How to specify what files/directories to ignore checking?">
         <div className="space-y-2">
-          <p>There are 2 methods:</p>
           <p className="font-semibold">1. File/Directory Names</p>
           <div className="ml-1 space-y-1">
             <ul className="ml-6 list-disc">
               <li>
                 All files/directories matching the name,{" "}
-                <span className="font-semibold">regardless of its location</span>, will be ignored from checking. It
-                does not care where the ignored files/directories are located in.
+                <span className="font-semibold">regardless of its location</span>, will be ignored from checking.
               </li>
               <li>
                 Glob expressions (<code>*</code>) are accepted.

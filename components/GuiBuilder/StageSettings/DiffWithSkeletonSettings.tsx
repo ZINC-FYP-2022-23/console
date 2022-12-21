@@ -15,7 +15,8 @@ const excludeFromProvidedDesc = (
       <code>provided</code> files are helper files used for grading
     </li>
     <li>
-      If turned off, submitted files containing <code>provided</code> files will still be checked
+      Usually we turn this on. If turned off, submitted files containing <code>provided</code> files will still be
+      checked
     </li>
   </ul>
 );
