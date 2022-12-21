@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Tooltip } from "@mantine/core";
 import { useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
 import Image from "next/image";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import UnsupportedStage from "./UnsupportedStage";
 
 type StageLabelAlert = Record<
@@ -42,11 +42,15 @@ const getLabelAlertStyles = (alert: keyof StageLabelAlert | null, styles: { warn
  * Settings panel for an individual stage in the pipeline.
  */
 function StageSettings() {
+  const labelInputRef = useRef<HTMLInputElement>(null!);
+  const [labelAlert, setLabelAlert] = useState<keyof StageLabelAlert | null>(null);
+
   const selectedStage = useStoreState((state) => state.selectedStage);
   const hasDuplicateNonEmptyLabels = useStoreState((state) => state.hasDuplicateNonEmptyLabels);
+  const shouldFocusLabelInput = useStoreState((state) => state.pipelineEditor.shouldFocusLabelInput);
   const updateSelectedStage = useStoreActions((actions) => actions.updateSelectedStage);
   const setModal = useStoreActions((actions) => actions.setModal);
-  const [labelAlert, setLabelAlert] = useState<keyof StageLabelAlert | null>(null);
+  const setShouldFocusLabelInput = useStoreActions((actions) => actions.setShouldFocusLabelInput);
 
   const validateStageLabel = useCallback(
     (label: string) => {
@@ -69,6 +73,14 @@ function StageSettings() {
     }
   }, [selectedStage, validateStageLabel]);
 
+  // Focus stage label input box
+  useEffect(() => {
+    if (shouldFocusLabelInput) {
+      labelInputRef.current.focus();
+      setShouldFocusLabelInput(false);
+    }
+  }, [shouldFocusLabelInput, setShouldFocusLabelInput]);
+
   if (selectedStage === null) {
     return <NoStageSelected />;
   }
@@ -89,6 +101,7 @@ function StageSettings() {
             <p className="text-gray-500 text-sm font-medium">Label:</p>
             <input
               type="text"
+              ref={labelInputRef}
               value={selectedStage.label}
               onChange={(event) => {
                 const value = event.target.value;

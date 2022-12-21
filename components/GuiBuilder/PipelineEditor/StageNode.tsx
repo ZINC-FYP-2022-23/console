@@ -33,6 +33,7 @@ function StageNode({ id, data, selected }: NodeProps<StageNodeData>) {
   const stageData = useStoreState((state) => state.editingConfig.stageData);
   const dragging = useStoreState((state) => state.pipelineEditor.dragging);
   const setModal = useStoreActions((actions) => actions.setModal);
+  const setShouldFocusLabelInput = useStoreActions((actions) => actions.setShouldFocusLabelInput);
   const duplicateStage = useStoreActions((action) => action.duplicateStage);
 
   const stageLabel = stageData[id]?.label ?? "";
@@ -57,10 +58,13 @@ function StageNode({ id, data, selected }: NodeProps<StageNodeData>) {
         <Handle className="!p-[5px] !border-2 !bg-cse-600 !-left-[7px]" type="target" position={Position.Left} />
         {/* When dragging a new stage on top of existing stage, adding "pointer-events-none" avoids firing `dragleave` event
          * in the parent when mouse is over the below div. */}
-        <div className={`${dragging ? "pointer-events-none" : ""} flex flex-col items-center gap-2`}>
+        <div className={`${dragging ? "pointer-events-none" : ""} flex flex-col items-center gap-1`}>
           <p className="font-medium text-center leading-5">{data.label}</p>
           {stageLabel !== "" && (
-            <div className="flex items-center gap-1 text-sm leading-none max-w-[140px]">
+            <div
+              className="max-w-[140px] flex items-center px-2 py-1 gap-1 text-sm leading-none rounded-full hover:bg-gray-300 transition"
+              onClick={() => setShouldFocusLabelInput(true)}
+            >
               <FontAwesomeIcon icon={["fas", "tag"]} className="text-xs text-gray-500" />
               <span className="text-gray-600 overflow-hidden text-ellipsis whitespace-nowrap">{stageLabel}</span>
             </div>

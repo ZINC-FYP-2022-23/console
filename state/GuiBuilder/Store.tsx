@@ -72,12 +72,14 @@ export interface StoreStates {
   pipelineEditor: {
     /** Data being dragged from Add Stage panel. */
     dragging?: { stageName: string; stageData: SupportedStage };
-    /** Whether the editor should fit view to the nodes on the pane. */
-    shouldFitView: boolean;
     /** Pipeline stage nodes. */
     nodes: StageNode[];
     /** Edges that connect pipeline stage nodes. */
     edges: Edge[];
+    /** Whether the editor should fit view to the nodes on the pane. */
+    shouldFitView: boolean;
+    /** Whether to focus the selected stage's label input box. */
+    shouldFocusLabelInput: boolean;
   };
 }
 
@@ -165,6 +167,8 @@ export interface PipelineEditorActions {
 
   setDragging: Action<GuiBuilderStoreModel, { stageName: string; stageData: SupportedStage } | undefined>;
   setShouldFitView: Action<GuiBuilderStoreModel, boolean>;
+  setShouldFocusLabelInput: Action<GuiBuilderStoreModel, boolean>;
+
   /** Called on drag, select and remove of stage nodes. */
   onStageNodesChange: Action<GuiBuilderStoreModel, NodeChange[]>;
   /** Called on select and remove of stage edges. */
@@ -393,6 +397,10 @@ export const pipelineEditorActions: PipelineEditorActions = {
   setShouldFitView: action((state, shouldFitView) => {
     state.pipelineEditor.shouldFitView = shouldFitView;
   }),
+  setShouldFocusLabelInput: action((state, shouldFocusLabelInput) => {
+    state.pipelineEditor.shouldFocusLabelInput = shouldFocusLabelInput;
+  }),
+
   onStageNodesChange: action((state, changes) => {
     state.pipelineEditor.nodes = applyNodeChanges(changes, state.pipelineEditor.nodes);
   }),
@@ -548,6 +556,7 @@ export const initialModel: GuiBuilderStoreModel = {
     nodes: [],
     edges: [],
     shouldFitView: false,
+    shouldFocusLabelInput: false,
   },
 
   ...baseActions,
