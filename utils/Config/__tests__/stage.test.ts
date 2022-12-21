@@ -1,7 +1,8 @@
-import { FileStructureValidation, StageDataMap, StageDependencyMap, StageKind } from "@types";
+import { FileStructureValidation, Stage, StageDataMap, StageDependencyMap, StageKind } from "@types";
 import * as uuid from "uuid";
 import {
   deleteStageFromDeps,
+  generateStageLabels,
   getStageNameAndLabel,
   isStageDependencyEqual,
   parseStages,
@@ -289,6 +290,43 @@ describe("Stage utils", () => {
 
       expect(isStageDependencyEqual(deps1, deps2)).toBe(true);
       expect(isStageDependencyEqual(deps1, deps3)).toBe(false);
+    });
+  });
+
+  describe("generateStageLabels()", () => {
+    const createStage = (name: string, label = ""): Stage => ({
+      name,
+      label,
+      kind: StageKind.PRE_GLOBAL,
+      config: {},
+    });
+
+    const mathRandomMock = jest.spyOn(Math, "random");
+
+    it("generates random labels if exist >=2 stages of same name with empty labels", () => {
+      mathRandomMock.mockReturnValueOnce(0.1).mockReturnValueOnce(0.2);
+      const stageData: StageDataMap = {
+        "uuid-1": createStage("Compile"),
+        "uuid-2": createStage("DiffWithSkeleton"),
+        "uuid-3": createStage("Compile", "all"),
+        "uuid-4": createStage("Compile"),
+      };
+      expect(generateStageLabels(stageData)).toEqual({
+        "uuid-1": createStage("Compile", (0.1).toString(36).slice(2, 8)),
+        "uuid-2": createStage("DiffWithSkeleton"),
+        "uuid-3": createStage("Compile", "all"),
+        "uuid-4": createStage("Compile", (0.2).toString(36).slice(2, 8)),
+      });
+    });
+
+    it("does nothing if there are no >=2 stages of same name with empty labels", () => {
+      const stageData: StageDataMap = {
+        "uuid-1": createStage("DiffWithSkeleton"),
+        "uuid-2": createStage("Compile", "student"),
+        "uuid-3": createStage("Compile", "main"),
+        "uuid-4": createStage("Score"),
+      };
+      expect(generateStageLabels(stageData)).toEqual(stageData);
     });
   });
 

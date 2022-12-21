@@ -108,7 +108,7 @@ export function deleteStageFromDeps(target: string, stageDeps: StageDependencyMa
  * @param stageDeps Assume that the stage dependency graph has the shape of a **linked list**.
  */
 export function stagesToYamlObj(stageDeps: StageDependencyMap, stageData: StageDataMap): { [key: string]: any } {
-  const stageDataTidied = tidyStageDataConfigs(stageData);
+  const stageDataTidied = tidyStageDataConfigs(generateStageLabels(stageData));
 
   // Currently the grader executes each stage sequentially. Hence, `stageDeps` is a linked list.
   // By transposing the graph, we are "reversing" the linked list to get the order of execution.
@@ -156,6 +156,31 @@ export function isStageDependencyEqual(deps1: StageDependencyMap, deps2: StageDe
     _deps2[id] = [...dependsOn].sort();
   }
   return isEqual(_deps1, _deps2);
+}
+
+/**
+ * Generates a random label if multiple stages of the same name have empty labels.
+ * @param stageData This object will NOT be mutated.
+ */
+export function generateStageLabels(stageData: StageDataMap): StageDataMap {
+  const s = cloneDeep(stageData);
+
+  // Key is stage name, value is number of empty labels
+  const emptyLabelsCount: Record<string, number> = Object.values(s).reduce((acc, stage) => {
+    if (stage.label === "") {
+      acc[stage.name] = stage.name in acc ? acc[stage.name] + 1 : 1;
+    }
+    return acc;
+  }, {});
+
+  Object.values(s).forEach((stage) => {
+    if (stage.label === "" && emptyLabelsCount[stage.name] > 1) {
+      // Random string of length 6 with characters [a-z0-9]
+      stage.label = Math.random().toString(36).slice(2, 8);
+    }
+  });
+
+  return s;
 }
 
 /**
