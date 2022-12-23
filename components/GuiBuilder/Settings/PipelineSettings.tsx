@@ -1,6 +1,7 @@
 import { Checkbox, Select, SwitchGroup, TextInput } from "@components/Input";
 import ListInput from "@components/Input/ListInput";
 import { ACCEPTED_LANG } from "@constants/Config/AcceptedLang";
+import supportedStages from "@constants/Config/supportedStages";
 import { useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
 import { SettingsFeatures, SettingsGpuDevice, SettingsUseTemplate } from "@types";
 import { settingsLangToString } from "@utils/Config";
@@ -339,6 +340,9 @@ LangVersionTooltip.displayName = "LangVersionTooltip";
 
 const UseTemplateTooltip = memo(() => {
   const setStep = useStoreActions((actions) => actions.setStep);
+  const setAccordion = useStoreActions((actions) => actions.setAccordion);
+  const setAddStageSearchString = useStoreActions((actions) => actions.setAddStageSearchString);
+
   return (
     <InfoTooltip width={520}>
       <ul className="px-3 list-disc">
@@ -361,7 +365,14 @@ const UseTemplateTooltip = memo(() => {
       <p className="mt-2">
         To perform the actual checking, add the &quot;
         <span className="font-semibold">File Structure Validation</span>&quot; stage in your{" "}
-        <button onClick={() => setStep("pipeline")} className="underline text-blue-700">
+        <button
+          onClick={() => {
+            setStep("pipeline");
+            setAccordion({ path: "addNewStage", value: ["preCompile"] });
+            setAddStageSearchString(supportedStages.FileStructureValidation.label);
+          }}
+          className="underline text-blue-700"
+        >
           grading pipeline
         </button>
         .
