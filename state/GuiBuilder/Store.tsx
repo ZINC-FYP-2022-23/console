@@ -65,6 +65,8 @@ export interface StoreStates {
     accordion: AccordionState;
     /** Which modals are opened. */
     modal: ModalState;
+    /** Value of the search bar in "Add New Stage" panel. */
+    addStageSearchString: string;
     /** Whether the "Add New Stage" panel is collapsed. */
     isAddStageCollapsed: boolean;
   };
@@ -134,6 +136,7 @@ export interface LayoutActions {
       value: boolean;
     }
   >;
+  setAddStageSearchString: Action<GuiBuilderStoreModel, string>;
   toggleAddStageCollapsed: Action<GuiBuilderStoreModel>;
 }
 
@@ -290,6 +293,9 @@ export const layoutActions: LayoutActions = {
   }),
   setModal: action((state, payload) => {
     state.layout.modal[payload.path] = payload.value;
+  }),
+  setAddStageSearchString: action((state, searchString) => {
+    state.layout.addStageSearchString = searchString;
   }),
   toggleAddStageCollapsed: action((state) => {
     state.layout.isAddStageCollapsed = !state.layout.isAddStageCollapsed;
@@ -549,6 +555,7 @@ export const initialModel: GuiBuilderStoreModel = {
       deleteStage: false,
       stageLabelInfo: false,
     },
+    addStageSearchString: "",
     isAddStageCollapsed: false,
   },
 
