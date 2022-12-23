@@ -71,7 +71,9 @@ const supportedStages: SupportedStages = {
     label: "Score",
     kind: StageKind.POST,
     description: "Accumulates all scores from previous stages",
-    defaultConfig: {},
+    defaultConfig: {
+      normalizedTo: "",
+    },
     stageSettings: dynamic(() => import("../../components/GuiBuilder/StageSettings/ScoreSettings"), {
       loading: () => <StageSettingsLoading />,
     }),

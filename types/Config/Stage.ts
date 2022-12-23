@@ -75,9 +75,9 @@ export interface FileStructureValidation {
 }
 
 export interface Score {
-  normalizedTo?: number;
-  minScore?: number;
-  maxScore?: number;
+  normalizedTo?: number | string; // It is string if it's stored in <input />
+  minScore?: number | string;
+  maxScore?: number | string;
 }
 
 export interface StdioTest {

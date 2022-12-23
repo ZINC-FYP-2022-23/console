@@ -1,4 +1,5 @@
-import { FileStructureValidation, Stage, StageDataMap, StageDependencyMap, StageKind } from "@types";
+import supportedStages from "@constants/Config/supportedStages";
+import { FileStructureValidation, Score, Stage, StageDataMap, StageDependencyMap, StageKind } from "@types";
 import * as uuid from "uuid";
 import {
   deleteStageFromDeps,
@@ -331,30 +332,60 @@ describe("Stage utils", () => {
   });
 
   describe("tidyStageDataConfigs()", () => {
-    describe("FileStructureValidation", () => {
-      const createStageData = (config: FileStructureValidation): StageDataMap => ({
-        "mock-uuid-0": {
-          name: "FileStructureValidation",
-          label: "",
-          kind: StageKind.PRE_GLOBAL,
-          config,
-        },
-      });
+    const createStage = <T = any>(name: string, config: T): StageDataMap => ({
+      "uuid-1": {
+        name,
+        label: "",
+        kind: supportedStages[name].kind,
+        config,
+      },
+    });
 
+    describe("FileStructureValidation", () => {
       it("trims and removes empty strings in ignore_in_submission", () => {
-        const stageData = createStageData({
+        const stageData = createStage<FileStructureValidation>("FileStructureValidation", {
           ignore_in_submission: ["  a.txt", "", "b.txt  "],
         });
         const _stageData = tidyStageDataConfigs(stageData);
-        expect(_stageData["mock-uuid-0"].config.ignore_in_submission).toEqual(["a.txt", "b.txt"]);
+        expect(_stageData["uuid-1"].config.ignore_in_submission).toEqual(["a.txt", "b.txt"]);
       });
 
       it("converts empty ignore_in_submission array to undefined", () => {
-        const stageData = createStageData({
+        const stageData = createStage<FileStructureValidation>("FileStructureValidation", {
           ignore_in_submission: [],
         });
         const _stageData = tidyStageDataConfigs(stageData);
-        expect(_stageData["mock-uuid-0"].config.ignore_in_submission).toBeUndefined();
+        expect(_stageData["uuid-1"].config.ignore_in_submission).toBeUndefined();
+      });
+    });
+
+    describe("Score", () => {
+      it("converts empty strings to undefined", () => {
+        const stageData = createStage<Score>("Score", {
+          normalizedTo: "",
+          minScore: "",
+          maxScore: "",
+        });
+        const {
+          "uuid-1": { config },
+        } = tidyStageDataConfigs(stageData);
+        expect(config.normalizedTo).toBeUndefined();
+        expect(config.minScore).toBeUndefined();
+        expect(config.maxScore).toBeUndefined();
+      });
+
+      it("converts non-empty strings to numbers", () => {
+        const stageData = createStage<Score>("Score", {
+          normalizedTo: "100.0",
+          minScore: "0",
+          maxScore: "100.5",
+        });
+        const {
+          "uuid-1": { config },
+        } = tidyStageDataConfigs(stageData);
+        expect(config.normalizedTo).toBe(100.0);
+        expect(config.minScore).toBe(0);
+        expect(config.maxScore).toBe(100.5);
       });
     });
   });

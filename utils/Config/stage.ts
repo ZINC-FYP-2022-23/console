@@ -3,7 +3,7 @@
  */
 
 import supportedStages, { SupportedStage } from "@constants/Config/supportedStages";
-import { FileStructureValidation, StageDataMap, StageDependencyMap, StageKind } from "@types";
+import { FileStructureValidation, Score, StageDataMap, StageDependencyMap, StageKind } from "@types";
 import camelCase from "lodash/camelCase";
 import cloneDeep from "lodash/cloneDeep";
 import isEqual from "lodash/isEqual";
@@ -193,12 +193,21 @@ export function tidyStageDataConfigs(stageData: StageDataMap): StageDataMap {
   const s = cloneDeep(stageData);
   Object.values(s).forEach((stage) => {
     switch (stage.name) {
-      case "FileStructureValidation":
+      case "FileStructureValidation": {
         const config = stage.config as FileStructureValidation;
         config.ignore_in_submission = config.ignore_in_submission?.length
           ? config.ignore_in_submission.map((path) => path.trim()).filter((path) => path !== "")
           : undefined;
         break;
+      }
+
+      case "Score": {
+        const config = stage.config as Score;
+        config.normalizedTo = config.normalizedTo === "" ? undefined : parseFloat(config.normalizedTo as string);
+        config.minScore = config.minScore === "" ? undefined : parseFloat(config.minScore as string);
+        config.maxScore = config.maxScore === "" ? undefined : parseFloat(config.maxScore as string);
+        break;
+      }
     }
   });
   return s;
