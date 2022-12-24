@@ -72,7 +72,7 @@ function StageNode({ id, data, selected }: NodeProps<StageNodeData>) {
         <div className="absolute left-[50%] -bottom-11 translate-x-[-50%] flex gap-5">
           <Tooltip label="Duplicate stage" position="bottom" openDelay={500}>
             <button
-              onClick={() => duplicateStage()}
+              onClick={() => duplicateStage(id)}
               className="w-8 h-8 flex justify-center items-center text-white bg-green-600 drop-shadow rounded-full hover:bg-green-800 transition"
             >
               <FontAwesomeIcon icon={["far", "copy"]} />

@@ -52,23 +52,48 @@ export function useReactFlowFitView() {
 /**
  * Handles custom keyboard shortcuts in the Pipeline Editor.
  *  - `Backspace`: Delete selected node or edge.
+ *  - `Ctrl/Cmd + C`: Copy selected node.
+ *  - `Ctrl/Cmd + V`: Paste copied node.
  */
 export function usePipelineEditorHotKeys() {
   const deleteHotKeyPressed = useKeyPress("Backspace");
+  const copyHotKeyPressed = useKeyPress(["Control+c", "Meta+c"]);
+  const pasteHotKeyPressed = useKeyPress(["Control+v", "Meta+v"]);
 
-  const nodes = useStoreState((state) => state.pipelineEditor.nodes);
+  const copiedStageId = useStoreState((state) => state.pipelineEditor.copiedStageId);
   const edges = useStoreState((state) => state.pipelineEditor.edges);
-  const setModal = useStoreActions((actions) => actions.setModal);
+  const selectedStage = useStoreState((state) => state.selectedStage);
   const deleteStageEdge = useStoreActions((actions) => actions.deleteStageEdge);
+  const duplicateStage = useStoreActions((actions) => actions.duplicateStage);
+  const setCopiedStageId = useStoreActions((actions) => actions.setCopiedStageId);
+  const setModal = useStoreActions((actions) => actions.setModal);
 
-  // Backspace: Delete selected node or edge
   useEffect(() => {
+    // Backspace: Delete selected node or edge
     if (deleteHotKeyPressed) {
-      const selectedNode = nodes.find((node) => node.selected);
       const selectedEdge = edges.find((edge) => edge.selected);
-
-      if (selectedNode) setModal({ path: "deleteStage", value: true });
+      if (selectedStage) setModal({ path: "deleteStage", value: true });
       if (selectedEdge) deleteStageEdge(selectedEdge.id);
     }
-  }, [deleteHotKeyPressed, nodes, edges, deleteStageEdge, setModal]);
+    // Ctrl/Cmd + C: Copy selected node
+    if (copyHotKeyPressed && selectedStage) {
+      setCopiedStageId(selectedStage.id);
+    }
+    // Ctrl/Cmd + V: Paste copied node
+    if (pasteHotKeyPressed && copiedStageId) {
+      duplicateStage(copiedStageId);
+      setCopiedStageId(undefined);
+    }
+  }, [
+    copiedStageId,
+    copyHotKeyPressed,
+    deleteHotKeyPressed,
+    deleteStageEdge,
+    duplicateStage,
+    edges,
+    pasteHotKeyPressed,
+    selectedStage,
+    setCopiedStageId,
+    setModal,
+  ]);
 }

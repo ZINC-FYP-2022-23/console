@@ -82,6 +82,8 @@ export interface StoreStates {
     shouldFitView: boolean;
     /** Whether to focus the selected stage's label input box. */
     shouldFocusLabelInput: boolean;
+    /** ID of a stage the user wishes to duplicate by pressing `Ctrl/Cmd + C`. */
+    copiedStageId?: string;
   };
 }
 
@@ -171,6 +173,7 @@ export interface PipelineEditorActions {
   setDragging: Action<GuiBuilderStoreModel, { stageName: string; stageData: SupportedStage } | undefined>;
   setShouldFitView: Action<GuiBuilderStoreModel, boolean>;
   setShouldFocusLabelInput: Action<GuiBuilderStoreModel, boolean>;
+  setCopiedStageId: Action<GuiBuilderStoreModel, string | undefined>;
 
   /** Called on drag, select and remove of stage nodes. */
   onStageNodesChange: Action<GuiBuilderStoreModel, NodeChange[]>;
@@ -202,8 +205,8 @@ export interface PipelineEditorActions {
    */
   deleteStageEdge: Action<GuiBuilderStoreModel, string>;
 
-  /** Duplicates the selected stage. */
-  duplicateStage: Action<GuiBuilderStoreModel>;
+  /** Duplicates a stage given its ID. */
+  duplicateStage: Action<GuiBuilderStoreModel, string>;
 }
 
 export interface AccordionState {
@@ -406,6 +409,9 @@ export const pipelineEditorActions: PipelineEditorActions = {
   setShouldFocusLabelInput: action((state, shouldFocusLabelInput) => {
     state.pipelineEditor.shouldFocusLabelInput = shouldFocusLabelInput;
   }),
+  setCopiedStageId: action((state, stageId) => {
+    state.pipelineEditor.copiedStageId = stageId;
+  }),
 
   onStageNodesChange: action((state, changes) => {
     state.pipelineEditor.nodes = applyNodeChanges(changes, state.pipelineEditor.nodes);
@@ -509,29 +515,31 @@ export const pipelineEditorActions: PipelineEditorActions = {
     state.editingConfig.stageDeps[target] = targetDeps.filter((depId) => depId !== source);
   }),
 
-  duplicateStage: action((state) => {
-    if (state.selectedStage) {
-      const stageId = uuidv4();
+  duplicateStage: action((state, sourceId) => {
+    const sourceData: Stage | undefined = state.editingConfig.stageData[sourceId];
+    const sourceNode = state.pipelineEditor.nodes.find((node) => node.id === sourceId);
 
-      const stageData = state.editingConfig.stageData[state.selectedStage.id];
-      const stageDataCopy = cloneDeep(stageData);
-      stageDataCopy.label = camelCase(stageDataCopy.label + "Copy");
-      state.editingConfig.stageData[stageId] = stageDataCopy;
-      state.editingConfig.stageDeps[stageId] = [];
-
-      const selectedNode = state.pipelineEditor.nodes.find((node) => node.id === state.selectedStage!.id);
-      if (selectedNode) {
-        const newNode = cloneDeep(selectedNode);
-        newNode.id = stageId;
-        newNode.selected = false;
-        newNode.position.y += (newNode.height || 50) * 1.5; // Place the new node below the selected node
-        state.pipelineEditor.nodes.push(newNode);
-
-        // Select the newly duplicated stage
-        selectedNode.selected = false;
-        newNode.selected = true;
-      }
+    if (sourceData === undefined || sourceNode === undefined) {
+      console.warn(`Failed to duplicate stage of id '${sourceId}' because it does not exist.`);
+      return;
     }
+
+    // Duplicate stage data in `editingConfig`
+    const targetId = uuidv4();
+    const targetData = cloneDeep(sourceData);
+    targetData.label = camelCase(targetData.label + "Copy");
+    state.editingConfig.stageData[targetId] = targetData;
+    state.editingConfig.stageDeps[targetId] = [];
+
+    // Duplicate React Flow node
+    const targetNode = cloneDeep(sourceNode);
+    targetNode.id = targetId;
+    targetNode.position.y += (targetNode.height || 50) * 1.5; // Place below the source node
+    state.pipelineEditor.nodes.push(targetNode);
+
+    // Select the newly duplicated stage
+    state.pipelineEditor.nodes.forEach((node) => (node.selected = false));
+    targetNode.selected = true;
   }),
 };
 

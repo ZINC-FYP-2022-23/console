@@ -88,7 +88,9 @@ describe("GuiBuilder Store - PipelineEditorActions", () => {
         name: "Score",
         label: "",
         kind: StageKind.POST,
-        config: {},
+        config: {
+          normalizedTo: "",
+        },
       },
     };
 
@@ -192,21 +194,12 @@ describe("GuiBuilder Store - PipelineEditorActions", () => {
   });
 
   describe("duplicateStage()", () => {
-    it("duplicates the selected stage", () => {
-      const model: GuiBuilderStoreModel = {
-        ...getThreeStageModel(),
-        // Mock that we're duplicating 3rd stage
-        selectedStage: computed(() => ({ id: "stage-2", name: "Compile", label: "all" })),
-      };
+    it("duplicates a stage given its ID", () => {
+      const model = getThreeStageModel();
       const store = createStore(model);
-      store.getActions().duplicateStage();
+      store.getActions().duplicateStage("stage-2");
 
-      expect(store.getState().pipelineEditor.edges).toEqual(model.pipelineEditor.edges);
-      expect(store.getState().pipelineEditor.nodes.length).toBe(4);
-      const newNode = store.getState().pipelineEditor.nodes[3];
-      expect(newNode.id).toBe("stage-3");
-      expect(newNode.data.name).toBe("Compile");
-
+      // Test stage data in `editingConfig`
       expect(store.getState().editingConfig.stageDeps).toEqual({
         ...model.editingConfig.stageDeps,
         "stage-3": [],
@@ -215,6 +208,36 @@ describe("GuiBuilder Store - PipelineEditorActions", () => {
         ...model.editingConfig.stageData,
         "stage-3": { ...model.editingConfig.stageData["stage-2"], label: "allCopy" },
       });
+
+      // Test React Node data
+      expect(store.getState().pipelineEditor.nodes.length).toBe(4);
+      expect(store.getState().pipelineEditor.edges).toEqual(model.pipelineEditor.edges);
+      const newNode = store.getState().pipelineEditor.nodes[3];
+      expect(newNode.id).toBe("stage-3");
+      expect(newNode.data.name).toBe("Compile");
+    });
+
+    it("selects the duplicated node upon success", () => {
+      const model = getThreeStageModel();
+      // Mock that we've selected 3rd stage
+      model.selectedStage = computed(() => ({ id: "stage-2", name: "Compile", label: "all" }));
+      const store = createStore(model);
+      store.getActions().duplicateStage("stage-0"); // Duplicate a non-selected stage
+
+      const nodesSelected = store.getState().pipelineEditor.nodes.map((n) => n.selected);
+      expect(nodesSelected).toEqual([false, false, false, true]);
+    });
+
+    it("does nothing if the stage ID is invalid", () => {
+      jest.spyOn(console, "warn").mockImplementationOnce(() => {});
+      const model = getThreeStageModel();
+      const store = createStore(model);
+      store.getActions().duplicateStage("foo");
+
+      expect(store.getState().editingConfig.stageDeps).toEqual(model.editingConfig.stageDeps);
+      expect(store.getState().editingConfig.stageData).toEqual(model.editingConfig.stageData);
+      expect(store.getState().pipelineEditor.nodes).toEqual(model.pipelineEditor.nodes);
+      expect(store.getState().pipelineEditor.edges).toEqual(model.pipelineEditor.edges);
     });
   });
 });
