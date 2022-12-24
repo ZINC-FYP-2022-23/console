@@ -8,14 +8,20 @@ const useStyles = createStyles((theme) => ({
     padding: "6px 8px",
     borderRadius: theme.radius.md,
     transition: "background-color 150ms ease",
-    "&:hover": {
+    "&:hover:not([disabled])": {
       backgroundColor: "#bfdbfe",
     },
-    "&:active": {
+    "&:active:not([disabled])": {
       backgroundColor: "#93c5fd",
     },
     "&[data-progress]": {
       backgroundColor: "#bfdbfe",
+      "&[disabled]": {
+        backgroundColor: theme.colors.gray[4],
+      },
+    },
+    "&[disabled]": {
+      cursor: "not-allowed",
     },
   },
   separator: {
@@ -26,6 +32,19 @@ const useStyles = createStyles((theme) => ({
   stepLabel: {
     color: theme.colors.blue[8],
     lineHeight: 1.1,
+    "button[disabled] &": {
+      color: theme.colors.gray[6],
+    },
+  },
+  stepIcon: {
+    "button[disabled] &": {
+      backgroundColor: theme.colors.gray[2],
+      borderColor: theme.colors.gray[2],
+    },
+    "button[disabled] &[data-completed]": {
+      backgroundColor: theme.colors.gray[5],
+      borderColor: theme.colors.gray[5],
+    },
   },
 }));
 
@@ -39,6 +58,7 @@ interface StepperProps {
  */
 function Stepper({ className = "" }: StepperProps) {
   const { classes } = useStyles();
+  const configId = useStoreState((state) => state.configId);
   const step = useStoreState((state) => state.layout.step);
   const setStep = useStoreActions((actions) => actions.setStep);
 
@@ -52,8 +72,17 @@ function Stepper({ className = "" }: StepperProps) {
       className={className}
     >
       {guiBuilderSteps.map((step, index) => {
-        const iconBlue = <div className="text-cse-700">{step.icon}</div>;
-        return <StepperMantine.Step key={index} label={step.label} icon={iconBlue} completedIcon={step.icon} />;
+        const isDisabled = configId === null && !step.allowedWhenNew;
+        const iconBlue = <div className={isDisabled ? "text-gray-500" : "text-cse-700"}>{step.icon}</div>;
+        return (
+          <StepperMantine.Step
+            key={index}
+            label={step.label}
+            icon={iconBlue}
+            completedIcon={step.icon}
+            disabled={isDisabled}
+          />
+        );
       })}
     </StepperMantine>
   );

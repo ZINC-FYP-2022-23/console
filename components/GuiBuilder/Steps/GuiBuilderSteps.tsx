@@ -7,9 +7,16 @@ export type GuiBuilderStep = {
   label: string;
   icon: React.ReactNode;
   /**
+   * Whether the step can be accessible when creating a brand new config.
+   *
+   * This is because some steps must require a non-null config ID in order to properly work,
+   * and config ID is `null` when creating a new config.
+   */
+  allowedWhenNew: boolean;
+  /**
    * The component to render in the step.
    *
-   * @remarks It should be dynamically imported to reduce the bundle size.
+   * It should be dynamically imported to reduce the bundle size.
    */
   component: React.ComponentType<{}>;
 };
@@ -28,6 +35,7 @@ const guiBuilderSteps: GuiBuilderStep[] = [
     slug: "settings",
     label: "General Settings",
     icon: <FontAwesomeIcon icon={["fad", "gears"]} />,
+    allowedWhenNew: true,
     component: dynamic(() => import("./GeneralSettings"), {
       loading: () => <StepLoading />,
     }),
@@ -36,6 +44,7 @@ const guiBuilderSteps: GuiBuilderStep[] = [
     slug: "pipeline",
     label: "Pipeline Stages",
     icon: <FontAwesomeIcon icon={["fad", "pipe-section"]} />,
+    allowedWhenNew: true,
     component: dynamic(() => import("./PipelineStages"), {
       loading: () => <StepLoading />,
     }),
@@ -44,6 +53,7 @@ const guiBuilderSteps: GuiBuilderStep[] = [
     slug: "upload",
     label: "Upload Files",
     icon: <FontAwesomeIcon icon={["fad", "upload"]} />,
+    allowedWhenNew: false,
     component: dynamic(() => import("./UploadFiles"), {
       loading: () => <StepLoading />,
     }),
@@ -52,6 +62,7 @@ const guiBuilderSteps: GuiBuilderStep[] = [
     slug: "test",
     label: "Test Submission",
     icon: <FontAwesomeIcon icon={["fad", "flask"]} />,
+    allowedWhenNew: false,
     component: dynamic(() => import("./TestSubmission"), {
       loading: () => <StepLoading />,
     }),
@@ -60,6 +71,7 @@ const guiBuilderSteps: GuiBuilderStep[] = [
     slug: "assign",
     label: "Assign Students",
     icon: <FontAwesomeIcon icon={["fad", "sitemap"]} />,
+    allowedWhenNew: false,
     component: dynamic(() => import("./AssignStudents"), {
       loading: () => <StepLoading />,
     }),
