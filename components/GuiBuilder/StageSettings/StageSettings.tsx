@@ -1,6 +1,6 @@
 import supportedStages, { SupportedStage } from "@constants/Config/supportedStages";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Tooltip } from "@mantine/core";
+import { clsx, Tooltip } from "@mantine/core";
 import { useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
 import Image from "next/image";
 import React, { useCallback, useEffect, useRef, useState } from "react";
@@ -108,13 +108,13 @@ function StageSettings() {
                 validateStageLabel(value);
                 updateSelectedStage({ path: "label", value });
               }}
-              className={`w-36 px-2 py-1 mx-2 border border-gray-300 text-sm leading-4 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-100 focus:border-blue-300 transition ${getLabelAlertStyles(
-                labelAlert,
-                {
+              className={clsx(
+                "w-36 px-2 py-1 mx-2 border border-gray-300 text-sm leading-4 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-100 focus:border-blue-300 transition",
+                getLabelAlertStyles(labelAlert, {
                   warning: "border-orange-500 focus:border-orange-500 focus:ring-orange-100",
                   error: "border-red-500 focus:border-red-500 focus:ring-red-100",
-                },
-              )}`}
+                }),
+              )}
             />
             <Tooltip label="Open help dialog" openDelay={500}>
               <button
@@ -129,10 +129,10 @@ function StageSettings() {
         <div className="flex justify-between">
           <div className="text-xs text-gray-500">{supportedStage && <p>{supportedStage.description}</p>}</div>
           <div
-            className={`mr-8 text-xs font-medium ${getLabelAlertStyles(labelAlert, {
-              warning: "text-orange-500",
-              error: "text-red-500",
-            })}`}
+            className={clsx(
+              "mr-8 text-xs font-medium",
+              getLabelAlertStyles(labelAlert, { warning: "text-orange-500", error: "text-red-500" }),
+            )}
           >
             {labelAlert && labelAlerts[labelAlert].message}
           </div>

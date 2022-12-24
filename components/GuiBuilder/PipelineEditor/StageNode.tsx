@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Tooltip } from "@mantine/core";
+import { clsx, Tooltip } from "@mantine/core";
 import { useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
 import { StageNodeData } from "@types";
 import { DragEventHandler, useState } from "react";
@@ -13,16 +13,6 @@ import { Handle, NodeProps, Position } from "reactflow";
  */
 const onDragOver: DragEventHandler<HTMLDivElement> = (event) => {
   event.preventDefault();
-};
-
-const extraStyles = (isSelected: boolean, isDragOver: boolean) => {
-  if (isDragOver) {
-    return "bg-green-100 border-green-600 outline outline-2 outline-green-600";
-  } else if (isSelected) {
-    return "bg-blue-100 border-gray-900 outline outline-2 outline-gray-900";
-  } else {
-    return "bg-white";
-  }
 };
 
 /**
@@ -46,19 +36,26 @@ function StageNode({ id, data, selected }: NodeProps<StageNodeData>) {
         onDragOver={onDragOver}
         // PipelineEditor's `onDrop` will check whether the new stage block is dropped onto this stage node.
         onDrop={() => setIsDragOver(false)}
-        // The `"stage-node"` class is for PipelineEditor's `onDrop` to check whether the new stage block is
-        // dropped onto a stage node.
-        className={`stage-node ${extraStyles(
-          selected,
-          isDragOver,
-        )} px-5 py-3 min-w-[140px] max-w-[175px] relative leading-6 border border-gray-400 rounded-md cursor-pointer hover:bg-blue-100 transition `}
+        className={clsx(
+          "stage-node", // for PipelineEditor's `onDrop` to check whether the new stage block is dropped onto a stage node
+          "px-5 py-3 min-w-[140px] max-w-[175px] relative leading-6 border rounded-md cursor-pointer hover:bg-blue-100 transition",
+          ((selected, isDragOver) => {
+            if (isDragOver) {
+              return "bg-green-100 border-green-600 outline outline-2 outline-green-600";
+            } else if (selected) {
+              return "bg-blue-100 border-gray-900 outline outline-2 outline-gray-900";
+            } else {
+              return "bg-white border-gray-400";
+            }
+          })(selected, isDragOver),
+        )}
       >
         {/* TODO(Anson): Validate handle connection with `isValidConnection` */}
         <Handle className="!p-[5px] !border-2 !bg-cse-600 !-right-[7px]" type="source" position={Position.Right} />
         <Handle className="!p-[5px] !border-2 !bg-cse-600 !-left-[7px]" type="target" position={Position.Left} />
         {/* When dragging a new stage on top of existing stage, adding "pointer-events-none" avoids firing `dragleave` event
          * in the parent when mouse is over the below div. */}
-        <div className={`${dragging ? "pointer-events-none" : ""} flex flex-col items-center gap-1`}>
+        <div className={clsx("flex flex-col items-center gap-1", dragging && "pointer-events-none")}>
           <p className="font-medium text-center leading-5">{data.label}</p>
           {stageLabel !== "" && (
             <div

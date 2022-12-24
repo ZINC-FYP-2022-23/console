@@ -1,3 +1,4 @@
+import { clsx } from "@mantine/core";
 import { useStoreState } from "@state/GuiBuilder/Hooks";
 import { ReactFlowProvider } from "reactflow";
 import AddStagePanel, { AddStagePanelCollapsed } from "../AddStagePanel";
@@ -11,7 +12,7 @@ function PipelineStages() {
 
   return (
     <div className="h-full pt-1 pl-1 flex flex-row gap-3 overflow-y-hidden">
-      <div className={`${isAddStageCollapsed ? "flex-1" : "w-4/6"} flex flex-col gap-3`}>
+      <div className={clsx("flex flex-col gap-3", isAddStageCollapsed ? "flex-1" : "w-4/6")}>
         <div className="h-[43%]">
           <ReactFlowProvider>
             <PipelineEditor />
@@ -21,7 +22,7 @@ function PipelineStages() {
           <StageSettings />
         </div>
       </div>
-      <div className={`${isAddStageCollapsed ? "" : "w-2/6"} bg-white rounded-md shadow overflow-y-auto`}>
+      <div className={clsx("bg-white rounded-md shadow overflow-y-auto", !isAddStageCollapsed && "w-2/6")}>
         {isAddStageCollapsed ? <AddStagePanelCollapsed /> : <AddStagePanel />}
       </div>
       <DeleteStageModal />

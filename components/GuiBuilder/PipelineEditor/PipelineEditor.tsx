@@ -1,3 +1,4 @@
+import { clsx } from "@mantine/core";
 import { usePipelineEditorHotKeys, useReactFlowFitView, useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
 import StoreActions from "@state/GuiBuilder/Store";
 import { DragEvent, DragEventHandler, memo, useCallback, useRef } from "react";
@@ -135,9 +136,10 @@ function PipelineEditor() {
 
   return (
     <div
-      className={`h-full relative rounded-md shadow overflow-hidden transition duration-200 ease-in-out ${
-        dragging ? "ring ring-blue-400" : ""
-      }`}
+      className={clsx(
+        "h-full relative rounded-md shadow overflow-hidden transition duration-200 ease-in-out",
+        dragging && "ring ring-blue-400",
+      )}
       ref={reactFlowWrapper}
     >
       <FloatingActionButtons />
