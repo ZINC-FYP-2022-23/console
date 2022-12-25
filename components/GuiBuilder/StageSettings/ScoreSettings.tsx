@@ -11,7 +11,7 @@ function Score() {
   return (
     <div className="p-3">
       <div className="flex gap-2">
-        <div className="mt-2 flex-1">
+        <div className="flex-1">
           <label htmlFor="normalizedTo">Normalize maximum score to</label>
           <ul className="mx-5 list-disc text-xs text-gray-500">
             <li>Usually for normalizing score to 100-based</li>
@@ -31,7 +31,7 @@ function Score() {
         </div>
       </div>
       <div className="mt-6 flex gap-2">
-        <div className="mt-2 flex-1">
+        <div className="flex-1">
           <p>Limit the final score within a range</p>
           <ul className="mx-5 list-disc text-xs text-gray-500">
             <li>Set score to Min if score &lt; Min</li>
@@ -39,7 +39,7 @@ function Score() {
             <li>Leave the input(s) blank to disable clipping</li>
           </ul>
         </div>
-        <div className="flex-1 space-y-2">
+        <div className="flex-1 space-y-3">
           <div className="flex items-center gap-2">
             <label htmlFor="minScore" className="w-8 text-gray-500 text-sm">
               Min:
