@@ -3,7 +3,7 @@
  */
 
 import supportedStages, { SupportedStage } from "@constants/Config/supportedStages";
-import { FileStructureValidation, Score, StageDataMap, StageDependencyMap, StageKind } from "@types";
+import { StageDataMap, StageDependencyMap, StageKind } from "@types";
 import camelCase from "lodash/camelCase";
 import cloneDeep from "lodash/cloneDeep";
 import isEqual from "lodash/isEqual";
@@ -31,7 +31,7 @@ export function parseStages(stages: { [key: string]: any }): [StageDependencyMap
   const stageData: StageDataMap = {};
   let prevStage: string | null = null;
 
-  Object.entries(stages).forEach(([key, config]) => {
+  Object.entries(stages).forEach(([key, rawConfig]) => {
     const [stageName, stageLabel] = getStageNameAndLabel(key);
     const stage: SupportedStage | undefined = supportedStages[stageName];
     if (stage === undefined) {
@@ -45,7 +45,7 @@ export function parseStages(stages: { [key: string]: any }): [StageDependencyMap
       name: stageName,
       label: stageLabel,
       kind: stage?.kind ?? StageKind.GRADING,
-      config,
+      config: stage?.configFromRaw ? stage.configFromRaw(rawConfig) : rawConfig,
     };
     prevStage = stageId;
   });
@@ -108,7 +108,7 @@ export function deleteStageFromDeps(target: string, stageDeps: StageDependencyMa
  * @param stageDeps Assume that the stage dependency graph has the shape of a **linked list**.
  */
 export function stagesToYamlObj(stageDeps: StageDependencyMap, stageData: StageDataMap): { [key: string]: any } {
-  const stageDataTidied = tidyStageDataConfigs(generateStageLabels(stageData));
+  const stageDataTidied = configsToConfigsRaw(generateStageLabels(stageData));
 
   // Currently the grader executes each stage sequentially. Hence, `stageDeps` is a linked list.
   // By transposing the graph, we are "reversing" the linked list to get the order of execution.
@@ -184,30 +184,17 @@ export function generateStageLabels(stageData: StageDataMap): StageDataMap {
 }
 
 /**
- * Tidies up the config in each stage's data (e.g. remove empty fields). This facilitates de-serialization
- * to YAML or comparison of two stage data in the future.
+ * Tidies up the config in each stage's data, such that its shape is compliant to the format expected by
+ * the Grader.
  * @param stageData The stage data to be tidied up. This object will NOT be mutated.
  * @returns A cloned copy of the `stageData` argument that's tidied up.
  */
-export function tidyStageDataConfigs(stageData: StageDataMap): StageDataMap {
+export function configsToConfigsRaw(stageData: StageDataMap): StageDataMap {
   const s = cloneDeep(stageData);
   Object.values(s).forEach((stage) => {
-    switch (stage.name) {
-      case "FileStructureValidation": {
-        const config = stage.config as FileStructureValidation;
-        config.ignore_in_submission = config.ignore_in_submission?.length
-          ? config.ignore_in_submission.map((path) => path.trim()).filter((path) => path !== "")
-          : undefined;
-        break;
-      }
-
-      case "Score": {
-        const config = stage.config as Score;
-        config.normalizedTo = config.normalizedTo === "" ? undefined : parseFloat(config.normalizedTo as string);
-        config.minScore = config.minScore === "" ? undefined : parseFloat(config.minScore as string);
-        config.maxScore = config.maxScore === "" ? undefined : parseFloat(config.maxScore as string);
-        break;
-      }
+    const stageMetadata: SupportedStage | undefined = supportedStages[stage.name];
+    if (stageMetadata && stageMetadata.configToRaw) {
+      stage.config = stageMetadata.configToRaw(stage.config);
     }
   });
   return s;

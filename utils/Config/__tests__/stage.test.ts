@@ -1,14 +1,14 @@
 import supportedStages from "@constants/Config/supportedStages";
-import { FileStructureValidation, Score, Stage, StageDataMap, StageDependencyMap, StageKind } from "@types";
+import { FileStructureValidation, Score, ScoreRaw, Stage, StageDataMap, StageDependencyMap, StageKind } from "@types";
 import * as uuid from "uuid";
 import {
+  configsToConfigsRaw,
   deleteStageFromDeps,
   generateStageLabels,
   getStageNameAndLabel,
   isStageDependencyEqual,
   parseStages,
   stagesToYamlObj,
-  tidyStageDataConfigs,
   transposeStageDeps,
 } from "../stage";
 
@@ -70,6 +70,10 @@ describe("Stage utils", () => {
   });
 
   describe("parseStages()", () => {
+    const createRawStage = <T = object>(key: string, config: T) => ({
+      [key]: config,
+    });
+
     it("parses stages from a config YAML object", () => {
       jest
         .spyOn(uuid, "v4")
@@ -97,6 +101,34 @@ describe("Stage utils", () => {
       expect(stageData[mockedId].kind).toBe(StageKind.GRADING);
 
       consoleWarnMock.mockRestore();
+    });
+
+    describe("Score", () => {
+      it("converts all numerical fields to strings", () => {
+        jest.spyOn(uuid, "v4").mockReturnValueOnce("mock-uuid-1");
+        const stage = createRawStage<ScoreRaw>("score", {
+          normalizedTo: 100,
+          minScore: 0,
+          maxScore: 100.5,
+        });
+        expect(parseStages(stage)[1]["mock-uuid-1"].config).toEqual({
+          normalizedTo: "100",
+          minScore: "0",
+          maxScore: "100.5",
+        });
+      });
+
+      it("converts all undefined fields to empty strings", () => {
+        jest.spyOn(uuid, "v4").mockReturnValueOnce("mock-uuid-1");
+        const stage = createRawStage<ScoreRaw>("score", {
+          normalizedTo: 100,
+        });
+        expect(parseStages(stage)[1]["mock-uuid-1"].config).toEqual({
+          normalizedTo: "100",
+          minScore: "",
+          maxScore: "",
+        });
+      });
     });
   });
 
@@ -331,8 +363,8 @@ describe("Stage utils", () => {
     });
   });
 
-  describe("tidyStageDataConfigs()", () => {
-    const createStage = <T = any>(name: string, config: T): StageDataMap => ({
+  describe("configsToConfigsRaw()", () => {
+    const createStage = <T = object>(name: string, config: T): StageDataMap => ({
       "uuid-1": {
         name,
         label: "",
@@ -346,7 +378,7 @@ describe("Stage utils", () => {
         const stageData = createStage<FileStructureValidation>("FileStructureValidation", {
           ignore_in_submission: ["  a.txt", "", "b.txt  "],
         });
-        const _stageData = tidyStageDataConfigs(stageData);
+        const _stageData = configsToConfigsRaw(stageData);
         expect(_stageData["uuid-1"].config.ignore_in_submission).toEqual(["a.txt", "b.txt"]);
       });
 
@@ -354,38 +386,38 @@ describe("Stage utils", () => {
         const stageData = createStage<FileStructureValidation>("FileStructureValidation", {
           ignore_in_submission: [],
         });
-        const _stageData = tidyStageDataConfigs(stageData);
+        const _stageData = configsToConfigsRaw(stageData);
         expect(_stageData["uuid-1"].config.ignore_in_submission).toBeUndefined();
       });
     });
 
     describe("Score", () => {
-      it("converts empty strings to undefined", () => {
+      it("converts numerical strings to numbers", () => {
         const stageData = createStage<Score>("Score", {
-          normalizedTo: "",
-          minScore: "",
-          maxScore: "",
-        });
-        const {
-          "uuid-1": { config },
-        } = tidyStageDataConfigs(stageData);
-        expect(config.normalizedTo).toBeUndefined();
-        expect(config.minScore).toBeUndefined();
-        expect(config.maxScore).toBeUndefined();
-      });
-
-      it("converts non-empty strings to numbers", () => {
-        const stageData = createStage<Score>("Score", {
-          normalizedTo: "100.0",
+          normalizedTo: "100",
           minScore: "0",
           maxScore: "100.5",
         });
-        const {
-          "uuid-1": { config },
-        } = tidyStageDataConfigs(stageData);
-        expect(config.normalizedTo).toBe(100.0);
-        expect(config.minScore).toBe(0);
-        expect(config.maxScore).toBe(100.5);
+        const _stageData = configsToConfigsRaw(stageData);
+        expect(_stageData["uuid-1"].config).toEqual({
+          normalizedTo: 100,
+          minScore: 0,
+          maxScore: 100.5,
+        });
+      });
+
+      it("converts empty strings to undefined", () => {
+        const stageData = createStage<Score>("Score", {
+          normalizedTo: "100",
+          minScore: "",
+          maxScore: "",
+        });
+        const _stageData = configsToConfigsRaw(stageData);
+        expect(_stageData["uuid-1"].config).toEqual({
+          normalizedTo: 100,
+          minScore: undefined,
+          maxScore: undefined,
+        });
       });
     });
   });

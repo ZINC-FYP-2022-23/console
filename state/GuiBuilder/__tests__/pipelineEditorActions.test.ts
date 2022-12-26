@@ -90,6 +90,8 @@ describe("GuiBuilder Store - PipelineEditorActions", () => {
         kind: StageKind.POST,
         config: {
           normalizedTo: "",
+          minScore: "",
+          maxScore: "",
         },
       },
     };

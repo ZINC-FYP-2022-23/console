@@ -2,11 +2,11 @@ import { TextInput } from "@components/Input";
 import { useSelectedStageConfig } from "@state/GuiBuilder/Hooks";
 import { Score } from "@types";
 
-function Score() {
+function ScoreSettings() {
   const [config, setConfig] = useSelectedStageConfig<Score>();
 
   const isMinGreaterThanMax =
-    config.minScore && config.maxScore && parseFloat(config.minScore as string) > parseFloat(config.maxScore as string);
+    config.minScore && config.maxScore && parseFloat(config.minScore) > parseFloat(config.maxScore);
 
   return (
     <div className="p-3">
@@ -21,7 +21,7 @@ function Score() {
         <div className="flex-1">
           <TextInput
             id="normalizedTo"
-            value={config.normalizedTo ?? ""}
+            value={config.normalizedTo}
             onChange={(e) => setConfig({ ...config, normalizedTo: e.target.value })}
             type="number"
             min="0"
@@ -46,7 +46,7 @@ function Score() {
             </label>
             <TextInput
               id="minScore"
-              value={config.minScore ?? ""}
+              value={config.minScore}
               onChange={(e) => setConfig({ ...config, minScore: e.target.value })}
               type="number"
               placeholder="No minimum limit"
@@ -60,7 +60,7 @@ function Score() {
             </label>
             <TextInput
               id="maxScore"
-              value={config.maxScore ?? ""}
+              value={config.maxScore}
               onChange={(e) => setConfig({ ...config, maxScore: e.target.value })}
               type="number"
               placeholder="No maximum limit"
@@ -77,4 +77,4 @@ function Score() {
   );
 }
 
-export default Score;
+export default ScoreSettings;

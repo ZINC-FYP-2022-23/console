@@ -16,7 +16,8 @@ export const useStoreState = typedHooks.useStoreState;
 
 /**
  * Returns the config of the currently selected stage, and a function to update it.
- * @remarks Do **not** use this hook if there are no stages selected.
+ *
+ * Do **not** use this hook if there are no stages selected.
  */
 export function useSelectedStageConfig<TConfig = any>() {
   const selectedStage = useStoreState((state) => state.selectedStage);

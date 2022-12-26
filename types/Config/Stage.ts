@@ -74,10 +74,21 @@ export interface FileStructureValidation {
   ignore_in_submission?: string[];
 }
 
+/**
+ * The shape of `Score` stage's config returned by the backend.
+ *
+ * Reference: https://docs.zinc.ust.dev/user/pipeline/local/Score.html#config
+ */
+export interface ScoreRaw {
+  normalizedTo?: number;
+  minScore?: number;
+  maxScore?: number;
+}
+
 export interface Score {
-  normalizedTo?: number | string; // It is string if it's stored in <input />
-  minScore?: number | string;
-  maxScore?: number | string;
+  normalizedTo: string;
+  minScore: string;
+  maxScore: string;
 }
 
 export interface StdioTest {

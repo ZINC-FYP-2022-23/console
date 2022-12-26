@@ -1,5 +1,5 @@
 import { Spinner } from "@components/Spinner";
-import { StageConfig, StageKind } from "@types";
+import { FileStructureValidation, ScoreRaw, StageConfig, StageKind } from "@types";
 import dynamic from "next/dynamic";
 import { ComponentType } from "react";
 
@@ -13,9 +13,18 @@ export interface SupportedStage<TConfig = any> {
   /** Default configuration of the stage. */
   readonly defaultConfig: TConfig;
   /**
-   * Stage settings panel component.
-   *
-   * It should be dynamically imported to reduce the initial bundle size.
+   * @param raw The raw stage config object obtained from parsing the YAML.
+   * @returns A tidied stage config object. Its shape can differ from the `raw` parameter to
+   * facilitate GUI implementation.
+   */
+  readonly configFromRaw?: (raw: any) => TConfig;
+  /**
+   * @param config The stage config object to be converted to raw.
+   * @returns A raw stage config object to be de-serialized to YAML.
+   */
+  readonly configToRaw?: (config: TConfig) => any;
+  /**
+   * Stage settings panel component. It should be dynamically imported to reduce the initial bundle size.
    */
   readonly stageSettings: ComponentType<{}>;
 }
@@ -63,6 +72,11 @@ const supportedStages: SupportedStages = {
     defaultConfig: {
       ignore_in_submission: [],
     },
+    configToRaw: (config): FileStructureValidation => ({
+      ignore_in_submission: config.ignore_in_submission?.length
+        ? config.ignore_in_submission.map((path) => path.trim()).filter((path) => path !== "")
+        : undefined,
+    }),
     stageSettings: dynamic(() => import("../../components/GuiBuilder/StageSettings/FileStructureValidationSettings"), {
       loading: () => <StageSettingsLoading />,
     }),
@@ -73,7 +87,19 @@ const supportedStages: SupportedStages = {
     description: "Accumulates all scores from previous stages",
     defaultConfig: {
       normalizedTo: "",
+      minScore: "",
+      maxScore: "",
     },
+    configFromRaw: (raw: ScoreRaw) => ({
+      normalizedTo: raw.normalizedTo?.toString() ?? "",
+      minScore: raw.minScore?.toString() ?? "",
+      maxScore: raw.maxScore?.toString() ?? "",
+    }),
+    configToRaw: (config): ScoreRaw => ({
+      normalizedTo: config.normalizedTo ? parseFloat(config.normalizedTo) : undefined,
+      minScore: config.minScore ? parseFloat(config.minScore) : undefined,
+      maxScore: config.maxScore ? parseFloat(config.maxScore) : undefined,
+    }),
     stageSettings: dynamic(() => import("../../components/GuiBuilder/StageSettings/ScoreSettings"), {
       loading: () => <StageSettingsLoading />,
     }),
