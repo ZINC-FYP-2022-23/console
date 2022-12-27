@@ -1,5 +1,15 @@
 import supportedStages from "@constants/Config/supportedStages";
-import { FileStructureValidation, Score, ScoreRaw, Stage, StageDataMap, StageDependencyMap, StageKind } from "@types";
+import {
+  Compile,
+  CompileRaw,
+  FileStructureValidation,
+  Score,
+  ScoreRaw,
+  Stage,
+  StageDataMap,
+  StageDependencyMap,
+  StageKind,
+} from "@types";
 import * as uuid from "uuid";
 import {
   configsToConfigsRaw,
@@ -74,6 +84,12 @@ describe("Stage utils", () => {
       [key]: config,
     });
 
+    const MOCK_ID = "mock-uuid-1";
+
+    beforeEach(() => {
+      jest.spyOn(uuid, "v4").mockReturnValue(MOCK_ID);
+    });
+
     it("parses stages from a config YAML object", () => {
       jest
         .spyOn(uuid, "v4")
@@ -90,28 +106,36 @@ describe("Stage utils", () => {
           bar: "baz",
         },
       };
-
-      const mockedId = "mock-uuid-1";
       const consoleWarnMock = jest.spyOn(console, "warn").mockImplementation();
-      jest.spyOn(uuid, "v4").mockReturnValue(mockedId);
-
       const [_, stageData] = parseStages(yamlObj);
 
       expect(consoleWarnMock).toHaveBeenCalled();
-      expect(stageData[mockedId].kind).toBe(StageKind.GRADING);
+      expect(stageData[MOCK_ID].kind).toBe(StageKind.GRADING);
 
       consoleWarnMock.mockRestore();
     });
 
+    describe("Compile", () => {
+      it("converts flags array to a string", () => {
+        const stage = createRawStage<CompileRaw>("compile", {
+          input: ["*.cpp"],
+          flags: ["-Wall", "-Wextra", "-g"],
+        });
+        expect(parseStages(stage)[1][MOCK_ID].config).toEqual({
+          input: ["*.cpp"],
+          flags: "-Wall -Wextra -g",
+        });
+      });
+    });
+
     describe("Score", () => {
       it("converts all numerical fields to strings", () => {
-        jest.spyOn(uuid, "v4").mockReturnValueOnce("mock-uuid-1");
         const stage = createRawStage<ScoreRaw>("score", {
           normalizedTo: 100,
           minScore: 0,
           maxScore: 100.5,
         });
-        expect(parseStages(stage)[1]["mock-uuid-1"].config).toEqual({
+        expect(parseStages(stage)[1][MOCK_ID].config).toEqual({
           normalizedTo: "100",
           minScore: "0",
           maxScore: "100.5",
@@ -119,11 +143,10 @@ describe("Stage utils", () => {
       });
 
       it("converts all undefined fields to empty strings", () => {
-        jest.spyOn(uuid, "v4").mockReturnValueOnce("mock-uuid-1");
         const stage = createRawStage<ScoreRaw>("score", {
           normalizedTo: 100,
         });
-        expect(parseStages(stage)[1]["mock-uuid-1"].config).toEqual({
+        expect(parseStages(stage)[1][MOCK_ID].config).toEqual({
           normalizedTo: "100",
           minScore: "",
           maxScore: "",
@@ -364,13 +387,39 @@ describe("Stage utils", () => {
   });
 
   describe("configsToConfigsRaw()", () => {
+    const MOCK_ID = "mock-uuid-1";
+
     const createStage = <T = object>(name: string, config: T): StageDataMap => ({
-      "uuid-1": {
+      [MOCK_ID]: {
         name,
         label: "",
         kind: supportedStages[name].kind,
         config,
       },
+    });
+
+    beforeEach(() => {
+      jest.spyOn(uuid, "v4").mockReturnValue(MOCK_ID);
+    });
+
+    describe("Compile", () => {
+      it("trims the string in output", () => {
+        const stageData = createStage<Compile>("Compile", {
+          input: ["*.cpp"],
+          output: "  a.out  ",
+        });
+        const _stageData = configsToConfigsRaw(stageData);
+        expect(_stageData[MOCK_ID].config.output).toBe("a.out");
+      });
+
+      it("converts flags to string array", () => {
+        const stageData = createStage<Compile>("Compile", {
+          input: ["*.cpp"],
+          flags: "  -Wall -Wextra   -g   ",
+        });
+        const _stageData = configsToConfigsRaw(stageData);
+        expect(_stageData[MOCK_ID].config.flags).toEqual(["-Wall", "-Wextra", "-g"]);
+      });
     });
 
     describe("FileStructureValidation", () => {
@@ -379,7 +428,7 @@ describe("Stage utils", () => {
           ignore_in_submission: ["  a.txt", "", "b.txt  "],
         });
         const _stageData = configsToConfigsRaw(stageData);
-        expect(_stageData["uuid-1"].config.ignore_in_submission).toEqual(["a.txt", "b.txt"]);
+        expect(_stageData[MOCK_ID].config.ignore_in_submission).toEqual(["a.txt", "b.txt"]);
       });
 
       it("converts empty ignore_in_submission array to undefined", () => {
@@ -387,7 +436,7 @@ describe("Stage utils", () => {
           ignore_in_submission: [],
         });
         const _stageData = configsToConfigsRaw(stageData);
-        expect(_stageData["uuid-1"].config.ignore_in_submission).toBeUndefined();
+        expect(_stageData[MOCK_ID].config.ignore_in_submission).toBeUndefined();
       });
     });
 
@@ -399,7 +448,7 @@ describe("Stage utils", () => {
           maxScore: "100.5",
         });
         const _stageData = configsToConfigsRaw(stageData);
-        expect(_stageData["uuid-1"].config).toEqual({
+        expect(_stageData[MOCK_ID].config).toEqual({
           normalizedTo: 100,
           minScore: 0,
           maxScore: 100.5,
@@ -413,7 +462,7 @@ describe("Stage utils", () => {
           maxScore: "",
         });
         const _stageData = configsToConfigsRaw(stageData);
-        expect(_stageData["uuid-1"].config).toEqual({
+        expect(_stageData[MOCK_ID].config).toEqual({
           normalizedTo: 100,
           minScore: undefined,
           maxScore: undefined,

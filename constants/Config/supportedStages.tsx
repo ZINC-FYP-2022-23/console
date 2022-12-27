@@ -1,5 +1,5 @@
 import { Spinner } from "@components/Spinner";
-import { FileStructureValidation, ScoreRaw, StageConfig, StageKind } from "@types";
+import { CompileRaw, FileStructureValidation, ScoreRaw, StageConfig, StageKind } from "@types";
 import dynamic from "next/dynamic";
 import { ComponentType } from "react";
 
@@ -50,6 +50,18 @@ const supportedStages: SupportedStages = {
     defaultConfig: {
       input: [],
     },
+    configFromRaw: (raw: CompileRaw) => ({
+      ...raw,
+      flags: raw.flags?.join(" "),
+    }),
+    configToRaw: (config): CompileRaw => ({
+      ...config,
+      output: config.output?.trim(),
+      flags: config.flags
+        ?.trim()
+        .split(" ")
+        .filter((flag) => flag !== ""),
+    }),
     stageSettings: dynamic(() => import("../../components/GuiBuilder/StageSettings/CompileSettings"), {
       loading: () => <StageSettingsLoading />,
     }),

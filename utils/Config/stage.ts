@@ -186,6 +186,9 @@ export function generateStageLabels(stageData: StageDataMap): StageDataMap {
 /**
  * Tidies up the config in each stage's data, such that its shape is compliant to the format expected by
  * the Grader.
+ *
+ * How the tidying up is done is defined in {@link SupportedStage.configToRaw}.
+ *
  * @param stageData The stage data to be tidied up. This object will NOT be mutated.
  * @returns A cloned copy of the `stageData` argument that's tidied up.
  */

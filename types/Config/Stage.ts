@@ -59,10 +59,22 @@ export interface StageConfig {
   StdioTest: StdioTest;
 }
 
-export interface Compile {
+/**
+ * The shape of `Compile` stage's config returned by the backend.
+ *
+ * Reference: https://docs.zinc.ust.dev/user/pipeline/docker/Compile.html#config
+ */
+export interface CompileRaw {
   input: string[];
   output?: string;
   flags?: string[];
+  additional_packages?: string[];
+}
+
+export interface Compile {
+  input: string[];
+  output?: string;
+  flags?: string;
   additional_packages?: string[];
 }
 
