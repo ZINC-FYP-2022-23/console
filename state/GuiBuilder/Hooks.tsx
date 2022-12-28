@@ -1,9 +1,10 @@
 /**
  * @file Hooks for the GUI Assignment Builder page.
  */
-import { ActionCreator, createTypedHooks } from "easy-peasy";
+import { useHotkeys } from "@mantine/hooks";
+import { createTypedHooks } from "easy-peasy";
 import { useEffect } from "react";
-import { useKeyPress, useReactFlow } from "reactflow";
+import { useReactFlow } from "reactflow";
 import { GuiBuilderStoreModel } from "./Store";
 
 /**
@@ -57,10 +58,6 @@ export function useReactFlowFitView() {
  *  - `Ctrl/Cmd + V`: Paste copied node.
  */
 export function usePipelineEditorHotKeys() {
-  const deleteHotKeyPressed = useKeyPress("Backspace");
-  const copyHotKeyPressed = useKeyPress(["Control+c", "Meta+c"]);
-  const pasteHotKeyPressed = useKeyPress(["Control+v", "Meta+v"]);
-
   const copiedStageId = useStoreState((state) => state.pipelineEditor.copiedStageId);
   const edges = useStoreState((state) => state.pipelineEditor.edges);
   const selectedStage = useStoreState((state) => state.selectedStage);
@@ -69,32 +66,37 @@ export function usePipelineEditorHotKeys() {
   const setCopiedStageId = useStoreActions((actions) => actions.setCopiedStageId);
   const setModal = useStoreActions((actions) => actions.setModal);
 
-  useEffect(() => {
-    // Backspace: Delete selected node or edge
-    if (deleteHotKeyPressed) {
-      const selectedEdge = edges.find((edge) => edge.selected);
-      if (selectedStage) setModal({ path: "deleteStage", value: true });
-      if (selectedEdge) deleteStageEdge(selectedEdge.id);
-    }
-    // Ctrl/Cmd + C: Copy selected node
-    if (copyHotKeyPressed && selectedStage) {
-      setCopiedStageId(selectedStage.id);
-    }
-    // Ctrl/Cmd + V: Paste copied node
-    if (pasteHotKeyPressed && copiedStageId) {
-      duplicateStage(copiedStageId);
-      setCopiedStageId(undefined);
-    }
-  }, [
-    copiedStageId,
-    copyHotKeyPressed,
-    deleteHotKeyPressed,
-    deleteStageEdge,
-    duplicateStage,
-    edges,
-    pasteHotKeyPressed,
-    selectedStage,
-    setCopiedStageId,
-    setModal,
+  useHotkeys([
+    [
+      "Backspace", // Backspace: Delete selected node or edge
+      () => {
+        const selectedEdge = edges.find((edge) => edge.selected);
+        if (selectedStage) setModal({ path: "deleteStage", value: true });
+        if (selectedEdge) deleteStageEdge(selectedEdge.id);
+      },
+    ],
+    [
+      "mod+C", // Ctrl/Cmd + C: Copy selected node
+      () => {
+        // Fix "Ctrl+C" not working when copying selected text in window
+        const selectedText = window.getSelection()?.toString();
+        if (selectedText) {
+          navigator.clipboard.writeText(selectedText);
+          return;
+        }
+        if (selectedStage) {
+          setCopiedStageId(selectedStage.id);
+        }
+      },
+    ],
+    [
+      "mod+V", // Ctrl/Cmd + V: Paste copied node
+      () => {
+        if (copiedStageId) {
+          duplicateStage(copiedStageId);
+          setCopiedStageId(undefined);
+        }
+      },
+    ],
   ]);
 }
