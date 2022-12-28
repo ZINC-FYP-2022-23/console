@@ -7,12 +7,12 @@ export type GuiBuilderStep = {
   label: string;
   icon: React.ReactNode;
   /**
-   * Whether the step can be accessible when creating a brand new config.
+   * Whether the step is locked when creating a brand new config.
    *
    * This is because some steps must require a non-null config ID in order to properly work,
    * and config ID is `null` when creating a new config.
    */
-  allowedWhenNew: boolean;
+  lockedWhenNew: boolean;
   /**
    * The component to render in the step.
    *
@@ -35,7 +35,7 @@ const guiBuilderSteps: GuiBuilderStep[] = [
     slug: "settings",
     label: "General Settings",
     icon: <FontAwesomeIcon icon={["fad", "gears"]} />,
-    allowedWhenNew: true,
+    lockedWhenNew: true,
     component: dynamic(() => import("./GeneralSettings"), {
       loading: () => <StepLoading />,
     }),
@@ -44,7 +44,7 @@ const guiBuilderSteps: GuiBuilderStep[] = [
     slug: "pipeline",
     label: "Pipeline Stages",
     icon: <FontAwesomeIcon icon={["fad", "pipe-section"]} />,
-    allowedWhenNew: true,
+    lockedWhenNew: true,
     component: dynamic(() => import("./PipelineStages"), {
       loading: () => <StepLoading />,
     }),
@@ -53,7 +53,7 @@ const guiBuilderSteps: GuiBuilderStep[] = [
     slug: "upload",
     label: "Upload Files",
     icon: <FontAwesomeIcon icon={["fad", "upload"]} />,
-    allowedWhenNew: false,
+    lockedWhenNew: false,
     component: dynamic(() => import("./UploadFiles"), {
       loading: () => <StepLoading />,
     }),
@@ -62,7 +62,7 @@ const guiBuilderSteps: GuiBuilderStep[] = [
     slug: "test",
     label: "Test Submission",
     icon: <FontAwesomeIcon icon={["fad", "flask"]} />,
-    allowedWhenNew: false,
+    lockedWhenNew: false,
     component: dynamic(() => import("./TestSubmission"), {
       loading: () => <StepLoading />,
     }),
@@ -71,7 +71,7 @@ const guiBuilderSteps: GuiBuilderStep[] = [
     slug: "assign",
     label: "Assign Students",
     icon: <FontAwesomeIcon icon={["fad", "sitemap"]} />,
-    allowedWhenNew: false,
+    lockedWhenNew: false,
     component: dynamic(() => import("./AssignStudents"), {
       loading: () => <StepLoading />,
     }),

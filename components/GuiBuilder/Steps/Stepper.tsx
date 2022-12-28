@@ -8,20 +8,23 @@ const useStyles = createStyles((theme) => ({
     padding: "6px 8px",
     borderRadius: theme.radius.md,
     transition: "background-color 150ms ease",
-    "&:hover:not([disabled])": {
+    "&:hover": {
       backgroundColor: "#bfdbfe",
     },
-    "&:active:not([disabled])": {
+    "&.locked:hover": {
+      backgroundColor: theme.colors.gray[4],
+    },
+    "&:active": {
       backgroundColor: "#93c5fd",
+    },
+    "&.locked:active": {
+      backgroundColor: theme.colors.gray[5],
     },
     "&[data-progress]": {
       backgroundColor: "#bfdbfe",
-      "&[disabled]": {
+      "&.locked": {
         backgroundColor: theme.colors.gray[4],
       },
-    },
-    "&[disabled]": {
-      cursor: "not-allowed",
     },
   },
   separator: {
@@ -32,16 +35,16 @@ const useStyles = createStyles((theme) => ({
   stepLabel: {
     color: theme.colors.blue[8],
     lineHeight: 1.1,
-    "button[disabled] &": {
+    "button.locked &": {
       color: theme.colors.gray[6],
     },
   },
   stepIcon: {
-    "button[disabled] &": {
+    "button.locked &": {
       backgroundColor: theme.colors.gray[2],
       borderColor: theme.colors.gray[2],
     },
-    "button[disabled] &[data-completed]": {
+    "button.locked &[data-completed]": {
       backgroundColor: theme.colors.gray[5],
       borderColor: theme.colors.gray[5],
     },
@@ -72,15 +75,15 @@ function Stepper({ className = "" }: StepperProps) {
       className={className}
     >
       {guiBuilderSteps.map((step, index) => {
-        const isDisabled = configId === null && !step.allowedWhenNew;
-        const iconBlue = <div className={isDisabled ? "text-gray-500" : "text-cse-700"}>{step.icon}</div>;
+        const isLocked = configId === null && !step.lockedWhenNew;
+        const iconBlue = <div className={isLocked ? "text-gray-500" : "text-cse-700"}>{step.icon}</div>;
         return (
           <StepperMantine.Step
             key={index}
             label={step.label}
             icon={iconBlue}
             completedIcon={step.icon}
-            disabled={isDisabled}
+            className={isLocked ? "locked" : ""}
           />
         );
       })}
