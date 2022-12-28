@@ -100,7 +100,7 @@ function CompileSettings() {
           onChange={(e) => setConfig({ ...config, output: e.target.value })}
           placeholder={metadata.output.disabled ? "No need to specify" : metadata.output.defaultValue}
           disabled={metadata.output.disabled}
-          extraClassNames="flex-1 font-mono !leading-5 placeholder:disabled:font-sans"
+          classNames={{ root: "flex-1 font-mono", input: "!leading-5 placeholder:disabled:font-sans" }}
         />
       </div>
       <div className="flex items-center">

@@ -76,12 +76,12 @@ function PipelineSettings() {
           </Select>
           <span className="flex-none text-gray-500">version</span>
           <TextInput
-            extraClassNames="grow w-20"
             value={_settings.lang.version}
             onChange={(event) => {
               const value = event.target.value;
               updateField({ path: "_settings.lang.version", value });
             }}
+            classNames={{ root: "flex-1" }}
           />
           <LangVersionTooltip />
         </div>
@@ -200,7 +200,7 @@ function PipelineSettings() {
                     const value = event.target.value;
                     updateField({ path: "_settings.stage_wait_duration_secs", value });
                   }}
-                  extraClassNames="flex-1 w-10"
+                  classNames={{ root: "flex-1" }}
                 />
                 <span className="ml-3 flex-none text-gray-500">secs</span>
               </div>
@@ -221,7 +221,7 @@ function PipelineSettings() {
                   const value = event.target.value;
                   updateField({ path: "_settings.cpus", value });
                 }}
-                extraClassNames="flex-1 w-10"
+                classNames={{ root: "flex-1" }}
               />
             </div>
             <div>
@@ -308,7 +308,7 @@ function PipelineSettings() {
                     const value = event.target.value;
                     updateField({ path: "_settings.mem_gb", value });
                   }}
-                  extraClassNames="flex-1 w-10"
+                  classNames={{ root: "flex-1" }}
                 />
                 <span className="ml-3 flex-none text-gray-500">GB</span>
               </div>

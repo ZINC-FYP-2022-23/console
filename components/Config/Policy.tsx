@@ -49,7 +49,7 @@ export function PolicyConfig({ policy, onChange }) {
           onChange={(e) => updatePolicy({ attemptLimits: e.target.value || null })}
           placeholder="Unlimited"
           value={policy.attemptLimits}
-          extraClassNames="w-1/2"
+          classNames={{ root: "w-1/2" }}
         />
       </div>
       <div className="mt-4">

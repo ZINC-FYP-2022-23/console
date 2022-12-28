@@ -10,7 +10,7 @@ function Policy() {
   return (
     <div className="flex flex-col gap-5 text-sm">
       <div className="flex items-center gap-2">
-        <div className="flex-none w-1/2 flex items-center gap-1">
+        <div className="flex-1 flex items-center gap-1">
           <label htmlFor="attemptLimits" className="">
             Attempt Limits
           </label>
@@ -27,7 +27,7 @@ function Policy() {
             const attemptLimits = value === "" ? null : parseInt(value, 10);
             updatePolicy({ ...policy, attemptLimits });
           }}
-          extraClassNames="flex-1 w-10"
+          classNames={{ root: "flex-1" }}
         />
       </div>
       <SwitchGroup

@@ -26,7 +26,7 @@ function ScoreSettings() {
             type="number"
             min="0"
             placeholder="No normalization"
-            extraClassNames="w-full"
+            classNames={{ root: "w-full" }}
           />
         </div>
       </div>
@@ -51,7 +51,7 @@ function ScoreSettings() {
               type="number"
               placeholder="No minimum limit"
               alertLevel={isMinGreaterThanMax ? "error" : undefined}
-              extraClassNames="flex-1"
+              classNames={{ root: "flex-1" }}
             />
           </div>
           <div className="flex items-center gap-2">
@@ -65,7 +65,7 @@ function ScoreSettings() {
               type="number"
               placeholder="No maximum limit"
               alertLevel={isMinGreaterThanMax ? "error" : undefined}
-              extraClassNames="flex-1"
+              classNames={{ root: "flex-1" }}
             />
           </div>
           {isMinGreaterThanMax && (
