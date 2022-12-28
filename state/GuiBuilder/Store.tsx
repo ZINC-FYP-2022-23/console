@@ -149,7 +149,11 @@ export interface PipelineEditorActions {
     GuiBuilderStoreModel,
     {
       id: string;
+      /** Stage name code (e.g. `"DiffWithSkeleton"`). */
       name: string;
+      /** Stage name shown in UI (e.g. `"Diff With Skeleton"`). */
+      nameInUi: string;
+      /** Stage label. See {@link Stage.label}. */
       label: string;
     } | null
   >;
@@ -319,9 +323,11 @@ export const pipelineEditorActions: PipelineEditorActions = {
       return null;
     }
 
+    const name = selectedStageData.name;
     return {
       id,
-      name: selectedStageData.name,
+      name,
+      nameInUi: supportedStages[name]?.label ?? name,
       label: selectedStageData.label,
     };
   }),

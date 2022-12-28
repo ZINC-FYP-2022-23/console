@@ -4,7 +4,7 @@ import { useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
 
 const useStyles = createStyles((theme) => ({
   title: {
-    color: "#ef4444",
+    color: theme.colors.red[7],
     fontSize: theme.fontSizes.xl,
     fontWeight: 600,
   },
@@ -24,7 +24,18 @@ function DeleteStageModal() {
   const closeModal = () => setModal({ path: "deleteStage", value: false });
 
   return (
-    <Modal title="Delete stage?" opened={isModalOpened} onClose={closeModal} centered size="sm" classNames={classes}>
+    <Modal
+      title={
+        selectedStage
+          ? `Delete "${selectedStage.nameInUi}${selectedStage.label ? ` (${selectedStage.label})` : ""}" stage?`
+          : "Delete stage?"
+      }
+      opened={isModalOpened}
+      onClose={closeModal}
+      centered
+      size="md"
+      classNames={classes}
+    >
       <div className="space-y-5">
         <p className="text-gray-800">
           Are you sure you want to delete this stage? This action{" "}

@@ -12,6 +12,28 @@ jest.mock("uuid");
 jest.spyOn(uuid, "v4").mockReturnValue("stage-3");
 
 describe("GuiBuilder Store - PipelineEditorActions", () => {
+  describe("selectedStage", () => {
+    it("returns the data of the selected stage", () => {
+      const model = getThreeStageModel();
+      model.pipelineEditor.nodes[0].selected = true;
+      model.editingConfig.stageData["stage-0"].label = "foo";
+
+      const store = createStore(model);
+      expect(store.getState().selectedStage).toEqual({
+        id: "stage-0",
+        name: "DiffWithSkeleton",
+        nameInUi: "Diff With Skeleton",
+        label: "foo",
+      });
+    });
+
+    it("returns null if no stages are selected", () => {
+      const model = getThreeStageModel();
+      const store = createStore(model);
+      expect(store.getState().selectedStage).toBeNull();
+    });
+  });
+
   describe("initializePipeline()", () => {
     it("initializes nodes and edges in the pipeline editor", () => {
       const model: GuiBuilderStoreModel = {
@@ -48,7 +70,7 @@ describe("GuiBuilder Store - PipelineEditorActions", () => {
           () => {},
         ),
       };
-      const store = createStore(model, {});
+      const store = createStore(model);
       store.getActions().initializePipeline();
 
       expect(store.getState().pipelineEditor.nodes).toEqual([
@@ -222,7 +244,12 @@ describe("GuiBuilder Store - PipelineEditorActions", () => {
     it("selects the duplicated node upon success", () => {
       const model = getThreeStageModel();
       // Mock that we've selected 3rd stage
-      model.selectedStage = computed(() => ({ id: "stage-2", name: "Compile", label: "all" }));
+      model.selectedStage = computed(() => ({
+        id: "stage-2",
+        name: "Compile",
+        nameInUi: "Compile",
+        label: "all",
+      }));
       const store = createStore(model);
       store.getActions().duplicateStage("stage-0"); // Duplicate a non-selected stage
 
