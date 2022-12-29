@@ -34,10 +34,14 @@ describe("Raw stage configs conversion", () => {
           input: ["*.cpp"],
           flags: ["-Wall", "-Wextra", "-g"],
         });
-        expect(parseStages(stage)[1][UUID].config).toEqual({
+        expect(parseStages(stage)[1][UUID].config.flags).toBe("-Wall -Wextra -g");
+      });
+
+      it("converts `additional_packages` to empty array if undefined", () => {
+        const stage = createRawStage<CompileRaw>("compile", {
           input: ["*.cpp"],
-          flags: "-Wall -Wextra -g",
         });
+        expect(parseStages(stage)[1][UUID].config.additional_packages).toEqual([]);
       });
     });
 
@@ -46,6 +50,7 @@ describe("Raw stage configs conversion", () => {
         const stage = createStage<Compile>("Compile", {
           input: ["*.cpp"],
           output: "  a.out  ",
+          additional_packages: [],
         });
         const _stage = configsToConfigsRaw(stage);
         expect(_stage[UUID].config.output).toBe("a.out");
@@ -55,9 +60,19 @@ describe("Raw stage configs conversion", () => {
         const stage = createStage<Compile>("Compile", {
           input: ["*.cpp"],
           flags: "  -Wall -Wextra   -g   ",
+          additional_packages: [],
         });
         const _stage = configsToConfigsRaw(stage);
         expect(_stage[UUID].config.flags).toEqual(["-Wall", "-Wextra", "-g"]);
+      });
+
+      it("converts `additional_packages` to undefined if empty", () => {
+        const stage = createStage<Compile>("Compile", {
+          input: ["*.cpp"],
+          additional_packages: [],
+        });
+        const _stage = configsToConfigsRaw(stage);
+        expect(_stage[UUID].config.additional_packages).toBeUndefined();
       });
     });
   });

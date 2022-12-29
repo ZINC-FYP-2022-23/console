@@ -60,15 +60,11 @@ function CompileSettings() {
   /** If user has typed something in the input box of tags input, add it to the list of tags. */
   const onTagInputBlur = (target: "input" | "additional_packages"): FocusEventHandler<HTMLInputElement> => {
     return (e) => {
-      const value = e.target.value;
-      if (value.trim() !== "") {
-        if (config[target] === undefined) {
-          setConfig({ ...config, [target]: [value] });
-          e.target.value = "";
-        } else if (!config[target]!.includes(value)) {
-          setConfig({ ...config, [target]: [...(config[target] as string[]), value] });
-          e.target.value = "";
-        }
+      const value = e.target.value.trim();
+      if (value === "") return;
+      if (!config[target]!.includes(value)) {
+        setConfig({ ...config, [target]: [...(config[target] as string[]), value] });
+        e.target.value = "";
       }
     };
   };
@@ -123,9 +119,10 @@ function CompileSettings() {
         </div>
         <TagsInput
           name="additional_packages"
-          value={config.additional_packages ?? []}
+          value={config.additional_packages}
           onChange={(tags) => setConfig({ ...config, additional_packages: tags })}
           onBlur={onTagInputBlur("additional_packages")}
+          placeHolder={config.additional_packages.length === 0 ? "e.g. curl" : ""}
           separators={[" ", ","]}
           isEditOnRemove
           className="flex-1 font-mono text-sm"

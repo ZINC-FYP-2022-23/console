@@ -49,10 +49,12 @@ const supportedStages: SupportedStages = {
     description: "Compiles source files to executable for grading",
     defaultConfig: {
       input: [],
+      additional_packages: [],
     },
     configFromRaw: (raw: CompileRaw) => ({
       ...raw,
       flags: raw.flags?.join(" "),
+      additional_packages: raw.additional_packages ?? [],
     }),
     configToRaw: (config): CompileRaw => ({
       ...config,
@@ -61,6 +63,7 @@ const supportedStages: SupportedStages = {
         ?.trim()
         .split(" ")
         .filter((flag) => flag !== ""),
+      additional_packages: config.additional_packages.length ? config.additional_packages : undefined,
     }),
     stageSettings: dynamic(() => import("../../components/GuiBuilder/StageSettings/CompileSettings"), {
       loading: () => <StageSettingsLoading />,

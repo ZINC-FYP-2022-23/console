@@ -50,7 +50,11 @@ describe("Config utils", () => {
           name: "Compile",
           label: "",
           kind: StageKind.PRE_LOCAL,
-          config: { input: ["*.cpp"], output: "a.out" },
+          config: {
+            input: ["*.cpp"],
+            output: "a.out",
+            additional_packages: [],
+          },
         },
       };
       const config: Config = {
