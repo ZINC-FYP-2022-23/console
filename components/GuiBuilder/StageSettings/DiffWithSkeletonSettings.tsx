@@ -21,7 +21,7 @@ const excludeFromProvidedDesc = (
   </ul>
 );
 
-function DiffWithSkeleton() {
+function DiffWithSkeletonSettings() {
   const [config, setConfig] = useSelectedStageConfig<DiffWithSkeleton>();
   const setStep = useStoreActions((actions) => actions.setStep);
 
@@ -54,4 +54,4 @@ function DiffWithSkeleton() {
   );
 }
 
-export default DiffWithSkeleton;
+export default DiffWithSkeletonSettings;

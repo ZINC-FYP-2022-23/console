@@ -26,7 +26,7 @@ const useStyles = createStyles(() => ({
   },
 }));
 
-function FileStructureValidation() {
+function FileStructureValidationSettings() {
   const [config, setConfig] = useSelectedStageConfig<FileStructureValidation>();
   const setStep = useStoreActions((actions) => actions.setStep);
 
@@ -185,4 +185,4 @@ const InfoAccordion = ({ title, children }: InfoAccordionProps) => {
   );
 };
 
-export default FileStructureValidation;
+export default FileStructureValidationSettings;
