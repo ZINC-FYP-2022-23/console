@@ -10,7 +10,6 @@ import ReactFlow, {
   EdgeTypes,
   MarkerType,
   NodeTypes,
-  OnEdgesDelete,
   OnInit,
   ProOptions,
   useReactFlow,
@@ -65,7 +64,6 @@ function PipelineEditor() {
 
   const layoutPipeline = useStoreActions((actions) => actions.layoutPipeline);
   const addStageNode = useStoreActions((actions) => actions.addStageNode);
-  const deleteStageEdge = useStoreActions((actions) => actions.deleteStageEdge);
   const onNodesChange = useStoreActions((actions) => actions.onStageNodesChange);
   const onEdgesChange = useStoreActions((actions) => actions.onStageEdgesChange);
   const onStageConnect = useStoreActions((actions) => actions.onStageConnect);
@@ -82,17 +80,6 @@ function PipelineEditor() {
   const onInit: OnInit = useCallback(() => {
     fitView({ padding: 0.2 });
   }, [fitView]);
-
-  /**
-   * We pass this handler on top of `onEdgesChange` to make sure that `state.editingConfig` is properly
-   * updated if the user presses "Backspace" to delete a selected edge.
-   */
-  const onEdgesDelete: OnEdgesDelete = useCallback(
-    (edges) => {
-      deleteStageEdge(edges[0].id);
-    },
-    [deleteStageEdge],
-  );
 
   /** Handler for dropping a stage block to the React Flow editor. */
   const onDrop = useCallback(
