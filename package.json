@@ -26,7 +26,7 @@
     "@fortawesome/react-fontawesome": "^0.1.18",
     "@grpc/grpc-js": "^1.4.4",
     "@grpc/proto-loader": "^0.6.7",
-    "@headlessui/react": "^1.4.1",
+    "@headlessui/react": "^1.7.7",
     "@heroicons/react": "^1.0.4",
     "@kunukn/react-collapse": "^2.2.9",
     "@mantine/core": "^5.7.2",

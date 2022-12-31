@@ -45,7 +45,7 @@ export interface SettingsRaw {
 }
 
 /**
- * Class representation of the `_settings.lang` field.
+ * Object representation of the `_settings.lang` field.
  *
  * {@link https://docs.zinc.ust.dev/user/model/Config.html#settings-lang}
  */

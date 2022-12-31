@@ -156,8 +156,12 @@
   @apply px-2 py-1 border-gray-300 shadow-sm transition focus-within:border-blue-300 focus-within:ring focus-within:ring-blue-100;
 }
 
+.tag-input.disabled .rti--container {
+  @apply cursor-not-allowed opacity-70 bg-gray-100;
+}
+
 .tag-input .rti--input {
-  @apply w-auto flex-grow px-1 py-1 transition-none placeholder:text-gray-400 focus:ring-0 focus:ring-transparent;
+  @apply w-2/5 flex-grow px-1 py-1 transition-none placeholder:text-gray-400 focus:ring-0 focus:ring-transparent disabled:cursor-not-allowed disabled:opacity-70 disabled:bg-gray-100 disabled:placeholder:font-sans disabled:placeholder:text-gray-600;
 }
 
 .tag-input .rti--tag {

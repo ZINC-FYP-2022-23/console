@@ -1,5 +1,5 @@
 import { Spinner } from "@components/Spinner";
-import { CompileRaw, FileStructureValidation, ScoreRaw, StageConfig, StageKind } from "@types";
+import { CompileRaw, FileStructureValidation, ScoreRaw, StageConfig, StageKind, StdioTestRaw } from "@types";
 import dynamic from "next/dynamic";
 import { ComponentType } from "react";
 
@@ -122,10 +122,23 @@ const supportedStages: SupportedStages = {
   StdioTest: {
     label: "Standard I/O Test",
     kind: StageKind.GRADING,
-    description: "Grades against standard input/output using test cases",
+    description: "Grades an executable's standard output against test cases",
     defaultConfig: {
       testCases: [],
+      diff_ignore_flags: [],
+      additional_packages: [],
+      additional_pip_packages: [],
     },
+    configFromRaw: (raw: StdioTestRaw) => ({
+      testCases: raw.testCases,
+      diff_ignore_flags: raw.diff_ignore_flags ?? [],
+      additional_packages: raw.additional_packages ?? [],
+      additional_pip_packages: raw.additional_pip_packages ?? [],
+    }),
+    configToRaw: (config): StdioTestRaw => ({
+      // TODO(Anson)
+      ...config,
+    }),
     stageSettings: dynamic(() => import("../../components/GuiBuilder/StageSettings/StdioTestSettings"), {
       loading: () => <StageSettingsLoading />,
     }),

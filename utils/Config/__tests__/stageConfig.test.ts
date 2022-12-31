@@ -4,7 +4,7 @@
  */
 
 import supportedStages, { SupportedStage } from "@constants/Config/supportedStages";
-import { Compile, CompileRaw, FileStructureValidation, Score, ScoreRaw, StageDataMap } from "@types";
+import { Compile, CompileRaw, FileStructureValidation, Score, ScoreRaw, StageDataMap, StdioTestRaw } from "@types";
 import * as uuid from "uuid";
 import { configsToConfigsRaw, parseStages } from "../stage";
 
@@ -150,6 +150,22 @@ describe("Raw stage configs conversion", () => {
           normalizedTo: 100,
           minScore: undefined,
           maxScore: undefined,
+        });
+      });
+    });
+  });
+
+  describe("StdioTest", () => {
+    describe("configFromRaw", () => {
+      it("converts nullable arrays to empty arrays", () => {
+        const stage = createRawStage<StdioTestRaw>("stdioTest", {
+          testCases: [],
+        });
+        expect(parseStages(stage)[1][UUID].config).toEqual({
+          testCases: [],
+          diff_ignore_flags: [],
+          additional_packages: [],
+          additional_pip_packages: [],
         });
       });
     });

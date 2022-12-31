@@ -53,10 +53,58 @@ export interface Score {
   maxScore: string;
 }
 
+/**
+ * The shape of `StdioTest` stage's config returned by the backend
+ * ({@link https://docs.zinc.ust.dev/user/pipeline/docker/StdioTest.html#config Reference}).
+ */
+export interface StdioTestRaw {
+  testCases: TestCaseRaw[];
+  diff_ignore_flags?: DiffIgnoreFlag[];
+  additional_packages?: string[];
+  additional_pip_packages?: string[];
+}
+
 export interface StdioTest {
-  // TODO(Anson)
+  testCases: TestCaseRaw[];
+  diff_ignore_flags: DiffIgnoreFlag[];
+  additional_packages: string[];
+  additional_pip_packages: string[];
+}
+
+export interface Valgrind {
+  enabled?: boolean;
+  args?: string[];
+  checksFilter?: ChecksFilter[];
+  visibility?: Visibility;
+  score?: number;
 }
 
 /////////////// HELPER TYPES ///////////////
+
+export type ChecksFilter = "*" | "Leak_*" | "Uninit*" | "*Free";
+
+export type DiffIgnoreFlag = "TRAILING_WHITESPACE" | "SPACE_CHANGE" | "ALL_SPACE" | "BLANK_LINES";
+
+export type HiddenItem = "STDIN" | "STDOUT" | "STDERR" | "DIFF";
+
+export interface TestCaseRaw {
+  id: number;
+  file: string;
+  visibility: Visibility;
+  args?: string[];
+  stdin?: string;
+  file_stdin?: string;
+  expected?: string;
+  file_expected?: string;
+  hide_from_report?: HiddenItem[];
+  score?: number;
+  valgrind?: Valgrind;
+}
+
+export type Visibility =
+  | "ALWAYS_VISIBLE"
+  | "ALWAYS_HIDDEN"
+  | "VISIBLE_AFTER_GRADING"
+  | "VISIBLE_AFTER_GRADING_IF_FAILED";
 
 export default StageConfig;

@@ -138,7 +138,7 @@ function StageSettings() {
           </div>
         </div>
       </div>
-      <div className="overflow-y-auto">
+      <div className="flex-1 overflow-y-auto">
         <StageSettings />
       </div>
     </div>

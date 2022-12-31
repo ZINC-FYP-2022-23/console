@@ -152,7 +152,7 @@ const AdditionalPackagesTooltip = memo(() => (
     <ul className="px-3 text-sm list-disc">
       <li>If your container requires external dependencies, specify the package names here.</li>
       <li>
-        They will be installed by your container&apos;s package manager (usually is <code>apt-get</code>)
+        They will be installed by your container&apos;s package manager (e.g. <code>apt-get</code>)
       </li>
     </ul>
   </InfoTooltip>
