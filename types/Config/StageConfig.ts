@@ -65,17 +65,17 @@ export interface StdioTestRaw {
 }
 
 export interface StdioTest {
-  testCases: TestCaseRaw[];
+  testCases: TestCase[];
   diff_ignore_flags: DiffIgnoreFlag[];
   additional_packages: string[];
   additional_pip_packages: string[];
 }
 
-export interface Valgrind {
+export interface ValgrindRaw {
   enabled?: boolean;
   args?: string[];
   checksFilter?: ChecksFilter[];
-  visibility?: Visibility;
+  visibility?: VisibilityTestCase;
   score?: number;
 }
 
@@ -90,7 +90,7 @@ export type HiddenItem = "STDIN" | "STDOUT" | "STDERR" | "DIFF";
 export interface TestCaseRaw {
   id: number;
   file: string;
-  visibility: Visibility;
+  visibility: VisibilityTestCase;
   args?: string[];
   stdin?: string;
   file_stdin?: string;
@@ -98,10 +98,29 @@ export interface TestCaseRaw {
   file_expected?: string;
   hide_from_report?: HiddenItem[];
   score?: number;
-  valgrind?: Valgrind;
 }
 
-export type Visibility =
+export interface TestCase {
+  id: number;
+  file: string;
+  visibility: VisibilityTestCase;
+  args?: string;
+
+  /** Helper field to indicate how standard input is specified. */
+  _stdinInputMode: "text" | "file" | "none";
+  stdin?: string;
+  file_stdin?: string;
+
+  /** Helper field to indicate how expected output is specified. */
+  _expectedInputMode: "text" | "file" | "none";
+  expected?: string;
+  file_expected?: string;
+
+  hide_from_report?: HiddenItem[];
+  score: string;
+}
+
+export type VisibilityTestCase =
   | "ALWAYS_VISIBLE"
   | "ALWAYS_HIDDEN"
   | "VISIBLE_AFTER_GRADING"

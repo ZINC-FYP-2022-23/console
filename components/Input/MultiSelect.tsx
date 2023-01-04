@@ -16,18 +16,32 @@ interface MultiSelectProps<TValue extends string> {
   value: TValue[];
   /** Callback when a new option is selected. */
   onChange: (value: TValue[]) => void;
-  /** Placeholder to show when there are no items. */
+  disabled?: boolean;
   placeholder?: string;
+  /** Whether to show the pop-up menu above the button. */
+  showAbove?: boolean;
 }
 
 /**
  * A multi-select input that lets users pick 0 or more options.
  */
-function MultiSelect<TValue extends string>({ data, value, onChange, placeholder }: MultiSelectProps<TValue>) {
+function MultiSelect<TValue extends string>({
+  data,
+  value,
+  onChange,
+  disabled = false,
+  placeholder,
+  showAbove = false,
+}: MultiSelectProps<TValue>) {
   return (
-    <Listbox value={value} onChange={onChange} multiple>
+    <Listbox value={value} onChange={onChange} multiple disabled={disabled}>
       <div className="relative">
-        <Listbox.Button className="w-full py-2 pl-3 pr-8 border border-gray-300 bg-white text-left cursor-default text-sm rounded-md shadow-sm">
+        <Listbox.Button
+          className={clsx(
+            "w-full py-2 pl-3 pr-8 border border-gray-300 text-left cursor-default text-sm rounded-md shadow-sm",
+            disabled ? "cursor-not-allowed opacity-70 bg-gray-100 text-gray-400" : "bg-white",
+          )}
+        >
           {value.length ? (
             <span className="block">
               {value.map((v) => data.find((item) => item.value === v)?.label ?? "").join(", ")}
@@ -40,7 +54,12 @@ function MultiSelect<TValue extends string>({ data, value, onChange, placeholder
           </span>
         </Listbox.Button>
         <Transition as={Fragment} leave="transition duration-100" leaveFrom="opacity-100" leaveTo="opacity-0">
-          <Listbox.Options className="w-full mt-1 py-1 absolute bg-white text-sm overflow-auto rounded-md drop-shadow-lg z-10 focus:outline-none">
+          <Listbox.Options
+            className={clsx(
+              "w-full py-1 absolute bg-white text-sm overflow-auto rounded-md drop-shadow-lg z-10 focus:outline-none",
+              showAbove ? "mb-1 bottom-full" : "mt-1 top-full",
+            )}
+          >
             {data.map((dataItem, index) => {
               return (
                 <Listbox.Option

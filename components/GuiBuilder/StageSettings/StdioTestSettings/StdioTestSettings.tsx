@@ -1,9 +1,10 @@
 import Button from "@components/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { createStyles, Modal, ScrollArea } from "@mantine/core";
+import { clsx, createStyles, Modal, ScrollArea } from "@mantine/core";
 import { useSelectedStageConfig } from "@state/GuiBuilder/Hooks";
 import { StdioTest } from "@types";
-import { useState } from "react";
+import { ButtonHTMLAttributes, useState } from "react";
+import StdioTestCaseSettings from "./StdioTestCaseSettings";
 import StdioTestStageSettings from "./StdioTestStageSettings";
 
 function StdioTestSettings() {
@@ -11,6 +12,7 @@ function StdioTestSettings() {
   const [config] = useSelectedStageConfig<StdioTest>();
 
   const [modalOpened, setModalOpened] = useState(false);
+  const [page, setPage] = useState<"settings" | number>("settings");
 
   return (
     <>
@@ -39,6 +41,7 @@ function StdioTestSettings() {
               <Button
                 icon={<FontAwesomeIcon icon={["fas", "gear"]} />}
                 className="!justify-start bg-cse-700 text-white hover:bg-cse-500"
+                onClick={() => setPage("settings")}
               >
                 Settings
               </Button>
@@ -49,16 +52,16 @@ function StdioTestSettings() {
                 Add Test
               </Button>
             </div>
-            <ScrollArea type="auto" className="px-3">
+            <ScrollArea type="auto" className="px-3 pb-3">
               <div className="flex flex-col gap-1">
-                {config.testCases.map((test) => (
-                  <TestCaseButton key={test.id} id={test.id} />
+                {config.testCases.map(({ id }) => (
+                  <TestCaseButton key={id} caseId={id} isSelected={page === id} onClick={() => setPage(id)} />
                 ))}
               </div>
             </ScrollArea>
           </div>
-          <div className="flex-1 pl-5 py-2 overflow-y-auto">
-            <StdioTestStageSettings />
+          <div className="flex-1 pr-1 pl-5 overflow-y-auto">
+            {page === "settings" ? <StdioTestStageSettings /> : <StdioTestCaseSettings caseId={page} />}
           </div>
         </div>
       </Modal>
@@ -85,12 +88,23 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-interface TestCaseButtonProps {
-  id: number;
+interface TestCaseButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  caseId: number;
+  isSelected: boolean;
 }
 
-function TestCaseButton({ id }: TestCaseButtonProps) {
-  return <Button className="!px-3 !justify-start text-black hover:bg-blue-200 hover:text-blue-900">Test #{id}</Button>;
+function TestCaseButton({ caseId, isSelected, ...props }: TestCaseButtonProps) {
+  return (
+    <Button
+      className={clsx(
+        "!px-3 !justify-start hover:bg-blue-100 active:bg-blue-200",
+        isSelected ? "bg-blue-200 text-blue-800" : "text-black",
+      )}
+      {...props}
+    >
+      Test #{caseId}
+    </Button>
+  );
 }
 
 export default StdioTestSettings;

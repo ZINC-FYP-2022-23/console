@@ -96,7 +96,7 @@ function CompileSettings() {
           onChange={(e) => setConfig({ ...config, output: e.target.value })}
           placeholder={metadata.output.disabled ? "No need to specify" : metadata.output.defaultValue}
           disabled={metadata.output.disabled}
-          classNames={{ root: "flex-1 font-mono", input: "!leading-5 placeholder:disabled:font-sans" }}
+          classNames={{ root: "flex-1", input: "font-mono placeholder:disabled:font-sans" }}
         />
       </div>
       <div className="flex items-center">
@@ -109,7 +109,7 @@ function CompileSettings() {
           value={config.flags ?? ""}
           onChange={(e) => setConfig({ ...config, flags: e.target.value })}
           placeholder={metadata.flags.defaultValue ?? "e.g. -verbose -nowarn"}
-          className="flex-1 py-2 px-3 text-sm font-mono leading-5 resize-none rounded-md shadow-sm border border-gray-300 transition ease-in-out placeholder:text-gray-400 placeholder:disabled:font-sans focus:outline-none focus:ring focus:ring-blue-100 focus:border-blue-300"
+          className="flex-1 py-2 px-3 text-sm font-mono resize-none rounded-md shadow-sm border border-gray-300 transition ease-in-out placeholder:text-gray-400 placeholder:disabled:font-sans focus:outline-none focus:ring focus:ring-blue-100 focus:border-blue-300"
         />
       </div>
       <div className="flex items-center">

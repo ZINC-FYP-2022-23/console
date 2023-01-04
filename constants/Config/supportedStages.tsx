@@ -1,5 +1,14 @@
 import { Spinner } from "@components/Spinner";
-import { CompileRaw, FileStructureValidation, ScoreRaw, StageConfig, StageKind, StdioTestRaw } from "@types";
+import {
+  CompileRaw,
+  FileStructureValidation,
+  ScoreRaw,
+  StageConfig,
+  StageKind,
+  StdioTestRaw,
+  TestCase,
+  TestCaseRaw,
+} from "@types";
 import dynamic from "next/dynamic";
 import { ComponentType } from "react";
 
@@ -130,14 +139,46 @@ const supportedStages: SupportedStages = {
       additional_pip_packages: [],
     },
     configFromRaw: (raw: StdioTestRaw) => ({
-      testCases: raw.testCases,
+      testCases: raw.testCases
+        .sort((a, b) => a.id - b.id)
+        .map(
+          (test): TestCase => ({
+            ...test,
+            score: test.score?.toString() ?? "",
+            args: test.args?.join(" "),
+
+            // Helper fields
+            _stdinInputMode: (() => {
+              if (!test.stdin && !test.file_stdin) return "none";
+              return test.stdin ? "text" : "file";
+            })(),
+            _expectedInputMode: (() => {
+              if (!test.expected && !test.file_expected) return "none";
+              return test.expected ? "text" : "file";
+            })(),
+          }),
+        ),
       diff_ignore_flags: raw.diff_ignore_flags ?? [],
       additional_packages: raw.additional_packages ?? [],
       additional_pip_packages: raw.additional_pip_packages ?? [],
     }),
     configToRaw: (config): StdioTestRaw => ({
-      // TODO(Anson)
       ...config,
+      testCases: config.testCases.map((test): TestCaseRaw => {
+        const { _stdinInputMode, _expectedInputMode, ...testRest } = test;
+        return {
+          ...testRest,
+          score: test.score ? parseFloat(test.score) : undefined,
+          args: test.args
+            ?.trim()
+            .split(" ")
+            .filter((arg) => arg !== ""),
+          stdin: _stdinInputMode === "text" ? test.stdin : undefined,
+          file_stdin: _stdinInputMode === "file" ? test.file_stdin : undefined,
+          expected: _expectedInputMode === "text" ? test.expected : undefined,
+          file_expected: _expectedInputMode === "file" ? test.file_expected : undefined,
+        };
+      }),
     }),
     stageSettings: dynamic(() => import("../../components/GuiBuilder/StageSettings/StdioTestSettings"), {
       loading: () => <StageSettingsLoading />,
