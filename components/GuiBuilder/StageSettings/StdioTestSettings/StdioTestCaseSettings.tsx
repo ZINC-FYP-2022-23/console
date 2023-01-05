@@ -1,23 +1,34 @@
+import InfoTooltip from "@components/GuiBuilder/Diagnostics/InfoTooltip";
 import { MultiSelect, Select, SelectWithDescription, SwitchGroup, TextInput } from "@components/Input";
 import { valgrindDefaultConfig } from "@constants/Config/supportedStages";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { clsx } from "@mantine/core";
 import { ControlledEditor, ControlledEditorProps } from "@monaco-editor/react";
-import { useSelectedStageConfig, useStoreActions } from "@state/GuiBuilder/Hooks";
+import { useSelectedStageConfig, useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
 import { StdioTest, TestCase } from "@types";
 import cloneDeep from "lodash/cloneDeep";
-import { ChangeEventHandler } from "react";
+import { ChangeEventHandler, memo } from "react";
 import TextareaAutosize from "react-textarea-autosize";
+import {
+  checksFilterOptions as valgrindChecksFilterOptions,
+  visibilityOptions as valgrindVisibilityOptions,
+} from "../ValgrindSettings";
 import { hiddenItemOptions, inputModeOptions, visibilityOptions } from "./inputOptions";
 
 interface StdioTestCaseSettingsProps {
   caseId: number;
+  /** A callback that closes the current modal. */
+  closeModal: () => void;
 }
 
 /**
  * Test case settings page for the "Standard I/O Test" settings panel.
  */
-function StdioTestCaseSettings({ caseId }: StdioTestCaseSettingsProps) {
+function StdioTestCaseSettings({ caseId, closeModal }: StdioTestCaseSettingsProps) {
   const [config, setConfig] = useSelectedStageConfig<StdioTest>();
+  const hasValgrindStage = useStoreState((state) => state.hasValgrindStage);
+  const setAddStageSearchString = useStoreActions((actions) => actions.setAddStageSearchString);
+
   const caseConfig = config.testCases.find((test) => test.id === caseId);
   if (caseConfig === undefined) {
     console.error(`Cannot find test case of id ${caseId}.`);
@@ -49,7 +60,7 @@ function StdioTestCaseSettings({ caseId }: StdioTestCaseSettingsProps) {
           <div className="space-y-3">
             <div className="flex items-center gap-2">
               <label htmlFor="score" className="flex-[2]">
-                Score
+                Test case score
               </label>
               <TextInput
                 id="score"
@@ -196,6 +207,148 @@ function StdioTestCaseSettings({ caseId }: StdioTestCaseSettingsProps) {
             )}
           </div>
         </div>
+        <div>
+          <p className="mb-4 font-semibold text-lg">Valgrind</p>
+          <div className="space-y-5">
+            <div>
+              <SwitchGroup
+                label="Override config from Valgrind stage"
+                checked={caseConfig._valgrindOverride}
+                onChange={(value) =>
+                  updateTestCase((testCase) => {
+                    testCase._valgrindOverride = value;
+                    if (value && !testCase.valgrind) {
+                      testCase.valgrind = cloneDeep(valgrindDefaultConfig);
+                    }
+                  })
+                }
+              />
+              {caseConfig._valgrindOverride && !hasValgrindStage && (
+                <div className="px-4 py-3 mt-3 flex items-center gap-4 bg-yellow-100 text-yellow-800 rounded-md">
+                  <FontAwesomeIcon icon={["far", "triangle-exclamation"]} className="text-xl text-yellow-600" />
+                  <p>
+                    Your grading pipeline is missing a{" "}
+                    <button
+                      className="text-blue-700 underline"
+                      onClick={() => {
+                        closeModal();
+                        setAddStageSearchString("Valgrind");
+                      }}
+                    >
+                      Valgrind stage
+                    </button>
+                    . Please add it back.
+                  </p>
+                </div>
+              )}
+            </div>
+            <SwitchGroup
+              label="Run Valgrind on this test case"
+              checked={caseConfig.valgrind?.enabled ?? valgrindDefaultConfig.enabled}
+              onChange={(value) =>
+                updateTestCase((testCase) => {
+                  if (!testCase.valgrind) testCase.valgrind = cloneDeep(valgrindDefaultConfig);
+                  testCase.valgrind.enabled = value;
+                })
+              }
+              disabled={!caseConfig._valgrindOverride}
+            />
+          </div>
+          <div className="mt-5 space-y-3">
+            <div className="flex gap-2">
+              <div className="flex-[2] flex items-center gap-1">
+                <label htmlFor="valgrind.score" className={!caseConfig._valgrindOverride ? "text-gray-400" : ""}>
+                  Valgrind score
+                </label>
+                <ValgrindScoreTooltip />
+              </div>
+              <TextInput
+                id="valgrind.score"
+                value={caseConfig.valgrind?.score ?? ""}
+                onChange={(e) =>
+                  updateTestCase((testCase) => {
+                    if (!testCase.valgrind) testCase.valgrind = cloneDeep(valgrindDefaultConfig);
+                    testCase.valgrind.score = e.target.value;
+                  })
+                }
+                disabled={!caseConfig._valgrindOverride}
+                type="number"
+                step=".1"
+                min="0"
+                placeholder={caseConfig.score ? caseConfig.score : "Use the score value from the Valgrind stage"}
+                classNames={{ root: "flex-[3]" }}
+              />
+            </div>
+            <div className="flex gap-2">
+              <label
+                htmlFor="valgrind.checksFilter"
+                className={clsx("mt-2 flex-[2]", !caseConfig._valgrindOverride && "text-gray-400")}
+              >
+                Visibility to students
+              </label>
+              <SelectWithDescription
+                data={valgrindVisibilityOptions}
+                value={caseConfig.valgrind?.visibility ?? valgrindDefaultConfig.visibility}
+                onChange={(value) => {
+                  updateTestCase((testCase) => {
+                    if (!value) return;
+                    if (!testCase.valgrind) testCase.valgrind = cloneDeep(valgrindDefaultConfig);
+                    testCase.valgrind.visibility = value;
+                  });
+                }}
+                disabled={!caseConfig._valgrindOverride}
+                className="flex-[3]"
+                maxDropdownHeight={320}
+              />
+            </div>
+            <div className="flex gap-2">
+              <label
+                htmlFor="valgrind.checksFilter"
+                className={clsx("mt-2 flex-[2]", !caseConfig._valgrindOverride && "text-gray-400")}
+              >
+                Errors to check
+              </label>
+              <div className="flex-[3]">
+                <MultiSelect
+                  data={valgrindChecksFilterOptions}
+                  value={caseConfig.valgrind?.checksFilter ?? valgrindDefaultConfig.checksFilter}
+                  onChange={(value) => {
+                    updateTestCase((testCase) => {
+                      if (!testCase.valgrind) testCase.valgrind = cloneDeep(valgrindDefaultConfig);
+                      testCase.valgrind.checksFilter = value;
+                    });
+                  }}
+                  disabled={!caseConfig._valgrindOverride}
+                  placeholder="Select errors..."
+                  showAbove
+                />
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <label
+                htmlFor="valgrind.args"
+                className={clsx("mt-2 flex-[2]", !caseConfig._valgrindOverride && "text-gray-400")}
+              >
+                Valgrind command-line options
+              </label>
+              <div className="flex-[3] flex">
+                <TextareaAutosize
+                  id="valgrind.args"
+                  value={caseConfig.valgrind?.args ?? ""}
+                  onChange={(e) => {
+                    updateTestCase((testCase) => {
+                      if (!testCase.valgrind) testCase.valgrind = cloneDeep(valgrindDefaultConfig);
+                      testCase.valgrind.args = e.target.value;
+                    });
+                  }}
+                  placeholder="e.g. --leak-check=full"
+                  className="w-full py-2 px-3 text-sm font-mono resize-none rounded-md shadow-sm border border-gray-300 transition ease-in-out placeholder:text-gray-400 focus:outline-none focus:ring focus:ring-blue-100 focus:border-blue-300 disabled:cursor-not-allowed disabled:opacity-70 disabled:bg-gray-100"
+                  disabled={!caseConfig._valgrindOverride}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -249,5 +402,20 @@ function MonacoEditorCard({ cardTitle, ...props }: MonacoEditorCardProps) {
     </div>
   );
 }
+
+const ValgrindScoreTooltip = memo(() => (
+  <InfoTooltip width={520}>
+    <ul className="px-3 text-sm list-disc">
+      <li>
+        If this field is blank, it uses the score value from the &quot;Test case score&quot; field at the very top.
+      </li>
+      <li>
+        If both this field and the &quot;Test case score&quot; field are blank, it uses the score value from the
+        Valgrind stage of your grading pipeline.
+      </li>
+    </ul>
+  </InfoTooltip>
+));
+ValgrindScoreTooltip.displayName = "ValgrindScoreTooltip";
 
 export default StdioTestCaseSettings;

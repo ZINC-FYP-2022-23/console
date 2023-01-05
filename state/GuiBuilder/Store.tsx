@@ -117,6 +117,8 @@ export interface BaseActions {
    * Whether there exist 2 different stages with the same name (e.g. Compile) and same non-empty {@link Stage.label label}.
    */
   hasDuplicateNonEmptyLabels: Computed<GuiBuilderStoreModel, boolean>;
+  /** Whether the pipeline has a `Valgrind` stage. */
+  hasValgrindStage: Computed<GuiBuilderStoreModel, boolean>;
 }
 
 /** Actions for {@link StoreStates.layout}. */
@@ -288,6 +290,9 @@ export const baseActions: BaseActions = {
       stageNamesToLabels[stage.name].push(stage.label);
     }
     return false;
+  }),
+  hasValgrindStage: computed((state) => {
+    return Object.values(state.editingConfig.stageData).some((stage) => stage.name === "Valgrind");
   }),
 };
 

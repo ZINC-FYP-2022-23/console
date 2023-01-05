@@ -64,7 +64,7 @@ describe("GuiBuilder Store - BaseActions", () => {
       const model: GuiBuilderStoreModel = {
         ...getThreeStageModel(),
         // Mock that we've selected 3rd stage
-        selectedStage: computed(() => ({ id: "stage-2", name: "Compile", label: "" })),
+        selectedStage: computed(() => ({ id: "stage-2", name: "Compile", nameInUi: "Compile", label: "" })),
       };
       const store = createStore(model);
       const newConfig = { input: ["hi.cpp"], output: "hi.out" };
@@ -77,7 +77,7 @@ describe("GuiBuilder Store - BaseActions", () => {
       const model: GuiBuilderStoreModel = {
         ...getThreeStageModel(),
         // Mock that we've selected 3rd stage
-        selectedStage: computed(() => ({ id: "stage-2", name: "Compile", label: "" })),
+        selectedStage: computed(() => ({ id: "stage-2", name: "Compile", nameInUi: "Compile", label: "" })),
       };
       const store = createStore(model);
       const newLabel = "all";
@@ -157,6 +157,42 @@ describe("GuiBuilder Store - BaseActions", () => {
       };
       const store = createStore(model);
       expect(store.getState().hasDuplicateNonEmptyLabels).toBe(true);
+    });
+  });
+
+  describe("hasValgrindStage", () => {
+    it("returns true if the pipeline has a Valgrind stage", () => {
+      const model = cloneDeep(initialModel);
+      model.editingConfig.stageData = {
+        "stage-0": {
+          name: "DiffWithSkeleton",
+          label: "",
+          kind: StageKind.PRE_GLOBAL,
+          config: {},
+        },
+        "stage-1": {
+          name: "Valgrind",
+          label: "",
+          kind: StageKind.GRADING,
+          config: {},
+        },
+      };
+      const store = createStore(model);
+      expect(store.getState().hasValgrindStage).toBe(true);
+    });
+
+    it("returns false if the pipeline is missing a Valgrind stage", () => {
+      const model = cloneDeep(initialModel);
+      model.editingConfig.stageData = {
+        "stage-0": {
+          name: "DiffWithSkeleton",
+          label: "",
+          kind: StageKind.PRE_GLOBAL,
+          config: {},
+        },
+      };
+      const store = createStore(model);
+      expect(store.getState().hasValgrindStage).toBe(false);
     });
   });
 });

@@ -6,9 +6,10 @@ import {
   StageConfig,
   StageKind,
   StdioTestRaw,
-  TestCase,
   TestCaseRaw,
+  Valgrind,
 } from "@types";
+import { testCaseFromRaw, testCaseToRaw } from "@utils/Config/stageConfig";
 import dynamic from "next/dynamic";
 import { ComponentType } from "react";
 
@@ -47,6 +48,16 @@ const StageSettingsLoading = () => (
     <Spinner className="h-14 w-14 text-cse-500" />
   </div>
 );
+
+/**
+ * Default config values for Valgrind stage.
+ * ({@link https://docs.zinc.ust.dev/user/pipeline/docker/Valgrind.html Reference}).
+ */
+export const valgrindDefaultConfig: Valgrind = {
+  enabled: true,
+  checksFilter: ["*"],
+  visibility: "INHERIT",
+};
 
 /**
  * Pipeline stages supported by the GUI Assignment Builder.
@@ -139,46 +150,14 @@ const supportedStages: SupportedStages = {
       additional_pip_packages: [],
     },
     configFromRaw: (raw: StdioTestRaw) => ({
-      testCases: raw.testCases
-        .sort((a, b) => a.id - b.id)
-        .map(
-          (test): TestCase => ({
-            ...test,
-            score: test.score?.toString() ?? "",
-            args: test.args?.join(" "),
-
-            // Helper fields
-            _stdinInputMode: (() => {
-              if (!test.stdin && !test.file_stdin) return "none";
-              return test.stdin ? "text" : "file";
-            })(),
-            _expectedInputMode: (() => {
-              if (!test.expected && !test.file_expected) return "none";
-              return test.expected ? "text" : "file";
-            })(),
-          }),
-        ),
+      testCases: raw.testCases.sort((a, b) => a.id - b.id).map((testCase) => testCaseFromRaw(testCase)),
       diff_ignore_flags: raw.diff_ignore_flags ?? [],
       additional_packages: raw.additional_packages ?? [],
       additional_pip_packages: raw.additional_pip_packages ?? [],
     }),
     configToRaw: (config): StdioTestRaw => ({
       ...config,
-      testCases: config.testCases.map((test): TestCaseRaw => {
-        const { _stdinInputMode, _expectedInputMode, ...testRest } = test;
-        return {
-          ...testRest,
-          score: test.score ? parseFloat(test.score) : undefined,
-          args: test.args
-            ?.trim()
-            .split(" ")
-            .filter((arg) => arg !== ""),
-          stdin: _stdinInputMode === "text" ? test.stdin : undefined,
-          file_stdin: _stdinInputMode === "file" ? test.file_stdin : undefined,
-          expected: _expectedInputMode === "text" ? test.expected : undefined,
-          file_expected: _expectedInputMode === "file" ? test.file_expected : undefined,
-        };
-      }),
+      testCases: config.testCases.map((test): TestCaseRaw => testCaseToRaw(test)),
     }),
     stageSettings: dynamic(() => import("../../components/GuiBuilder/StageSettings/StdioTestSettings"), {
       loading: () => <StageSettingsLoading />,

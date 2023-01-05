@@ -24,8 +24,7 @@ export const checksFilterOptions: MultiSelectData<ChecksFilter>[] = [
 export const visibilityOptions: SelectItem<VisibilityValgrind>[] = [
   {
     value: "INHERIT",
-    label: "Inherit",
-    description: "Inherit visibility from the test case",
+    label: "Same visibility as the test case",
   },
   ...testCaseVisibilityOptions,
 ];

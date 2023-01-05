@@ -75,8 +75,16 @@ export interface ValgrindRaw {
   enabled?: boolean;
   args?: string[];
   checksFilter?: ChecksFilter[];
-  visibility?: VisibilityTestCase;
+  visibility?: VisibilityValgrind;
   score?: number;
+}
+
+export interface Valgrind {
+  enabled: boolean;
+  args?: string;
+  checksFilter: ChecksFilter[];
+  visibility: VisibilityValgrind;
+  score?: string;
 }
 
 /////////////// HELPER TYPES ///////////////
@@ -98,6 +106,7 @@ export interface TestCaseRaw {
   file_expected?: string;
   hide_from_report?: HiddenItem[];
   score?: number;
+  valgrind?: ValgrindRaw;
 }
 
 export interface TestCase {
@@ -118,6 +127,10 @@ export interface TestCase {
 
   hide_from_report?: HiddenItem[];
   score: string;
+
+  /** Helper field to indicate whether to override setting from the Valgrind stage. */
+  _valgrindOverride: boolean;
+  valgrind?: Valgrind;
 }
 
 export type VisibilityTestCase =
@@ -125,5 +138,7 @@ export type VisibilityTestCase =
   | "ALWAYS_HIDDEN"
   | "VISIBLE_AFTER_GRADING"
   | "VISIBLE_AFTER_GRADING_IF_FAILED";
+
+export type VisibilityValgrind = VisibilityTestCase | "INHERIT";
 
 export default StageConfig;

@@ -61,7 +61,11 @@ function StdioTestSettings() {
             </ScrollArea>
           </div>
           <div className="flex-1 pr-1 pl-5 overflow-y-auto">
-            {page === "settings" ? <StdioTestStageSettings /> : <StdioTestCaseSettings caseId={page} />}
+            {page === "settings" ? (
+              <StdioTestStageSettings />
+            ) : (
+              <StdioTestCaseSettings caseId={page} closeModal={() => setModalOpened(false)} />
+            )}
           </div>
         </div>
       </Modal>
