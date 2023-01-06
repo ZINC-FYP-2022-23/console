@@ -1,4 +1,4 @@
-import type { Config, GradingPolicy, Schedule, Settings } from "@types";
+import type { Config, GradingPolicy, Schedule, Settings, TestCase } from "@types";
 import { addDays, set } from "date-fns";
 import { v4 as uuidv4 } from "uuid";
 
@@ -48,4 +48,15 @@ export const defaultSchedule: Schedule = {
   dueAt: set(addDays(new Date(), 7), { hours: 23, minutes: 59 }).toISOString(),
   stopCollectionAt: set(addDays(new Date(), 7), { hours: 23, minutes: 59 }).toISOString(),
   releaseGradeAt: set(addDays(new Date(), 7), { hours: 23, minutes: 59 }).toISOString(),
+};
+
+export const defaultTestCase: TestCase = {
+  id: 0,
+  file: "",
+  visibility: "ALWAYS_VISIBLE",
+  _stdinInputMode: "none",
+  _expectedInputMode: "text",
+  expected: "",
+  score: "",
+  _valgrindOverride: false,
 };

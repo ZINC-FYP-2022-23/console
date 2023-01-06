@@ -81,3 +81,11 @@ export const valgrindToRaw = (valgrind: Valgrind): ValgrindRaw => {
   };
   return output;
 };
+
+/**
+ * @returns The largest test case ID in the given test cases.
+ */
+export const getTestCasesLargestId = (testCases: TestCase[]) => {
+  if (testCases.length === 0) return 0; // Since `Math.max(...[])` returns `-Infinity`
+  return Math.max(...testCases.map((test) => test.id));
+};

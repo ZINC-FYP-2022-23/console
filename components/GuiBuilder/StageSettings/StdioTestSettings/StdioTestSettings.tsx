@@ -1,18 +1,33 @@
 import Button from "@components/Button";
+import { defaultTestCase } from "@constants/Config/defaults";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { clsx, createStyles, Modal, ScrollArea } from "@mantine/core";
 import { useSelectedStageConfig } from "@state/GuiBuilder/Hooks";
 import { StdioTest } from "@types";
+import { getTestCasesLargestId } from "@utils/Config/stageConfig";
+import cloneDeep from "lodash/cloneDeep";
 import { ButtonHTMLAttributes, useState } from "react";
 import StdioTestCaseSettings from "./StdioTestCaseSettings";
 import StdioTestStageSettings from "./StdioTestStageSettings";
 
 function StdioTestSettings() {
   const { classes } = useStyles();
-  const [config] = useSelectedStageConfig<StdioTest>();
+  const [config, setConfig] = useSelectedStageConfig<StdioTest>();
 
   const [modalOpened, setModalOpened] = useState(false);
-  const [page, setPage] = useState<"settings" | number>("settings");
+  /**
+   * - "settings" = Stage settings
+   * - `number` = Test case ID
+   * - `null` = No test case is selected (i.e. empty page)
+   */
+  const [page, setPage] = useState<"settings" | number | null>("settings");
+
+  const addTestCase = () => {
+    const testCase = cloneDeep(defaultTestCase);
+    testCase.id = getTestCasesLargestId(config.testCases) + 1;
+    setConfig({ ...config, testCases: [...config.testCases, testCase] });
+    setPage(testCase.id);
+  };
 
   return (
     <>
@@ -46,6 +61,7 @@ function StdioTestSettings() {
                 Settings
               </Button>
               <Button
+                onClick={addTestCase}
                 icon={<FontAwesomeIcon icon={["fas", "add"]} />}
                 className="!justify-start bg-green-600 text-white hover:bg-green-700"
               >
@@ -64,7 +80,7 @@ function StdioTestSettings() {
             {page === "settings" ? (
               <StdioTestStageSettings />
             ) : (
-              <StdioTestCaseSettings caseId={page} closeModal={() => setModalOpened(false)} />
+              <StdioTestCaseSettings caseId={page} closeModal={() => setModalOpened(false)} setPage={setPage} />
             )}
           </div>
         </div>

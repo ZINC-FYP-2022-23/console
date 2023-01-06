@@ -1,3 +1,4 @@
+import Button from "@components/Button";
 import InfoTooltip from "@components/GuiBuilder/Diagnostics/InfoTooltip";
 import { MultiSelect, Select, SelectWithDescription, SwitchGroup, TextInput } from "@components/Input";
 import { valgrindDefaultConfig } from "@constants/Config/supportedStages";
@@ -6,6 +7,7 @@ import { clsx } from "@mantine/core";
 import { ControlledEditor, ControlledEditorProps } from "@monaco-editor/react";
 import { useSelectedStageConfig, useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
 import { StdioTest, TestCase } from "@types";
+import { getTestCasesLargestId } from "@utils/Config/stageConfig";
 import cloneDeep from "lodash/cloneDeep";
 import { ChangeEventHandler, memo } from "react";
 import TextareaAutosize from "react-textarea-autosize";
@@ -16,28 +18,44 @@ import {
 import { hiddenItemOptions, inputModeOptions, visibilityOptions } from "./inputOptions";
 
 interface StdioTestCaseSettingsProps {
-  caseId: number;
+  /** Test case ID. It's `null` when no test case is selected. */
+  caseId: number | null;
   /** A callback that closes the current modal. */
   closeModal: () => void;
+  /** Sets the page to display. */
+  setPage: (page: "settings" | number | null) => void;
 }
 
 /**
  * Test case settings page for the "Standard I/O Test" settings panel.
  */
-function StdioTestCaseSettings({ caseId, closeModal }: StdioTestCaseSettingsProps) {
+function StdioTestCaseSettings({ caseId, closeModal, setPage }: StdioTestCaseSettingsProps) {
   const [config, setConfig] = useSelectedStageConfig<StdioTest>();
   const hasValgrindStage = useStoreState((state) => state.hasValgrindStage);
   const setAddStageSearchString = useStoreActions((actions) => actions.setAddStageSearchString);
 
   const caseConfig = config.testCases.find((test) => test.id === caseId);
-  if (caseConfig === undefined) {
-    console.error(`Cannot find test case of id ${caseId}.`);
-    return null;
+  if (!caseConfig) {
+    return <TestCaseEmptyState />;
   }
+
+  const deleteTestCase = () => {
+    const testCases = config.testCases.filter((test) => test.id !== caseId);
+    setConfig({ ...config, testCases });
+    setPage(null);
+  };
+
+  const duplicateTestCase = () => {
+    const newTestCase = cloneDeep(caseConfig);
+    newTestCase.id = getTestCasesLargestId(config.testCases) + 1;
+    setConfig({ ...config, testCases: [...config.testCases, newTestCase] });
+    setPage(newTestCase.id);
+  };
 
   /**
    * Updates the store by mutating the data of the current test case.
-   * @param callback A callback that updates the test case data.
+   * @param callback A callback that updates the test case data, where you can directly mutate the
+   * `testCase` parameter.
    */
   const updateTestCase = (callback: (testCase: TestCase) => void) => {
     const index = config.testCases.findIndex((test) => test.id === caseId);
@@ -53,7 +71,25 @@ function StdioTestCaseSettings({ caseId, closeModal }: StdioTestCaseSettingsProp
 
   return (
     <div className="pb-6">
-      <p className="mb-6 font-semibold text-xl">Test Case #{caseId}</p>
+      <div className="mb-6 flex items-center justify-between">
+        <p className="font-semibold text-xl">Test Case #{caseId}</p>
+        <div className="flex items-center gap-3">
+          <Button
+            onClick={duplicateTestCase}
+            icon={<FontAwesomeIcon icon={["far", "copy"]} />}
+            className="bg-green-600 text-white hover:bg-green-700 active:bg-green-800"
+          >
+            Duplicate
+          </Button>
+          <Button
+            onClick={deleteTestCase}
+            icon={<FontAwesomeIcon icon={["far", "trash-can"]} />}
+            className="bg-red-500 text-white hover:bg-red-600 active:bg-red-700"
+          >
+            Delete
+          </Button>
+        </div>
+      </div>
       <div className="space-y-6">
         <div>
           <p className="mb-2 font-semibold text-lg">Report</p>
@@ -350,6 +386,16 @@ function StdioTestCaseSettings({ caseId, closeModal }: StdioTestCaseSettingsProp
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+function TestCaseEmptyState() {
+  return (
+    <div className="mt-40 flex flex-col items-center text-gray-400">
+      <p className="mb-6 font-medium text-gray-500 text-xl">No test case selected</p>
+      <p>Please select a test case at the left sidebar.</p>
+      <p>You can also press the &quot;Add Test&quot; button to create one.</p>
     </div>
   );
 }
