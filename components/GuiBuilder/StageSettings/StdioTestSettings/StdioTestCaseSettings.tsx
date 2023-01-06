@@ -3,13 +3,13 @@ import InfoTooltip from "@components/GuiBuilder/Diagnostics/InfoTooltip";
 import { MultiSelect, Select, SelectWithDescription, SwitchGroup, TextInput } from "@components/Input";
 import { valgrindDefaultConfig } from "@constants/Config/supportedStages";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { clsx } from "@mantine/core";
+import { clsx, Tooltip } from "@mantine/core";
 import { ControlledEditor, ControlledEditorProps } from "@monaco-editor/react";
 import { useSelectedStageConfig, useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
 import { StdioTest, TestCase } from "@types";
 import { getTestCasesLargestId } from "@utils/Config/stageConfig";
 import cloneDeep from "lodash/cloneDeep";
-import { ChangeEventHandler, memo } from "react";
+import { ChangeEventHandler, memo, useState } from "react";
 import TextareaAutosize from "react-textarea-autosize";
 import {
   checksFilterOptions as valgrindChecksFilterOptions,
@@ -34,6 +34,9 @@ function StdioTestCaseSettings({ caseId, closeModal, setPage }: StdioTestCaseSet
   const hasValgrindStage = useStoreState((state) => state.hasValgrindStage);
   const setAddStageSearchString = useStoreActions((actions) => actions.setAddStageSearchString);
 
+  const [isEditingId, setIsEditingId] = useState(false);
+  const [newId, setNewId] = useState("");
+
   const caseConfig = config.testCases.find((test) => test.id === caseId);
   if (!caseConfig) {
     return <TestCaseEmptyState />;
@@ -43,6 +46,7 @@ function StdioTestCaseSettings({ caseId, closeModal, setPage }: StdioTestCaseSet
     const testCases = config.testCases.filter((test) => test.id !== caseId);
     setConfig({ ...config, testCases });
     setPage(null);
+    setIsEditingId(false);
   };
 
   const duplicateTestCase = () => {
@@ -50,6 +54,7 @@ function StdioTestCaseSettings({ caseId, closeModal, setPage }: StdioTestCaseSet
     newTestCase.id = getTestCasesLargestId(config.testCases) + 1;
     setConfig({ ...config, testCases: [...config.testCases, newTestCase] });
     setPage(newTestCase.id);
+    setIsEditingId(false);
   };
 
   /**
@@ -69,10 +74,83 @@ function StdioTestCaseSettings({ caseId, closeModal, setPage }: StdioTestCaseSet
     }
   };
 
+  const isNewIdInvalid =
+    parseInt(newId) < 1 ||
+    config.testCases
+      .map((test) => test.id)
+      .filter((id) => id !== caseId)
+      .includes(parseInt(newId));
+
+  const updateTestCaseId = () => {
+    const _newId = parseInt(newId);
+    updateTestCase((testCase) => {
+      testCase.id = _newId;
+    });
+    setIsEditingId(false);
+    setPage(_newId);
+  };
+
   return (
     <div className="pb-6">
       <div className="mb-6 flex items-center justify-between">
-        <p className="font-semibold text-xl">Test Case #{caseId}</p>
+        {isEditingId ? (
+          <div className="flex items-center">
+            <p className="font-semibold text-xl">Test Case #</p>
+            <div className="flex items-center relative">
+              <TextInput
+                value={newId}
+                onChange={(e) => setNewId(e.target.value)}
+                alertLevel={isNewIdInvalid ? "error" : undefined}
+                type="number"
+                min={1}
+                classNames={{ root: "mx-2", input: "w-24 !px-2 !py-1 text-lg" }}
+              />
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={updateTestCaseId}
+                  className={clsx(
+                    "w-7 h-7 flex items-center justify-center rounded-full transition disabled:cursor-not-allowed",
+                    isNewIdInvalid
+                      ? "bg-gray-300 text-gray-500"
+                      : "bg-green-600 text-white hover:bg-green-700 active:bg-green-800",
+                  )}
+                  disabled={isNewIdInvalid}
+                >
+                  <FontAwesomeIcon icon={["fas", "check"]} />
+                </button>
+                <button
+                  onClick={() => {
+                    setIsEditingId(false);
+                    setNewId(caseId?.toString() ?? "");
+                  }}
+                  className="w-7 h-7 flex items-center justify-center bg-red-500 text-white rounded-full transition hover:bg-red-600 active:bg-red-700"
+                >
+                  <FontAwesomeIcon icon={["fas", "close"]} />
+                </button>
+              </div>
+              {isNewIdInvalid && (
+                <p className="ml-2 absolute bottom-[-1.25rem] font-medium text-xs text-red-500">
+                  {parseInt(newId) < 1 ? "ID should be greater than 1" : "This ID is already taken"}
+                </p>
+              )}
+            </div>
+          </div>
+        ) : (
+          <div className="flex items-center gap-5">
+            <p className="font-semibold text-xl">Test Case #{caseId}</p>
+            <Tooltip label="Edit test case ID" position="right">
+              <button
+                onClick={() => {
+                  setNewId(caseId?.toString() ?? "");
+                  setIsEditingId(true);
+                }}
+                className="w-8 h-8 flex items-center justify-center bg-amber-200 text-amber-700 rounded-full transition hover:bg-amber-300 active:bg-amber-400"
+              >
+                <FontAwesomeIcon icon={["far", "pen-field"]} />
+              </button>
+            </Tooltip>
+          </div>
+        )}
         <div className="flex items-center gap-3">
           <Button
             onClick={duplicateTestCase}

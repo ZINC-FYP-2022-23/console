@@ -70,9 +70,11 @@ function StdioTestSettings() {
             </div>
             <ScrollArea type="auto" className="px-3 pb-3">
               <div className="flex flex-col gap-1">
-                {config.testCases.map(({ id }) => (
-                  <TestCaseButton key={id} caseId={id} isSelected={page === id} onClick={() => setPage(id)} />
-                ))}
+                {config.testCases
+                  .sort((a, b) => a.id - b.id)
+                  .map(({ id }) => (
+                    <TestCaseButton key={id} caseId={id} isSelected={page === id} onClick={() => setPage(id)} />
+                  ))}
               </div>
             </ScrollArea>
           </div>

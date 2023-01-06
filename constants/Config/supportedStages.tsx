@@ -157,7 +157,7 @@ const supportedStages: SupportedStages = {
     }),
     configToRaw: (config): StdioTestRaw => ({
       ...config,
-      testCases: config.testCases.map((test): TestCaseRaw => testCaseToRaw(test)),
+      testCases: config.testCases.sort((a, b) => a.id - b.id).map((test): TestCaseRaw => testCaseToRaw(test)),
     }),
     stageSettings: dynamic(() => import("../../components/GuiBuilder/StageSettings/StdioTestSettings"), {
       loading: () => <StageSettingsLoading />,

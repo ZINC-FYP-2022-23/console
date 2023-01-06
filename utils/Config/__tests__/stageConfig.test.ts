@@ -247,6 +247,30 @@ describe("Raw stage configs conversion", () => {
     });
 
     describe("configToRaw", () => {
+      it("sorts `testCases` in ascending order of ID", () => {
+        const commonField: Omit<TestCase, "id"> = {
+          file: "a.out",
+          visibility: "ALWAYS_VISIBLE",
+          score: "5",
+          _stdinInputMode: "none",
+          _expectedInputMode: "none",
+          _valgrindOverride: false,
+        };
+        const stage = createStage<StdioTest>("StdioTest", {
+          testCases: [
+            { id: 3, ...commonField },
+            { id: 2, ...commonField },
+            { id: 1, ...commonField },
+          ],
+          diff_ignore_flags: [],
+          additional_packages: [],
+          additional_pip_packages: [],
+        });
+        const _stage = configsToConfigsRaw(stage);
+        const outputTestCaseIds = _stage[UUID].config.testCases.map((testCase: TestCaseRaw) => testCase.id);
+        expect(outputTestCaseIds).toEqual([1, 2, 3]);
+      });
+
       it("calls testCaseToRaw() on each test case", () => {
         const testCaseToRawMock = jest.spyOn(stageConfig, "testCaseToRaw");
         const testCases: TestCase[] = [
