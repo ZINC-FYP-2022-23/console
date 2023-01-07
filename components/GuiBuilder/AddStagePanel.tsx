@@ -11,12 +11,12 @@ import AddableStage from "./PipelineEditor/AddableStage";
 
 type AccordionKeys = AccordionState["addNewStage"][number];
 
-const allAccordionKeys: AccordionKeys[] = ["preCompile", "compile", "testCases", "miscStages"];
+const allAccordionKeys: AccordionKeys[] = ["preCompile", "compile", "grading", "miscStages"];
 
 const categoryLabel: Record<AccordionKeys, string> = {
   preCompile: "Pre-Compile",
   compile: "Compile",
-  testCases: "Test Cases",
+  grading: "Grading",
   miscStages: "Misc Stages",
 };
 
@@ -27,7 +27,7 @@ const getCategoryByKind = (kind: StageKind): AccordionKeys => {
     case StageKind.PRE_LOCAL:
       return "compile";
     case StageKind.GRADING:
-      return "testCases";
+      return "grading";
     case StageKind.POST:
     case StageKind.CONSTANT:
       return "miscStages";
@@ -42,7 +42,7 @@ const getStagesByCategory = (searchString: string) => {
   const output: Record<AccordionKeys, { [stageName: string]: SupportedStage }> = {
     preCompile: {},
     compile: {},
-    testCases: {},
+    grading: {},
     miscStages: {},
   };
   Object.entries(supportedStages).forEach(([name, data]) => {

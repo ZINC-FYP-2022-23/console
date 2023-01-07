@@ -160,8 +160,8 @@ describe("GuiBuilder Store - BaseActions", () => {
     });
   });
 
-  describe("hasValgrindStage", () => {
-    it("returns true if the pipeline has a Valgrind stage", () => {
+  describe("hasStage", () => {
+    it("returns true if the pipeline has a stage with the given name", () => {
       const model = cloneDeep(initialModel);
       model.editingConfig.stageData = {
         "stage-0": {
@@ -178,10 +178,10 @@ describe("GuiBuilder Store - BaseActions", () => {
         },
       };
       const store = createStore(model);
-      expect(store.getState().hasValgrindStage).toBe(true);
+      expect(store.getState().hasStage("Valgrind")).toBe(true);
     });
 
-    it("returns false if the pipeline is missing a Valgrind stage", () => {
+    it("returns false if the pipeline does not have a stage with the given name", () => {
       const model = cloneDeep(initialModel);
       model.editingConfig.stageData = {
         "stage-0": {
@@ -192,7 +192,7 @@ describe("GuiBuilder Store - BaseActions", () => {
         },
       };
       const store = createStore(model);
-      expect(store.getState().hasValgrindStage).toBe(false);
+      expect(store.getState().hasStage("Valgrind")).toBe(false);
     });
   });
 });

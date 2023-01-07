@@ -1,7 +1,7 @@
 import Button from "@components/Button";
 import InfoTooltip from "@components/GuiBuilder/Diagnostics/InfoTooltip";
 import { MultiSelect, Select, SelectWithDescription, SwitchGroup, TextInput } from "@components/Input";
-import { valgrindDefaultConfig } from "@constants/Config/supportedStages";
+import supportedStages, { valgrindDefaultConfig } from "@constants/Config/supportedStages";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { clsx, Tooltip } from "@mantine/core";
 import { ControlledEditor, ControlledEditorProps } from "@monaco-editor/react";
@@ -31,7 +31,7 @@ interface StdioTestCaseSettingsProps {
  */
 function StdioTestCaseSettings({ caseId, closeModal, setPage }: StdioTestCaseSettingsProps) {
   const [config, setConfig] = useSelectedStageConfig<StdioTest>();
-  const hasValgrindStage = useStoreState((state) => state.hasValgrindStage);
+  const hasValgrindStage = useStoreState((state) => state.hasStage("Valgrind"));
   const setAddStageSearchString = useStoreActions((actions) => actions.setAddStageSearchString);
 
   const [isEditingId, setIsEditingId] = useState(false);
@@ -346,7 +346,7 @@ function StdioTestCaseSettings({ caseId, closeModal, setPage }: StdioTestCaseSet
                       className="text-blue-700 underline"
                       onClick={() => {
                         closeModal();
-                        setAddStageSearchString("Valgrind");
+                        setAddStageSearchString(supportedStages.Valgrind.label);
                       }}
                     >
                       Valgrind stage
@@ -395,12 +395,13 @@ function StdioTestCaseSettings({ caseId, closeModal, setPage }: StdioTestCaseSet
             </div>
             <div className="flex gap-2">
               <label
-                htmlFor="valgrind.checksFilter"
+                htmlFor="valgrind.visibility"
                 className={clsx("mt-2 flex-[2]", !caseConfig._valgrindOverride && "text-gray-400")}
               >
                 Visibility to students
               </label>
               <SelectWithDescription
+                id="valgrind.visibility"
                 data={valgrindVisibilityOptions}
                 value={caseConfig.valgrind?.visibility ?? valgrindDefaultConfig.visibility}
                 onChange={(value) => {
@@ -528,14 +529,14 @@ function MonacoEditorCard({ cardTitle, ...props }: MonacoEditorCardProps) {
 }
 
 const ValgrindScoreTooltip = memo(() => (
-  <InfoTooltip width={520}>
+  <InfoTooltip width={550}>
     <ul className="px-3 text-sm list-disc">
       <li>
         If this field is blank, it uses the score value from the &quot;Test case score&quot; field at the very top.
       </li>
       <li>
-        If both this field and the &quot;Test case score&quot; field are blank, it uses the score value from the
-        Valgrind stage of your grading pipeline.
+        If both this field and the &quot;Test case score&quot; field are blank, it uses the &quot;Default Valgrind
+        score&quot; value from the Valgrind stage of your grading pipeline.
       </li>
     </ul>
   </InfoTooltip>

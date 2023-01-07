@@ -7,6 +7,7 @@ interface StageConfig {
   FileStructureValidation: FileStructureValidation;
   Score: Score;
   StdioTest: StdioTest;
+  Valgrind: Valgrind;
 }
 
 /////////////// STAGE CONFIG TYPES ///////////////
@@ -139,6 +140,11 @@ export type VisibilityTestCase =
   | "VISIBLE_AFTER_GRADING"
   | "VISIBLE_AFTER_GRADING_IF_FAILED";
 
-export type VisibilityValgrind = VisibilityTestCase | "INHERIT";
+export type VisibilityValgrind =
+  | "ALWAYS_VISIBLE"
+  | "ALWAYS_HIDDEN"
+  | "VISIBLE_AFTER_GRADING"
+  | "VISIBLE_AFTER_GRADING_IF_FAILED"
+  | "INHERIT";
 
 export default StageConfig;

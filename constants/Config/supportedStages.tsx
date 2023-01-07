@@ -8,8 +8,9 @@ import {
   StdioTestRaw,
   TestCaseRaw,
   Valgrind,
+  ValgrindRaw,
 } from "@types";
-import { testCaseFromRaw, testCaseToRaw } from "@utils/Config/stageConfig";
+import { testCaseFromRaw, testCaseToRaw, valgrindFromRaw, valgrindToRaw } from "@utils/Config/stageConfig";
 import dynamic from "next/dynamic";
 import { ComponentType } from "react";
 
@@ -160,6 +161,17 @@ const supportedStages: SupportedStages = {
       testCases: config.testCases.sort((a, b) => a.id - b.id).map((test): TestCaseRaw => testCaseToRaw(test)),
     }),
     stageSettings: dynamic(() => import("../../components/GuiBuilder/StageSettings/StdioTestSettings"), {
+      loading: () => <StageSettingsLoading />,
+    }),
+  },
+  Valgrind: {
+    label: "Valgrind",
+    kind: StageKind.GRADING,
+    description: "Memory checking with Valgrind",
+    defaultConfig: valgrindDefaultConfig,
+    configFromRaw: (raw: ValgrindRaw) => valgrindFromRaw(raw),
+    configToRaw: (config): ValgrindRaw => valgrindToRaw(config),
+    stageSettings: dynamic(() => import("../../components/GuiBuilder/StageSettings/ValgrindSettings"), {
       loading: () => <StageSettingsLoading />,
     }),
   },

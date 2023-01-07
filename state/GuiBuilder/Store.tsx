@@ -117,8 +117,8 @@ export interface BaseActions {
    * Whether there exist 2 different stages with the same name (e.g. Compile) and same non-empty {@link Stage.label label}.
    */
   hasDuplicateNonEmptyLabels: Computed<GuiBuilderStoreModel, boolean>;
-  /** Whether the pipeline has a `Valgrind` stage. */
-  hasValgrindStage: Computed<GuiBuilderStoreModel, boolean>;
+  /** Whether the pipeline has a stage given its name. */
+  hasStage: Computed<GuiBuilderStoreModel, (stageName: string) => boolean>;
 }
 
 /** Actions for {@link StoreStates.layout}. */
@@ -217,7 +217,7 @@ export interface PipelineEditorActions {
 
 export interface AccordionState {
   /** Which accordion items are opened in Add New Stage panel. */
-  addNewStage: ("preCompile" | "compile" | "testCases" | "miscStages")[];
+  addNewStage: ("preCompile" | "compile" | "grading" | "miscStages")[];
 }
 
 export interface ModalState {
@@ -291,8 +291,9 @@ export const baseActions: BaseActions = {
     }
     return false;
   }),
-  hasValgrindStage: computed((state) => {
-    return Object.values(state.editingConfig.stageData).some((stage) => stage.name === "Valgrind");
+  hasStage: computed((state) => {
+    return (stageName: string) =>
+      Object.values(state.editingConfig.stageData).some((stage) => stage.name === stageName);
   }),
 };
 

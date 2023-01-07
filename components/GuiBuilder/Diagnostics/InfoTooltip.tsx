@@ -20,7 +20,7 @@ function InfoTooltip({ children, faIcon = ["far", "circle-question"], ...hoverCa
           <FontAwesomeIcon icon={faIcon} />
         </button>
       </HoverCard.Target>
-      <HoverCard.Dropdown className="py-2 text-justify !bg-blue-50 !border !border-blue-300 !drop-shadow-lg">
+      <HoverCard.Dropdown className="!py-2 text-justify !bg-blue-50 !border !border-blue-300 !drop-shadow-lg">
         {children}
       </HoverCard.Dropdown>
     </HoverCard>
