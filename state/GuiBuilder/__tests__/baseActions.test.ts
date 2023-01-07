@@ -100,63 +100,67 @@ describe("GuiBuilder Store - BaseActions", () => {
     });
   });
 
-  describe("hasDuplicateNonEmptyLabels", () => {
-    it("returns false if there are no duplicate non-empty labels", () => {
+  describe("isStageLabelDuplicate", () => {
+    it("returns false if the given stage label is empty", () => {
+      const model = cloneDeep(initialModel);
+      const store = createStore(model);
+      expect(store.getState().isStageLabelDuplicate("Compile", "")).toBe(false);
+    });
+
+    it("returns false if the given non-empty stage label is not duplicate", () => {
       const model = cloneDeep(initialModel);
       model.editingConfig.stageData = {
         "stage-0": {
-          name: "DiffWithSkeleton",
-          label: "",
-          kind: StageKind.PRE_GLOBAL,
+          name: "Compile",
+          label: "main",
+          kind: StageKind.PRE_LOCAL,
           config: {},
         },
         "stage-1": {
-          name: "FileStructureValidation",
-          label: "",
-          kind: StageKind.PRE_GLOBAL,
-          config: {},
-        },
-        "stage-2": {
           name: "Compile",
           label: "test",
           kind: StageKind.PRE_LOCAL,
           config: {},
         },
-        "stage-3": {
+        "stage-2": {
           name: "Score",
-          label: "test", // OK to have same label as stage-2 because their stage names are different
+          label: "main", // OK to have same label as stage-0 because their stage names are different
           kind: StageKind.GRADING,
           config: {},
         },
       };
       const store = createStore(model);
-      expect(store.getState().hasDuplicateNonEmptyLabels).toBe(false);
+      Object.values(model.editingConfig.stageData).forEach((stage) => {
+        expect(store.getState().isStageLabelDuplicate(stage.name, stage.label)).toBe(false);
+      });
     });
 
-    it("returns true if two stages of the same name have the same non-empty label", () => {
+    it("returns true if the given non-empty label is duplicate", () => {
       const model = cloneDeep(initialModel);
       model.editingConfig.stageData = {
         "stage-0": {
-          name: "DiffWithSkeleton",
-          label: "test",
-          kind: StageKind.PRE_GLOBAL,
+          name: "Compile",
+          label: "main",
+          kind: StageKind.PRE_LOCAL,
           config: {},
         },
         "stage-1": {
           name: "Compile",
-          label: "",
+          label: "test",
           kind: StageKind.PRE_LOCAL,
           config: {},
         },
         "stage-2": {
-          name: "DiffWithSkeleton",
-          label: "test", // duplicate label with stage-0, which has same stage name
-          kind: StageKind.PRE_GLOBAL,
+          name: "Compile",
+          label: "main",
+          kind: StageKind.PRE_LOCAL,
           config: {},
         },
       };
       const store = createStore(model);
-      expect(store.getState().hasDuplicateNonEmptyLabels).toBe(true);
+      expect(store.getState().isStageLabelDuplicate("Compile", "main")).toBe(true);
+      // The result of passing "main" as label should not interfere with the result of passing "test" as label
+      expect(store.getState().isStageLabelDuplicate("Compile", "test")).toBe(false);
     });
   });
 

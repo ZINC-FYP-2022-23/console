@@ -46,7 +46,7 @@ function StageSettings() {
   const [labelAlert, setLabelAlert] = useState<keyof StageLabelAlert | null>(null);
 
   const selectedStage = useStoreState((state) => state.selectedStage);
-  const hasDuplicateNonEmptyLabels = useStoreState((state) => state.hasDuplicateNonEmptyLabels);
+  const isStageLabelDuplicate = useStoreState((state) => state.isStageLabelDuplicate);
   const shouldFocusLabelInput = useStoreState((state) => state.pipelineEditor.shouldFocusLabelInput);
   const updateSelectedStage = useStoreActions((actions) => actions.updateSelectedStage);
   const setModal = useStoreActions((actions) => actions.setModal);
@@ -58,13 +58,13 @@ function StageSettings() {
         setLabelAlert("hasColon");
       } else if (label.match(/[^a-zA-Z0-9]/)) {
         setLabelAlert("discouragedChars");
-      } else if (hasDuplicateNonEmptyLabels) {
+      } else if (selectedStage && isStageLabelDuplicate(selectedStage.name, label)) {
         setLabelAlert("duplicateName");
       } else {
         setLabelAlert(null);
       }
     },
-    [hasDuplicateNonEmptyLabels],
+    [isStageLabelDuplicate, selectedStage],
   );
 
   useEffect(() => {

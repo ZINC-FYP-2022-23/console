@@ -114,9 +114,13 @@ export interface BaseActions {
   /** Whether the config has been edited. */
   isEdited: Computed<GuiBuilderStoreModel, boolean>;
   /**
-   * Whether there exist 2 different stages with the same name (e.g. Compile) and same non-empty {@link Stage.label label}.
+   * Returns a callback that check whether another stage with the same `stageName` (e.g. `"DiffWithSkeleton"`)
+   * has a non-empty {@link Stage.label label} that is equal to the provided `label`.
+   *
+   * It always return `false` if the provided `label` is empty, since the UI allows two stages of the same
+   * name to both have empty labels.
    */
-  hasDuplicateNonEmptyLabels: Computed<GuiBuilderStoreModel, boolean>;
+  isStageLabelDuplicate: Computed<GuiBuilderStoreModel, (stageName: string, label: string) => boolean>;
   /** Whether the pipeline has a stage given its name. */
   hasStage: Computed<GuiBuilderStoreModel, (stageName: string) => boolean>;
 }
@@ -275,21 +279,19 @@ export const baseActions: BaseActions = {
     const isScheduleEdited = !isScheduleEqual(state.initSchedule, state.editingSchedule);
     return isConfigEdited || isPolicyEdited || isScheduleEdited;
   }),
-  hasDuplicateNonEmptyLabels: computed((state) => {
-    const stageNamesToLabels: Record<string, string[]> = {};
-    for (const stage of Object.values(state.editingConfig.stageData)) {
-      if (stage.label === "") continue;
-      if (!(stage.name in stageNamesToLabels)) {
-        stageNamesToLabels[stage.name] = [stage.label];
-        continue;
-      }
+  isStageLabelDuplicate: computed((state) => {
+    return (stageName: string, label: string) => {
+      if (label === "") return false;
 
-      if (stageNamesToLabels[stage.name].includes(stage.label)) {
-        return true;
+      let hasProcessedItself = false;
+      for (const stage of Object.values(state.editingConfig.stageData)) {
+        if (stage.name === stageName && stage.label === label) {
+          if (hasProcessedItself) return true;
+          hasProcessedItself = true;
+        }
       }
-      stageNamesToLabels[stage.name].push(stage.label);
-    }
-    return false;
+      return false;
+    };
   }),
   hasStage: computed((state) => {
     return (stageName: string) =>
