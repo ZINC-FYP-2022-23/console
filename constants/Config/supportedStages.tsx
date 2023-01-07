@@ -16,12 +16,12 @@ import { ComponentType } from "react";
 
 export interface SupportedStage<TConfig = any> {
   /** Label to be shown in the UI. */
-  readonly label: string;
+  readonly nameInUI: string;
   /** Stage kind. */
   readonly kind: StageKind;
   /** Description to be shown in the UI. */
   readonly description: string;
-  /** Default configuration of the stage. */
+  /** Default configuration to use when a new stage is created. */
   readonly defaultConfig: TConfig;
   /**
    * @param raw The raw stage config object obtained from parsing the YAML.
@@ -65,7 +65,7 @@ export const valgrindDefaultConfig: Valgrind = {
  */
 const supportedStages: SupportedStages = {
   Compile: {
-    label: "Compile",
+    nameInUI: "Compile",
     kind: StageKind.PRE_LOCAL,
     description: "Compiles source files to executable for grading",
     defaultConfig: {
@@ -84,14 +84,13 @@ const supportedStages: SupportedStages = {
         ?.trim()
         .split(" ")
         .filter((flag) => flag !== ""),
-      additional_packages: config.additional_packages.length ? config.additional_packages : undefined,
     }),
     stageSettings: dynamic(() => import("../../components/GuiBuilder/StageSettings/CompileSettings"), {
       loading: () => <StageSettingsLoading />,
     }),
   },
   DiffWithSkeleton: {
-    label: "Diff With Skeleton",
+    nameInUI: "Diff With Skeleton",
     kind: StageKind.PRE_GLOBAL,
     description: "Diff submission against skeleton files",
     defaultConfig: {
@@ -102,23 +101,21 @@ const supportedStages: SupportedStages = {
     }),
   },
   FileStructureValidation: {
-    label: "File Structure Validation",
+    nameInUI: "File Structure Validation",
     kind: StageKind.PRE_GLOBAL,
     description: "Checks if the submission follows the specified file structure",
     defaultConfig: {
       ignore_in_submission: [],
     },
     configToRaw: (config): FileStructureValidation => ({
-      ignore_in_submission: config.ignore_in_submission?.length
-        ? config.ignore_in_submission.map((path) => path.trim()).filter((path) => path !== "")
-        : undefined,
+      ignore_in_submission: config.ignore_in_submission?.map((path) => path.trim()).filter((path) => path !== ""),
     }),
     stageSettings: dynamic(() => import("../../components/GuiBuilder/StageSettings/FileStructureValidationSettings"), {
       loading: () => <StageSettingsLoading />,
     }),
   },
   Score: {
-    label: "Score",
+    nameInUI: "Score",
     kind: StageKind.POST,
     description: "Accumulates all scores from previous stages",
     defaultConfig: {
@@ -141,7 +138,7 @@ const supportedStages: SupportedStages = {
     }),
   },
   StdioTest: {
-    label: "Standard I/O Test",
+    nameInUI: "Standard I/O Test",
     kind: StageKind.GRADING,
     description: "Grades an executable's standard output against test cases",
     defaultConfig: {
@@ -165,7 +162,7 @@ const supportedStages: SupportedStages = {
     }),
   },
   Valgrind: {
-    label: "Valgrind",
+    nameInUI: "Valgrind",
     kind: StageKind.GRADING,
     description: "Memory checking with Valgrind",
     defaultConfig: valgrindDefaultConfig,

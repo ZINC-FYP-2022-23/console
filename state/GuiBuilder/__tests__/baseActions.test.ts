@@ -64,7 +64,7 @@ describe("GuiBuilder Store - BaseActions", () => {
       const model: GuiBuilderStoreModel = {
         ...getThreeStageModel(),
         // Mock that we've selected 3rd stage
-        selectedStage: computed(() => ({ id: "stage-2", name: "Compile", nameInUi: "Compile", label: "" })),
+        selectedStage: computed(() => ({ id: "stage-2", name: "Compile", nameInUI: "Compile", label: "" })),
       };
       const store = createStore(model);
       const newConfig = { input: ["hi.cpp"], output: "hi.out" };
@@ -77,7 +77,7 @@ describe("GuiBuilder Store - BaseActions", () => {
       const model: GuiBuilderStoreModel = {
         ...getThreeStageModel(),
         // Mock that we've selected 3rd stage
-        selectedStage: computed(() => ({ id: "stage-2", name: "Compile", nameInUi: "Compile", label: "" })),
+        selectedStage: computed(() => ({ id: "stage-2", name: "Compile", nameInUI: "Compile", label: "" })),
       };
       const store = createStore(model);
       const newLabel = "all";

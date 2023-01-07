@@ -154,7 +154,7 @@ export interface PipelineEditorActions {
       /** Stage name code (e.g. `"DiffWithSkeleton"`). */
       name: string;
       /** Stage name shown in UI (e.g. `"Diff With Skeleton"`). */
-      nameInUi: string;
+      nameInUI: string;
       /** Stage label. See {@link Stage.label}. */
       label: string;
     } | null
@@ -333,7 +333,7 @@ export const pipelineEditorActions: PipelineEditorActions = {
     return {
       id,
       name,
-      nameInUi: supportedStages[name]?.label ?? name,
+      nameInUI: supportedStages[name]?.nameInUI ?? name,
       label: selectedStageData.label,
     };
   }),
@@ -356,7 +356,7 @@ export const pipelineEditorActions: PipelineEditorActions = {
         position: { x: 0, y: 0 },
         data: {
           name: stage.name,
-          label: stageMetadata?.label ?? stage.name,
+          label: stageMetadata?.nameInUI ?? stage.name,
         },
         type: "stage",
       };
@@ -452,7 +452,7 @@ export const pipelineEditorActions: PipelineEditorActions = {
     const newNode: StageNode = {
       id: stageId,
       position,
-      data: { name: dragging.stageName, label: dragging.stageData.label },
+      data: { name: dragging.stageName, label: dragging.stageData.nameInUI },
       type: "stage",
     };
     state.pipelineEditor.nodes = state.pipelineEditor.nodes.concat(newNode);

@@ -24,7 +24,7 @@ function AddableStage({ stageName, stageData }: AddableStageProps) {
         }}
         onDragEnd={() => setDragging(undefined)}
       >
-        {stageData.label}
+        {stageData.nameInUI}
       </div>
       <p className="mt-1 text-xs text-gray-500">{stageData.description}</p>
     </div>

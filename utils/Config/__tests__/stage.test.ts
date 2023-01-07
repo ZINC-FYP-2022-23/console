@@ -22,6 +22,7 @@ const yamlObj = {
   "compile:all": {
     input: ["*.cpp"],
     output: "a.out",
+    additional_packages: [],
   },
 };
 

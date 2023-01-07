@@ -27,7 +27,7 @@ function DeleteStageModal() {
     <Modal
       title={
         selectedStage
-          ? `Delete "${selectedStage.nameInUi}${selectedStage.label ? ` (${selectedStage.label})` : ""}" stage?`
+          ? `Delete "${selectedStage.nameInUI}${selectedStage.label ? ` (${selectedStage.label})` : ""}" stage?`
           : "Delete stage?"
       }
       opened={isModalOpened}

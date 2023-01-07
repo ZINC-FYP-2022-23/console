@@ -21,7 +21,7 @@ function ValgrindSettings() {
             Your grading pipeline is missing a{" "}
             <button
               className="text-blue-700 underline"
-              onClick={() => setAddStageSearchString(supportedStages.StdioTest.label)}
+              onClick={() => setAddStageSearchString(supportedStages.StdioTest.nameInUI)}
             >
               Standard I/O Test stage
             </button>

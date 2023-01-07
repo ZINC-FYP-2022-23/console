@@ -369,7 +369,7 @@ const UseTemplateTooltip = memo(() => {
           onClick={() => {
             setStep("pipeline");
             setAccordion({ path: "addNewStage", value: ["preCompile"] });
-            setAddStageSearchString(supportedStages.FileStructureValidation.label);
+            setAddStageSearchString(supportedStages.FileStructureValidation.nameInUI);
           }}
           className="underline text-blue-700"
         >

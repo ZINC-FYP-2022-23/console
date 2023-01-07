@@ -22,7 +22,7 @@ describe("GuiBuilder Store - PipelineEditorActions", () => {
       expect(store.getState().selectedStage).toEqual({
         id: "stage-0",
         name: "DiffWithSkeleton",
-        nameInUi: "Diff With Skeleton",
+        nameInUI: "Diff With Skeleton",
         label: "foo",
       });
     });
@@ -247,7 +247,7 @@ describe("GuiBuilder Store - PipelineEditorActions", () => {
       model.selectedStage = computed(() => ({
         id: "stage-2",
         name: "Compile",
-        nameInUi: "Compile",
+        nameInUI: "Compile",
         label: "all",
       }));
       const store = createStore(model);

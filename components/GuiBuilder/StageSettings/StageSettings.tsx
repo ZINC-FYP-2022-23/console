@@ -94,7 +94,7 @@ function StageSettings() {
       <div className="px-3 py-2 bg-blue-50 border-b border-gray-300">
         <div className="flex justify-between">
           <div className="flex items-center">
-            <h2 className="text-xl font-semibold">{supportedStage?.label ?? stageName}</h2>
+            <h2 className="text-xl font-semibold">{supportedStage?.nameInUI ?? stageName}</h2>
           </div>
           <div className="flex items-center">
             <FontAwesomeIcon icon={["fas", "tag"]} className="mr-1 text-gray-500" />

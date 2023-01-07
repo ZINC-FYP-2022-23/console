@@ -79,15 +79,6 @@ describe("Raw stage configs conversion", () => {
         const _stage = configsToConfigsRaw(stage);
         expect(_stage[UUID].config.flags).toEqual(["-Wall", "-Wextra", "-g"]);
       });
-
-      it("converts `additional_packages` to undefined if empty", () => {
-        const stage = createStage<Compile>("Compile", {
-          input: ["*.cpp"],
-          additional_packages: [],
-        });
-        const _stage = configsToConfigsRaw(stage);
-        expect(_stage[UUID].config.additional_packages).toBeUndefined();
-      });
     });
   });
 
@@ -99,14 +90,6 @@ describe("Raw stage configs conversion", () => {
         });
         const _stage = configsToConfigsRaw(stage);
         expect(_stage[UUID].config.ignore_in_submission).toEqual(["a.txt", "b.txt"]);
-      });
-
-      it("converts empty `ignore_in_submission` array to undefined", () => {
-        const stage = createStage<FileStructureValidation>("FileStructureValidation", {
-          ignore_in_submission: [],
-        });
-        const _stage = configsToConfigsRaw(stage);
-        expect(_stage[UUID].config.ignore_in_submission).toBeUndefined();
       });
     });
   });

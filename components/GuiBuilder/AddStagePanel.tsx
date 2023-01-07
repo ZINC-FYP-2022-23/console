@@ -52,7 +52,7 @@ const getStagesByCategory = (searchString: string) => {
 
     if (tidiedSearchString !== "") {
       if (
-        data.label.toLowerCase().includes(tidiedSearchString) ||
+        data.nameInUI.toLowerCase().includes(tidiedSearchString) ||
         data.description.toLowerCase().includes(tidiedSearchString)
       ) {
         shouldAddToOutput = true;

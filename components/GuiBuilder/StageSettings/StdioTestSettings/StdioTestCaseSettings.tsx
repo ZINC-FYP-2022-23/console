@@ -346,7 +346,7 @@ function StdioTestCaseSettings({ caseId, closeModal, setPage }: StdioTestCaseSet
                       className="text-blue-700 underline"
                       onClick={() => {
                         closeModal();
-                        setAddStageSearchString(supportedStages.Valgrind.label);
+                        setAddStageSearchString(supportedStages.Valgrind.nameInUI);
                       }}
                     >
                       Valgrind stage
