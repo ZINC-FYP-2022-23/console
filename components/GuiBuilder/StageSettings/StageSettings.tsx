@@ -1,3 +1,4 @@
+import { TextInput } from "@components/Input";
 import supportedStages, { SupportedStage } from "@constants/Config/supportedStages";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { clsx, Tooltip } from "@mantine/core";
@@ -99,8 +100,7 @@ function StageSettings() {
           <div className="flex items-center">
             <FontAwesomeIcon icon={["fas", "tag"]} className="mr-1 text-gray-500" />
             <p className="text-gray-500 text-sm font-medium">Label:</p>
-            <input
-              type="text"
+            <TextInput
               ref={labelInputRef}
               value={selectedStage.label}
               onChange={(event) => {
@@ -108,13 +108,8 @@ function StageSettings() {
                 validateStageLabel(value);
                 updateSelectedStage({ path: "label", value });
               }}
-              className={clsx(
-                "w-36 px-2 py-1 mx-2 border border-gray-300 text-sm leading-4 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-100 focus:border-blue-300 transition",
-                getLabelAlertStyles(labelAlert, {
-                  warning: "border-orange-500 focus:border-orange-500 focus:ring-orange-100",
-                  error: "border-red-500 focus:border-red-500 focus:ring-red-100",
-                }),
-              )}
+              alertLevel={labelAlert ? labelAlerts[labelAlert].severity : undefined}
+              classNames={{ root: "w-36 mx-2", input: "!px-2 !py-1 !leading-4" }}
             />
             <Tooltip label="Open help dialog" openDelay={500}>
               <button

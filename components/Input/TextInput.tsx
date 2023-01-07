@@ -1,5 +1,5 @@
 import { clsx } from "@mantine/core";
-import { InputHTMLAttributes } from "react";
+import { forwardRef, InputHTMLAttributes } from "react";
 
 interface TextInputProps extends InputHTMLAttributes<HTMLInputElement> {
   /**
@@ -28,10 +28,11 @@ interface TextInputProps extends InputHTMLAttributes<HTMLInputElement> {
 /**
  * Generic input text box component.
  */
-function TextInput({ type = "text", alertLevel, alertText, classNames, ...props }: TextInputProps) {
-  return (
+const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
+  ({ type = "text", alertLevel, alertText, classNames, ...props }, ref) => (
     <div className={clsx("flex flex-col", classNames?.root)}>
       <input
+        ref={ref}
         type={type}
         className={clsx(
           "py-2 px-3 text-sm leading-5 rounded-md shadow-sm placeholder:text-gray-400 border border-gray-300 focus:outline-none focus:ring focus:ring-blue-100 focus:border-blue-300 transition ease-in-out",
@@ -54,7 +55,8 @@ function TextInput({ type = "text", alertLevel, alertText, classNames, ...props 
         </div>
       )}
     </div>
-  );
-}
+  ),
+);
+TextInput.displayName = "TextInput";
 
 export default TextInput;
