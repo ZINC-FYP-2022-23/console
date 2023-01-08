@@ -33,10 +33,7 @@ interface SelectProps<TValue extends string> extends Omit<MantineSelectProps, "d
 }
 
 const useStyles = createStyles((theme) => ({
-  wrapper: {
-    // A trick to increase specificity of styles so they don't get overridden by Tailwind default styles
-    "& input": getInputBoxWrapperStyles(theme),
-  },
+  wrapper: getInputBoxWrapperStyles(theme),
   item: {
     "&[data-selected]": {
       backgroundColor: "#dbeafe",

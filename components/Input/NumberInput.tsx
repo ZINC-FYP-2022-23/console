@@ -22,10 +22,7 @@ interface NumberInputProps extends MantineNumberInputProps {
 }
 
 const useStyles = createStyles((theme) => ({
-  wrapper: {
-    // A trick to increase specificity of styles so they don't get overridden by Tailwind default styles
-    "& input": getInputBoxWrapperStyles(theme, true),
-  },
+  wrapper: getInputBoxWrapperStyles(theme, true),
 }));
 
 /**

@@ -10,7 +10,6 @@ import { CSSObject, MantineTheme } from "@mantine/core";
  * to have a `data-alert-level: "warning" | "error"` attribute.
  */
 export const getInputBoxWrapperStyles = (theme: MantineTheme, addErrorStyles = false): CSSObject => ({
-  height: "auto",
   borderColor: theme.colors.gray[4],
   borderRadius: 6,
   boxShadow: "rgba(0, 0, 0, 0.05) 0px 1px 2px 0px",
@@ -18,21 +17,27 @@ export const getInputBoxWrapperStyles = (theme: MantineTheme, addErrorStyles = f
   lineHeight: "1.25rem",
   transitionDuration: "150ms",
   transitionProperty: "border-color, box-shadow",
-  "&:focus": {
+  "& input, & textarea": {
+    height: "auto",
+    padding: "0.5rem 0.75rem",
+    lineHeight: "1.25rem",
+  },
+  "& input:focus, & textarea:focus": {
     borderColor: "#93c5fd",
     boxShadow: "0 0 0 3px #dbeafe",
+    transition: "inherit",
   },
-  "&::placeholder": {
+  "& input::placeholder, & textarea::placeholder": {
     color: "#9ca3af",
   },
   ...(addErrorStyles && {
-    "&[data-alert-level=error]": {
+    "& input[data-alert-level=error], & textarea[data-alert-level=error]": {
       borderColor: theme.colors.red[6],
       "&:focus": {
         boxShadow: `0 0 0 3px ${theme.colors.red[1]}`,
       },
     },
-    "&[data-alert-level=warning]": {
+    "& input[data-alert-level=warning], & textarea[data-alert-level=warning]": {
       borderColor: theme.colors.orange[6],
       "&:focus": {
         boxShadow: `0 0 0 3px ${theme.colors.orange[1]}`,

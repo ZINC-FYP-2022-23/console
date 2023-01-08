@@ -109,7 +109,7 @@ const Item = ({ index, onEnterKeyPressed, onDelete, ...inputProps }: ItemProps) 
         ref={(ref) => (inputRefs.current[index] = ref)}
         type="text"
         onKeyDown={(event) => handleInputKeyDown(event, index)}
-        className="flex-1 py-1 border-0 border-b-2 border-gray-200 font-mono text-sm leading-6 placeholder:text-gray-400 focus:ring-0 focus:border-blue-400 transition"
+        className="flex-1 px-3 py-1 border-0 border-b-2 border-gray-200 font-mono text-sm leading-6 placeholder:text-gray-400 focus:outline-none focus:ring-0 focus:border-blue-400 transition"
         {...inputProps}
       />
       <button

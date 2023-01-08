@@ -14,9 +14,8 @@ interface TextareaProps extends MantineTextareaProps {
 function Textarea({ autosize = true, monospace = false, ...props }: TextareaProps) {
   const useStyles = createStyles((theme) => ({
     root: {
-      // A trick to increase specificity of styles so they don't get overridden by Tailwind default styles
+      ...getInputBoxWrapperStyles(theme),
       "& textarea": {
-        ...getInputBoxWrapperStyles(theme),
         padding: "0.5rem 0.75rem",
         ...(monospace && { fontFamily: theme.fontFamilyMonospace }),
       },

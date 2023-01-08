@@ -207,7 +207,7 @@ function PipelineSettings() {
           />
           <div className="flex flex-col gap-3">
             <div className="flex items-center gap-2">
-              <div className="flex-none w-1/2 flex items-center gap-1">
+              <div className="flex-1 flex items-center gap-1">
                 <label htmlFor="stage_wait_duration_secs">Max. stage execution time</label>
                 <StageWaitDurationTooltip />
               </div>
@@ -224,7 +224,7 @@ function PipelineSettings() {
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <div className="flex-none w-1/2 flex items-center gap-1">
+              <div className="flex-1 flex items-center gap-1">
                 <label htmlFor="cpus">CPUs</label>
                 <CpusTooltip />
               </div>
@@ -241,7 +241,7 @@ function PipelineSettings() {
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <div className="flex-none w-1/2 flex items-center gap-1">
+                <div className="flex-1 flex items-center gap-1">
                   <label htmlFor="gpus">GPU</label>
                   <GpuTooltip />
                 </div>
@@ -254,7 +254,7 @@ function PipelineSettings() {
                     const gpuDevice = gpuSelectValueToGpuDevice(value);
                     updateField({ path: "_settings.enable_features.gpu_device", value: gpuDevice });
                   }}
-                  styles={{ root: { width: "100%" } }}
+                  styles={{ root: { flex: 1 } }}
                 />
               </div>
               {Array.isArray(_settings.enable_features.gpu_device) && (
@@ -291,7 +291,7 @@ function PipelineSettings() {
               )}
             </div>
             <div className="flex items-center gap-2">
-              <div className="flex-none w-1/2 flex items-center gap-1">
+              <div className="flex-1 flex items-center gap-1">
                 <label htmlFor="mem_gb">Memory</label>
                 <MemoryTooltip />
               </div>
