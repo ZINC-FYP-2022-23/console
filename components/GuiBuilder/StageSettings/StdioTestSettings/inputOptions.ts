@@ -43,12 +43,7 @@ export const hiddenItemOptions: MultiSelectData<HiddenItem>[] = [
   },
 ];
 
-interface InputModeOption {
-  value: "none" | "text" | "file";
-  label: string;
-}
-
-export const inputModeOptions: InputModeOption[] = [
+export const inputModeOptions: SelectItem<"none" | "text" | "file">[] = [
   {
     value: "none",
     label: "None",

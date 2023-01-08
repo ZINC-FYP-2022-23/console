@@ -1,27 +1,87 @@
-import { clsx } from "@mantine/core";
-import React, { SelectHTMLAttributes } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { createStyles, Select as MantineSelect, SelectProps as MantineSelectProps } from "@mantine/core";
+import { forwardRef } from "react";
+import { getInputBoxWrapperStyles } from "./mantineStyles";
 
-interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
-  children: React.ReactNode;
-  /** Classes to apply extra styling. */
-  extraClassNames?: string;
+/**
+ * Data of an item in the {@link Select} component. The `TValue` type parameter
+ * is the type of the item's value.
+ *
+ * It's similar to Mantine's `SelectItem` type but with generics support.
+ */
+export interface SelectItem<TValue extends string> {
+  value: TValue;
+  /** Label to show in the UI. */
+  label?: string;
+  /** Description of the item. */
+  description?: string;
+  disabled?: boolean;
+  group?: string;
+  [key: string]: any;
 }
 
 /**
- * A styled `<select>` element to create a drop-down list.
+ * Props for Mantine's `Select` component with generics support.
  */
-function Select({ children, extraClassNames = "", ...props }: SelectProps) {
+interface SelectProps<TValue extends string> extends Omit<MantineSelectProps, "data" | "value" | "onChange"> {
+  /** Data for each select option. */
+  data: SelectItem<TValue>[];
+  /** The selected value. */
+  value: TValue;
+  /** Callback when a new option is selected. */
+  onChange: (value: TValue | null) => void;
+}
+
+const useStyles = createStyles((theme) => ({
+  wrapper: {
+    // A trick to increase specificity of styles so they don't get overridden by Tailwind default styles
+    "& input": getInputBoxWrapperStyles(theme),
+  },
+  item: {
+    "&[data-selected]": {
+      backgroundColor: "#dbeafe",
+      color: "#1d4ed8",
+      fontWeight: 500,
+      "&:hover": {
+        backgroundColor: "#dbeafe",
+      },
+    },
+  },
+}));
+
+const rightChevron = <FontAwesomeIcon icon={["fas", "chevron-down"]} className="text-sm text-gray-400" />;
+
+/**
+ * A component for selecting a value from a list of options.
+ *
+ * Each select item can have an optional description.
+ */
+function Select<TValue extends string>({ data, value, onChange, ...props }: SelectProps<TValue>) {
+  const { classes } = useStyles();
   return (
-    <select
-      className={clsx(
-        "form-input pr-8 rounded-md shadow-sm text-sm border border-gray-300 focus:outline-none focus:ring focus:ring-blue-100 focus:border-blue-300 transition duration-150 ease-in-out",
-        extraClassNames,
-      )}
+    <MantineSelect
+      data={data}
+      value={value}
+      onChange={onChange}
+      itemComponent={SelectItem}
+      rightSection={rightChevron}
+      classNames={classes}
       {...props}
-    >
-      {children}
-    </select>
+    />
   );
 }
+
+interface SelectItemProps extends React.ComponentPropsWithoutRef<"div"> {
+  label: string;
+  description?: string;
+}
+
+const SelectItem = forwardRef<HTMLDivElement, SelectItemProps>(({ label, description, ...props }, ref) => (
+  <div ref={ref} {...props}>
+    <p>{label}</p>
+    {description && <p className="text-xs text-gray-500 font-normal">{description}</p>}
+  </div>
+));
+SelectItem.displayName = "SelectItem";
 
 export default Select;

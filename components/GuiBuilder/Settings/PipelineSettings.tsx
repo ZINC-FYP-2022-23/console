@@ -1,7 +1,9 @@
-import { Checkbox, NumberInput, Select, SwitchGroup, TextInput } from "@components/Input";
+import Button from "@components/Button";
+import { Checkbox, NumberInput, SelectItem, Select, SwitchGroup, TextInput } from "@components/Input";
 import ListInput from "@components/Input/ListInput";
 import { ACCEPTED_LANG } from "@constants/Config/AcceptedLang";
 import supportedStages from "@constants/Config/supportedStages";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
 import { SettingsFeatures, SettingsGpuDevice, SettingsUseTemplate } from "@types";
 import { settingsLangToString } from "@utils/Config";
@@ -9,35 +11,50 @@ import { memo } from "react";
 import { v4 as uuidv4 } from "uuid";
 import InfoTooltip from "../Diagnostics/InfoTooltip";
 
-interface UseTemplateSelectOptions {
-  label: string;
-  value: "undefined" | SettingsUseTemplate;
-}
-
-const useTemplateSelectOptions: UseTemplateSelectOptions[] = [
-  { label: "None", value: "undefined" },
-  { label: "Text input", value: SettingsUseTemplate.FILENAMES },
-  { label: "File upload", value: SettingsUseTemplate.PATH },
+const useTemplateSelectOptions: SelectItem<"undefined" | SettingsUseTemplate>[] = [
+  {
+    label: "None",
+    value: "undefined",
+    description: "Does not check what files students should submit",
+  },
+  {
+    label: "Text input",
+    value: SettingsUseTemplate.FILENAMES,
+    description: "Input the names of the files to submit",
+  },
+  {
+    label: "File upload",
+    value: SettingsUseTemplate.PATH,
+    description: "Specify files to submit by uploading files",
+  },
 ];
 
-interface GpuSelectOptions {
-  label: string;
-  value: "undefined" | "ANY" | "choose";
-}
+type GpuSelectValue = "undefined" | "ANY" | "choose";
 
-const gpuSelectOptions: GpuSelectOptions[] = [
+const gpuSelectOptions: SelectItem<GpuSelectValue>[] = [
   { label: "None", value: "undefined" },
   { label: "Any GPU", value: "ANY" },
   { label: "Choose vendors", value: "choose" },
 ];
 
-const getGpuSelectValue = (gpu: SettingsFeatures["gpu_device"]): GpuSelectOptions["value"] => {
+const getGpuSelectValue = (gpu: SettingsFeatures["gpu_device"]): GpuSelectValue => {
   if (gpu === undefined) {
     return "undefined";
   } else if (gpu === "ANY") {
     return "ANY";
   } else {
     return "choose";
+  }
+};
+
+const gpuSelectValueToGpuDevice = (value: GpuSelectValue): SettingsFeatures["gpu_device"] => {
+  switch (value) {
+    case "undefined":
+      return undefined;
+    case "ANY":
+      return "ANY";
+    case "choose":
+      return [];
   }
 };
 
@@ -49,6 +66,7 @@ const gpuVendorSelectOptions = [
 
 function PipelineSettings() {
   const _settings = useStoreState((state) => state.editingConfig._settings);
+  const setStep = useStoreActions((actions) => actions.setStep);
   const updateField = useStoreActions((actions) => actions.updateField);
 
   return (
@@ -58,22 +76,19 @@ function PipelineSettings() {
         <h3 className="mb-3 font-semibold text-base">Language</h3>
         <div className="flex items-center gap-3">
           <Select
-            extraClassNames="grow"
-            onChange={(event) => {
-              const values = event.target.value.split("/");
+            data={ACCEPTED_LANG.map(({ lang: value, label }) => ({ value, label }))}
+            value={settingsLangToString(_settings.lang).split(":")[0]}
+            onChange={(value) => {
+              if (value === null) return;
+              const values = value.split("/");
               const language = values[0];
               const compiler = values.length > 1 ? values[1] : null;
               updateField({ path: "_settings.lang.language", value: language });
               updateField({ path: "_settings.lang.compiler", value: compiler });
             }}
-            defaultValue={settingsLangToString(_settings.lang).split(":")[0]}
-          >
-            {ACCEPTED_LANG.map(({ lang, label }) => (
-              <option key={lang} value={lang}>
-                {label}
-              </option>
-            ))}
-          </Select>
+            maxDropdownHeight={320}
+            styles={{ root: { flexGrow: 1 } }}
+          />
           <span className="flex-none text-gray-500">version</span>
           <TextInput
             value={_settings.lang.version}
@@ -105,26 +120,21 @@ function PipelineSettings() {
             }}
           />
           <div>
-            <div className="flex items-center gap-2">
-              <div className="pr-2 flex-none w-1/2 flex items-center gap-1">
+            <div className="mt-4 flex items-center gap-2">
+              <div className="pr-2 flex-1 flex items-center gap-1">
                 <label htmlFor="use_template">Specify files that students should submit</label>
                 <UseTemplateTooltip />
               </div>
               <Select
                 id="use_template"
-                extraClassNames="w-full"
-                onChange={(event) => {
-                  const value = event.target.value as UseTemplateSelectOptions["value"];
+                data={useTemplateSelectOptions}
+                value={_settings.use_template ?? "undefined"}
+                onChange={(value) => {
+                  if (value === null) return;
                   updateField({ path: "_settings.use_template", value: value === "undefined" ? undefined : value });
                 }}
-                value={_settings.use_template ?? "undefined"}
-              >
-                {useTemplateSelectOptions.map(({ label, value }) => (
-                  <option key={value} value={value}>
-                    {label}
-                  </option>
-                ))}
-              </Select>
+                styles={{ root: { flex: 1 } }}
+              />
             </div>
             {_settings.use_template === SettingsUseTemplate.FILENAMES && (
               <div className="mt-4 mx-3 p-3 bg-gray-50 rounded-lg drop-shadow">
@@ -159,6 +169,18 @@ function PipelineSettings() {
                     }}
                   />
                 </ListInput>
+              </div>
+            )}
+            {_settings.use_template === SettingsUseTemplate.PATH && (
+              <div className="mt-4 mx-3 p-3 flex items-center gap-4 bg-gray-50 rounded-lg drop-shadow">
+                <p className="text-gray-700">Upload your files here:</p>
+                <Button
+                  onClick={() => setStep("upload")}
+                  icon={<FontAwesomeIcon icon={["fad", "upload"]} />}
+                  className="border border-cse-600 text-cse-600 hover:bg-blue-100 active:bg-blue-200"
+                >
+                  Upload files
+                </Button>
               </div>
             )}
           </div>
@@ -225,31 +247,15 @@ function PipelineSettings() {
                 </div>
                 <Select
                   id="gpus"
-                  extraClassNames="w-full"
-                  onChange={(event) => {
-                    const value = event.target.value as GpuSelectOptions["value"];
-                    let gpuDevice: SettingsFeatures["gpu_device"];
-                    switch (value) {
-                      case "undefined":
-                        gpuDevice = undefined;
-                        break;
-                      case "ANY":
-                        gpuDevice = "ANY";
-                        break;
-                      case "choose":
-                        gpuDevice = [];
-                        break;
-                    }
+                  data={gpuSelectOptions}
+                  value={getGpuSelectValue(_settings.enable_features.gpu_device)}
+                  onChange={(value) => {
+                    if (value === null) return;
+                    const gpuDevice = gpuSelectValueToGpuDevice(value);
                     updateField({ path: "_settings.enable_features.gpu_device", value: gpuDevice });
                   }}
-                  value={getGpuSelectValue(_settings.enable_features.gpu_device)}
-                >
-                  {gpuSelectOptions.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </Select>
+                  styles={{ root: { width: "100%" } }}
+                />
               </div>
               {Array.isArray(_settings.enable_features.gpu_device) && (
                 <div className="mt-4 mb-2 mx-3 p-3 bg-gray-50 rounded-lg drop-shadow">
@@ -335,24 +341,7 @@ const UseTemplateTooltip = memo(() => {
 
   return (
     <InfoTooltip width={520}>
-      <ul className="px-3 list-disc">
-        <li>
-          <span className="font-semibold">None: </span>
-          Does not check what files students should submit
-        </li>
-        <li>
-          <span className="font-semibold">Text input: </span>
-          Input the names of the files to submit
-        </li>
-        <li>
-          <span className="font-semibold">File upload: </span>
-          Specify files to submit by{" "}
-          <button onClick={() => setStep("upload")} className="underline text-blue-700">
-            uploading files
-          </button>{" "}
-        </li>
-      </ul>
-      <p className="mt-2">
+      <p>
         To perform the actual checking, add the &quot;
         <span className="font-semibold">File Structure Validation</span>&quot; stage in your{" "}
         <button

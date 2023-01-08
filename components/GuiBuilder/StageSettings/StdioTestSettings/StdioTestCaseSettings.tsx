@@ -1,14 +1,6 @@
 import Button from "@components/Button";
 import InfoTooltip from "@components/GuiBuilder/Diagnostics/InfoTooltip";
-import {
-  MultiSelect,
-  NumberInput,
-  Select,
-  SelectWithDescription,
-  SwitchGroup,
-  Textarea,
-  TextInput,
-} from "@components/Input";
+import { MultiSelect, NumberInput, Select, SwitchGroup, Textarea, TextInput } from "@components/Input";
 import supportedStages, { valgrindDefaultConfig } from "@constants/Config/supportedStages";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { clsx, Tooltip } from "@mantine/core";
@@ -205,7 +197,7 @@ function StdioTestCaseSettings({ caseId, closeModal, setPage }: StdioTestCaseSet
               <label htmlFor="visibility" className="flex-[2]">
                 Visibility to students
               </label>
-              <SelectWithDescription
+              <Select
                 data={visibilityOptions}
                 value={caseConfig.visibility}
                 onChange={(value) => value && updateTestCase((testCase) => (testCase.visibility = value))}
@@ -263,24 +255,16 @@ function StdioTestCaseSettings({ caseId, closeModal, setPage }: StdioTestCaseSet
                 <label htmlFor="_stdinInputMode" className="flex-[2]">
                   Standard input
                 </label>
-                <div className="flex-[3]">
-                  <Select
-                    id="_stdinInputMode"
-                    value={caseConfig._stdinInputMode}
-                    onChange={(e) =>
-                      updateTestCase(
-                        (testCase) => (testCase._stdinInputMode = e.target.value as TestCase["_stdinInputMode"]),
-                      )
-                    }
-                    extraClassNames="w-full"
-                  >
-                    {inputModeOptions.map(({ value, label }) => (
-                      <option key={value} value={value}>
-                        {label}
-                      </option>
-                    ))}
-                  </Select>
-                </div>
+                <Select
+                  id="_stdinInputMode"
+                  data={inputModeOptions}
+                  value={caseConfig._stdinInputMode}
+                  onChange={(value) => {
+                    if (value === null) return;
+                    updateTestCase((testCase) => (testCase._stdinInputMode = value));
+                  }}
+                  styles={{ root: { flex: 3 } }}
+                />
               </div>
               {caseConfig._stdinInputMode === "file" && (
                 <HelperFileInputCard
@@ -301,24 +285,16 @@ function StdioTestCaseSettings({ caseId, closeModal, setPage }: StdioTestCaseSet
               <label htmlFor="_expectedInputMode" className="flex-[2]">
                 Expected output
               </label>
-              <div className="flex-[3]">
-                <Select
-                  id="_expectedInputMode"
-                  value={caseConfig._expectedInputMode}
-                  onChange={(e) =>
-                    updateTestCase(
-                      (testCase) => (testCase._expectedInputMode = e.target.value as TestCase["_expectedInputMode"]),
-                    )
-                  }
-                  extraClassNames="w-full"
-                >
-                  {inputModeOptions.map(({ value, label }) => (
-                    <option key={value} value={value}>
-                      {label}
-                    </option>
-                  ))}
-                </Select>
-              </div>
+              <Select
+                id="_expectedInputMode"
+                data={inputModeOptions}
+                value={caseConfig._expectedInputMode}
+                onChange={(value) => {
+                  if (value === null) return;
+                  updateTestCase((testCase) => (testCase._expectedInputMode = value));
+                }}
+                styles={{ root: { flex: 3 } }}
+              />
             </div>
             {caseConfig._expectedInputMode === "file" && (
               <HelperFileInputCard
@@ -415,7 +391,7 @@ function StdioTestCaseSettings({ caseId, closeModal, setPage }: StdioTestCaseSet
               >
                 Visibility to students
               </label>
-              <SelectWithDescription
+              <Select
                 id="valgrind.visibility"
                 data={valgrindVisibilityOptions}
                 value={caseConfig.valgrind?.visibility ?? valgrindDefaultConfig.visibility}

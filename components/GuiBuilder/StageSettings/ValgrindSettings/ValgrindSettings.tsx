@@ -1,6 +1,6 @@
 import Alert from "@components/GuiBuilder/Diagnostics/Alert";
 import InfoTooltip from "@components/GuiBuilder/Diagnostics/InfoTooltip";
-import { MultiSelect, NumberInput, SelectWithDescription, SwitchGroup, Textarea } from "@components/Input";
+import { MultiSelect, NumberInput, Select, SwitchGroup, Textarea } from "@components/Input";
 import supportedStages, { valgrindDefaultConfig } from "@constants/Config/supportedStages";
 import { useSelectedStageConfig, useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
 import { Valgrind } from "@types";
@@ -53,7 +53,7 @@ function ValgrindSettings() {
         <label htmlFor="visibility" className="flex-1">
           Visibility to students
         </label>
-        <SelectWithDescription
+        <Select
           id="visibility"
           data={visibilityOptions}
           value={config.visibility ?? valgrindDefaultConfig.visibility}
