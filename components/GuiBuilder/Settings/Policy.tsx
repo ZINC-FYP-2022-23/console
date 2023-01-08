@@ -1,4 +1,5 @@
 import { SwitchGroup, TextInput } from "@components/Input";
+import NumberInput from "@components/Input/NumberInput";
 import { useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
 import { memo } from "react";
 import InfoTooltip from "../Diagnostics/InfoTooltip";
@@ -11,23 +12,16 @@ function Policy() {
     <div className="flex flex-col gap-5 text-sm">
       <div className="flex items-center gap-2">
         <div className="flex-1 flex items-center gap-1">
-          <label htmlFor="attemptLimits" className="">
-            Attempt Limits
-          </label>
+          <label htmlFor="attemptLimits">Attempt Limits</label>
           <AttemptLimitsTooltip />
         </div>
-        <TextInput
+        <NumberInput
           id="attemptLimits"
-          value={policy.attemptLimits?.toString() ?? ""}
-          type="number"
-          min="1"
+          value={policy.attemptLimits ?? undefined}
+          onChange={(value) => updatePolicy({ ...policy, attemptLimits: value ?? null })}
+          min={1}
           placeholder="Unlimited"
-          onChange={(event) => {
-            const value = event.target.value;
-            const attemptLimits = value === "" ? null : parseInt(value, 10);
-            updatePolicy({ ...policy, attemptLimits });
-          }}
-          classNames={{ root: "flex-1" }}
+          className="flex-1"
         />
       </div>
       <SwitchGroup

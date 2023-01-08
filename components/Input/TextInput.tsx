@@ -4,8 +4,10 @@ import { forwardRef, InputHTMLAttributes } from "react";
 interface TextInputProps extends InputHTMLAttributes<HTMLInputElement> {
   /**
    * Type of the input.
+   *
+   * For number input, use `NumberInput` instead.
    */
-  type?: "text" | "number" | "email" | "password";
+  type?: "text" | "email" | "password";
   /**
    * Alert stylings to apply.
    */

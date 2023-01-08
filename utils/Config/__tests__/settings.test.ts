@@ -25,9 +25,9 @@ function getMockSettings(): Settings {
     ],
     use_skeleton: true,
     use_provided: true,
-    stage_wait_duration_secs: "10",
-    cpus: "2",
-    mem_gb: "4.5",
+    stage_wait_duration_secs: 10,
+    cpus: 2,
+    mem_gb: 4.5,
     early_return_on_throw: false,
     enable_features: {
       network: true,
@@ -59,9 +59,7 @@ describe("Settings utils", () => {
         ],
         use_skeleton: false,
         use_provided: false,
-        stage_wait_duration_secs: "",
-        cpus: "2.5",
-        mem_gb: "",
+        cpus: 2.5,
         early_return_on_throw: false,
         enable_features: { network: true },
       };
@@ -86,13 +84,6 @@ describe("Settings utils", () => {
 
       const settingsRaw = settingsToSettingsRaw(settings);
       expect(settingsRaw.template).toEqual(["foo.txt", "bar.txt"]);
-    });
-
-    it("converts numerical strings to numbers", () => {
-      const settingsRaw = settingsToSettingsRaw(getMockSettings());
-      expect(settingsRaw.stage_wait_duration_secs).toBe(10);
-      expect(settingsRaw.cpus).toBe(2);
-      expect(settingsRaw.mem_gb).toBe(4.5);
     });
   });
 

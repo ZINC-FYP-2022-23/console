@@ -9,10 +9,9 @@ import { TestCase, TestCaseRaw, Valgrind, ValgrindRaw } from "@types";
  * Converts a raw test case config obtained from parsing the YAML into a tidied test case config.
  */
 export const testCaseFromRaw = (testCaseRaw: TestCaseRaw): TestCase => {
-  const { score, args, valgrind, ...test } = testCaseRaw;
+  const { args, valgrind, ...test } = testCaseRaw;
   const output: TestCase = {
     ...test,
-    score: score?.toString() ?? "",
     args: args?.join(" "),
     valgrind: valgrind ? valgrindFromRaw(valgrind) : undefined,
 
@@ -37,7 +36,6 @@ export const testCaseToRaw = (testCase: TestCase): TestCaseRaw => {
   const { _stdinInputMode, _expectedInputMode, _valgrindOverride, ...testRest } = testCase;
   const output: TestCaseRaw = {
     ...testRest,
-    score: testCase.score ? parseFloat(testCase.score) : undefined,
     args: testCase.args
       ?.trim()
       .split(" ")
@@ -61,7 +59,7 @@ export const valgrindFromRaw = (valgrindRaw: ValgrindRaw): Valgrind => {
     args: args?.join(" "),
     checksFilter: checksFilter ?? valgrindDefaultConfig.checksFilter,
     visibility: visibility ?? valgrindDefaultConfig.visibility,
-    score: score?.toString(),
+    score,
   };
   return output;
 };
@@ -70,14 +68,13 @@ export const valgrindFromRaw = (valgrindRaw: ValgrindRaw): Valgrind => {
  * Converts a Valgrind config into a raw Valgrind config to be converted to YAML.
  */
 export const valgrindToRaw = (valgrind: Valgrind): ValgrindRaw => {
-  const { args, score } = valgrind;
+  const { args } = valgrind;
   const output: ValgrindRaw = {
     ...valgrind,
     args: args
       ?.trim()
       .split(" ")
       .filter((arg) => arg !== ""),
-    score: score ? parseFloat(score) : undefined,
   };
   return output;
 };

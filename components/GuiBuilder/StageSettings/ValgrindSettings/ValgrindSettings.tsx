@@ -1,6 +1,6 @@
 import Alert from "@components/GuiBuilder/Diagnostics/Alert";
 import InfoTooltip from "@components/GuiBuilder/Diagnostics/InfoTooltip";
-import { MultiSelect, SelectWithDescription, SwitchGroup, TextInput } from "@components/Input";
+import { MultiSelect, NumberInput, SelectWithDescription, SwitchGroup } from "@components/Input";
 import supportedStages, { valgrindDefaultConfig } from "@constants/Config/supportedStages";
 import { useSelectedStageConfig, useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
 import { Valgrind } from "@types";
@@ -39,15 +39,15 @@ function ValgrindSettings() {
           <label htmlFor="score">Default Valgrind score</label>
           <ScoreTooltip />
         </div>
-        <TextInput
+        <NumberInput
           id="score"
-          value={config.score ?? ""}
-          onChange={(e) => setConfig({ ...config, score: e.target.value })}
-          type="number"
-          step=".1"
-          min="0"
+          value={config.score}
+          onChange={(score) => setConfig({ ...config, score })}
+          precision={1}
+          step={0.1}
+          min={0}
           placeholder="Use test case's score"
-          classNames={{ root: "flex-[2]" }}
+          className="flex-[2]"
         />
       </div>
       <div className="flex items-center">

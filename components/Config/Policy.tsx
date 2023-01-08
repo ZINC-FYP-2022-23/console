@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useLayoutDispatch, useLayoutState } from "../../contexts/layout";
 import { UPDATE_ASSIGNMENT_CONFIG } from "../../graphql/mutations/user";
 import { useZinc } from "../../contexts/zinc";
-import { Checkbox, TextInput } from "@components/Input";
+import { Checkbox, NumberInput } from "@components/Input";
 
 export function PolicyConfig({ policy, onChange }) {
   const router = useRouter();
@@ -43,13 +43,13 @@ export function PolicyConfig({ policy, onChange }) {
         <label htmlFor="attemptLimits" className="block text-sm font-medium leading-5 text-gray-700">
           Attempt Limits
         </label>
-        <TextInput
+        <NumberInput
           id="attemptLimits"
-          type="number"
-          onChange={(e) => updatePolicy({ attemptLimits: e.target.value || null })}
+          onChange={(value) => updatePolicy({ attemptLimits: value?.toString() || null })}
           placeholder="Unlimited"
           value={policy.attemptLimits}
-          classNames={{ root: "w-1/2" }}
+          min={1}
+          className="w-1/2"
         />
       </div>
       <div className="mt-4">

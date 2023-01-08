@@ -6,6 +6,7 @@ export { default as Checkbox } from "./Checkbox";
 export { default as DateInput } from "./DateInput";
 export * from "./MultiSelect";
 export { default as MultiSelect } from "./MultiSelect";
+export { default as NumberInput } from "./NumberInput";
 export { default as Select } from "./Select";
 export * from "./SelectWithDescription";
 export { default as SelectWithDescription } from "./SelectWithDescription";

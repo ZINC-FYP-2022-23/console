@@ -1,5 +1,6 @@
 /// <reference types="jest-extended" />
 import { defaultSettings } from "@constants/Config/defaults";
+import supportedStages from "@constants/Config/supportedStages";
 import { StageDataMap, StageKind, StageNode } from "@types";
 import { computed, createStore, thunkOn } from "easy-peasy";
 import "jest-extended";
@@ -110,11 +111,7 @@ describe("GuiBuilder Store - PipelineEditorActions", () => {
         name: "Score",
         label: "",
         kind: StageKind.POST,
-        config: {
-          normalizedTo: "",
-          minScore: "",
-          maxScore: "",
-        },
+        config: supportedStages.Score.defaultConfig,
       },
     };
 

@@ -1,6 +1,6 @@
 import Button from "@components/Button";
 import InfoTooltip from "@components/GuiBuilder/Diagnostics/InfoTooltip";
-import { MultiSelect, Select, SelectWithDescription, SwitchGroup, TextInput } from "@components/Input";
+import { MultiSelect, NumberInput, Select, SelectWithDescription, SwitchGroup, TextInput } from "@components/Input";
 import supportedStages, { valgrindDefaultConfig } from "@constants/Config/supportedStages";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { clsx, Tooltip } from "@mantine/core";
@@ -35,7 +35,7 @@ function StdioTestCaseSettings({ caseId, closeModal, setPage }: StdioTestCaseSet
   const setAddStageSearchString = useStoreActions((actions) => actions.setAddStageSearchString);
 
   const [isEditingId, setIsEditingId] = useState(false);
-  const [newId, setNewId] = useState("");
+  const [newId, setNewId] = useState(caseId);
 
   const caseConfig = config.testCases.find((test) => test.id === caseId);
   if (!caseConfig) {
@@ -75,19 +75,20 @@ function StdioTestCaseSettings({ caseId, closeModal, setPage }: StdioTestCaseSet
   };
 
   const isNewIdInvalid =
-    parseInt(newId) < 1 ||
+    newId === null ||
+    newId < 1 ||
     config.testCases
       .map((test) => test.id)
       .filter((id) => id !== caseId)
-      .includes(parseInt(newId));
+      .includes(newId);
 
   const updateTestCaseId = () => {
-    const _newId = parseInt(newId);
+    if (newId === null) return;
     updateTestCase((testCase) => {
-      testCase.id = _newId;
+      testCase.id = newId;
     });
     setIsEditingId(false);
-    setPage(_newId);
+    setPage(newId);
   };
 
   return (
@@ -97,13 +98,19 @@ function StdioTestCaseSettings({ caseId, closeModal, setPage }: StdioTestCaseSet
           <div className="flex items-center">
             <p className="font-semibold text-xl">Test Case #</p>
             <div className="flex items-center relative">
-              <TextInput
-                value={newId}
-                onChange={(e) => setNewId(e.target.value)}
+              <NumberInput
+                value={newId ?? undefined}
+                onChange={(value) => setNewId(value ?? null)}
                 alertLevel={isNewIdInvalid ? "error" : undefined}
-                type="number"
                 min={1}
-                classNames={{ root: "mx-2", input: "w-24 !px-2 !py-1 text-lg" }}
+                className="mx-2 mt-1"
+                styles={{
+                  input: {
+                    width: "6rem",
+                    padding: "0.25rem 0.5rem !important",
+                    fontSize: "1.125rem !important",
+                  },
+                }}
               />
               <div className="flex items-center gap-3">
                 <button
@@ -121,7 +128,7 @@ function StdioTestCaseSettings({ caseId, closeModal, setPage }: StdioTestCaseSet
                 <button
                   onClick={() => {
                     setIsEditingId(false);
-                    setNewId(caseId?.toString() ?? "");
+                    setNewId(caseId);
                   }}
                   className="w-7 h-7 flex items-center justify-center bg-red-500 text-white rounded-full transition hover:bg-red-600 active:bg-red-700"
                 >
@@ -130,7 +137,7 @@ function StdioTestCaseSettings({ caseId, closeModal, setPage }: StdioTestCaseSet
               </div>
               {isNewIdInvalid && (
                 <p className="ml-2 absolute bottom-[-1.25rem] font-medium text-xs text-red-500">
-                  {parseInt(newId) < 1 ? "ID should be greater than 1" : "This ID is already taken"}
+                  {newId === null || newId < 1 ? "ID should be greater than 1" : "This ID is already taken"}
                 </p>
               )}
             </div>
@@ -141,7 +148,7 @@ function StdioTestCaseSettings({ caseId, closeModal, setPage }: StdioTestCaseSet
             <Tooltip label="Edit test case ID" position="right">
               <button
                 onClick={() => {
-                  setNewId(caseId?.toString() ?? "");
+                  setNewId(caseId);
                   setIsEditingId(true);
                 }}
                 className="w-8 h-8 flex items-center justify-center bg-amber-200 text-amber-700 rounded-full transition hover:bg-amber-300 active:bg-amber-400"
@@ -176,15 +183,15 @@ function StdioTestCaseSettings({ caseId, closeModal, setPage }: StdioTestCaseSet
               <label htmlFor="score" className="flex-[2]">
                 Test case score
               </label>
-              <TextInput
+              <NumberInput
                 id="score"
                 value={caseConfig.score}
-                onChange={(e) => updateTestCase((testCase) => (testCase.score = e.target.value))}
-                type="number"
-                step=".1"
-                min="0"
+                onChange={(value) => updateTestCase((testCase) => (testCase.score = value))}
+                precision={1}
+                step={0.1}
+                min={0}
                 placeholder="Disable scoring in this test case"
-                classNames={{ root: "flex-[3]" }}
+                className="flex-[3]"
               />
             </div>
             <div className="flex items-center gap-2">
@@ -376,21 +383,21 @@ function StdioTestCaseSettings({ caseId, closeModal, setPage }: StdioTestCaseSet
                 </label>
                 <ValgrindScoreTooltip />
               </div>
-              <TextInput
+              <NumberInput
                 id="valgrind.score"
-                value={caseConfig.valgrind?.score ?? ""}
-                onChange={(e) =>
+                value={caseConfig.valgrind?.score}
+                onChange={(value) =>
                   updateTestCase((testCase) => {
                     if (!testCase.valgrind) testCase.valgrind = cloneDeep(valgrindDefaultConfig);
-                    testCase.valgrind.score = e.target.value;
+                    testCase.valgrind.score = value;
                   })
                 }
                 disabled={!caseConfig._valgrindOverride}
-                type="number"
-                step=".1"
-                min="0"
-                placeholder={caseConfig.score ? caseConfig.score : "Use the score value from the Valgrind stage"}
-                classNames={{ root: "flex-[3]" }}
+                precision={1}
+                step={0.1}
+                min={0}
+                placeholder={caseConfig.score?.toString() ?? "Use the score value from the Valgrind stage"}
+                className="flex-[3]"
               />
             </div>
             <div className="flex gap-2">

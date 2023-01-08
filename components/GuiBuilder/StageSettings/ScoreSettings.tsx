@@ -1,4 +1,4 @@
-import { TextInput } from "@components/Input";
+import { NumberInput } from "@components/Input";
 import { useSelectedStageConfig } from "@state/GuiBuilder/Hooks";
 import { Score } from "@types";
 
@@ -6,7 +6,7 @@ function ScoreSettings() {
   const [config, setConfig] = useSelectedStageConfig<Score>();
 
   const isMinGreaterThanMax =
-    config.minScore && config.maxScore && parseFloat(config.minScore) > parseFloat(config.maxScore);
+    config.minScore !== undefined && config.maxScore !== undefined && config.minScore > config.maxScore;
 
   return (
     <div className="p-3">
@@ -18,17 +18,14 @@ function ScoreSettings() {
             <li>Leave blank to use the original maximum value</li>
           </ul>
         </div>
-        <div className="flex-1">
-          <TextInput
-            id="normalizedTo"
-            value={config.normalizedTo}
-            onChange={(e) => setConfig({ ...config, normalizedTo: e.target.value })}
-            type="number"
-            min="0"
-            placeholder="No normalization"
-            classNames={{ root: "w-full" }}
-          />
-        </div>
+        <NumberInput
+          id="normalizedTo"
+          value={config.normalizedTo}
+          onChange={(normalizedTo) => setConfig({ ...config, normalizedTo })}
+          min={0}
+          placeholder="No normalization"
+          className="flex-1"
+        />
       </div>
       <div className="mt-6 flex gap-2">
         <div className="flex-1">
@@ -44,28 +41,26 @@ function ScoreSettings() {
             <label htmlFor="minScore" className="w-8 text-gray-500 text-sm">
               Min:
             </label>
-            <TextInput
+            <NumberInput
               id="minScore"
               value={config.minScore}
-              onChange={(e) => setConfig({ ...config, minScore: e.target.value })}
-              type="number"
+              onChange={(minScore) => setConfig({ ...config, minScore })}
               placeholder="No minimum limit"
               alertLevel={isMinGreaterThanMax ? "error" : undefined}
-              classNames={{ root: "flex-1" }}
+              className="flex-1"
             />
           </div>
           <div className="flex items-center gap-2">
             <label htmlFor="maxScore" className="w-8 text-gray-500 text-sm">
               Max:
             </label>
-            <TextInput
+            <NumberInput
               id="maxScore"
               value={config.maxScore}
-              onChange={(e) => setConfig({ ...config, maxScore: e.target.value })}
-              type="number"
-              placeholder="No maximum limit"
+              onChange={(maxScore) => setConfig({ ...config, maxScore })}
+              placeholder="No minimum limit"
               alertLevel={isMinGreaterThanMax ? "error" : undefined}
-              classNames={{ root: "flex-1" }}
+              className="flex-1"
             />
           </div>
           {isMinGreaterThanMax && (

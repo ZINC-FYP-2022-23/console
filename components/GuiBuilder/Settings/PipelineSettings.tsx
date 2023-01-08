@@ -1,4 +1,4 @@
-import { Checkbox, Select, SwitchGroup, TextInput } from "@components/Input";
+import { Checkbox, NumberInput, Select, SwitchGroup, TextInput } from "@components/Input";
 import ListInput from "@components/Input/ListInput";
 import { ACCEPTED_LANG } from "@constants/Config/AcceptedLang";
 import supportedStages from "@constants/Config/supportedStages";
@@ -190,17 +190,13 @@ function PipelineSettings() {
                 <StageWaitDurationTooltip />
               </div>
               <div className="flex-1 flex items-center">
-                <TextInput
+                <NumberInput
                   id="stage_wait_duration_secs"
                   value={_settings.stage_wait_duration_secs}
-                  type="number"
-                  min="0"
+                  min={0}
                   placeholder="60"
-                  onChange={(event) => {
-                    const value = event.target.value;
-                    updateField({ path: "_settings.stage_wait_duration_secs", value });
-                  }}
-                  classNames={{ root: "flex-1" }}
+                  onChange={(value) => updateField({ path: "_settings.stage_wait_duration_secs", value })}
+                  className="flex-1"
                 />
                 <span className="ml-3 flex-none text-gray-500">secs</span>
               </div>
@@ -210,18 +206,15 @@ function PipelineSettings() {
                 <label htmlFor="cpus">CPUs</label>
                 <CpusTooltip />
               </div>
-              <TextInput
+              <NumberInput
                 id="cpus"
                 value={_settings.cpus}
-                type="number"
-                step=".1"
-                min="1"
+                precision={1}
+                step={0.1}
+                min={1}
                 placeholder="2.0"
-                onChange={(event) => {
-                  const value = event.target.value;
-                  updateField({ path: "_settings.cpus", value });
-                }}
-                classNames={{ root: "flex-1" }}
+                onChange={(value) => updateField({ path: "_settings.cpus", value })}
+                className="flex-1"
               />
             </div>
             <div>
@@ -297,18 +290,15 @@ function PipelineSettings() {
                 <MemoryTooltip />
               </div>
               <div className="flex-1 flex items-center">
-                <TextInput
+                <NumberInput
                   id="mem_gb"
                   value={_settings.mem_gb}
-                  type="number"
-                  step=".1"
-                  min="1"
-                  placeholder="4.0"
-                  onChange={(event) => {
-                    const value = event.target.value;
-                    updateField({ path: "_settings.mem_gb", value });
-                  }}
-                  classNames={{ root: "flex-1" }}
+                  precision={1}
+                  step={0.1}
+                  min={1}
+                  placeholder="2.0"
+                  onChange={(value) => updateField({ path: "_settings.mem_gb", value })}
+                  className="flex-1"
                 />
                 <span className="ml-3 flex-none text-gray-500">GB</span>
               </div>

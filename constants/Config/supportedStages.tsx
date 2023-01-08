@@ -2,7 +2,6 @@ import { Spinner } from "@components/Spinner";
 import {
   CompileRaw,
   FileStructureValidation,
-  ScoreRaw,
   StageConfig,
   StageKind,
   StdioTestRaw,
@@ -119,20 +118,8 @@ const supportedStages: SupportedStages = {
     kind: StageKind.POST,
     description: "Accumulates all scores from previous stages",
     defaultConfig: {
-      normalizedTo: "",
-      minScore: "",
-      maxScore: "",
+      normalizedTo: undefined,
     },
-    configFromRaw: (raw: ScoreRaw) => ({
-      normalizedTo: raw.normalizedTo?.toString() ?? "",
-      minScore: raw.minScore?.toString() ?? "",
-      maxScore: raw.maxScore?.toString() ?? "",
-    }),
-    configToRaw: (config): ScoreRaw => ({
-      normalizedTo: config.normalizedTo ? parseFloat(config.normalizedTo) : undefined,
-      minScore: config.minScore ? parseFloat(config.minScore) : undefined,
-      maxScore: config.maxScore ? parseFloat(config.maxScore) : undefined,
-    }),
     stageSettings: dynamic(() => import("../../components/GuiBuilder/StageSettings/ScoreSettings"), {
       loading: () => <StageSettingsLoading />,
     }),

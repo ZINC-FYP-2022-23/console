@@ -38,20 +38,10 @@ export interface FileStructureValidation {
   ignore_in_submission?: string[];
 }
 
-/**
- * The shape of `Score` stage's config returned by the backend
- * ({@link https://docs.zinc.ust.dev/user/pipeline/local/Score.html#config Reference}).
- */
-export interface ScoreRaw {
+export interface Score {
   normalizedTo?: number;
   minScore?: number;
   maxScore?: number;
-}
-
-export interface Score {
-  normalizedTo: string;
-  minScore: string;
-  maxScore: string;
 }
 
 /**
@@ -85,7 +75,7 @@ export interface Valgrind {
   args?: string;
   checksFilter: ChecksFilter[];
   visibility: VisibilityValgrind;
-  score?: string;
+  score?: number;
 }
 
 /////////////// HELPER TYPES ///////////////
@@ -127,7 +117,7 @@ export interface TestCase {
   file_expected?: string;
 
   hide_from_report?: HiddenItem[];
-  score: string;
+  score?: number;
 
   /** Helper field to indicate whether to override setting from the Valgrind stage. */
   _valgrindOverride: boolean;

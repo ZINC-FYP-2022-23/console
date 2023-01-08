@@ -1,22 +1,11 @@
 import { createStyles, Select, SelectProps } from "@mantine/core";
 import { forwardRef } from "react";
+import { getInputBoxWrapperStyles } from "./mantineStyles";
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
     // A trick to increase specificity of styles so they don't get overridden by Tailwind default styles
-    "& input": {
-      height: "auto",
-      borderColor: theme.colors.gray[4],
-      borderRadius: 6,
-      fontSize: "0.875rem",
-      lineHeight: "1.25rem",
-      transitionDuration: "150ms",
-      transitionProperty: "border-color, box-shadow",
-      "&:focus": {
-        borderColor: "#93c5fd",
-        boxShadow: "0 0 0 0px #fff, 0 0 0 3px #dbeafe",
-      },
-    },
+    "& input": getInputBoxWrapperStyles(theme),
   },
   item: {
     "&[data-selected]": {

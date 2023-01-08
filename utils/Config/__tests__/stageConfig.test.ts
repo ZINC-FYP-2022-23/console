@@ -8,8 +8,6 @@ import {
   Compile,
   CompileRaw,
   FileStructureValidation,
-  Score,
-  ScoreRaw,
   StageDataMap,
   StdioTest,
   StdioTestRaw,
@@ -94,64 +92,6 @@ describe("Raw stage configs conversion", () => {
     });
   });
 
-  describe("Score", () => {
-    describe("configFromRaw", () => {
-      it("converts all numerical fields to strings", () => {
-        const stage = createRawStage<ScoreRaw>("score", {
-          normalizedTo: 100,
-          minScore: 0,
-          maxScore: 100.5,
-        });
-        expect(parseStages(stage)[1][UUID].config).toEqual({
-          normalizedTo: "100",
-          minScore: "0",
-          maxScore: "100.5",
-        });
-      });
-
-      it("converts all undefined fields to empty strings", () => {
-        const stage = createRawStage<ScoreRaw>("score", {
-          normalizedTo: 100,
-        });
-        expect(parseStages(stage)[1][UUID].config).toEqual({
-          normalizedTo: "100",
-          minScore: "",
-          maxScore: "",
-        });
-      });
-    });
-
-    describe("configToRaw", () => {
-      it("converts numerical strings to numbers", () => {
-        const stage = createStage<Score>("Score", {
-          normalizedTo: "100",
-          minScore: "0",
-          maxScore: "100.5",
-        });
-        const _stage = configsToConfigsRaw(stage);
-        expect(_stage[UUID].config).toEqual({
-          normalizedTo: 100,
-          minScore: 0,
-          maxScore: 100.5,
-        });
-      });
-
-      it("converts empty strings to undefined", () => {
-        const stage = createStage<Score>("Score", {
-          normalizedTo: "100",
-          minScore: "",
-          maxScore: "",
-        });
-        const _stage = configsToConfigsRaw(stage);
-        expect(_stage[UUID].config).toEqual({
-          normalizedTo: 100,
-          minScore: undefined,
-          maxScore: undefined,
-        });
-      });
-    });
-  });
-
   describe("StdioTest", () => {
     describe("configFromRaw", () => {
       it("converts nullable arrays to empty arrays", () => {
@@ -201,7 +141,6 @@ describe("Raw stage configs conversion", () => {
           id: 1,
           file: "a.out",
           visibility: "ALWAYS_VISIBLE",
-          score: "",
           _stdinInputMode: "none",
           _expectedInputMode: "none",
           _valgrindOverride: false,
@@ -221,7 +160,6 @@ describe("Raw stage configs conversion", () => {
           valgrind: { score: 10 },
         };
         const output = stageConfig.testCaseFromRaw(testCaseRaw);
-        expect(output.score).toBe("5");
         expect(output.args).toBe("1 2");
         expect(output._stdinInputMode).toBe("file");
         expect(output._expectedInputMode).toBe("text");
@@ -234,7 +172,7 @@ describe("Raw stage configs conversion", () => {
         const commonField: Omit<TestCase, "id"> = {
           file: "a.out",
           visibility: "ALWAYS_VISIBLE",
-          score: "5",
+          score: 5,
           _stdinInputMode: "none",
           _expectedInputMode: "none",
           _valgrindOverride: false,
@@ -261,7 +199,7 @@ describe("Raw stage configs conversion", () => {
             id: 1,
             file: "a.out",
             visibility: "ALWAYS_VISIBLE",
-            score: "5",
+            score: 5,
             _stdinInputMode: "none",
             _expectedInputMode: "none",
             _valgrindOverride: false,
@@ -285,7 +223,7 @@ describe("Raw stage configs conversion", () => {
           id: 1,
           file: "a.out",
           visibility: "ALWAYS_VISIBLE",
-          score: "5",
+          score: 5,
           _stdinInputMode: "none",
           _expectedInputMode: "none",
           _valgrindOverride: false,
@@ -302,7 +240,7 @@ describe("Raw stage configs conversion", () => {
           file: "a.out",
           visibility: "ALWAYS_VISIBLE",
           args: "   1   2 ",
-          score: "5",
+          score: 5,
           stdin: "1 2 3",
           file_stdin: "stdin.txt",
           expected: "hello world",
@@ -312,7 +250,6 @@ describe("Raw stage configs conversion", () => {
           _valgrindOverride: false,
         };
         const output = stageConfig.testCaseToRaw(testCase);
-        expect(output.score).toBe(5);
         expect(output.args).toEqual(["1", "2"]);
         expect(output.stdin).toBeUndefined(); // Since _stdinInputMode is "none"
         expect(output.file_stdin).toBeUndefined();
@@ -335,13 +272,6 @@ describe("Raw stage configs conversion", () => {
         });
         expect(parseStages(stage)[1][UUID].config.args).toBe("--leak-check=full --show-leak-kinds=all");
       });
-
-      it("converts `score` from number to string", () => {
-        const stage = createRawStage<ValgrindRaw>("valgrind", {
-          score: 5,
-        });
-        expect(parseStages(stage)[1][UUID].config.score).toBe("5");
-      });
     });
 
     describe("valgrindToRaw()", () => {
@@ -353,16 +283,6 @@ describe("Raw stage configs conversion", () => {
           args: "  --leak-check=full    --show-leak-kinds=all    ",
         });
         expect(configsToConfigsRaw(stage)[UUID].config.args).toEqual(["--leak-check=full", "--show-leak-kinds=all"]);
-      });
-
-      it("converts `score` to number", () => {
-        const stage = createStage<Valgrind>("Valgrind", {
-          enabled: true,
-          checksFilter: ["*"],
-          visibility: "INHERIT",
-          score: "5.5",
-        });
-        expect(configsToConfigsRaw(stage)[UUID].config.score).toBe(5.5);
       });
     });
   });
@@ -376,7 +296,7 @@ describe("Raw stage configs conversion", () => {
       const commonField: Omit<TestCase, "id"> = {
         file: "a.out",
         visibility: "ALWAYS_VISIBLE",
-        score: "5",
+        score: 5,
         _stdinInputMode: "none",
         _expectedInputMode: "none",
         _valgrindOverride: false,

@@ -15,9 +15,9 @@ interface Settings {
   }[];
   use_skeleton: boolean;
   use_provided: boolean;
-  stage_wait_duration_secs: string;
-  cpus: string;
-  mem_gb: string;
+  stage_wait_duration_secs?: number;
+  cpus?: number;
+  mem_gb?: number;
   early_return_on_throw: boolean;
   enable_features: SettingsFeatures;
 }

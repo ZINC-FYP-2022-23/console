@@ -19,9 +19,9 @@ export function settingsRawToSettings(sr: SettingsRaw): Settings {
     template: sr.template?.map((t) => ({ id: uuidv4(), name: t })) ?? defaultSettings.template,
     use_skeleton: sr.use_skeleton ?? defaultSettings.use_skeleton,
     use_provided: sr.use_provided ?? defaultSettings.use_provided,
-    stage_wait_duration_secs: sr.stage_wait_duration_secs?.toString() ?? "",
-    cpus: sr.cpus?.toString() ?? "",
-    mem_gb: sr.mem_gb?.toString() ?? "",
+    stage_wait_duration_secs: sr.stage_wait_duration_secs ?? undefined,
+    cpus: sr.cpus ?? undefined,
+    mem_gb: sr.mem_gb ?? undefined,
     early_return_on_throw: sr.early_return_on_throw ?? defaultSettings.early_return_on_throw,
     enable_features: {
       network: sr.enable_features?.network ?? defaultSettings.enable_features.network,
@@ -40,9 +40,6 @@ export function settingsToSettingsRaw(settings: Settings): SettingsRaw {
     ...s,
     lang: settingsLangToString(s.lang),
     template: s.template.map((t) => t.name),
-    stage_wait_duration_secs: parseInt(s.stage_wait_duration_secs),
-    cpus: parseFloat(s.cpus),
-    mem_gb: parseFloat(s.mem_gb),
   };
 
   return _settings;
