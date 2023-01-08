@@ -69,7 +69,6 @@
     "react-hot-toast": "^2.1.1",
     "react-nice-dates": "^3.0.7",
     "react-tag-input-component": "^2.0.2",
-    "react-textarea-autosize": "^8.4.0",
     "react-transition-group": "^4.4.1",
     "reactflow": "^11.3.2",
     "redis": "^3.1.2",

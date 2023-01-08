@@ -13,4 +13,5 @@ export { default as SelectWithDescription } from "./SelectWithDescription";
 export { default as Switch } from "./Switch";
 export { default as SwitchGroup } from "./SwitchGroup";
 export { default as TagsInput } from "./TagsInput";
+export { default as Textarea } from "./Textarea";
 export { default as TextInput } from "./TextInput";

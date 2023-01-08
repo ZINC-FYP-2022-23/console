@@ -1,8 +1,7 @@
-import { TagsInput, TextInput } from "@components/Input";
+import { TagsInput, Textarea, TextInput } from "@components/Input";
 import { useSelectedStageConfig, useStoreState } from "@state/GuiBuilder/Hooks";
 import { Compile } from "@types";
 import { FocusEventHandler, memo } from "react";
-import TextareaAutosize from "react-textarea-autosize";
 import InfoTooltip from "../Diagnostics/InfoTooltip";
 
 interface ConfigMetadata {
@@ -104,12 +103,13 @@ function CompileSettings() {
           <label htmlFor="flags">Command-line flags</label>
           <FlagsTooltip />
         </div>
-        <TextareaAutosize
+        <Textarea
           id="flags"
           value={config.flags ?? ""}
           onChange={(e) => setConfig({ ...config, flags: e.target.value })}
           placeholder={metadata.flags.defaultValue ?? "e.g. -verbose -nowarn"}
-          className="flex-1 py-2 px-3 text-sm font-mono resize-none rounded-md shadow-sm border border-gray-300 transition ease-in-out placeholder:text-gray-400 placeholder:disabled:font-sans focus:outline-none focus:ring focus:ring-blue-100 focus:border-blue-300"
+          monospace
+          styles={{ root: { flex: 1 } }}
         />
       </div>
       <div className="flex items-center">

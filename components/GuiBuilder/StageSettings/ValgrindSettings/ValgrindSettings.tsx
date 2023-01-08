@@ -1,11 +1,10 @@
 import Alert from "@components/GuiBuilder/Diagnostics/Alert";
 import InfoTooltip from "@components/GuiBuilder/Diagnostics/InfoTooltip";
-import { MultiSelect, NumberInput, SelectWithDescription, SwitchGroup } from "@components/Input";
+import { MultiSelect, NumberInput, SelectWithDescription, SwitchGroup, Textarea } from "@components/Input";
 import supportedStages, { valgrindDefaultConfig } from "@constants/Config/supportedStages";
 import { useSelectedStageConfig, useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
 import { Valgrind } from "@types";
 import { memo } from "react";
-import TextareaAutosize from "react-textarea-autosize";
 import { checksFilterOptions, visibilityOptions } from "./inputOptions";
 
 function ValgrindSettings() {
@@ -84,12 +83,13 @@ function ValgrindSettings() {
           Valgrind command-line options
         </label>
         <div className="flex-[2] flex">
-          <TextareaAutosize
+          <Textarea
             id="args"
             value={config.args ?? ""}
             onChange={(e) => setConfig({ ...config, args: e.target.value })}
             placeholder="e.g. --leak-check=full"
-            className="w-full py-2 px-3 text-sm font-mono resize-none rounded-md shadow-sm border border-gray-300 transition ease-in-out placeholder:text-gray-400 focus:outline-none focus:ring focus:ring-blue-100 focus:border-blue-300 disabled:cursor-not-allowed disabled:opacity-70 disabled:bg-gray-100"
+            monospace
+            styles={{ root: { width: "100%" } }}
           />
         </div>
       </div>

@@ -18,6 +18,7 @@ const mantineTheme: MantineThemeOverride = {
     blue: ["#8FADE0", "#6F95D8", "#4F7ECF", "#3560C0", "#2C56A0", "#234580", "#1B3663", "#162B50", "#122340"],
   },
   fontFamily: `Inter var, ${defaultTheme.fontFamily.sans.join(", ")}`,
+  fontFamilyMonospace: `Fira Code, ${defaultTheme.fontFamily.mono.join(", ")}`,
 };
 
 interface GUIAssignmentBuilderRootProps {

@@ -1,6 +1,14 @@
 import Button from "@components/Button";
 import InfoTooltip from "@components/GuiBuilder/Diagnostics/InfoTooltip";
-import { MultiSelect, NumberInput, Select, SelectWithDescription, SwitchGroup, TextInput } from "@components/Input";
+import {
+  MultiSelect,
+  NumberInput,
+  Select,
+  SelectWithDescription,
+  SwitchGroup,
+  Textarea,
+  TextInput,
+} from "@components/Input";
 import supportedStages, { valgrindDefaultConfig } from "@constants/Config/supportedStages";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { clsx, Tooltip } from "@mantine/core";
@@ -10,7 +18,6 @@ import { StdioTest, TestCase } from "@types";
 import { getTestCasesLargestId } from "@utils/Config/stageConfig";
 import cloneDeep from "lodash/cloneDeep";
 import { ChangeEventHandler, memo, useState } from "react";
-import TextareaAutosize from "react-textarea-autosize";
 import {
   checksFilterOptions as valgrindChecksFilterOptions,
   visibilityOptions as valgrindVisibilityOptions,
@@ -241,12 +248,13 @@ function StdioTestCaseSettings({ caseId, closeModal, setPage }: StdioTestCaseSet
                 Command-line arguments
               </label>
               <div className="flex-[3] flex">
-                <TextareaAutosize
+                <Textarea
                   id="flags"
                   value={caseConfig.args ?? ""}
                   onChange={(e) => updateTestCase((testCase) => (testCase.args = e.target.value))}
                   placeholder="e.g. 1"
-                  className="w-full py-2 px-3 text-sm font-mono resize-none rounded-md shadow-sm border border-gray-300 transition ease-in-out placeholder:text-gray-400 placeholder:disabled:font-sans focus:outline-none focus:ring focus:ring-blue-100 focus:border-blue-300"
+                  monospace
+                  styles={{ root: { width: "100%" } }}
                 />
               </div>
             </div>
@@ -454,7 +462,7 @@ function StdioTestCaseSettings({ caseId, closeModal, setPage }: StdioTestCaseSet
                 Valgrind command-line options
               </label>
               <div className="flex-[3] flex">
-                <TextareaAutosize
+                <Textarea
                   id="valgrind.args"
                   value={caseConfig.valgrind?.args ?? ""}
                   onChange={(e) => {
@@ -464,8 +472,9 @@ function StdioTestCaseSettings({ caseId, closeModal, setPage }: StdioTestCaseSet
                     });
                   }}
                   placeholder="e.g. --leak-check=full"
-                  className="w-full py-2 px-3 text-sm font-mono resize-none rounded-md shadow-sm border border-gray-300 transition ease-in-out placeholder:text-gray-400 focus:outline-none focus:ring focus:ring-blue-100 focus:border-blue-300 disabled:cursor-not-allowed disabled:opacity-70 disabled:bg-gray-100"
                   disabled={!caseConfig._valgrindOverride}
+                  monospace
+                  styles={{ root: { width: "100%" } }}
                 />
               </div>
             </div>

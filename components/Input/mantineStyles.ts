@@ -22,6 +22,9 @@ export const getInputBoxWrapperStyles = (theme: MantineTheme, addErrorStyles = f
     borderColor: "#93c5fd",
     boxShadow: "0 0 0 3px #dbeafe",
   },
+  "&::placeholder": {
+    color: "#9ca3af",
+  },
   ...(addErrorStyles && {
     "&[data-alert-level=error]": {
       borderColor: theme.colors.red[6],
