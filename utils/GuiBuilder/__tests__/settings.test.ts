@@ -1,4 +1,4 @@
-import { Settings, SettingsGpuDevice, SettingsLang, SettingsRaw, SettingsUseTemplate } from "../../../types/Config";
+import { Settings, SettingsGpuDevice, SettingsLang, SettingsRaw, SettingsUseTemplate } from "@types";
 import {
   isSettingsEqual,
   parseLangString,

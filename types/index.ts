@@ -1,4 +1,3 @@
-export * from "./Config";
-export * from "./pipelineEditor";
+export * from "./GuiBuilder";
 export * from "./report";
 export * from "./tables";
