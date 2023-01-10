@@ -17,9 +17,9 @@ export const defaultSettings: Settings = {
   template: [{ id: uuidv4(), name: "" }],
   use_skeleton: false,
   use_provided: false,
-  stage_wait_duration_secs: "60",
-  cpus: "2.0",
-  mem_gb: "4.0",
+  stage_wait_duration_secs: 60,
+  cpus: 2.0,
+  mem_gb: 4.0,
   early_return_on_throw: false,
   enable_features: {
     network: true,
@@ -57,6 +57,5 @@ export const defaultTestCase: TestCase = {
   _stdinInputMode: "none",
   _expectedInputMode: "text",
   expected: "",
-  score: "",
   _valgrindOverride: false,
 };
