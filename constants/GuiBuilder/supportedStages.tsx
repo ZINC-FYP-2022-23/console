@@ -9,7 +9,7 @@ import {
   Valgrind,
   ValgrindRaw,
 } from "@types";
-import { testCaseFromRaw, testCaseToRaw, valgrindFromRaw, valgrindToRaw } from "@utils/Config/stageConfig";
+import { testCaseFromRaw, testCaseToRaw, valgrindFromRaw, valgrindToRaw } from "@utils/GuiBuilder/stageConfig";
 import dynamic from "next/dynamic";
 import { ComponentType } from "react";
 

@@ -6,7 +6,7 @@ import supportedStages from "@constants/GuiBuilder/supportedStages";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
 import { SettingsFeatures, SettingsGpuDevice, SettingsUseTemplate } from "@types";
-import { settingsLangToString } from "@utils/Config";
+import { settingsLangToString } from "@utils/GuiBuilder";
 import { memo } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { InfoTooltip } from "../Diagnostics";

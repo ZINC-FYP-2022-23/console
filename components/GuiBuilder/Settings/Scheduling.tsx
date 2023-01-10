@@ -1,6 +1,6 @@
 import { DateInput } from "@components/Input";
 import { useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
-import { appendZToIsoString } from "@utils/Config";
+import { appendZToIsoString } from "@utils/GuiBuilder";
 import { utcToZonedTime, zonedTimeToUtc } from "date-fns-tz";
 
 const getLocalDateFromString = (date: string) => {

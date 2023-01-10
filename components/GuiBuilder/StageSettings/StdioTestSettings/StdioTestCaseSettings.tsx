@@ -6,7 +6,7 @@ import { clsx, Tooltip } from "@mantine/core";
 import { ControlledEditor, ControlledEditorProps } from "@monaco-editor/react";
 import { useSelectedStageConfig, useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
 import { StdioTest, TestCase } from "@types";
-import { getTestCasesLargestId } from "@utils/Config/stageConfig";
+import { getTestCasesLargestId } from "@utils/GuiBuilder/stageConfig";
 import cloneDeep from "lodash/cloneDeep";
 import { ChangeEventHandler, memo, useState } from "react";
 import { InfoTooltip } from "../../Diagnostics";

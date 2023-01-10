@@ -5,7 +5,7 @@ import { Accordion, createStyles, Tooltip } from "@mantine/core";
 import { useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
 import { AccordionState } from "@state/GuiBuilder/Store";
 import { StageKind } from "@types";
-import { configToYaml } from "@utils/Config";
+import { configToYaml } from "@utils/GuiBuilder";
 import { forwardRef, memo, useEffect, useRef, useState } from "react";
 import AddableStage from "./PipelineEditor/AddableStage";
 

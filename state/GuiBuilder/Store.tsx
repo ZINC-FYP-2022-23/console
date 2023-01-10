@@ -8,7 +8,7 @@ import guiBuilderSteps, { GuiBuilderStep } from "@components/GuiBuilder/Steps/Gu
 import { defaultConfig, defaultPolicy, defaultSchedule } from "@constants/GuiBuilder/defaults";
 import supportedStages, { SupportedStage } from "@constants/GuiBuilder/supportedStages";
 import type { Config, GradingPolicy, Schedule, Stage, StageNode } from "@types";
-import { deleteStageFromDeps, isConfigEqual, isScheduleEqual, parseConfigYaml } from "@utils/Config";
+import { deleteStageFromDeps, isConfigEqual, isScheduleEqual, parseConfigYaml } from "@utils/GuiBuilder";
 import { coordQuad, dagConnect, sugiyama } from "d3-dag";
 import { Action, action, computed, Computed, createStore, StoreProvider, thunkOn, ThunkOn } from "easy-peasy";
 import camelCase from "lodash/camelCase";

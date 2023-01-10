@@ -1,5 +1,5 @@
 import { Config, GradingPolicy, Schedule, StageKind } from "@types";
-import * as configUtils from "@utils/Config/config";
+import * as configUtils from "@utils/GuiBuilder/config";
 import { computed, createStore } from "easy-peasy";
 import cloneDeep from "lodash/cloneDeep";
 import { GuiBuilderStoreModel, initialModel } from "../Store";

@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { clsx, createStyles, Modal, ScrollArea } from "@mantine/core";
 import { useSelectedStageConfig } from "@state/GuiBuilder/Hooks";
 import { StdioTest } from "@types";
-import { getTestCasesLargestId } from "@utils/Config/stageConfig";
+import { getTestCasesLargestId } from "@utils/GuiBuilder/stageConfig";
 import cloneDeep from "lodash/cloneDeep";
 import { ButtonHTMLAttributes, useState } from "react";
 import StdioTestCaseSettings from "./StdioTestCaseSettings";
