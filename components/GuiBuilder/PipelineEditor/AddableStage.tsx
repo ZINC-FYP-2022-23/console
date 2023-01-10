@@ -1,4 +1,4 @@
-import { SupportedStage } from "@constants/Config/supportedStages";
+import { SupportedStage } from "@constants/GuiBuilder/supportedStages";
 import { useStoreActions } from "@state/GuiBuilder/Hooks";
 
 interface AddableStageProps {

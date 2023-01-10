@@ -2,7 +2,7 @@
  * @file Utilities for the `Settings` type.
  */
 
-import { defaultSettings } from "@constants/Config/defaults";
+import { defaultSettings } from "@constants/GuiBuilder/defaults";
 import type { Settings, SettingsLang, SettingsRaw } from "@types";
 import cloneDeep from "lodash/cloneDeep";
 import isEqual from "lodash/isEqual";

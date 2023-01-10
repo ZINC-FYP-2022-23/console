@@ -1,8 +1,8 @@
 import Button from "@components/Button";
 import { Checkbox, NumberInput, Select, SelectItem, SwitchGroup, TextInput } from "@components/Input";
 import ListInput from "@components/Input/ListInput";
-import { ACCEPTED_LANG } from "@constants/Config/AcceptedLang";
-import supportedStages from "@constants/Config/supportedStages";
+import { ACCEPTED_LANG } from "@constants/GuiBuilder/acceptedLang";
+import supportedStages from "@constants/GuiBuilder/supportedStages";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
 import { SettingsFeatures, SettingsGpuDevice, SettingsUseTemplate } from "@types";

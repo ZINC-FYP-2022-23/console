@@ -1,5 +1,5 @@
-import { defaultSettings } from "@constants/Config/defaults";
-import supportedStages from "@constants/Config/supportedStages";
+import { defaultSettings } from "@constants/GuiBuilder/defaults";
+import supportedStages from "@constants/GuiBuilder/supportedStages";
 import { StageKind } from "@types";
 import cloneDeep from "lodash/cloneDeep";
 import { GuiBuilderStoreModel, initialModel } from "../../Store";

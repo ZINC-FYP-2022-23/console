@@ -1,6 +1,6 @@
 import Button from "@components/Button";
 import { MultiSelect, NumberInput, Select, SwitchGroup, Textarea, TextInput } from "@components/Input";
-import supportedStages, { valgrindDefaultConfig } from "@constants/Config/supportedStages";
+import supportedStages, { valgrindDefaultConfig } from "@constants/GuiBuilder/supportedStages";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { clsx, Tooltip } from "@mantine/core";
 import { ControlledEditor, ControlledEditorProps } from "@monaco-editor/react";

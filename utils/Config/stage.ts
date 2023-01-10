@@ -2,7 +2,7 @@
  * @file Utilities for the `Stage` type.
  */
 
-import supportedStages, { SupportedStage } from "@constants/Config/supportedStages";
+import supportedStages, { SupportedStage } from "@constants/GuiBuilder/supportedStages";
 import { StageDataMap, StageDependencyMap, StageKind } from "@types";
 import camelCase from "lodash/camelCase";
 import cloneDeep from "lodash/cloneDeep";

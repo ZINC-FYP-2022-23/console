@@ -2,7 +2,7 @@
  * @file Utilities for manipulating stage configs (e.g. converting to/from raw configs).
  */
 
-import { valgrindDefaultConfig } from "@constants/Config/supportedStages";
+import { valgrindDefaultConfig } from "@constants/GuiBuilder/supportedStages";
 import { TestCase, TestCaseRaw, Valgrind, ValgrindRaw } from "@types";
 
 /**

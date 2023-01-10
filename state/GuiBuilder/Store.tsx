@@ -5,8 +5,8 @@
  */
 
 import guiBuilderSteps, { GuiBuilderStep } from "@components/GuiBuilder/Steps/GuiBuilderSteps";
-import { defaultConfig, defaultPolicy, defaultSchedule } from "@constants/Config/defaults";
-import supportedStages, { SupportedStage } from "@constants/Config/supportedStages";
+import { defaultConfig, defaultPolicy, defaultSchedule } from "@constants/GuiBuilder/defaults";
+import supportedStages, { SupportedStage } from "@constants/GuiBuilder/supportedStages";
 import type { Config, GradingPolicy, Schedule, Stage, StageNode } from "@types";
 import { deleteStageFromDeps, isConfigEqual, isScheduleEqual, parseConfigYaml } from "@utils/Config";
 import { coordQuad, dagConnect, sugiyama } from "d3-dag";

@@ -1,5 +1,5 @@
 import { TextInput } from "@components/Input";
-import supportedStages, { SupportedStage } from "@constants/Config/supportedStages";
+import supportedStages, { SupportedStage } from "@constants/GuiBuilder/supportedStages";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { clsx, Tooltip } from "@mantine/core";
 import { useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";

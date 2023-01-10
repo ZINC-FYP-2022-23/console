@@ -1,4 +1,4 @@
-import { defaultSettings } from "@constants/Config/defaults";
+import { defaultSettings } from "@constants/GuiBuilder/defaults";
 import { Config, StageDataMap, StageDependencyMap, StageKind } from "@types";
 import cloneDeep from "lodash/cloneDeep";
 import { configToYaml, parseConfigYaml } from "../config";
