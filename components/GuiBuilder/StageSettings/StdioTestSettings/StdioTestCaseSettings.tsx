@@ -1,5 +1,4 @@
 import Button from "@components/Button";
-import InfoTooltip from "@components/GuiBuilder/Diagnostics/InfoTooltip";
 import { MultiSelect, NumberInput, Select, SwitchGroup, Textarea, TextInput } from "@components/Input";
 import supportedStages, { valgrindDefaultConfig } from "@constants/Config/supportedStages";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -10,6 +9,7 @@ import { StdioTest, TestCase } from "@types";
 import { getTestCasesLargestId } from "@utils/Config/stageConfig";
 import cloneDeep from "lodash/cloneDeep";
 import { ChangeEventHandler, memo, useState } from "react";
+import { InfoTooltip } from "../../Diagnostics";
 import {
   checksFilterOptions as valgrindChecksFilterOptions,
   visibilityOptions as valgrindVisibilityOptions,

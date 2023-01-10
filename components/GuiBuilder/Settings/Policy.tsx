@@ -1,8 +1,8 @@
-import { SwitchGroup, TextInput } from "@components/Input";
+import { SwitchGroup } from "@components/Input";
 import NumberInput from "@components/Input/NumberInput";
 import { useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
 import { memo } from "react";
-import InfoTooltip from "../Diagnostics/InfoTooltip";
+import { InfoTooltip } from "../Diagnostics";
 
 function Policy() {
   const policy = useStoreState((state) => state.editingPolicy);

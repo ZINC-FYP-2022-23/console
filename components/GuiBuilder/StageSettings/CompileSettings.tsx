@@ -2,7 +2,7 @@ import { TagsInput, Textarea, TextInput } from "@components/Input";
 import { useSelectedStageConfig, useStoreState } from "@state/GuiBuilder/Hooks";
 import { Compile } from "@types";
 import { FocusEventHandler, memo } from "react";
-import InfoTooltip from "../Diagnostics/InfoTooltip";
+import { InfoTooltip } from "../Diagnostics";
 
 interface ConfigMetadata {
   input: {

@@ -1,8 +1,8 @@
-import InfoTooltip from "@components/GuiBuilder/Diagnostics/InfoTooltip";
 import { MultiSelect, TagsInput } from "@components/Input";
 import { useSelectedStageConfig, useStoreState } from "@state/GuiBuilder/Hooks";
 import { StdioTest } from "@types";
 import { FocusEventHandler, memo } from "react";
+import { InfoTooltip } from "../../Diagnostics";
 import { diffIgnoreFlagOptions } from "./inputOptions";
 
 /**

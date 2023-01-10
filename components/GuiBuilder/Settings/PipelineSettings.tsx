@@ -1,5 +1,5 @@
 import Button from "@components/Button";
-import { Checkbox, NumberInput, SelectItem, Select, SwitchGroup, TextInput } from "@components/Input";
+import { Checkbox, NumberInput, Select, SelectItem, SwitchGroup, TextInput } from "@components/Input";
 import ListInput from "@components/Input/ListInput";
 import { ACCEPTED_LANG } from "@constants/Config/AcceptedLang";
 import supportedStages from "@constants/Config/supportedStages";
@@ -9,7 +9,7 @@ import { SettingsFeatures, SettingsGpuDevice, SettingsUseTemplate } from "@types
 import { settingsLangToString } from "@utils/Config";
 import { memo } from "react";
 import { v4 as uuidv4 } from "uuid";
-import InfoTooltip from "../Diagnostics/InfoTooltip";
+import { InfoTooltip } from "../Diagnostics";
 
 const useTemplateSelectOptions: SelectItem<"undefined" | SettingsUseTemplate>[] = [
   {
