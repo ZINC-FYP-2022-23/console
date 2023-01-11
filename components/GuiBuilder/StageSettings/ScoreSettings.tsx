@@ -5,6 +5,8 @@ import { Score } from "@types";
 function ScoreSettings() {
   const [config, setConfig] = useSelectedStageConfig<Score>();
 
+  if (!config) return null;
+
   const isMinGreaterThanMax =
     config.minScore !== undefined && config.maxScore !== undefined && config.minScore > config.maxScore;
 

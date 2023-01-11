@@ -22,6 +22,8 @@ function StdioTestSettings() {
    */
   const [page, setPage] = useState<"settings" | number | null>("settings");
 
+  if (!config) return null;
+
   const addTestCase = () => {
     const testCase = cloneDeep(defaultTestCase);
     testCase.id = getTestCasesLargestId(config.testCases) + 1;

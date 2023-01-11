@@ -36,6 +36,8 @@ function StdioTestCaseSettings({ caseId, closeModal, setPage }: StdioTestCaseSet
   const [isEditingId, setIsEditingId] = useState(false);
   const [newId, setNewId] = useState(caseId);
 
+  if (!config) return null;
+
   const caseConfig = config.testCases.find((test) => test.id === caseId);
   if (!caseConfig) {
     return <TestCaseEmptyState />;

@@ -25,6 +25,8 @@ function DiffWithSkeletonSettings() {
   const [config, setConfig] = useSelectedStageConfig<DiffWithSkeleton>();
   const setStep = useStoreActions((actions) => actions.setStep);
 
+  if (!config) return null;
+
   return (
     <div className="p-4">
       <div className="flex items-center text-blue-500 gap-4">

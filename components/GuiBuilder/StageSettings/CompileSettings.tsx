@@ -54,6 +54,8 @@ function CompileSettings() {
   const [config, setConfig] = useSelectedStageConfig<Compile>();
   const language = useStoreState((state) => state.editingConfig._settings.lang.language);
 
+  if (!config) return null;
+
   const metadata = getConfigMetadata(language);
 
   /** If user has typed something in the input box of tags input, add it to the list of tags. */

@@ -1,5 +1,5 @@
 import ListInput from "@components/Input/ListInput";
-import { createStyles, Accordion } from "@mantine/core";
+import { Accordion, createStyles } from "@mantine/core";
 import { useSelectedStageConfig, useStoreActions } from "@state/GuiBuilder/Hooks";
 import { FileStructureValidation } from "@types";
 import { useState } from "react";
@@ -31,8 +31,10 @@ function FileStructureValidationSettings() {
   const setStep = useStoreActions((actions) => actions.setStep);
 
   const [ignoredFiles, setIgnoredFiles] = useState<{ id: string; name: string }[]>(
-    config.ignore_in_submission?.map((name) => ({ id: uuidv4(), name })) ?? [],
+    config?.ignore_in_submission?.map((name) => ({ id: uuidv4(), name })) ?? [],
   );
+
+  if (!config) return null;
 
   const updateIgnoredFiles = (files: { id: string; name: string }[]) => {
     setIgnoredFiles(files);

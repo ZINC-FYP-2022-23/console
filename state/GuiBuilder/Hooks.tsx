@@ -18,17 +18,15 @@ export const useStoreState = typedHooks.useStoreState;
 /**
  * Returns the config of the currently selected stage, and a function to update it.
  *
- * Do **not** use this hook if there are no stages selected.
+ * The config is `undefined` if no stage is selected. This may possibly happen for a very short
+ * time when the user is selecting a new stage.
  */
 export function useSelectedStageConfig<TConfig = any>() {
   const selectedStage = useStoreState((state) => state.selectedStage);
   const stageData = useStoreState((state) => state.editingConfig.stageData);
   const updateSelectedStage = useStoreActions((actions) => actions.updateSelectedStage);
 
-  if (selectedStage === null) {
-    throw new Error("No stage is selected while trying to use useSelectedStageConfig()");
-  }
-  const config = stageData[selectedStage.id].config as TConfig;
+  const config = selectedStage ? (stageData[selectedStage.id].config as TConfig) : undefined;
   const updateFunction = (config: TConfig) => {
     updateSelectedStage({ path: "config", value: config });
   };

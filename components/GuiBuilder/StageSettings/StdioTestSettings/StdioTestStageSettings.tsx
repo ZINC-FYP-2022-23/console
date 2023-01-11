@@ -12,6 +12,8 @@ function StdioTestStageSettings() {
   const [config, setConfig] = useSelectedStageConfig<StdioTest>();
   const language = useStoreState((state) => state.editingConfig._settings.lang.language);
 
+  if (!config) return null;
+
   const isPipDisabled = language !== "python" && !config.additional_packages.includes("python3-pip");
 
   /** If user has typed something in the input box of tags input, add it to the list of tags. */

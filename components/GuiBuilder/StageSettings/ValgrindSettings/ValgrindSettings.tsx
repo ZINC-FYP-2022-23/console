@@ -11,6 +11,8 @@ function ValgrindSettings() {
   const hasStdioTestStage = useStoreState((state) => state.hasStage("StdioTest"));
   const setAddStageSearchString = useStoreActions((actions) => actions.setAddStageSearchString);
 
+  if (!config) return null;
+
   return (
     <div className="p-3 flex flex-col gap-4">
       {!hasStdioTestStage && (
