@@ -4,6 +4,7 @@
 
 import supportedStages, { SupportedStage } from "@constants/GuiBuilder/supportedStages";
 import { StageDataMap, StageDependencyMap, StageKind } from "@types";
+import { dump, load } from "js-yaml";
 import camelCase from "lodash/camelCase";
 import cloneDeep from "lodash/cloneDeep";
 import isEqual from "lodash/isEqual";
@@ -45,7 +46,7 @@ export function parseStages(stages: { [key: string]: any }): [StageDependencyMap
       name: stageName,
       label: stageLabel,
       kind: stage?.kind ?? StageKind.GRADING,
-      config: stage?.configFromRaw ? stage.configFromRaw(rawConfig) : rawConfig,
+      config: stage === undefined ? dump(rawConfig) : stage?.configFromRaw?.(rawConfig) ?? rawConfig,
     };
     prevStage = stageId;
   });
@@ -196,8 +197,10 @@ export function configsToConfigsRaw(stageData: StageDataMap): StageDataMap {
   const s = cloneDeep(stageData);
   Object.values(s).forEach((stage) => {
     const stageMetadata: SupportedStage | undefined = supportedStages[stage.name];
-    if (stageMetadata && stageMetadata.configToRaw) {
-      stage.config = stageMetadata.configToRaw(stage.config);
+    if (stageMetadata) {
+      stage.config = stageMetadata.configToRaw?.(stage.config) ?? stage.config;
+    } else {
+      stage.config = load(stage.config); // Parse the raw YAML for unsupported stages
     }
   });
   return s;

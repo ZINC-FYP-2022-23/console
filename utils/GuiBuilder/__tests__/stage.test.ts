@@ -1,6 +1,8 @@
 import { Stage, StageDataMap, StageDependencyMap, StageKind } from "@types";
+import * as jsYaml from "js-yaml";
 import * as uuid from "uuid";
 import {
+  configsToConfigsRaw,
   deleteStageFromDeps,
   generateStageLabels,
   getStageNameAndLabel,
@@ -10,6 +12,7 @@ import {
   transposeStageDeps,
 } from "../stage";
 
+jest.mock("js-yaml");
 jest.mock("uuid");
 
 const yamlObj = {
@@ -86,12 +89,18 @@ describe("Stage utils", () => {
           bar: "baz",
         },
       };
+      const expectedConfig = "bar: baz\n"; // It should turn the config into a YAML string
+
       jest.spyOn(uuid, "v4").mockReturnValue("mock-uuid-1");
       const consoleWarnMock = jest.spyOn(console, "warn").mockImplementation();
+      const dumpMock = jest.spyOn(jsYaml, "dump").mockReturnValue(expectedConfig);
+
       const [_, stageData] = parseStages(yamlObj);
 
       expect(consoleWarnMock).toHaveBeenCalled();
+      expect(dumpMock).toHaveBeenCalledWith(yamlObj.foo);
       expect(stageData["mock-uuid-1"].kind).toBe(StageKind.GRADING);
+      expect(stageData["mock-uuid-1"].config).toBe(expectedConfig);
 
       consoleWarnMock.mockRestore();
     });
@@ -325,6 +334,26 @@ describe("Stage utils", () => {
         "uuid-4": createStage("Score"),
       };
       expect(generateStageLabels(stageData)).toEqual(stageData);
+    });
+  });
+
+  describe("configsToConfigsRaw", () => {
+    it("parses the raw YAML config to an object in unsupported stages", () => {
+      const stageData: StageDataMap = {
+        "uuid-1": {
+          name: "UnsupportedStage",
+          kind: StageKind.GRADING,
+          label: "Unsupported Stage",
+          config: "foo: bar",
+        },
+      };
+      const expectedConfig = { foo: "bar" };
+
+      const loadMock = jest.spyOn(jsYaml, "load").mockReturnValue(expectedConfig);
+      const output = configsToConfigsRaw(stageData);
+
+      expect(loadMock).toHaveBeenCalledWith("foo: bar");
+      expect(output["uuid-1"].config).toEqual(expectedConfig);
     });
   });
 });

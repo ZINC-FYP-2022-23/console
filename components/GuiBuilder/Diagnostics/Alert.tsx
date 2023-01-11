@@ -22,7 +22,7 @@ function Alert({ severity, children }: AlertProps) {
   return (
     <div
       className={clsx(
-        "px-4 py-3 mb-2 flex items-center gap-4 rounded-md",
+        "px-4 py-3 flex items-center gap-4 rounded-md",
         severity === "info" && "bg-sky-100 text-sky-800",
         severity === "warning" && "bg-yellow-100 text-yellow-800",
         severity === "error" && "bg-red-100 text-red-800",
