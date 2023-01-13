@@ -1,6 +1,7 @@
 import { SwitchGroup } from "@components/Input";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useSelectedStageConfig, useStoreActions } from "@state/GuiBuilder/Hooks";
+import { useSelectedStageConfig } from "@hooks/GuiBuilder";
+import { useStoreActions } from "@state/GuiBuilder/Hooks";
 import { DiffWithSkeleton } from "@types";
 
 const excludeFromProvidedLabel = (

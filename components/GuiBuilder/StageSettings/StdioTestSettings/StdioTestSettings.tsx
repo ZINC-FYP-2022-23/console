@@ -1,8 +1,8 @@
 import Button from "@components/Button";
 import { defaultTestCase } from "@constants/GuiBuilder/defaults";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useSelectedStageConfig } from "@hooks/GuiBuilder";
 import { clsx, createStyles, Modal, ScrollArea } from "@mantine/core";
-import { useSelectedStageConfig } from "@state/GuiBuilder/Hooks";
 import { StdioTest } from "@types";
 import { getTestCasesLargestId } from "@utils/GuiBuilder/stageConfig";
 import cloneDeep from "lodash/cloneDeep";

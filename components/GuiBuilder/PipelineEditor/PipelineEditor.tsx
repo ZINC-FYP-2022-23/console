@@ -1,5 +1,6 @@
+import { usePipelineEditorHotKeys, useReactFlowFitView } from "@hooks/GuiBuilder";
 import { clsx } from "@mantine/core";
-import { usePipelineEditorHotKeys, useReactFlowFitView, useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
+import { useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
 import StoreActions from "@state/GuiBuilder/Store";
 import { DragEvent, DragEventHandler, memo, useCallback, useRef } from "react";
 import ReactFlow, {

@@ -1,6 +1,7 @@
 import { MultiSelect, NumberInput, Select, SwitchGroup, Textarea } from "@components/Input";
 import supportedStages, { valgrindDefaultConfig } from "@constants/GuiBuilder/supportedStages";
-import { useSelectedStageConfig, useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
+import { useSelectedStageConfig } from "@hooks/GuiBuilder";
+import { useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
 import { Valgrind } from "@types";
 import { memo } from "react";
 import { Alert, InfoTooltip } from "../../Diagnostics";

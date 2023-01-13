@@ -1,6 +1,7 @@
 import ListInput from "@components/Input/ListInput";
+import { useSelectedStageConfig } from "@hooks/GuiBuilder";
 import { Accordion, createStyles } from "@mantine/core";
-import { useSelectedStageConfig, useStoreActions } from "@state/GuiBuilder/Hooks";
+import { useStoreActions } from "@state/GuiBuilder/Hooks";
 import { FileStructureValidation } from "@types";
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";

@@ -1,5 +1,5 @@
+import { useSelectedStageConfig } from "@hooks/GuiBuilder";
 import { ControlledEditor } from "@monaco-editor/react";
-import { useSelectedStageConfig } from "@state/GuiBuilder/Hooks";
 import { Alert } from "../Diagnostics";
 
 /**

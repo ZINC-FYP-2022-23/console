@@ -1,5 +1,5 @@
 import { NumberInput } from "@components/Input";
-import { useSelectedStageConfig } from "@state/GuiBuilder/Hooks";
+import { useSelectedStageConfig } from "@hooks/GuiBuilder";
 import { Score } from "@types";
 
 function ScoreSettings() {
