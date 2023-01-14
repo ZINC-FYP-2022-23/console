@@ -154,8 +154,8 @@ describe("Stage utils", () => {
         B: ["C"],
         C: [],
       };
-      deleteStageFromDeps("B", stageDeps);
-      expect(stageDeps).toEqual({
+      const output = deleteStageFromDeps("B", stageDeps);
+      expect(output).toEqual({
         A: [],
         C: [],
       });
@@ -168,8 +168,8 @@ describe("Stage utils", () => {
         B: ["C"],
         C: [],
       };
-      deleteStageFromDeps("C", stageDeps);
-      expect(stageDeps).toEqual({
+      const output = deleteStageFromDeps("C", stageDeps);
+      expect(output).toEqual({
         A: ["B"],
         B: [],
       });
@@ -184,8 +184,8 @@ describe("Stage utils", () => {
         C: ["D"],
         D: [],
       };
-      deleteStageFromDeps("C", stageDeps);
-      expect(stageDeps).toEqual({
+      const output = deleteStageFromDeps("C", stageDeps);
+      expect(output).toEqual({
         A: ["B"],
         B: ["D"],
         D: [],
@@ -199,8 +199,8 @@ describe("Stage utils", () => {
         B: [],
       };
       const consoleWarnMock = jest.spyOn(console, "warn").mockImplementation();
-      deleteStageFromDeps("C", stageDeps);
-      expect(stageDeps).toEqual(stageDeps); // Remains unchanged
+      const output = deleteStageFromDeps("C", stageDeps);
+      expect(output).toEqual(stageDeps); // Remains unchanged
       expect(consoleWarnMock).toHaveBeenCalled();
 
       consoleWarnMock.mockRestore();

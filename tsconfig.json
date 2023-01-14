@@ -32,6 +32,7 @@
       "@layout": ["layout/"],
       "@lib/*": ["lib/*"],
       "@state/*": ["state/*"],
+      "@store/*": ["store/*"],
       "@types": ["types/"],
       "@types/*": ["types/*"],
       "@utils/*": ["utils/*"]

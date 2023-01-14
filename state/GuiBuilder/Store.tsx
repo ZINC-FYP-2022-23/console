@@ -515,7 +515,7 @@ export const pipelineEditorActions: PipelineEditorActions = {
 
     // Delete stage data from `editingConfig`
     delete state.editingConfig.stageData[id];
-    deleteStageFromDeps(id, state.editingConfig.stageDeps);
+    state.editingConfig.stageDeps = deleteStageFromDeps(id, state.editingConfig.stageDeps);
   }),
   deleteStageEdge: action((state, id) => {
     // e.g. Delete edge "A -> B" in pipeline editor means remove "A" from "B"'s dependencies
