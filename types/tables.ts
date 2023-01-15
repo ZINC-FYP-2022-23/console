@@ -24,20 +24,20 @@ export type AssignmentConfig = {
   affected_users: AssignmentConfigUser[];
   assignment: Assignment;
   assignment_id: number;
-  attemptLimits?: number;
+  attemptLimits: number | null;
   configValidated: boolean;
   config_yaml: string;
   createdAt: string;
-  deletedAt?: string;
+  deletedAt: string | null;
   dueAt: string;
   gradeImmediately: boolean;
   id: number;
   /** Whether the current time is after `startCollectionAt`. It equals to false if `startCollectionAt` is null. */
   openForSubmission: boolean;
-  releaseGradeAt?: string;
-  showAt?: string;
+  releaseGradeAt: string | null;
+  showAt: string | null;
   showImmediateScores: boolean;
-  startCollectionAt?: string;
+  startCollectionAt: string | null;
   stopCollectionAt: string;
   /** Whether the current time is after `stopCollectionAt`. */
   submissionWindowPassed: boolean;

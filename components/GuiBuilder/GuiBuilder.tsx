@@ -12,44 +12,25 @@ interface GUIAssignmentBuilderProps {
     assignmentConfig: AssignmentConfig | null;
     assignment: Assignment;
   };
-  /** The `assignmentConfigId`. It's `-1` when creating a new assignment. */
-  configId: number;
+  /** The `assignmentConfigId`. It's `null` when creating a new assignment. */
+  configId: number | null;
 }
 
 function GUIAssignmentBuilder({ data, configId }: GUIAssignmentBuilderProps) {
-  const isNewAssignment = configId === -1;
+  const isNewAssignment = configId === null;
 
   const isEdited = useStoreState((state) => state.config.isEdited);
   const step = useStoreState((state) => state.layout.step);
-  const setCourseId = useStoreActions((actions) => actions.config.setCourseId);
-  const initializeConfig = useStoreActions((actions) => actions.config.initializeConfig);
-  const initializePolicy = useStoreActions((actions) => actions.config.initializePolicy);
-  const initializeSchedule = useStoreActions((actions) => actions.config.initializeSchedule);
-  const initializePipeline = useStoreActions((actions) => actions.pipelineEditor.initializePipeline);
+  const initializeAssignment = useStoreActions((actions) => actions.config.initializeAssignment);
 
   // Initialize store
   useEffect(() => {
-    if (data?.assignment) {
-      setCourseId(data.assignment.course.id);
-    }
-    // From existing assignment
-    if (data?.assignmentConfig) {
-      initializeConfig({ id: configId, configYaml: data.assignmentConfig.config_yaml });
-      initializePolicy({
-        attemptLimits: data.assignmentConfig.attemptLimits ?? null,
-        gradeImmediately: data.assignmentConfig.gradeImmediately,
-        showImmediateScores: data.assignmentConfig.showImmediateScores,
-      });
-      initializeSchedule({
-        showAt: data.assignmentConfig.showAt ?? "",
-        startCollectionAt: data.assignmentConfig.startCollectionAt ?? "",
-        dueAt: data.assignmentConfig.dueAt,
-        stopCollectionAt: data.assignmentConfig.stopCollectionAt,
-        releaseGradeAt: data.assignmentConfig.releaseGradeAt ?? "",
-      });
-      initializePipeline();
-    }
-  }, [data, configId, setCourseId, initializeConfig, initializePolicy, initializeSchedule, initializePipeline]);
+    initializeAssignment({
+      configId,
+      courseId: data?.assignment.course.id ?? null,
+      config: data?.assignmentConfig ?? null,
+    });
+  }, [data, configId, initializeAssignment]);
 
   const StepComponent = guiBuilderSteps[step].component;
 

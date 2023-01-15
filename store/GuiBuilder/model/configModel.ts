@@ -1,5 +1,14 @@
 import { defaultConfig, defaultPolicy, defaultSchedule } from "@constants/GuiBuilder/defaults";
-import { Config, GradingPolicy, Schedule, Settings, Stage, StageDataMap, StageDependencyMap } from "@types";
+import {
+  AssignmentConfig,
+  Config,
+  GradingPolicy,
+  Schedule,
+  Settings,
+  Stage,
+  StageDataMap,
+  StageDependencyMap,
+} from "@types";
 import { isConfigEqual, isScheduleEqual, parseConfigYaml } from "@utils/GuiBuilder";
 import { action, Action, computed, Computed, thunk, Thunk } from "easy-peasy";
 import cloneDeep from "lodash/cloneDeep";
@@ -96,6 +105,19 @@ interface ConfigModelAction {
 }
 
 interface ConfigModelThunk {
+  /** Initializes the store states according to the data queried from the database. */
+  initializeAssignment: Thunk<
+    ConfigModel,
+    {
+      configId: number | null;
+      courseId: number | null;
+      /** Existing assignment config queried from database (if any). */
+      config: AssignmentConfig | null;
+    },
+    undefined,
+    GuiBuilderModel
+  >;
+
   /** Updates a non-readonly field of the selected stage. */
   updateSelectedStage: Thunk<
     ConfigModel,
@@ -205,6 +227,26 @@ const configModelAction: ConfigModelAction = {
 };
 
 const configModelThunk: ConfigModelThunk = {
+  initializeAssignment: thunk((actions, { configId, courseId, config }, { getStoreActions }) => {
+    if (courseId !== null) actions.setCourseId(courseId);
+    if (config === null) return;
+
+    actions.initializeConfig({ id: configId, configYaml: config.config_yaml });
+    actions.initializePolicy({
+      attemptLimits: config.attemptLimits,
+      gradeImmediately: config.gradeImmediately,
+      showImmediateScores: config.showImmediateScores,
+    });
+    actions.initializeSchedule({
+      showAt: config.showAt ?? "",
+      startCollectionAt: config.startCollectionAt ?? "",
+      dueAt: config.dueAt,
+      stopCollectionAt: config.stopCollectionAt,
+      releaseGradeAt: config.releaseGradeAt ?? "",
+    });
+    getStoreActions().pipelineEditor.initializePipeline();
+  }),
+
   updateSelectedStage: thunk((actions, { path, value }, { getStoreState }) => {
     const selectedNode = getStoreState().pipelineEditor.nodes.find((node) => node.selected);
     if (selectedNode === undefined) {

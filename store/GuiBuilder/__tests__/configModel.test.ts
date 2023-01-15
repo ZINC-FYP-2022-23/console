@@ -1,7 +1,10 @@
-import { Config, GradingPolicy, Schedule, Stage, StageKind } from "@types";
+/// <reference types="jest-extended" />
+import { AssignmentConfig, Config, GradingPolicy, Schedule, Stage, StageKind } from "@types";
 import * as configUtils from "@utils/GuiBuilder/config";
 import { createStore } from "easy-peasy";
+import "jest-extended";
 import cloneDeep from "lodash/cloneDeep";
+import { guiBuilderModel } from "../guiBuilderModel";
 import { configModel } from "../model/configModel";
 import { getThreeStageModel } from "./utils/storeTestUtils";
 
@@ -272,6 +275,79 @@ describe("GuiBuilder Store - ConfigModel", () => {
       const { editingConfig, initConfig } = store.getState().config;
       expect(editingConfig.stageData).toStrictEqual(model.config.editingConfig.stageData);
       expect(initConfig.stageData).toStrictEqual(model.config.initConfig.stageData);
+    });
+  });
+
+  describe("initializeAssignment()", () => {
+    const type = {
+      initAssignmentStart: "@thunk.config.initializeAssignment(start)",
+      initAssignmentSuccess: "@thunk.config.initializeAssignment(success)",
+      setCourseId: "@action.config.setCourseId",
+      initConfig: "@action.config.initializeConfig",
+      initPolicy: "@action.config.initializePolicy",
+      initSchedule: "@action.config.initializeSchedule",
+      initPipelineStart: "@thunk.pipelineEditor.initializePipeline(start)",
+      initPipelineSuccess: "@thunk.pipelineEditor.initializePipeline(success)",
+    };
+
+    it("initializes the store states", () => {
+      const model = cloneDeep(guiBuilderModel);
+      const store = createStore(model, { mockActions: true });
+
+      const configId = 1;
+      const courseId = 2;
+      const config = {} as AssignmentConfig;
+      const payload = { configId, courseId, config };
+
+      store.getActions().config.initializeAssignment(payload);
+
+      const mockedActions = store.getMockedActions();
+      expect(mockedActions[0]).toEqual({ type: type.initAssignmentStart, payload });
+      expect(mockedActions.map((action) => action.type)).toIncludeAllMembers([
+        type.initAssignmentStart,
+        type.setCourseId,
+        type.initConfig,
+        type.initPolicy,
+        type.initSchedule,
+        type.initPipelineStart,
+        // ... ignore other actions invoked by `initializePipeline()`
+        type.initPipelineSuccess,
+        type.initAssignmentSuccess,
+      ]);
+
+      // initializePipeline() should be called after initializeConfig()
+      const initConfigIndex = mockedActions.findIndex((action) => action.type === type.initConfig);
+      const initPipelineIndex = mockedActions.findIndex((action) => action.type === type.initPipelineStart);
+      expect(initPipelineIndex).toBeGreaterThan(initConfigIndex);
+    });
+
+    it("only sets the course ID if config is null", () => {
+      const model = cloneDeep(guiBuilderModel);
+      const store = createStore(model, { mockActions: true });
+
+      const courseId = 1;
+      const payload = { configId: null, courseId, config: null };
+
+      store.getActions().config.initializeAssignment(payload);
+
+      expect(store.getMockedActions()).toEqual([
+        { type: type.initAssignmentStart, payload },
+        { type: type.setCourseId, payload: courseId },
+        { type: type.initAssignmentSuccess, payload },
+      ]);
+    });
+
+    it("does nothing if every payload field is null", () => {
+      const model = cloneDeep(guiBuilderModel);
+      const store = createStore(model, { mockActions: true });
+      const payload = { configId: null, courseId: null, config: null };
+
+      store.getActions().config.initializeAssignment(payload);
+
+      expect(store.getMockedActions()).toEqual([
+        { type: type.initAssignmentStart, payload },
+        { type: type.initAssignmentSuccess, payload },
+      ]);
     });
   });
 

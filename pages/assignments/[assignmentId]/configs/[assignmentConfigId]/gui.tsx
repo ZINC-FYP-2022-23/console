@@ -52,7 +52,7 @@ function GUIAssignmentBuilderRoot({ configId, assignmentId }: GUIAssignmentBuild
       <Layout title="Assignment Config">
         <MantineProvider theme={mantineTheme}>
           <StoreProvider store={guiBuilderStore}>
-            <GUIAssignmentBuilder data={data} configId={configId} />
+            <GUIAssignmentBuilder data={data} configId={configId === -1 ? null : configId} />
           </StoreProvider>
         </MantineProvider>
       </Layout>
