@@ -1,6 +1,6 @@
 import Button from "@components/Button";
 import { createStyles, Modal } from "@mantine/core";
-import { useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
+import { useStoreActions, useStoreState } from "@store/GuiBuilder";
 
 const useStyles = createStyles((theme) => ({
   title: {
@@ -17,9 +17,9 @@ function DeleteStageModal() {
   const { classes } = useStyles();
 
   const isModalOpened = useStoreState((state) => state.layout.modal.deleteStage);
-  const selectedStage = useStoreState((state) => state.selectedStage);
-  const deleteStageNode = useStoreActions((actions) => actions.deleteStageNode);
-  const setModal = useStoreActions((actions) => actions.setModal);
+  const selectedStage = useStoreState((state) => state.pipelineEditor.selectedStage);
+  const deleteStageNode = useStoreActions((actions) => actions.pipelineEditor.deleteStageNode);
+  const setModal = useStoreActions((actions) => actions.layout.setModal);
 
   const closeModal = () => setModal({ path: "deleteStage", value: false });
 

@@ -1,7 +1,7 @@
 import { SwitchGroup } from "@components/Input";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useSelectedStageConfig } from "@hooks/GuiBuilder";
-import { useStoreActions } from "@state/GuiBuilder/Hooks";
+import { useStoreActions } from "@store/GuiBuilder";
 import { DiffWithSkeleton } from "@types";
 
 const excludeFromProvidedLabel = (
@@ -24,7 +24,7 @@ const excludeFromProvidedDesc = (
 
 function DiffWithSkeletonSettings() {
   const [config, setConfig] = useSelectedStageConfig<DiffWithSkeleton>();
-  const setStep = useStoreActions((actions) => actions.setStep);
+  const setStep = useStoreActions((actions) => actions.layout.setStep);
 
   if (!config) return null;
 

@@ -1,5 +1,5 @@
 import { DateInput } from "@components/Input";
-import { useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
+import { useStoreActions, useStoreState } from "@store/GuiBuilder";
 import { appendZToIsoString } from "@utils/GuiBuilder";
 import { utcToZonedTime, zonedTimeToUtc } from "date-fns-tz";
 
@@ -15,9 +15,9 @@ const getDateStringFromLocalDate = (date: Date | null) => {
 };
 
 function Scheduling() {
-  const schedule = useStoreState((state) => state.editingSchedule);
-  const policy = useStoreState((state) => state.editingPolicy);
-  const updateSchedule = useStoreActions((state) => state.updateSchedule);
+  const schedule = useStoreState((state) => state.config.editingSchedule);
+  const policy = useStoreState((state) => state.config.editingPolicy);
+  const updateSchedule = useStoreActions((state) => state.config.updateSchedule);
 
   return (
     <div className="space-y-4">

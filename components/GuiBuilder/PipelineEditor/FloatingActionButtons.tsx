@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Tooltip } from "@mantine/core";
-import { useStoreActions } from "@state/GuiBuilder/Hooks";
+import { useStoreActions } from "@store/GuiBuilder";
 import { memo } from "react";
 
 /**
@@ -15,7 +15,7 @@ function FloatingActionButtons() {
 }
 
 function FormatPipelineButton() {
-  const layoutPipeline = useStoreActions((action) => action.layoutPipeline);
+  const layoutPipeline = useStoreActions((action) => action.pipelineEditor.layoutPipeline);
 
   return (
     <Tooltip label="Format the pipeline" position="bottom" transition="fade" transitionDuration={200}>

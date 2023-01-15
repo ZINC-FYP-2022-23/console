@@ -1,12 +1,12 @@
 import { SwitchGroup } from "@components/Input";
 import NumberInput from "@components/Input/NumberInput";
-import { useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
+import { useStoreActions, useStoreState } from "@store/GuiBuilder";
 import { memo } from "react";
 import { InfoTooltip } from "../Diagnostics";
 
 function Policy() {
-  const policy = useStoreState((state) => state.editingPolicy);
-  const updatePolicy = useStoreActions((actions) => actions.updatePolicy);
+  const policy = useStoreState((state) => state.config.editingPolicy);
+  const updatePolicy = useStoreActions((actions) => actions.config.updatePolicy);
 
   return (
     <div className="flex flex-col gap-5 text-sm">

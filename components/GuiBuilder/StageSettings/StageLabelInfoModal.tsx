@@ -1,6 +1,6 @@
 import Button from "@components/Button";
 import { createStyles, Modal } from "@mantine/core";
-import { useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
+import { useStoreActions, useStoreState } from "@store/GuiBuilder";
 import Image from "next/image";
 
 const useStyles = createStyles((theme) => ({
@@ -18,7 +18,7 @@ function StageLabelInfoModal() {
   const { classes } = useStyles();
 
   const isModalOpened = useStoreState((state) => state.layout.modal.stageLabelInfo);
-  const setModal = useStoreActions((actions) => actions.setModal);
+  const setModal = useStoreActions((actions) => actions.layout.setModal);
 
   const closeModal = () => setModal({ path: "stageLabelInfo", value: false });
 

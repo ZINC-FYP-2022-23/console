@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { clsx } from "@mantine/core";
-import { useStoreActions } from "@state/GuiBuilder/Hooks";
+import { useStoreActions } from "@store/GuiBuilder";
 import { useState } from "react";
 import { EdgeLabelRenderer, EdgeProps, getBezierPath } from "reactflow";
 import "reactflow/dist/style.css";
@@ -10,7 +10,7 @@ import "reactflow/dist/style.css";
  */
 function StageEdge({ id, sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition, markerEnd }: EdgeProps) {
   const [showDeleteBtn, setShowDeleteBtn] = useState(false);
-  const deleteStageEdge = useStoreActions((actions) => actions.deleteStageEdge);
+  const deleteStageEdge = useStoreActions((actions) => actions.pipelineEditor.deleteStageEdge);
 
   const [edgePath, labelX, labelY] = getBezierPath({
     sourceX,

@@ -1,6 +1,6 @@
 import { MultiSelect, TagsInput } from "@components/Input";
 import { useSelectedStageConfig } from "@hooks/GuiBuilder";
-import { useStoreState } from "@state/GuiBuilder/Hooks";
+import { useStoreState } from "@store/GuiBuilder";
 import { StdioTest } from "@types";
 import { FocusEventHandler, memo } from "react";
 import { InfoTooltip } from "../../Diagnostics";
@@ -11,7 +11,7 @@ import { diffIgnoreFlagOptions } from "./inputOptions";
  */
 function StdioTestStageSettings() {
   const [config, setConfig] = useSelectedStageConfig<StdioTest>();
-  const language = useStoreState((state) => state.editingConfig._settings.lang.language);
+  const language = useStoreState((state) => state.config.editingConfig._settings.lang.language);
 
   if (!config) return null;
 

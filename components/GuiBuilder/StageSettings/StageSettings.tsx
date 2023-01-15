@@ -2,7 +2,7 @@ import { TextInput } from "@components/Input";
 import supportedStages, { SupportedStage } from "@constants/GuiBuilder/supportedStages";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { clsx, Tooltip } from "@mantine/core";
-import { useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
+import { useStoreActions, useStoreState } from "@store/GuiBuilder";
 import Image from "next/image";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import UnsupportedStage from "./UnsupportedStage";
@@ -46,12 +46,12 @@ function StageSettings() {
   const labelInputRef = useRef<HTMLInputElement>(null!);
   const [labelAlert, setLabelAlert] = useState<keyof StageLabelAlert | null>(null);
 
-  const selectedStage = useStoreState((state) => state.selectedStage);
-  const isStageLabelDuplicate = useStoreState((state) => state.isStageLabelDuplicate);
+  const selectedStage = useStoreState((state) => state.pipelineEditor.selectedStage);
+  const isStageLabelDuplicate = useStoreState((state) => state.config.isStageLabelDuplicate);
   const shouldFocusLabelInput = useStoreState((state) => state.pipelineEditor.shouldFocusLabelInput);
-  const updateSelectedStage = useStoreActions((actions) => actions.updateSelectedStage);
-  const setModal = useStoreActions((actions) => actions.setModal);
-  const setShouldFocusLabelInput = useStoreActions((actions) => actions.setShouldFocusLabelInput);
+  const updateSelectedStage = useStoreActions((actions) => actions.config.updateSelectedStage);
+  const setModal = useStoreActions((actions) => actions.layout.setModal);
+  const setShouldFocusLabelInput = useStoreActions((actions) => actions.pipelineEditor.setShouldFocusLabelInput);
 
   const validateStageLabel = useCallback(
     (label: string) => {

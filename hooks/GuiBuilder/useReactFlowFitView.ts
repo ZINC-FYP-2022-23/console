@@ -1,4 +1,4 @@
-import { useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
+import { useStoreActions, useStoreState } from "@store/GuiBuilder";
 import { useEffect } from "react";
 import { useReactFlow } from "reactflow";
 
@@ -8,7 +8,7 @@ import { useReactFlow } from "reactflow";
 export default function useReactFlowFitView() {
   const { fitView } = useReactFlow();
   const shouldFitView = useStoreState((state) => state.pipelineEditor.shouldFitView);
-  const setShouldFitView = useStoreActions((actions) => actions.setShouldFitView);
+  const setShouldFitView = useStoreActions((actions) => actions.pipelineEditor.setShouldFitView);
 
   useEffect(() => {
     if (shouldFitView) {

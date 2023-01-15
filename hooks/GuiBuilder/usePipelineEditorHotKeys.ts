@@ -1,5 +1,5 @@
 import { useHotkeys } from "@mantine/hooks";
-import { useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
+import { useStoreActions, useStoreState } from "@store/GuiBuilder";
 
 /**
  * Handles custom keyboard shortcuts in the Pipeline Editor.
@@ -10,11 +10,11 @@ import { useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
 export default function usePipelineEditorHotKeys() {
   const copiedStageId = useStoreState((state) => state.pipelineEditor.copiedStageId);
   const edges = useStoreState((state) => state.pipelineEditor.edges);
-  const selectedStage = useStoreState((state) => state.selectedStage);
-  const deleteStageEdge = useStoreActions((actions) => actions.deleteStageEdge);
-  const duplicateStage = useStoreActions((actions) => actions.duplicateStage);
-  const setCopiedStageId = useStoreActions((actions) => actions.setCopiedStageId);
-  const setModal = useStoreActions((actions) => actions.setModal);
+  const selectedStage = useStoreState((state) => state.pipelineEditor.selectedStage);
+  const deleteStageEdge = useStoreActions((actions) => actions.pipelineEditor.deleteStageEdge);
+  const duplicateStage = useStoreActions((actions) => actions.pipelineEditor.duplicateStage);
+  const setCopiedStageId = useStoreActions((actions) => actions.pipelineEditor.setCopiedStageId);
+  const setModal = useStoreActions((actions) => actions.layout.setModal);
 
   useHotkeys([
     [

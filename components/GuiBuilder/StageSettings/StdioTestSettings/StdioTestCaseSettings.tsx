@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useSelectedStageConfig } from "@hooks/GuiBuilder";
 import { clsx, Tooltip } from "@mantine/core";
 import { ControlledEditor, ControlledEditorProps } from "@monaco-editor/react";
-import { useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
+import { useStoreActions, useStoreState } from "@store/GuiBuilder";
 import { StdioTest, TestCase } from "@types";
 import { getTestCasesLargestId } from "@utils/GuiBuilder/stageConfig";
 import cloneDeep from "lodash/cloneDeep";
@@ -31,8 +31,8 @@ interface StdioTestCaseSettingsProps {
  */
 function StdioTestCaseSettings({ caseId, closeModal, setPage }: StdioTestCaseSettingsProps) {
   const [config, setConfig] = useSelectedStageConfig<StdioTest>();
-  const hasValgrindStage = useStoreState((state) => state.hasStage("Valgrind"));
-  const setAddStageSearchString = useStoreActions((actions) => actions.setAddStageSearchString);
+  const hasValgrindStage = useStoreState((state) => state.config.hasStage("Valgrind"));
+  const setAddStageSearchString = useStoreActions((actions) => actions.layout.setAddStageSearchString);
 
   const [isEditingId, setIsEditingId] = useState(false);
   const [newId, setNewId] = useState(caseId);
@@ -484,7 +484,7 @@ interface HelperFileInputCardProps {
  * A card for users to input the helper file name in "Standard input" and "Expected output".
  */
 function HelperFileInputCard({ value, onChange, placeholder }: HelperFileInputCardProps) {
-  const setStep = useStoreActions((actions) => actions.setStep);
+  const setStep = useStoreActions((actions) => actions.layout.setStep);
   return (
     <div className="mb-3 mx-2 p-3 bg-gray-50 rounded-lg drop-shadow">
       <ol className="pl-4 mb-2 text-gray-600 text-sm list-decimal">

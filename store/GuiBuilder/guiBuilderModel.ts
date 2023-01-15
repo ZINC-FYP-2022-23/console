@@ -23,7 +23,7 @@ export const guiBuilderModel: GuiBuilderModel = {
 };
 
 /**
- * Typed Easy Peasy hooks ({@link https://easy-peasy.vercel.app/docs/tutorials/typescript.html#typing-the-hooks Docs}).
+ * Typed Easy Peasy hooks ({@link https://easy-peasy.dev/docs/tutorials/typescript.html#typing-the-hooks Docs}).
  */
 const typedHooks = createTypedHooks<GuiBuilderModel>();
 export const useStoreActions = typedHooks.useStoreActions;

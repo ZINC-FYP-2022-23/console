@@ -1,5 +1,5 @@
 import Button from "@components/Button";
-import { useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
+import { useStoreActions, useStoreState } from "@store/GuiBuilder";
 import { Assignment, AssignmentConfig } from "@types";
 import { useEffect } from "react";
 import guiBuilderSteps from "./Steps/GuiBuilderSteps";
@@ -19,13 +19,13 @@ interface GUIAssignmentBuilderProps {
 function GUIAssignmentBuilder({ data, configId }: GUIAssignmentBuilderProps) {
   const isNewAssignment = configId === -1;
 
-  const isEdited = useStoreState((state) => state.isEdited);
+  const isEdited = useStoreState((state) => state.config.isEdited);
   const step = useStoreState((state) => state.layout.step);
-  const setCourseId = useStoreActions((actions) => actions.setCourseId);
-  const initializeConfig = useStoreActions((actions) => actions.initializeConfig);
-  const initializePolicy = useStoreActions((actions) => actions.initializePolicy);
-  const initializeSchedule = useStoreActions((actions) => actions.initializeSchedule);
-  const initializePipeline = useStoreActions((actions) => actions.initializePipeline);
+  const setCourseId = useStoreActions((actions) => actions.config.setCourseId);
+  const initializeConfig = useStoreActions((actions) => actions.config.initializeConfig);
+  const initializePolicy = useStoreActions((actions) => actions.config.initializePolicy);
+  const initializeSchedule = useStoreActions((actions) => actions.config.initializeSchedule);
+  const initializePipeline = useStoreActions((actions) => actions.pipelineEditor.initializePipeline);
 
   // Initialize store
   useEffect(() => {

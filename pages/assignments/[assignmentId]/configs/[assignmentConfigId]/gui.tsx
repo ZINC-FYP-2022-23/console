@@ -5,8 +5,9 @@ import { GET_PIPELINE_CONFIG_FOR_ASSIGNMENT } from "@graphql/queries/user";
 import { Layout } from "@layout";
 import { initializeApollo } from "@lib/apollo";
 import { MantineProvider, MantineThemeOverride } from "@mantine/core";
-import { GuiBuilderStoreProvider } from "@state/GuiBuilder/Store";
+import { guiBuilderModel } from "@store/GuiBuilder";
 import { Assignment, AssignmentConfig } from "@types";
+import { createStore, StoreProvider } from "easy-peasy";
 import { GetServerSideProps } from "next";
 import defaultTheme from "tailwindcss/defaultTheme";
 
@@ -28,6 +29,8 @@ interface GUIAssignmentBuilderRootProps {
   assignmentId: number;
 }
 
+const guiBuilderStore = createStore(guiBuilderModel);
+
 function GUIAssignmentBuilderRoot({ configId, assignmentId }: GUIAssignmentBuilderRootProps) {
   const { data, error } = useQuery<{ assignmentConfig: AssignmentConfig; assignment: Assignment }>(
     GET_PIPELINE_CONFIG_FOR_ASSIGNMENT,
@@ -48,9 +51,9 @@ function GUIAssignmentBuilderRoot({ configId, assignmentId }: GUIAssignmentBuild
     <LayoutProvider>
       <Layout title="Assignment Config">
         <MantineProvider theme={mantineTheme}>
-          <GuiBuilderStoreProvider>
+          <StoreProvider store={guiBuilderStore}>
             <GUIAssignmentBuilder data={data} configId={configId} />
-          </GuiBuilderStoreProvider>
+          </StoreProvider>
         </MantineProvider>
       </Layout>
     </LayoutProvider>

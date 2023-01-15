@@ -1,13 +1,13 @@
 import Button from "@components/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useStoreActions } from "@state/GuiBuilder/Hooks";
+import { useStoreActions } from "@store/GuiBuilder";
 
 /**
  * A locked step. Some steps are locked when creating a new config because they require
  * a non-null config ID to work properly.
  */
 function LockedStep() {
-  const setStep = useStoreActions((actions) => actions.setStep);
+  const setStep = useStoreActions((actions) => actions.layout.setStep);
 
   return (
     <div className="mt-20 flex flex-col items-center">

@@ -2,8 +2,7 @@ import Button from "@components/Button";
 import supportedStages, { SupportedStage } from "@constants/GuiBuilder/supportedStages";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Accordion, createStyles, Tooltip } from "@mantine/core";
-import { useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
-import { AccordionState } from "@state/GuiBuilder/Store";
+import { AccordionState, useStoreActions, useStoreState } from "@store/GuiBuilder";
 import { StageKind } from "@types";
 import { configToYaml } from "@utils/GuiBuilder";
 import { forwardRef, memo, useEffect, useRef, useState } from "react";
@@ -90,11 +89,11 @@ function AddStagePanel() {
   const { classes } = useStyles();
   const searchBarRef = useRef<HTMLInputElement>(null);
 
-  const editingConfig = useStoreState((state) => state.editingConfig);
+  const editingConfig = useStoreState((state) => state.config.editingConfig);
   const accordion = useStoreState((state) => state.layout.accordion.addNewStage);
   const searchString = useStoreState((state) => state.layout.addStageSearchString);
-  const setAccordion = useStoreActions((action) => action.setAccordion);
-  const toggleAddStageCollapsed = useStoreActions((action) => action.toggleAddStageCollapsed);
+  const setAccordion = useStoreActions((action) => action.layout.setAccordion);
+  const toggleAddStageCollapsed = useStoreActions((action) => action.layout.toggleAddStageCollapsed);
 
   /**
    * Which accordions should open during searching. All accordions should open by default whenever
@@ -204,7 +203,7 @@ function AddStagePanel() {
  */
 const AddStageSearchBar = forwardRef<HTMLInputElement>((_, ref) => {
   const searchString = useStoreState((state) => state.layout.addStageSearchString);
-  const setSearchString = useStoreActions((action) => action.setAddStageSearchString);
+  const setSearchString = useStoreActions((action) => action.layout.setAddStageSearchString);
 
   return (
     <div className="group flex items-center border border-gray-300 bg-white rounded-md shadow-sm focus-within:border-blue-300 focus-within:ring focus-within:ring-blue-100">
@@ -236,7 +235,7 @@ AddStageSearchBar.displayName = "AddStageSearchBar";
  * The collapsed version of Add Stage Panel.
  */
 export function AddStagePanelCollapsed() {
-  const toggleAddStageCollapsed = useStoreActions((action) => action.toggleAddStageCollapsed);
+  const toggleAddStageCollapsed = useStoreActions((action) => action.layout.toggleAddStageCollapsed);
 
   return (
     <div className="p-2 flex flex-col gap-4">

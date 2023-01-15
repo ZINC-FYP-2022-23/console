@@ -1,5 +1,5 @@
 import { createStyles, Stepper as StepperMantine } from "@mantine/core";
-import { useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
+import { useStoreActions, useStoreState } from "@store/GuiBuilder";
 import { memo } from "react";
 import guiBuilderSteps from "./GuiBuilderSteps";
 
@@ -61,9 +61,9 @@ interface StepperProps {
  */
 function Stepper({ className = "" }: StepperProps) {
   const { classes } = useStyles();
-  const configId = useStoreState((state) => state.configId);
+  const configId = useStoreState((state) => state.config.configId);
   const step = useStoreState((state) => state.layout.step);
-  const setStep = useStoreActions((actions) => actions.setStep);
+  const setStep = useStoreActions((actions) => actions.layout.setStep);
 
   return (
     <StepperMantine

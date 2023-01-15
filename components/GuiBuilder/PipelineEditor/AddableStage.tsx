@@ -1,5 +1,5 @@
 import { SupportedStage } from "@constants/GuiBuilder/supportedStages";
-import { useStoreActions } from "@state/GuiBuilder/Hooks";
+import { useStoreActions } from "@store/GuiBuilder";
 
 interface AddableStageProps {
   stageName: string;
@@ -10,7 +10,7 @@ interface AddableStageProps {
  * Pipeline stage block that can be added to the pipeline editor.
  */
 function AddableStage({ stageName, stageData }: AddableStageProps) {
-  const setDragging = useStoreActions((action) => action.setDragging);
+  const setDragging = useStoreActions((action) => action.pipelineEditor.setDragging);
 
   return (
     <div className="flex flex-col">

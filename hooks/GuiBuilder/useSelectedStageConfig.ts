@@ -1,4 +1,4 @@
-import { useStoreState, useStoreActions } from "../../state/GuiBuilder/Hooks";
+import { useStoreState, useStoreActions } from "@store/GuiBuilder";
 
 /**
  * Returns the config of the currently selected stage, and a function to update it.
@@ -7,9 +7,9 @@ import { useStoreState, useStoreActions } from "../../state/GuiBuilder/Hooks";
  * time when the user is selecting a new stage.
  */
 export default function useSelectedStageConfig<TConfig = any>() {
-  const selectedStage = useStoreState((state) => state.selectedStage);
-  const stageData = useStoreState((state) => state.editingConfig.stageData);
-  const updateSelectedStage = useStoreActions((actions) => actions.updateSelectedStage);
+  const selectedStage = useStoreState((state) => state.pipelineEditor.selectedStage);
+  const stageData = useStoreState((state) => state.config.editingConfig.stageData);
+  const updateSelectedStage = useStoreActions((actions) => actions.config.updateSelectedStage);
 
   const config = selectedStage ? (stageData[selectedStage.id].config as TConfig) : undefined;
   const updateFunction = (config: TConfig) => {

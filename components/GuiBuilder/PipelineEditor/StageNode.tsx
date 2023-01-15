@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { clsx, Tooltip } from "@mantine/core";
-import { useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
+import { useStoreActions, useStoreState } from "@store/GuiBuilder";
 import { StageNodeData } from "@types";
 import { DragEventHandler, useState } from "react";
 import { Handle, NodeProps, Position } from "reactflow";
@@ -20,11 +20,11 @@ const onDragOver: DragEventHandler<HTMLDivElement> = (event) => {
  */
 function StageNode({ id, data, selected }: NodeProps<StageNodeData>) {
   const [isDragOver, setIsDragOver] = useState(false);
-  const stageData = useStoreState((state) => state.editingConfig.stageData);
+  const stageData = useStoreState((state) => state.config.editingConfig.stageData);
   const dragging = useStoreState((state) => state.pipelineEditor.dragging);
-  const setModal = useStoreActions((actions) => actions.setModal);
-  const setShouldFocusLabelInput = useStoreActions((actions) => actions.setShouldFocusLabelInput);
-  const duplicateStage = useStoreActions((action) => action.duplicateStage);
+  const setModal = useStoreActions((actions) => actions.layout.setModal);
+  const setShouldFocusLabelInput = useStoreActions((actions) => actions.pipelineEditor.setShouldFocusLabelInput);
+  const duplicateStage = useStoreActions((action) => action.pipelineEditor.duplicateStage);
 
   const stageLabel = stageData[id]?.label ?? "";
 

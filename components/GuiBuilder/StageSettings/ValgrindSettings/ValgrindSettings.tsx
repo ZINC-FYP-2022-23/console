@@ -1,7 +1,7 @@
 import { MultiSelect, NumberInput, Select, SwitchGroup, Textarea } from "@components/Input";
 import supportedStages, { valgrindDefaultConfig } from "@constants/GuiBuilder/supportedStages";
 import { useSelectedStageConfig } from "@hooks/GuiBuilder";
-import { useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
+import { useStoreActions, useStoreState } from "@store/GuiBuilder";
 import { Valgrind } from "@types";
 import { memo } from "react";
 import { Alert, InfoTooltip } from "../../Diagnostics";
@@ -9,8 +9,8 @@ import { checksFilterOptions, visibilityOptions } from "./inputOptions";
 
 function ValgrindSettings() {
   const [config, setConfig] = useSelectedStageConfig<Valgrind>();
-  const hasStdioTestStage = useStoreState((state) => state.hasStage("StdioTest"));
-  const setAddStageSearchString = useStoreActions((actions) => actions.setAddStageSearchString);
+  const hasStdioTestStage = useStoreState((state) => state.config.hasStage("StdioTest"));
+  const setAddStageSearchString = useStoreActions((actions) => actions.layout.setAddStageSearchString);
 
   if (!config) return null;
 

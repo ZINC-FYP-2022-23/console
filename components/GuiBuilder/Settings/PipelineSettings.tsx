@@ -4,7 +4,7 @@ import ListInput from "@components/Input/ListInput";
 import { ACCEPTED_LANG } from "@constants/GuiBuilder/acceptedLang";
 import supportedStages from "@constants/GuiBuilder/supportedStages";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
+import { useStoreActions, useStoreState } from "@store/GuiBuilder";
 import { SettingsFeatures, SettingsGpuDevice, SettingsUseTemplate } from "@types";
 import { settingsLangToString } from "@utils/GuiBuilder";
 import { memo } from "react";
@@ -65,9 +65,9 @@ const gpuVendorSelectOptions = [
 ];
 
 function PipelineSettings() {
-  const _settings = useStoreState((state) => state.editingConfig._settings);
-  const setStep = useStoreActions((actions) => actions.setStep);
-  const updateField = useStoreActions((actions) => actions.updateField);
+  const _settings = useStoreState((state) => state.config.editingConfig._settings);
+  const setStep = useStoreActions((actions) => actions.layout.setStep);
+  const updateField = useStoreActions((actions) => actions.config.updateField);
 
   return (
     <div className="flex flex-col gap-8 text-sm">
@@ -335,9 +335,9 @@ const LangVersionTooltip = memo(() => (
 LangVersionTooltip.displayName = "LangVersionTooltip";
 
 const UseTemplateTooltip = memo(() => {
-  const setStep = useStoreActions((actions) => actions.setStep);
-  const setAccordion = useStoreActions((actions) => actions.setAccordion);
-  const setAddStageSearchString = useStoreActions((actions) => actions.setAddStageSearchString);
+  const setStep = useStoreActions((actions) => actions.layout.setStep);
+  const setAccordion = useStoreActions((actions) => actions.layout.setAccordion);
+  const setAddStageSearchString = useStoreActions((actions) => actions.layout.setAddStageSearchString);
 
   return (
     <InfoTooltip width={520}>

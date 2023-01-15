@@ -1,7 +1,6 @@
 import { usePipelineEditorHotKeys, useReactFlowFitView } from "@hooks/GuiBuilder";
 import { clsx } from "@mantine/core";
-import { useStoreActions, useStoreState } from "@state/GuiBuilder/Hooks";
-import StoreActions from "@state/GuiBuilder/Store";
+import { useStoreActions, useStoreState, PipelineEditorModel } from "@store/GuiBuilder";
 import { DragEvent, DragEventHandler, memo, useCallback, useRef } from "react";
 import ReactFlow, {
   Background,
@@ -63,11 +62,11 @@ function PipelineEditor() {
   const nodes = useStoreState((state) => state.pipelineEditor.nodes);
   const edges = useStoreState((state) => state.pipelineEditor.edges);
 
-  const layoutPipeline = useStoreActions((actions) => actions.layoutPipeline);
-  const addStageNode = useStoreActions((actions) => actions.addStageNode);
-  const onNodesChange = useStoreActions((actions) => actions.onStageNodesChange);
-  const onEdgesChange = useStoreActions((actions) => actions.onStageEdgesChange);
-  const onStageConnect = useStoreActions((actions) => actions.onStageConnect);
+  const layoutPipeline = useStoreActions((actions) => actions.pipelineEditor.layoutPipeline);
+  const addStageNode = useStoreActions((actions) => actions.pipelineEditor.addStageNode);
+  const onNodesChange = useStoreActions((actions) => actions.pipelineEditor.onStageNodesChange);
+  const onEdgesChange = useStoreActions((actions) => actions.pipelineEditor.onStageEdgesChange);
+  const onStageConnect = useStoreActions((actions) => actions.pipelineEditor.onStageConnect);
 
   useReactFlowFitView();
   usePipelineEditorHotKeys();
@@ -75,7 +74,7 @@ function PipelineEditor() {
   /**
    * Fit view when the React Flow editor is initialized.
    *
-   * By the time this is called, {@link StoreActions.initializePipeline} has already inserted
+   * By the time this is called, {@link PipelineEditorModel.initializePipeline} has already inserted
    * nodes and edges in the editor.
    */
   const onInit: OnInit = useCallback(() => {
