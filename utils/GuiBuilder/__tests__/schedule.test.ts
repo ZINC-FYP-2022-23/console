@@ -7,7 +7,7 @@ describe("Schedule utils", () => {
       // s1 simulates a schedule object that comes from the Postgres database.
       // All timestamps are stored in UTC time, but the ISO strings do not end with a "Z" character.
       const s1: Schedule = {
-        showAt: "2022-09-01T16:00:00",
+        showAt: null,
         startCollectionAt: "2022-09-01T16:00:00",
         dueAt: "2022-09-10T16:00:00",
         stopCollectionAt: "2022-09-10T16:00:00",
@@ -17,10 +17,26 @@ describe("Schedule utils", () => {
         ...s1,
         // Simulates that we use Date Picker to pick the exact same time, but it returns
         // a slightly different ISO string (note the "Z" at the end)
-        showAt: "2022-09-01T16:00:00.000Z",
+        dueAt: "2022-09-10T16:00:00.000Z",
       };
 
       expect(isScheduleEqual(s1, s2)).toBe(true);
+    });
+
+    it("returns false if two schedules are different", () => {
+      const s1: Schedule = {
+        showAt: null,
+        startCollectionAt: null,
+        dueAt: "2022-09-10T16:00:00",
+        stopCollectionAt: "2022-09-10T16:00:00",
+        releaseGradeAt: null,
+      };
+      const s2: Schedule = {
+        ...s1,
+        releaseGradeAt: "2022-09-10T16:00:00",
+      };
+
+      expect(isScheduleEqual(s1, s2)).toBe(false);
     });
   });
 

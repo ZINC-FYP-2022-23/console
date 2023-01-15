@@ -238,11 +238,11 @@ const configModelThunk: ConfigModelThunk = {
       showImmediateScores: config.showImmediateScores,
     });
     actions.initializeSchedule({
-      showAt: config.showAt ?? "",
-      startCollectionAt: config.startCollectionAt ?? "",
+      showAt: config.showAt,
+      startCollectionAt: config.startCollectionAt,
       dueAt: config.dueAt,
       stopCollectionAt: config.stopCollectionAt,
-      releaseGradeAt: config.releaseGradeAt ?? "",
+      releaseGradeAt: config.releaseGradeAt,
     });
     getStoreActions().pipelineEditor.initializePipeline();
   }),

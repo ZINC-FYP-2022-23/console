@@ -3,15 +3,12 @@ import { useStoreActions, useStoreState } from "@store/GuiBuilder";
 import { appendZToIsoString } from "@utils/GuiBuilder";
 import { utcToZonedTime, zonedTimeToUtc } from "date-fns-tz";
 
-const getLocalDateFromString = (date: string) => {
+const getLocalDateFromString = (date: string | null) => {
   return date ? utcToZonedTime(appendZToIsoString(date), "Asia/Hong_Kong") : null;
 };
 
 const getDateStringFromLocalDate = (date: Date | null) => {
-  if (date) {
-    return zonedTimeToUtc(date, "Asia/Hong_Kong").toISOString();
-  }
-  return "";
+  return date ? zonedTimeToUtc(date, "Asia/Hong_Kong").toISOString() : null;
 };
 
 function Scheduling() {
@@ -72,13 +69,13 @@ function Scheduling() {
               if (date > getLocalDateFromString(schedule.stopCollectionAt)!) {
                 setSchedule({
                   ...schedule,
-                  dueAt: getDateStringFromLocalDate(date),
-                  stopCollectionAt: getDateStringFromLocalDate(date),
+                  dueAt: getDateStringFromLocalDate(date)!,
+                  stopCollectionAt: getDateStringFromLocalDate(date)!,
                 });
               } else {
                 setSchedule({
                   ...schedule,
-                  dueAt: getDateStringFromLocalDate(date),
+                  dueAt: getDateStringFromLocalDate(date)!,
                 });
               }
             }}
@@ -99,7 +96,7 @@ function Scheduling() {
               if (!date) return; // `stopCollectionAt` is non-nullable in database
               setSchedule({
                 ...schedule,
-                stopCollectionAt: getDateStringFromLocalDate(date),
+                stopCollectionAt: getDateStringFromLocalDate(date)!,
               });
             }}
             placeholderText="Assignment Collection Closing Date"

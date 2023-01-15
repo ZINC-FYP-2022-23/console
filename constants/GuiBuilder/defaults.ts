@@ -43,7 +43,7 @@ export const defaultPolicy: GradingPolicy = {
 };
 
 export const defaultSchedule: Schedule = {
-  showAt: "",
+  showAt: null,
   startCollectionAt: new Date().toISOString(),
   dueAt: set(addDays(new Date(), 7), { hours: 23, minutes: 59 }).toISOString(),
   stopCollectionAt: set(addDays(new Date(), 7), { hours: 23, minutes: 59 }).toISOString(),
