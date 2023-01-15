@@ -17,7 +17,7 @@ const getDateStringFromLocalDate = (date: Date | null) => {
 function Scheduling() {
   const schedule = useStoreState((state) => state.config.editingSchedule);
   const policy = useStoreState((state) => state.config.editingPolicy);
-  const updateSchedule = useStoreActions((state) => state.config.updateSchedule);
+  const setSchedule = useStoreActions((state) => state.config.setSchedule);
 
   return (
     <div className="space-y-4">
@@ -30,7 +30,7 @@ function Scheduling() {
             id="showAt"
             selected={getLocalDateFromString(schedule.showAt)}
             onChange={(date) => {
-              updateSchedule({
+              setSchedule({
                 ...schedule,
                 showAt: getDateStringFromLocalDate(date),
               });
@@ -49,7 +49,7 @@ function Scheduling() {
             selected={getLocalDateFromString(schedule.startCollectionAt)}
             maxDate={getLocalDateFromString(schedule.dueAt)}
             onChange={(date) => {
-              updateSchedule({
+              setSchedule({
                 ...schedule,
                 startCollectionAt: getDateStringFromLocalDate(date),
               });
@@ -70,13 +70,13 @@ function Scheduling() {
             onChange={(date) => {
               if (!date) return; // `dueAt` is non-nullable in database
               if (date > getLocalDateFromString(schedule.stopCollectionAt)!) {
-                updateSchedule({
+                setSchedule({
                   ...schedule,
                   dueAt: getDateStringFromLocalDate(date),
                   stopCollectionAt: getDateStringFromLocalDate(date),
                 });
               } else {
-                updateSchedule({
+                setSchedule({
                   ...schedule,
                   dueAt: getDateStringFromLocalDate(date),
                 });
@@ -97,7 +97,7 @@ function Scheduling() {
             minDate={getLocalDateFromString(schedule.dueAt)}
             onChange={(date) => {
               if (!date) return; // `stopCollectionAt` is non-nullable in database
-              updateSchedule({
+              setSchedule({
                 ...schedule,
                 stopCollectionAt: getDateStringFromLocalDate(date),
               });
@@ -116,7 +116,7 @@ function Scheduling() {
               id="releaseGradeAt"
               selected={getLocalDateFromString(schedule.releaseGradeAt)}
               onChange={(date) => {
-                updateSchedule({
+                setSchedule({
                   ...schedule,
                   releaseGradeAt: getDateStringFromLocalDate(date),
                 });

@@ -1,10 +1,10 @@
 import { defaultConfig, defaultPolicy, defaultSchedule } from "@constants/GuiBuilder/defaults";
-import { Config, GradingPolicy, Schedule, Stage, StageDependencyMap } from "@types";
+import { Config, GradingPolicy, Schedule, Settings, Stage, StageDataMap, StageDependencyMap } from "@types";
 import { isConfigEqual, isScheduleEqual, parseConfigYaml } from "@utils/GuiBuilder";
 import { action, Action, computed, Computed, thunk, Thunk } from "easy-peasy";
 import cloneDeep from "lodash/cloneDeep";
 import isEqual from "lodash/isEqual";
-import set from "lodash/set";
+import { MutableKeys } from "utility-types";
 import { GuiBuilderModel } from "../guiBuilderModel";
 
 // #region Model Definition
@@ -51,42 +51,48 @@ interface ConfigModelComputed {
 }
 
 interface ConfigModelAction {
-  setCourseId: Action<ConfigModel, number>;
   initializeConfig: Action<ConfigModel, { id: number | null; configYaml: string }>;
   initializePolicy: Action<ConfigModel, GradingPolicy>;
   initializeSchedule: Action<ConfigModel, Schedule>;
 
-  // TODO(Anson): Rename the following actions with better names (e.g. `updateField`, `setStageData`, etc.)
+  // NOTE: The following mutators should only mutate the `editing*` states (e.g. `editingConfig`),
+  // but not the `init*` states (e.g. `initConfig`).
 
-  /** Updates a field in `editingConfig` given its `path`. */
-  updateField: Action<ConfigModel, { path: string; value: any }>;
-  /**
-   * Set an entire's stage data in the stage data map inside {@link ConfigModel.editingConfig}.
-   *
-   * If the `stage` in the payload is `null`, it will delete the `stageId` key from the map.
-   */
-  setStageData: Action<ConfigModel, { stageId: string; stage: Stage | null }>;
-  /** Updates the data of a single stage given its UUID. */
-  updateStageData: Action<
-    ConfigModel,
-    {
-      stageId: string;
-      /** Path to update the selected stage data. It's same as `keyof Stage` but without `readonly` keys. */
-      // TODO(Anson): Install `utility-types` package and replace with `MutableKeys<Stage>`
-      path: "label" | "config";
-      value: any;
-    }
-  >;
+  setCourseId: Action<ConfigModel, number>;
+  setPolicy: Action<ConfigModel, GradingPolicy>;
+  setSchedule: Action<ConfigModel, Schedule>;
   /** Sets the entire stage dependency map. */
   setStageDeps: Action<ConfigModel, StageDependencyMap>;
   /**
-   * Updates the dependency data of a single stage given its UUID.
+   * Sets the dependency data of a single stage given its UUID.
    *
-   * It creates a new entry in the dependency map if the UUID does not exist.
+   * It creates a new entry in the {@link StageDependencyMap} if the UUID does not exist.
    */
-  updateStageDeps: Action<ConfigModel, { stageId: string; deps: string[] }>;
-  updatePolicy: Action<ConfigModel, GradingPolicy>;
-  updateSchedule: Action<ConfigModel, Schedule>;
+  setSingleStageDeps: Action<ConfigModel, { stageId: string; deps: string[] }>;
+  /**
+   * Set a single stage's entire stage data in {@link StageDataMap}.
+   *
+   * If the `stage` in the payload is `null`, it will delete the `stageId` key from the map.
+   */
+  setSingleStageData: Action<ConfigModel, { stageId: string; stage: Stage | null }>;
+
+  /**
+   * Updates the `_settings` field in {@link ConfigModel.editingConfig}.
+   *
+   * To specify how the field shall be updated, directly mutate the `_settings` parameter in the
+   * callback function of the payload.
+   */
+  updateSettings: Action<ConfigModel, (_settings: Settings) => void>;
+  /** Updates a field from the stage data of a single stage given its UUID. */
+  updateSingleStageData: Action<
+    ConfigModel,
+    {
+      stageId: string;
+      /** Path to update the selected stage data. */
+      path: MutableKeys<Stage>;
+      value: any;
+    }
+  >;
 }
 
 interface ConfigModelThunk {
@@ -94,9 +100,8 @@ interface ConfigModelThunk {
   updateSelectedStage: Thunk<
     ConfigModel,
     {
-      /** Path to update the selected stage data. It's same as `keyof Stage` but without `readonly` keys. */
-      // TODO(Anson): Install `utility-types` package and replace with `MutableKeys<Stage>`
-      path: "label" | "config";
+      /** Path to update the selected stage data. */
+      path: MutableKeys<Stage>;
       value: any;
     },
     undefined,
@@ -147,9 +152,6 @@ const configModelComputed: ConfigModelComputed = {
 };
 
 const configModelAction: ConfigModelAction = {
-  setCourseId: action((state, courseId) => {
-    state.courseId = courseId;
-  }),
   initializeConfig: action((state, payload) => {
     const { id, configYaml } = payload;
     const config = parseConfigYaml(configYaml);
@@ -166,35 +168,39 @@ const configModelAction: ConfigModelAction = {
     state.editingSchedule = { ...schedule };
   }),
 
-  updateField: action((state, payload) => {
-    set(state.editingConfig, payload.path, payload.value);
+  setCourseId: action((state, courseId) => {
+    state.courseId = courseId;
   }),
-  setStageData: action((state, { stageId, stage }) => {
+  setPolicy: action((state, gradingPolicy) => {
+    state.editingPolicy = gradingPolicy;
+  }),
+  setSchedule: action((state, schedule) => {
+    state.editingSchedule = schedule;
+  }),
+  setStageDeps: action((state, stageDeps) => {
+    state.editingConfig.stageDeps = stageDeps;
+  }),
+  setSingleStageDeps: action((state, { stageId, deps }) => {
+    state.editingConfig.stageDeps[stageId] = deps;
+  }),
+  setSingleStageData: action((state, { stageId, stage }) => {
     if (stage === null) {
       delete state.editingConfig.stageData[stageId];
     } else {
       state.editingConfig.stageData[stageId] = stage;
     }
   }),
-  updateStageData: action((state, { stageId, path, value }) => {
+
+  updateSettings: action((state, callback) => {
+    callback(state.editingConfig._settings);
+  }),
+  updateSingleStageData: action((state, { stageId, path, value }) => {
     const stage: Stage | undefined = state.editingConfig.stageData[stageId];
     if (stage === undefined) {
       console.warn(`No stage with UUID "${stageId}" found.`);
       return;
     }
     stage[path] = value;
-  }),
-  setStageDeps: action((state, stageDeps) => {
-    state.editingConfig.stageDeps = stageDeps;
-  }),
-  updateStageDeps: action((state, { stageId, deps }) => {
-    state.editingConfig.stageDeps[stageId] = deps;
-  }),
-  updatePolicy: action((state, gradingPolicy) => {
-    state.editingPolicy = gradingPolicy;
-  }),
-  updateSchedule: action((state, schedule) => {
-    state.editingSchedule = schedule;
   }),
 };
 
@@ -205,7 +211,7 @@ const configModelThunk: ConfigModelThunk = {
       console.warn("No stage is selected while trying to update the selected stage's config.");
       return;
     }
-    actions.updateStageData({ stageId: selectedNode.id, path, value });
+    actions.updateSingleStageData({ stageId: selectedNode.id, path, value });
   }),
 };
 

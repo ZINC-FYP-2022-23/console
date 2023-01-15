@@ -274,7 +274,7 @@ const pipelineEditorThunk: PipelineEditorModelThunk = {
       // e.g. Connection of "A -> B" means "B" depends on "A"
       // So in `stageDeps`: { "B": [], ... } --> { "B": ["A"], ... }
       const targetDeps = getStoreState().config.editingConfig.stageDeps[connection.target];
-      getStoreActions().config.updateStageDeps({
+      getStoreActions().config.setSingleStageDeps({
         stageId: connection.target,
         deps: [...targetDeps, connection.source],
       });
@@ -296,8 +296,8 @@ const pipelineEditorThunk: PipelineEditorModelThunk = {
     actions.setNodes(getState().nodes.concat(newNode));
 
     // Update `editingConfig`
-    getStoreActions().config.updateStageDeps({ stageId, deps: [] });
-    getStoreActions().config.setStageData({
+    getStoreActions().config.setSingleStageDeps({ stageId, deps: [] });
+    getStoreActions().config.setSingleStageData({
       stageId,
       stage: {
         name: dragging.stageName,
@@ -324,7 +324,7 @@ const pipelineEditorThunk: PipelineEditorModelThunk = {
           type: "stage",
         },
       ]);
-      getStoreActions().config.updateStageDeps({
+      getStoreActions().config.setSingleStageDeps({
         stageId,
         deps: [...getStoreState().config.editingConfig.stageDeps[stageId], parent],
       });
@@ -332,7 +332,7 @@ const pipelineEditorThunk: PipelineEditorModelThunk = {
       if (oldEdge) {
         // Remove `A -> B`
         actions.setEdges(getState().edges.filter((edge) => edge.id !== oldEdge.id));
-        getStoreActions().config.updateStageDeps({
+        getStoreActions().config.setSingleStageDeps({
           stageId: oldEdge.target,
           deps: getStoreState().config.editingConfig.stageDeps[oldEdge.target].filter(
             (depId) => depId !== oldEdge.source,
@@ -348,7 +348,7 @@ const pipelineEditorThunk: PipelineEditorModelThunk = {
             type: "stage",
           },
         ]);
-        getStoreActions().config.updateStageDeps({
+        getStoreActions().config.setSingleStageDeps({
           stageId: oldEdge.target,
           deps: [...getStoreState().config.editingConfig.stageDeps[oldEdge.target], stageId],
         });
@@ -369,7 +369,7 @@ const pipelineEditorThunk: PipelineEditorModelThunk = {
     }
 
     // Delete stage data from `editingConfig`
-    getStoreActions().config.setStageData({ stageId: id, stage: null });
+    getStoreActions().config.setSingleStageData({ stageId: id, stage: null });
     const stageDepsNew = deleteStageFromDeps(id, getStoreState().config.editingConfig.stageDeps);
     getStoreActions().config.setStageDeps(stageDepsNew);
   }),
@@ -383,7 +383,7 @@ const pipelineEditorThunk: PipelineEditorModelThunk = {
     actions.setEdges(edgesNew);
 
     const targetDeps = getStoreState().config.editingConfig.stageDeps[target];
-    getStoreActions().config.updateStageDeps({
+    getStoreActions().config.setSingleStageDeps({
       stageId: target,
       deps: targetDeps.filter((depId) => depId !== source),
     });
@@ -401,8 +401,8 @@ const pipelineEditorThunk: PipelineEditorModelThunk = {
     const targetId = uuidv4();
     const targetData = cloneDeep(sourceData);
     targetData.label = camelCase(targetData.label + "Copy");
-    getStoreActions().config.setStageData({ stageId: targetId, stage: targetData });
-    getStoreActions().config.updateStageDeps({ stageId: targetId, deps: [] });
+    getStoreActions().config.setSingleStageData({ stageId: targetId, stage: targetData });
+    getStoreActions().config.setSingleStageDeps({ stageId: targetId, deps: [] });
 
     // Duplicate React Flow node
     const targetNode = cloneDeep(sourceNode);

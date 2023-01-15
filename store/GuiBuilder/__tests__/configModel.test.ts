@@ -1,4 +1,4 @@
-import { Config, GradingPolicy, Schedule, StageKind } from "@types";
+import { Config, GradingPolicy, Schedule, Stage, StageKind } from "@types";
 import * as configUtils from "@utils/GuiBuilder/config";
 import { createStore } from "easy-peasy";
 import cloneDeep from "lodash/cloneDeep";
@@ -118,9 +118,9 @@ describe("GuiBuilder Store - ConfigModel", () => {
       expect(parseConfigYamlMock).toHaveBeenCalledWith(configYaml);
 
       const state = store.getState();
-      expect(state.initConfig).toEqual(mockConfig);
-      expect(state.editingConfig).toEqual(mockConfig);
-      expect(state.configId).toEqual(1);
+      expect(state.initConfig).toStrictEqual(mockConfig);
+      expect(state.editingConfig).toStrictEqual(mockConfig);
+      expect(state.configId).toBe(1);
 
       // initConfig and editingConfig should not point to the same object
       expect(state.initConfig).not.toBe(state.editingConfig);
@@ -138,8 +138,8 @@ describe("GuiBuilder Store - ConfigModel", () => {
       store.getActions().initializePolicy(mockPolicy);
 
       const state = store.getState();
-      expect(state.initPolicy).toEqual(mockPolicy);
-      expect(state.editingPolicy).toEqual(mockPolicy);
+      expect(state.initPolicy).toStrictEqual(mockPolicy);
+      expect(state.editingPolicy).toStrictEqual(mockPolicy);
       expect(state.initPolicy).not.toBe(state.editingPolicy);
     });
   });
@@ -157,9 +157,121 @@ describe("GuiBuilder Store - ConfigModel", () => {
       store.getActions().initializeSchedule(mockSchedule);
 
       const state = store.getState();
-      expect(state.initSchedule).toEqual(mockSchedule);
-      expect(state.editingSchedule).toEqual(mockSchedule);
+      expect(state.initSchedule).toStrictEqual(mockSchedule);
+      expect(state.editingSchedule).toStrictEqual(mockSchedule);
       expect(state.initSchedule).not.toBe(state.editingSchedule);
+    });
+  });
+
+  describe("setSingleStageDeps()", () => {
+    it("sets the stage dependencies of an existing stage", () => {
+      const model = cloneDeep(configModel);
+      model.editingConfig.stageDeps = {
+        "stage-0": [],
+        "stage-1": ["stage-0"],
+      };
+      const store = createStore(model);
+      store.getActions().setSingleStageDeps({ stageId: "stage-0", deps: ["stage-2"] });
+
+      const { editingConfig, initConfig } = store.getState();
+      expect(editingConfig.stageDeps).toStrictEqual({
+        "stage-0": ["stage-2"],
+        "stage-1": ["stage-0"],
+      });
+      expect(initConfig.stageDeps).toStrictEqual(model.initConfig.stageDeps);
+    });
+
+    it("creates a new entry if the stage does not exist", () => {
+      const model = cloneDeep(configModel);
+      model.editingConfig.stageDeps = { "stage-0": [] };
+      const store = createStore(model);
+      store.getActions().setSingleStageDeps({ stageId: "stage-1", deps: ["stage-0"] });
+
+      const { editingConfig, initConfig } = store.getState();
+      expect(editingConfig.stageDeps).toStrictEqual({
+        "stage-0": [],
+        "stage-1": ["stage-0"],
+      });
+      expect(initConfig.stageDeps).toStrictEqual(model.initConfig.stageDeps);
+    });
+  });
+
+  describe("setSingleStageData()", () => {
+    it("sets the stage data of an existing stage", () => {
+      const model = getThreeStageModel();
+      const store = createStore(model);
+
+      const newStage0Data: Stage = {
+        name: "Score",
+        label: "",
+        kind: StageKind.POST,
+        config: {},
+      };
+      store.getActions().config.setSingleStageData({ stageId: "stage-0", stage: newStage0Data });
+
+      const { editingConfig, initConfig } = store.getState().config;
+      expect(editingConfig.stageData).toStrictEqual({
+        ...model.config.editingConfig.stageData,
+        "stage-0": newStage0Data,
+      });
+      expect(initConfig.stageData).toStrictEqual(model.config.initConfig.stageData);
+    });
+
+    it("deletes the stage data if the `stage` payload is `null`", () => {
+      const model = getThreeStageModel();
+      const store = createStore(model);
+      store.getActions().config.setSingleStageData({ stageId: "stage-0", stage: null });
+
+      const { editingConfig, initConfig } = store.getState().config;
+      const { "stage-0": _, ...expectedStageData } = model.config.editingConfig.stageData;
+      expect(editingConfig.stageData).toStrictEqual(expectedStageData);
+      expect(initConfig.stageData).toStrictEqual(model.config.initConfig.stageData);
+    });
+  });
+
+  describe("updateSettings()", () => {
+    it("updates the `_settings` field in `editingConfig`", () => {
+      const model = cloneDeep(configModel);
+      const store = createStore(model);
+      store.getActions().updateSettings((_settings) => (_settings.lang.version = "10.0.0"));
+
+      const state = store.getState();
+      expect(state.editingConfig._settings.lang.version).toBe("10.0.0");
+      expect(state.initConfig._settings.lang.version).toBe(model.initConfig._settings.lang.version);
+    });
+  });
+
+  describe("updateSingleStageData()", () => {
+    it("updates a field from the stage data of a single stage", () => {
+      const model = getThreeStageModel();
+      const store = createStore(model);
+      store.getActions().config.updateSingleStageData({
+        stageId: "stage-0",
+        path: "label",
+        value: "test",
+      });
+
+      const { editingConfig, initConfig } = store.getState().config;
+      expect(editingConfig.stageData["stage-0"]).toStrictEqual({
+        ...model.config.editingConfig.stageData["stage-0"],
+        label: "test",
+      });
+      expect(initConfig.stageData).toStrictEqual(model.config.initConfig.stageData);
+    });
+
+    it("does nothing if the given stage ID is not found", () => {
+      const model = getThreeStageModel();
+      const store = createStore(model);
+      jest.spyOn(console, "warn").mockImplementationOnce(() => {});
+      store.getActions().config.updateSingleStageData({
+        stageId: "stage-999",
+        path: "label",
+        value: "test",
+      });
+
+      const { editingConfig, initConfig } = store.getState().config;
+      expect(editingConfig.stageData).toStrictEqual(model.config.editingConfig.stageData);
+      expect(initConfig.stageData).toStrictEqual(model.config.initConfig.stageData);
     });
   });
 
@@ -171,7 +283,9 @@ describe("GuiBuilder Store - ConfigModel", () => {
       const newConfig = { input: ["hi.cpp"], output: "hi.out" };
       store.getActions().config.updateSelectedStage({ path: "config", value: newConfig });
 
-      expect(store.getState().config.editingConfig.stageData["stage-2"].config).toEqual(newConfig);
+      const { config } = store.getState();
+      expect(config.editingConfig.stageData["stage-2"].config).toStrictEqual(newConfig);
+      expect(config.initConfig.stageData).toStrictEqual(model.config.initConfig.stageData);
     });
 
     it("updates the label of the selected stage", () => {
@@ -181,7 +295,9 @@ describe("GuiBuilder Store - ConfigModel", () => {
       const newLabel = "all";
       store.getActions().config.updateSelectedStage({ path: "label", value: newLabel });
 
-      expect(store.getState().config.editingConfig.stageData["stage-2"].label).toEqual(newLabel);
+      const { config } = store.getState();
+      expect(config.editingConfig.stageData["stage-2"].label).toStrictEqual(newLabel);
+      expect(config.initConfig.stageData).toStrictEqual(model.config.initConfig.stageData);
     });
 
     it("does nothing if there are no selected stages", () => {
@@ -191,7 +307,9 @@ describe("GuiBuilder Store - ConfigModel", () => {
       jest.spyOn(console, "warn").mockImplementationOnce(() => {});
       store.getActions().config.updateSelectedStage({ path: "config", value: newConfig });
 
-      expect(store.getState().config.editingConfig.stageData).toStrictEqual(model.config.editingConfig.stageData);
+      const { config } = store.getState();
+      expect(config.editingConfig.stageData).toStrictEqual(model.config.editingConfig.stageData);
+      expect(config.initConfig.stageData).toStrictEqual(model.config.initConfig.stageData);
     });
   });
 });

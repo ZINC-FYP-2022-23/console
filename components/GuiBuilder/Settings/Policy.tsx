@@ -6,7 +6,7 @@ import { InfoTooltip } from "../Diagnostics";
 
 function Policy() {
   const policy = useStoreState((state) => state.config.editingPolicy);
-  const updatePolicy = useStoreActions((actions) => actions.config.updatePolicy);
+  const setPolicy = useStoreActions((actions) => actions.config.setPolicy);
 
   return (
     <div className="flex flex-col gap-5 text-sm">
@@ -18,7 +18,7 @@ function Policy() {
         <NumberInput
           id="attemptLimits"
           value={policy.attemptLimits ?? undefined}
-          onChange={(value) => updatePolicy({ ...policy, attemptLimits: value ?? null })}
+          onChange={(value) => setPolicy({ ...policy, attemptLimits: value ?? null })}
           min={1}
           placeholder="Unlimited"
           className="flex-1"
@@ -28,7 +28,7 @@ function Policy() {
         label="Grade immediately after submission"
         checked={policy.gradeImmediately}
         onChange={(value) => {
-          updatePolicy({ ...policy, gradeImmediately: value });
+          setPolicy({ ...policy, gradeImmediately: value });
         }}
       />
       <SwitchGroup
@@ -36,7 +36,7 @@ function Policy() {
         description="Show all available grading information right after the submission is graded"
         checked={policy.showImmediateScores}
         onChange={(value) => {
-          updatePolicy({ ...policy, showImmediateScores: value });
+          setPolicy({ ...policy, showImmediateScores: value });
         }}
       />
     </div>

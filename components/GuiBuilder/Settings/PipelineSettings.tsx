@@ -67,7 +67,7 @@ const gpuVendorSelectOptions = [
 function PipelineSettings() {
   const _settings = useStoreState((state) => state.config.editingConfig._settings);
   const setStep = useStoreActions((actions) => actions.layout.setStep);
-  const updateField = useStoreActions((actions) => actions.config.updateField);
+  const updateSettings = useStoreActions((actions) => actions.config.updateSettings);
 
   return (
     <div className="flex flex-col gap-8 text-sm">
@@ -83,8 +83,10 @@ function PipelineSettings() {
               const values = value.split("/");
               const language = values[0];
               const compiler = values.length > 1 ? values[1] : null;
-              updateField({ path: "_settings.lang.language", value: language });
-              updateField({ path: "_settings.lang.compiler", value: compiler });
+              updateSettings((_settings) => {
+                _settings.lang.language = language;
+                _settings.lang.compiler = compiler;
+              });
             }}
             maxDropdownHeight={320}
             styles={{ root: { flexGrow: 1 } }}
@@ -94,7 +96,7 @@ function PipelineSettings() {
             value={_settings.lang.version}
             onChange={(event) => {
               const value = event.target.value;
-              updateField({ path: "_settings.lang.version", value });
+              updateSettings((_settings) => (_settings.lang.version = value));
             }}
             classNames={{ root: "flex-1" }}
           />
@@ -109,14 +111,14 @@ function PipelineSettings() {
             label="Provide skeleton code to students"
             checked={_settings.use_skeleton}
             onChange={(value) => {
-              updateField({ path: "_settings.use_skeleton", value });
+              updateSettings((_settings) => (_settings.use_skeleton = value));
             }}
           />
           <SwitchGroup
             label="Use driver programs for grading"
             checked={_settings.use_provided}
             onChange={(value) => {
-              updateField({ path: "_settings.use_provided", value });
+              updateSettings((_settings) => (_settings.use_provided = value));
             }}
           />
           <div>
@@ -131,7 +133,9 @@ function PipelineSettings() {
                 value={_settings.use_template ?? "undefined"}
                 onChange={(value) => {
                   if (value === null) return;
-                  updateField({ path: "_settings.use_template", value: value === "undefined" ? undefined : value });
+                  updateSettings((_settings) => {
+                    _settings.use_template = value === "undefined" ? undefined : value;
+                  });
                 }}
                 styles={{ root: { flex: 1 } }}
               />
@@ -149,23 +153,23 @@ function PipelineSettings() {
                       onChange={(event) => {
                         const newTemplate = [..._settings.template];
                         newTemplate[index].name = event.target.value;
-                        updateField({ path: "_settings.template", value: newTemplate });
+                        updateSettings((_settings) => (_settings.template = newTemplate));
                       }}
                       onEnterKeyPressed={() => {
                         const newTemplate = [..._settings.template];
                         newTemplate.splice(index + 1, 0, { id: uuidv4(), name: "" });
-                        updateField({ path: "_settings.template", value: newTemplate });
+                        updateSettings((_settings) => (_settings.template = newTemplate));
                       }}
                       onDelete={() => {
                         const newTemplate = _settings.template.filter((f) => f.id !== file.id);
-                        updateField({ path: "_settings.template", value: newTemplate });
+                        updateSettings((_settings) => (_settings.template = newTemplate));
                       }}
                     />
                   ))}
                   <ListInput.AddButton
                     onClick={() => {
                       const newTemplate = [..._settings.template, { id: uuidv4(), name: "" }];
-                      updateField({ path: "_settings.template", value: newTemplate });
+                      updateSettings((_settings) => (_settings.template = newTemplate));
                     }}
                   />
                 </ListInput>
@@ -195,14 +199,14 @@ function PipelineSettings() {
             description="Whether the pipeline will abort when any stage returns a non-zero exit code"
             checked={_settings.early_return_on_throw}
             onChange={(value) => {
-              updateField({ path: "_settings.early_return_on_throw", value });
+              updateSettings((_settings) => (_settings.early_return_on_throw = value));
             }}
           />
           <SwitchGroup
             label="Allow Internet access for all stages"
             checked={_settings.enable_features.network}
             onChange={(value) => {
-              updateField({ path: "_settings.enable_features.network", value });
+              updateSettings((_settings) => (_settings.enable_features.network = value));
             }}
           />
           <div className="flex flex-col gap-3">
@@ -217,7 +221,7 @@ function PipelineSettings() {
                   value={_settings.stage_wait_duration_secs}
                   min={0}
                   placeholder="60"
-                  onChange={(value) => updateField({ path: "_settings.stage_wait_duration_secs", value })}
+                  onChange={(value) => updateSettings((_settings) => (_settings.stage_wait_duration_secs = value))}
                   className="flex-1"
                 />
                 <span className="ml-3 flex-none text-gray-500">secs</span>
@@ -235,7 +239,7 @@ function PipelineSettings() {
                 step={0.1}
                 min={1}
                 placeholder="2.0"
-                onChange={(value) => updateField({ path: "_settings.cpus", value })}
+                onChange={(value) => updateSettings((_settings) => (_settings.cpus = value))}
                 className="flex-1"
               />
             </div>
@@ -252,7 +256,7 @@ function PipelineSettings() {
                   onChange={(value) => {
                     if (value === null) return;
                     const gpuDevice = gpuSelectValueToGpuDevice(value);
-                    updateField({ path: "_settings.enable_features.gpu_device", value: gpuDevice });
+                    updateSettings((_settings) => (_settings.enable_features.gpu_device = gpuDevice));
                   }}
                   styles={{ root: { flex: 1 } }}
                 />
@@ -275,7 +279,7 @@ function PipelineSettings() {
                               } else {
                                 gpuDevices.splice(gpuDevices.indexOf(value), 1);
                               }
-                              updateField({ path: "_settings.enable_features.gpu_device", value: gpuDevices });
+                              updateSettings((_settings) => (_settings.enable_features.gpu_device = gpuDevices));
                             }}
                           />
                           <div className="ml-3 text-sm leading-5">
@@ -303,7 +307,7 @@ function PipelineSettings() {
                   step={0.1}
                   min={1}
                   placeholder="2.0"
-                  onChange={(value) => updateField({ path: "_settings.mem_gb", value })}
+                  onChange={(value) => updateSettings((_settings) => (_settings.mem_gb = value))}
                   className="flex-1"
                 />
                 <span className="ml-3 flex-none text-gray-500">GB</span>
