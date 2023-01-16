@@ -232,6 +232,33 @@ describe("GuiBuilder Store - ConfigModel", () => {
     });
   });
 
+  describe("setInitConfigsToEditing()", () => {
+    it("sets `init*` fields to corresponding `editing*` fields", () => {
+      const model = getThreeStageModel();
+      model.config.editingPolicy = {
+        ...model.config.initPolicy,
+        attemptLimits: 10,
+      };
+      model.config.editingSchedule = {
+        ...model.config.initSchedule,
+        showAt: new Date(2023, 1).toISOString(),
+      };
+      const store = createStore(model);
+
+      store.getActions().config.setInitConfigsToEditing();
+
+      const { config } = store.getState();
+      expect(config.initConfig).toStrictEqual(config.editingConfig);
+      expect(config.initPolicy).toStrictEqual(config.initPolicy);
+      expect(config.initSchedule).toStrictEqual(config.initSchedule);
+
+      // Test that they don't share the same reference
+      expect(config.initConfig).not.toBe(config.editingConfig);
+      expect(config.initPolicy).not.toBe(config.editingPolicy);
+      expect(config.initSchedule).not.toBe(config.editingSchedule);
+    });
+  });
+
   describe("updateSettings()", () => {
     it("updates the `_settings` field in `editingConfig`", () => {
       const model = cloneDeep(configModel);
@@ -348,6 +375,22 @@ describe("GuiBuilder Store - ConfigModel", () => {
         { type: type.initAssignmentStart, payload },
         { type: type.initAssignmentSuccess, payload },
       ]);
+    });
+  });
+
+  describe("getConfigsToSave()", () => {
+    it("returns database-compatible fields", () => {
+      const model = getThreeStageModel();
+      const store = createStore(model);
+      const configToYamlMock = jest.spyOn(configUtils, "configToYaml");
+
+      const configsToSave = store.getActions().config.getConfigsToSave();
+
+      const policyKeys = ["attemptLimits", "gradeImmediately", "showImmediateScores"];
+      const scheduleKeys = ["showAt", "startCollectionAt", "dueAt", "stopCollectionAt", "releaseGradeAt"];
+      const expectedObjectKeys = ["config_yaml", ...policyKeys, ...scheduleKeys];
+      expect(configsToSave).toContainAllKeys(expectedObjectKeys);
+      expect(configToYamlMock).toHaveBeenCalledWith(model.config.editingConfig);
     });
   });
 

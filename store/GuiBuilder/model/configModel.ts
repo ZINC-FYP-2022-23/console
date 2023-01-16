@@ -9,7 +9,7 @@ import {
   StageDataMap,
   StageDependencyMap,
 } from "@types";
-import { isConfigEqual, isScheduleEqual, parseConfigYaml } from "@utils/GuiBuilder";
+import { configToYaml, isConfigEqual, isScheduleEqual, parseConfigYaml } from "@utils/GuiBuilder";
 import { action, Action, computed, Computed, thunk, Thunk } from "easy-peasy";
 import cloneDeep from "lodash/cloneDeep";
 import isEqual from "lodash/isEqual";
@@ -84,6 +84,13 @@ interface ConfigModelAction {
    * If the `stage` in the payload is `null`, it will delete the `stageId` key from the map.
    */
   setSingleStageData: Action<ConfigModel, { stageId: string; stage: Stage | null }>;
+  /**
+   * Sets all `init*` fields (e.g. `initConfig`) to the deep copy of the corresponding `editing*`
+   * fields (e.g. `editingConfig`).
+   *
+   * Example usage: Resets the editing progress after a user has saved the config.
+   */
+  setInitConfigsToEditing: Action<ConfigModel>;
 
   /**
    * Updates the `_settings` field in {@link ConfigModel.editingConfig}.
@@ -117,7 +124,13 @@ interface ConfigModelThunk {
     undefined,
     GuiBuilderModel
   >;
-
+  /**
+   * Gets the editing configs to be saved to the database.
+   *
+   * Making this a thunk allows us to lazily get the state. If this is a computed value,
+   * it will cause unnecessary re-renders whenever the user edits the config.
+   */
+  getConfigsToSave: Thunk<ConfigModel, undefined, undefined, GuiBuilderModel, ConfigsToSave>;
   /** Updates a non-readonly field of the selected stage. */
   updateSelectedStage: Thunk<
     ConfigModel,
@@ -130,6 +143,9 @@ interface ConfigModelThunk {
     GuiBuilderModel
   >;
 }
+
+/** Return type of {@link ConfigModel.getConfigsToSave}. It should be assignable to {@link AssignmentConfig}. */
+type ConfigsToSave = GradingPolicy & Schedule & Pick<AssignmentConfig, "config_yaml">;
 
 // #endregion
 
@@ -212,6 +228,11 @@ const configModelAction: ConfigModelAction = {
       state.editingConfig.stageData[stageId] = stage;
     }
   }),
+  setInitConfigsToEditing: action((state) => {
+    state.initConfig = cloneDeep(state.editingConfig);
+    state.initPolicy = cloneDeep(state.editingPolicy);
+    state.initSchedule = cloneDeep(state.editingSchedule);
+  }),
 
   updateSettings: action((state, callback) => {
     callback(state.editingConfig._settings);
@@ -246,7 +267,14 @@ const configModelThunk: ConfigModelThunk = {
     });
     getStoreActions().pipelineEditor.initializePipeline();
   }),
-
+  getConfigsToSave: thunk((_actions, _payload, { getState }) => {
+    const { editingConfig, editingPolicy, editingSchedule } = getState();
+    return {
+      ...editingPolicy,
+      ...editingSchedule,
+      config_yaml: configToYaml(editingConfig),
+    };
+  }),
   updateSelectedStage: thunk((actions, { path, value }, { getStoreState }) => {
     const selectedNode = getStoreState().pipelineEditor.nodes.find((node) => node.selected);
     if (selectedNode === undefined) {
