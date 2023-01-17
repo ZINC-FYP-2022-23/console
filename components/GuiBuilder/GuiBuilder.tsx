@@ -4,6 +4,7 @@ import { Spinner } from "@components/Spinner";
 import { useLayoutDispatch } from "@contexts/layout";
 import { useZinc } from "@contexts/zinc";
 import { CREATE_ASSIGNMENT_CONFIG, UPDATE_ASSIGNMENT_CONFIG } from "@graphql/mutations/user";
+import { useWarnUnsavedChanges } from "@hooks/GuiBuilder";
 import { Tooltip } from "@mantine/core";
 import { useStoreActions, useStoreState } from "@store/GuiBuilder";
 import { Assignment, AssignmentConfig } from "@types";
@@ -47,6 +48,8 @@ function GUIAssignmentBuilder({ data, configId: configIdProp }: GUIAssignmentBui
   const [updateConfig] = useMutation<any, UpdateConfigVariables>(UPDATE_ASSIGNMENT_CONFIG);
 
   const [isSaving, setIsSaving] = useState(false);
+
+  useWarnUnsavedChanges();
 
   // Initialize store
   useEffect(() => {
