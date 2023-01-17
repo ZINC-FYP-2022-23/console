@@ -3,18 +3,20 @@ import Button from "@components/Button";
 import { Spinner } from "@components/Spinner";
 import { useLayoutDispatch } from "@contexts/layout";
 import { useZinc } from "@contexts/zinc";
-import { UPDATE_ASSIGNMENT_CONFIG } from "@graphql/mutations/user";
+import { CREATE_ASSIGNMENT_CONFIG, UPDATE_ASSIGNMENT_CONFIG } from "@graphql/mutations/user";
 import { Tooltip } from "@mantine/core";
 import { useStoreActions, useStoreState } from "@store/GuiBuilder";
 import { Assignment, AssignmentConfig } from "@types";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import ConfigCreatedModal from "./ConfigCreatedModal";
 import guiBuilderSteps from "./Steps/GuiBuilderSteps";
 import Stepper from "./Steps/Stepper";
 
 interface GUIAssignmentBuilderProps {
   /** Config data queried from GraphQL. */
   data?: {
-    /** @remarks It's `null` when creating a new assignment. */
+    /** It's `null` when creating a new assignment. */
     assignmentConfig: AssignmentConfig | null;
     assignment: Assignment;
   };
@@ -22,18 +24,26 @@ interface GUIAssignmentBuilderProps {
   configId: number | null;
 }
 
+type CreateConfigVariables = { input: Partial<AssignmentConfig> };
+type CreateConfigReturnType = { createAssignmentConfig: { id: number } };
 type UpdateConfigVariables = { id: number; update: Partial<AssignmentConfig> };
 
-function GUIAssignmentBuilder({ data, configId }: GUIAssignmentBuilderProps) {
+function GUIAssignmentBuilder({ data, configId: configIdProp }: GUIAssignmentBuilderProps) {
   const { validateAssignmentConfig } = useZinc();
   const dispatch = useLayoutDispatch();
+  const router = useRouter();
 
+  const configId = useStoreState((state) => state.config.configId);
   const isEdited = useStoreState((state) => state.config.isEdited);
   const step = useStoreState((state) => state.layout.step);
+
   const initializeAssignment = useStoreActions((actions) => actions.config.initializeAssignment);
   const getConfigsToSave = useStoreActions((actions) => actions.config.getConfigsToSave);
+  const setConfigId = useStoreActions((actions) => actions.config.setConfigId);
   const setInitConfigsToEditing = useStoreActions((actions) => actions.config.setInitConfigsToEditing);
+  const setModal = useStoreActions((actions) => actions.layout.setModal);
 
+  const [createConfig] = useMutation<CreateConfigReturnType, CreateConfigVariables>(CREATE_ASSIGNMENT_CONFIG);
   const [updateConfig] = useMutation<any, UpdateConfigVariables>(UPDATE_ASSIGNMENT_CONFIG);
 
   const [isSaving, setIsSaving] = useState(false);
@@ -41,11 +51,11 @@ function GUIAssignmentBuilder({ data, configId }: GUIAssignmentBuilderProps) {
   // Initialize store
   useEffect(() => {
     initializeAssignment({
-      configId,
+      configId: configIdProp,
       courseId: data?.assignment.course.id ?? null,
       config: data?.assignmentConfig ?? null,
     });
-  }, [data, configId, initializeAssignment]);
+  }, [data, configIdProp, initializeAssignment]);
 
   const isNewAssignment = configId === null;
   const disableSave = !isNewAssignment && !isEdited;
@@ -76,12 +86,22 @@ function GUIAssignmentBuilder({ data, configId }: GUIAssignmentBuilderProps) {
             message: "There is an error in the assignment config.",
           },
         });
-        setIsSaving(false);
         return;
       }
-
       if (isNewAssignment) {
-        // TODO(Anson): Create new assignment
+        const { data } = await createConfig({
+          variables: {
+            input: {
+              ...configsToSave,
+              assignment_id: parseInt(router.query.assignmentId as string, 10),
+              configValidated: true,
+            },
+          },
+        });
+        if (data) {
+          setConfigId(data.createAssignmentConfig.id);
+          setModal({ path: "configCreated", value: true });
+        }
       } else {
         await updateConfig({
           variables: { id: configId, update: configsToSave },
@@ -111,7 +131,7 @@ function GUIAssignmentBuilder({ data, configId }: GUIAssignmentBuilderProps) {
     <div className="p-4 w-full flex flex-col gap-5">
       <div className="flex items-center">
         <Stepper className="flex-1" />
-        <Tooltip label="You didn't make any changes" disabled={!disableSave} position="bottom-end">
+        <Tooltip label="You didn't make any changes" disabled={!disableSave} position="bottom-end" openDelay={500}>
           <div className="ml-8">
             <Button
               onClick={() => saveConfig()}
@@ -126,6 +146,7 @@ function GUIAssignmentBuilder({ data, configId }: GUIAssignmentBuilderProps) {
       <div className="flex-1 overflow-y-hidden">
         <StepComponent />
       </div>
+      <ConfigCreatedModal />
     </div>
   );
 }

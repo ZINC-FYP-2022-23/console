@@ -67,6 +67,7 @@ interface ConfigModelAction {
   // NOTE: The following mutators should only mutate the `editing*` states (e.g. `editingConfig`),
   // but not the `init*` states (e.g. `initConfig`).
 
+  setConfigId: Action<ConfigModel, number>;
   setCourseId: Action<ConfigModel, number>;
   setPolicy: Action<ConfigModel, GradingPolicy>;
   setSchedule: Action<ConfigModel, Schedule>;
@@ -206,6 +207,9 @@ const configModelAction: ConfigModelAction = {
     state.editingSchedule = { ...schedule };
   }),
 
+  setConfigId: action((state, configId) => {
+    state.configId = configId;
+  }),
   setCourseId: action((state, courseId) => {
     state.courseId = courseId;
   }),

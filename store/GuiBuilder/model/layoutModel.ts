@@ -50,6 +50,8 @@ export interface AccordionState {
 }
 
 export interface ModalState {
+  /** Success modal after creating a new config. */
+  configCreated: boolean;
   /** Delete stage confirmation modal in "Pipeline Stages" step. */
   deleteStage: boolean;
   /** Help information for stage label input box in "Pipeline Stages" step. */
@@ -66,6 +68,7 @@ const layoutModelState: LayoutModelState = {
     addNewStage: [],
   },
   modal: {
+    configCreated: false,
     deleteStage: false,
     stageLabelInfo: false,
   },
