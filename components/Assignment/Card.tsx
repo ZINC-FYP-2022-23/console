@@ -175,17 +175,24 @@ export function AssignmentRow({ config, sections }) {
             >
               <Menu.Items className="z-10 rounded-md bg-white shadow-xs">
                 <Menu.Item>
-                  <Link href={`/assignments/${config.assignment.id}/configs/${config.id}`}>
-                    <a
-                      className="group flex items-center w-full px-4 py-2 text-sm leading-5 text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900"
-                      role="menuitem"
-                    >
-                      <span className="w-5 h-5 mr-3 flex items-center">
-                        <FontAwesomeIcon icon={["fad", "cog"]} size="lg" />
-                      </span>
-                      Reconfigure
-                    </a>
-                  </Link>
+                  <button
+                    onClick={() =>
+                      dispatch({
+                        type: "chooseAssignmentConfigEditor",
+                        payload: {
+                          assignmentId: config.assignment.id,
+                          assignmentConfigId: config.id,
+                        },
+                      })
+                    }
+                    className="group flex items-center w-full px-4 py-2 text-sm leading-5 text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900"
+                    role="menuitem"
+                  >
+                    <span className="w-5 h-5 mr-3 flex items-center">
+                      <FontAwesomeIcon icon={["fad", "cog"]} size="lg" />
+                    </span>
+                    Reconfigure
+                  </button>
                 </Menu.Item>
                 <Menu.Item>
                   <button

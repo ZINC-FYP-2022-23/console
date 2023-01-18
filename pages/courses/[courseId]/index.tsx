@@ -11,6 +11,7 @@ import { SlideOver } from "../../../components/SlideOver";
 import { AssignmentSlideOverContent } from "../../../components/Assignment/AssignmentSlideOverContent";
 import { Modal } from "../../../components/Modal";
 import { RegradingConfirmationDialog } from "../../../components/RegradingConfirmationDialog";
+import ChooseEditorModeModal from "@components/GuiBuilder/ChooseEditorModeModal";
 
 function CourseSlideOver() {
   const { coursePageSlideOver } = useLayoutState();
@@ -57,6 +58,7 @@ function Course() {
       <Modal size="regular">
         <RegradingConfirmationDialog />
       </Modal>
+      <ChooseEditorModeModal />
     </LayoutProvider>
   );
 }
