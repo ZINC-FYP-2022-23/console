@@ -47,7 +47,7 @@ const getStagesByCategory = (searchString: string) => {
   Object.entries(supportedStages).forEach(([name, data]) => {
     const category = getCategoryByKind(data.kind);
     const tidiedSearchString = searchString.trim().toLowerCase() ?? "";
-    let shouldAddToOutput = tidiedSearchString === "";
+    let shouldAddToOutput = tidiedSearchString === ""; // Show all if search string is empty
 
     if (tidiedSearchString !== "") {
       if (
@@ -103,6 +103,7 @@ function AddStagePanel() {
 
   const isSearching = searchString.trim() !== "";
   const stagesByCategory = getStagesByCategory(searchString);
+  const isStagesByCategoryEmpty = Object.values(stagesByCategory).every((val) => Object.keys(val).length === 0);
 
   // Ensures that all accordions are open whenever the user performs a new search.
   useEffect(() => {
@@ -194,6 +195,16 @@ function AddStagePanel() {
           </Accordion>
         );
       })}
+      {/* Empty search results */}
+      {isSearching && isStagesByCategoryEmpty && (
+        <div className="px-3 pt-16 flex flex-col items-center gap-4">
+          <FontAwesomeIcon icon={["fad", "empty-set"]} className="text-gray-500" size="3x" />
+          <p className="font-medium text-lg text-gray-700">No stages found</p>
+          <p className="w-3/4 text-center text-sm text-gray-500 leading-5">
+            This may because the stage you&apos;re searching for does not have a GUI yet.
+          </p>
+        </div>
+      )}
     </>
   );
 }
