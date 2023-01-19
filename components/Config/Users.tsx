@@ -37,7 +37,7 @@ interface AssignedStudentsProps {
   section: Section;
 }
 
-function AssignedStudents({ assignmentConfigId, assignedUserIds, section }: AssignedStudentsProps) {
+export function AssignedStudents({ assignmentConfigId, assignedUserIds, section }: AssignedStudentsProps) {
   const assignedStudents = section.users.filter(({ user }) => assignedUserIds.includes(user.id));
   const [removeTask, { loading: removing }] = useMutation(REMOVE_TASK_FROM_STUDENT);
 
@@ -79,7 +79,7 @@ interface UnassignedStudents {
   section: Section;
 }
 
-function UnassignedStudents({ section, assignedUserIds, assignmentConfigId }: UnassignedStudents) {
+export function UnassignedStudents({ section, assignedUserIds, assignmentConfigId }: UnassignedStudents) {
   const [assignTask, { loading: assigning }] = useMutation(ASSIGN_TASK_TO_STUDENT);
   const [bulkAssignTask, { loading: bulkAssigning }] = useMutation(BULK_ASSIGN_TASK_TO_STUDENTS);
   const unassignedStudents = section.users.filter(({ user }) => !assignedUserIds.includes(user.id));
@@ -141,7 +141,7 @@ interface CourseWideAssignStudentsProps {
   sections: Section[];
 }
 
-function CourseWideAssignStudents({ sections, assignmentConfigId }: CourseWideAssignStudentsProps) {
+export function CourseWideAssignStudents({ sections, assignmentConfigId }: CourseWideAssignStudentsProps) {
   const [bulkRemoveTask, { loading: bulkRemoving }] = useMutation(BULK_REMOVE_TASK_FROM_STUDENTS);
   const [bulkAssignTask, { loading: bulkAssigning }] = useMutation(BULK_ASSIGN_TASK_TO_STUDENTS);
   let userIds = sections
