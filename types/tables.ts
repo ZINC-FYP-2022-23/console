@@ -9,7 +9,7 @@ export type Assignment = {
   course: Course;
   course_id: number;
   createdAt: string;
-  deletedAt?: string;
+  deletedAt: string | null;
   description: string;
   description_html: string;
   id: number;
@@ -66,7 +66,7 @@ export type Course = {
   assignments: Assignment[];
   code: string;
   created_at: string;
-  deleted_at?: string;
+  deleted_at: string | null;
   id: number;
   is_shown: boolean;
   name: string;
@@ -75,7 +75,7 @@ export type Course = {
   semester_id: number;
   updated_at: string;
   users: User[];
-  website?: string;
+  website: string | null;
 };
 
 export type CourseUser = {
@@ -123,7 +123,7 @@ export type Section = {
   course: Course;
   course_id: number;
   created_at: string;
-  deleted_at?: string;
+  deleted_at: string | null;
   id: number;
   name: string;
   updated_at: string;
@@ -142,9 +142,9 @@ export type SectionUser = {
 
 export type Semester = {
   createdAt: string;
-  deletedAt?: string;
+  deletedAt: string | null;
   id: number;
-  name?: string;
+  name: string | null;
   term: SemesterTerm;
   updatedAt: string;
   year: number;
@@ -157,11 +157,11 @@ export type Submission = {
   assignment_config_id: number;
   checksum: string;
   created_at: string;
-  extracted_path?: string;
-  fail_reason?: string;
+  extracted_path: string | null;
+  fail_reason: string | null;
   id: number;
   isLate: boolean;
-  remarks?: object;
+  remarks: object | null;
   reports: Report[];
   size: number;
   stored_name: string;
