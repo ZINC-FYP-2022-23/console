@@ -6,6 +6,7 @@ import { useZinc } from "@contexts/zinc";
 import { CREATE_ASSIGNMENT_CONFIG, UPDATE_ASSIGNMENT_CONFIG } from "@graphql/mutations/user";
 import { useWarnUnsavedChanges } from "@hooks/GuiBuilder";
 import { Tooltip } from "@mantine/core";
+import { useHotkeys } from "@mantine/hooks";
 import { useStoreActions, useStoreState } from "@store/GuiBuilder";
 import { Assignment, AssignmentConfig } from "@types";
 import { useRouter } from "next/router";
@@ -64,7 +65,16 @@ function GUIAssignmentBuilder({ data, configId: configIdProp }: GUIAssignmentBui
   const disableSave = !isNewAssignment && !isEdited;
   const StepComponent = guiBuilderSteps[step].component;
 
+  useHotkeys([
+    [
+      "mod+S", // Ctrl/Cmd + S: Save config
+      () => saveConfig(),
+    ],
+  ]);
+
   const saveConfig = async () => {
+    if (disableSave) return;
+
     setIsSaving(true);
 
     // TODO(Anson): Validate pipeline graph first (e.g. make sure it's a linked list)
@@ -134,7 +144,11 @@ function GUIAssignmentBuilder({ data, configId: configIdProp }: GUIAssignmentBui
     <div className="p-4 w-full flex flex-col gap-5">
       <div className="flex items-center">
         <Stepper className="flex-1" />
-        <Tooltip label="You didn't make any changes" disabled={!disableSave} position="bottom-end" openDelay={500}>
+        <Tooltip
+          label={disableSave ? "You didn't make any changes" : "You can also save with Ctrl+S / ⌘+S"}
+          position="bottom-end"
+          openDelay={500}
+        >
           <div className="ml-8">
             <Button
               onClick={() => saveConfig()}
