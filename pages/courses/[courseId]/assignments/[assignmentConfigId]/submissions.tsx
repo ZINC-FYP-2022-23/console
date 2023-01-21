@@ -18,7 +18,7 @@ import { RegradingConfirmationDialog } from "../../../../../components/Regrading
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useZinc } from "../../../../../contexts/zinc";
 
-function ModalContent() {
+export function ModalContent() {
   const { modalType } = useLayoutState();
   switch (modalType) {
     case "stdiotest":
@@ -44,7 +44,7 @@ function ModalContent() {
   }
 }
 
-function Upload({ assignmentConfigId, userId }) {
+export function Upload({ assignmentConfigId, userId }) {
   const { submitFile } = useZinc();
   const dispatch = useLayoutDispatch();
 
@@ -85,7 +85,7 @@ function Upload({ assignmentConfigId, userId }) {
           });
       }
     },
-    [assignmentConfigId, userId],
+    [assignmentConfigId, dispatch, submitFile, userId],
   );
   const { getRootProps, getInputProps } = useDropzone({
     onDrop,
@@ -126,7 +126,7 @@ function Assignment() {
 
   return (
     <LayoutProvider>
-      <Layout title="Submssion History">
+      <Layout title="Submission History">
         <main className="flex-1 flex flex-col bg-gray-200 overflow-y-auto mb-6">
           <div className="px-6 mt-6">
             <div>
