@@ -1,7 +1,7 @@
 import { createStore } from "easy-peasy";
 import { layoutModel } from "../model/layoutModel";
 
-describe("GuiBuilder Store - LayoutModel", () => {
+describe("GuiBuilder: Store - LayoutModel", () => {
   describe("setStep()", () => {
     it("sets the step given its slug", () => {
       const store = createStore(layoutModel);

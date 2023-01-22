@@ -267,10 +267,10 @@ const pipelineEditorThunk: PipelineEditorModelThunk = {
     actions.setEdges(edges);
   }),
   onStageConnect: thunk((actions, connection, { getState, getStoreState, getStoreActions }) => {
-    const edges = addEdge(connection, getState().edges);
-    actions.setEdges(edges);
-
     if (connection.source && connection.target) {
+      const edges = addEdge(connection, getState().edges);
+      actions.setEdges(edges);
+
       // e.g. Connection of "A -> B" means "B" depends on "A"
       // So in `stageDeps`: { "B": [], ... } --> { "B": ["A"], ... }
       const targetDeps = getStoreState().config.editingConfig.stageDeps[connection.target];

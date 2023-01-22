@@ -8,7 +8,7 @@ import { guiBuilderModel } from "../guiBuilderModel";
 import { configModel } from "../model/configModel";
 import { getThreeStageModel } from "./utils/storeTestUtils";
 
-describe("GuiBuilder Store - ConfigModel", () => {
+describe("GuiBuilder: Store - ConfigModel", () => {
   describe("hasStage", () => {
     it("returns true if the pipeline has a stage with the given name", () => {
       const model = cloneDeep(configModel);

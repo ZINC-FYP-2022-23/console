@@ -9,7 +9,7 @@ import { getThreeStageModel } from "./utils/storeTestUtils";
 jest.mock("uuid");
 jest.spyOn(uuid, "v4").mockReturnValue("stage-3");
 
-describe("GuiBuilder Store - PipelineEditorModel", () => {
+describe("GuiBuilder: Store - PipelineEditorModel", () => {
   describe("selectedStage", () => {
     it("returns the data of the selected stage", () => {
       const model = getThreeStageModel();
@@ -84,6 +84,39 @@ describe("GuiBuilder Store - PipelineEditorModel", () => {
       expect(state.pipelineEditor.edges).toEqual([
         { id: "reactflow__edge-stage-0-stage-1", source: "stage-0", target: "stage-1", type: "stage" },
       ]);
+    });
+  });
+
+  describe("onStageConnect()", () => {
+    it("adds a stage edge", () => {
+      const model = getThreeStageModel();
+      model.config.editingConfig.stageDeps = {
+        "stage-0": [],
+        "stage-1": [],
+        "stage-2": [],
+      };
+      model.pipelineEditor.edges = [];
+      const store = createStore(model);
+
+      store.getActions().pipelineEditor.onStageConnect({
+        source: "stage-0",
+        target: "stage-1",
+        sourceHandle: null,
+        targetHandle: null,
+      });
+
+      const state = store.getState();
+      expect(state.pipelineEditor.edges.length).toBe(1);
+      expect(state.pipelineEditor.edges[0]).toMatchObject({
+        id: "reactflow__edge-stage-0-stage-1",
+        source: "stage-0",
+        target: "stage-1",
+      });
+      expect(state.config.editingConfig.stageDeps).toEqual({
+        "stage-0": [],
+        "stage-1": ["stage-0"],
+        "stage-2": [],
+      });
     });
   });
 
