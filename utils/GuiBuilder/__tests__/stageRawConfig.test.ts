@@ -8,6 +8,8 @@ import {
   Compile,
   CompileRaw,
   FileStructureValidation,
+  Make,
+  MakeRaw,
   StageDataMap,
   StdioTest,
   StdioTestRaw,
@@ -38,7 +40,7 @@ const createStage = <T>(name: string, config: T): StageDataMap => ({
   },
 });
 
-describe("Raw stage configs conversion", () => {
+describe("GuiBuilder: Raw stage configs conversion", () => {
   describe("Compile", () => {
     describe("configFromRaw", () => {
       it("converts `flags` array to a string", () => {
@@ -88,6 +90,36 @@ describe("Raw stage configs conversion", () => {
         });
         const _stage = configsToConfigsRaw(stage);
         expect(_stage[UUID].config.ignore_in_submission).toEqual(["a.txt", "b.txt"]);
+      });
+    });
+  });
+
+  describe("Make", () => {
+    describe("configFromRaw", () => {
+      it("converts nullable arrays to empty arrays", () => {
+        const stage = createRawStage<MakeRaw>("make", {});
+        const config = parseStages(stage)[1][UUID].config;
+        expect(config.targets).toEqual([]);
+        expect(config.additional_packages).toEqual([]);
+      });
+
+      it("converts `args` array to a string", () => {
+        const stage = createRawStage<MakeRaw>("make", {
+          args: ["-f", "Makefile"],
+        });
+        expect(parseStages(stage)[1][UUID].config.args).toBe("-f Makefile");
+      });
+    });
+
+    describe("configToRaw", () => {
+      it("converts `args` to string array", () => {
+        const stage = createStage<Make>("Make", {
+          targets: [],
+          args: "  -f Makefile  ",
+          additional_packages: [],
+        });
+        const _stage = configsToConfigsRaw(stage);
+        expect(_stage[UUID].config.args).toEqual(["-f", "Makefile"]);
       });
     });
   });

@@ -5,12 +5,13 @@ interface StageConfig {
   Compile: Compile;
   DiffWithSkeleton: DiffWithSkeleton;
   FileStructureValidation: FileStructureValidation;
+  Make: Make;
   Score: Score;
   StdioTest: StdioTest;
   Valgrind: Valgrind;
 }
 
-/////////////// STAGE CONFIG TYPES ///////////////
+// #region Stage Config Types
 
 /**
  * The shape of `Compile` stage's config returned by the backend
@@ -36,6 +37,22 @@ export interface DiffWithSkeleton {
 
 export interface FileStructureValidation {
   ignore_in_submission?: string[];
+}
+
+/**
+ * The shape of `Make` stage's config returned by the backend
+ * ({@link https://docs.zinc.ust.dev/user/pipeline/docker/Make.html Reference}).
+ */
+export interface MakeRaw {
+  targets?: string[];
+  args?: string[];
+  additional_packages?: string[];
+}
+
+export interface Make {
+  targets: string[];
+  args: string;
+  additional_packages: string[];
 }
 
 export interface Score {
@@ -78,7 +95,9 @@ export interface Valgrind {
   score?: number;
 }
 
-/////////////// HELPER TYPES ///////////////
+// #endregion
+
+// #region Helper Types
 
 export type ChecksFilter = "*" | "Leak_*" | "Uninit*" | "*Free";
 
@@ -136,5 +155,7 @@ export type VisibilityValgrind =
   | "VISIBLE_AFTER_GRADING"
   | "VISIBLE_AFTER_GRADING_IF_FAILED"
   | "INHERIT";
+
+// #endregion
 
 export default StageConfig;

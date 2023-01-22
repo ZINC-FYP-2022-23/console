@@ -4,6 +4,7 @@ import { useStoreState } from "@store/GuiBuilder";
 import { Compile } from "@types";
 import { FocusEventHandler, memo } from "react";
 import { InfoTooltip } from "../Diagnostics";
+import { AdditionalPackagesTooltip } from "./common";
 
 interface ConfigMetadata {
   input: {
@@ -82,9 +83,7 @@ function CompileSettings() {
           value={config.input}
           onChange={(tags) => setConfig({ ...config, input: tags })}
           onBlur={onTagInputBlur("input")}
-          separators={[" ", ","]}
           placeHolder={config.input.length === 0 ? metadata.input.placeholder : ""}
-          isEditOnRemove
           className="flex-1 font-mono text-sm"
         />
       </div>
@@ -126,8 +125,6 @@ function CompileSettings() {
           onChange={(tags) => setConfig({ ...config, additional_packages: tags })}
           onBlur={onTagInputBlur("additional_packages")}
           placeHolder={config.additional_packages.length === 0 ? "e.g. curl" : ""}
-          separators={[" ", ","]}
-          isEditOnRemove
           className="flex-1 font-mono text-sm"
         />
       </div>
@@ -149,17 +146,5 @@ const FlagsTooltip = memo(() => (
   </InfoTooltip>
 ));
 FlagsTooltip.displayName = "FlagsTooltip";
-
-const AdditionalPackagesTooltip = memo(() => (
-  <InfoTooltip width={450}>
-    <ul className="px-3 text-sm list-disc">
-      <li>If your container requires external dependencies, specify the package names here.</li>
-      <li>
-        They will be installed by your container&apos;s package manager (e.g. <code>apt-get</code>)
-      </li>
-    </ul>
-  </InfoTooltip>
-));
-AdditionalPackagesTooltip.displayName = "AdditionalPackagesTooltip";
 
 export default CompileSettings;

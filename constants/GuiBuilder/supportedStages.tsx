@@ -2,6 +2,7 @@ import { Spinner } from "@components/Spinner";
 import {
   CompileRaw,
   FileStructureValidation,
+  MakeRaw,
   StageConfig,
   StageKind,
   StdioTestRaw,
@@ -110,6 +111,31 @@ const supportedStages: SupportedStages = {
       ignore_in_submission: config.ignore_in_submission?.map((path) => path.trim()).filter((path) => path !== ""),
     }),
     stageSettings: dynamic(() => import("../../components/GuiBuilder/StageSettings/FileStructureValidationSettings"), {
+      loading: () => <StageSettingsLoading />,
+    }),
+  },
+  Make: {
+    nameInUI: "Make",
+    kind: StageKind.PRE_LOCAL,
+    description: "Builds executables using GNU Make",
+    defaultConfig: {
+      targets: [],
+      args: "",
+      additional_packages: [],
+    },
+    configFromRaw: (raw: MakeRaw) => ({
+      targets: raw.targets ?? [],
+      args: raw.args?.join(" ") ?? "",
+      additional_packages: raw.additional_packages ?? [],
+    }),
+    configToRaw: (config): MakeRaw => ({
+      ...config,
+      args: config.args
+        ?.trim()
+        .split(" ")
+        .filter((arg) => arg !== ""),
+    }),
+    stageSettings: dynamic(() => import("../../components/GuiBuilder/StageSettings/MakeSettings"), {
       loading: () => <StageSettingsLoading />,
     }),
   },

@@ -17,7 +17,7 @@ function TagsInput({ value, disabled = false, className = "", ...props }: TagsIn
   return (
     // Custom styles are put in `index.css`
     <div className={clsx("tag-input", disabled && "disabled", className)}>
-      <ReactTagInput value={value} disabled={disabled} {...props} />
+      <ReactTagInput value={value} disabled={disabled} separators={[" ", ","]} isEditOnRemove {...props} />
     </div>
   );
 }

@@ -61,8 +61,6 @@ function StdioTestStageSettings() {
             onChange={(tags) => setConfig({ ...config, additional_packages: tags })}
             onBlur={onTagInputBlur("additional_packages")}
             placeHolder={config.additional_packages.length === 0 ? "e.g. curl" : ""}
-            separators={[" ", ","]}
-            isEditOnRemove
             className="flex-[3] font-mono text-sm"
           />
         </div>
@@ -83,8 +81,6 @@ function StdioTestStageSettings() {
                   ? "Add `python3-pip` to 'Additional packages' first"
                   : ""
               }
-              separators={[" ", ","]}
-              isEditOnRemove
               className="flex-[3] font-mono text-sm"
             />
             {isPipDisabled && config.additional_pip_packages.length > 0 && (
