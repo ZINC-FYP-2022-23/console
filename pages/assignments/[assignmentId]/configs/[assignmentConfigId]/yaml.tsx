@@ -17,7 +17,7 @@ import { SlideOver } from "../../../../../components/SlideOver";
 import { useState } from "react";
 import AssignmentSupportingFilesUploader from "../../../../../components/AssignmentSupportingFilesUploader";
 import { FilesProvider } from "../../../../../contexts/assignmentSupportingFiles";
-import { Assignment, AssignmentConfig } from "@types";
+import { Assignment, AssignmentConfig } from "@/types";
 
 function SlideOverContent() {
   const { configSlideOver } = useLayoutState();

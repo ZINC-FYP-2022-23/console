@@ -1,4 +1,5 @@
-import { Settings, SettingsGpuDevice, SettingsLang, SettingsRaw, SettingsUseTemplate } from "@types";
+import { Settings, SettingsGpuDevice, SettingsLang, SettingsRaw, SettingsUseTemplate } from "@/types";
+import * as uuid from "uuid";
 import {
   isSettingsEqual,
   parseLangString,
@@ -7,7 +8,6 @@ import {
   settingsToSettingsRaw,
   tidySettings,
 } from "../settings";
-import * as uuid from "uuid";
 
 jest.mock("uuid");
 

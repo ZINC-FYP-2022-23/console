@@ -1,6 +1,6 @@
-import Button from "@components/Button";
+import Button from "@/components/Button";
+import { useStoreActions, useStoreState } from "@/store/GuiBuilder";
 import { createStyles, Modal } from "@mantine/core";
-import { useStoreActions, useStoreState } from "@store/GuiBuilder";
 
 const useStyles = createStyles((theme) => ({
   title: {

@@ -8,7 +8,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Collapse from "@kunukn/react-collapse";
 import { SlideOver } from "../../components/SlideOver";
 import { useState } from "react";
-import { Switch } from "@components/Input";
+import { Switch } from "@/components/Input";
 
 function Courses() {
   const { data, loading } = useQuery(GET_COURSES);

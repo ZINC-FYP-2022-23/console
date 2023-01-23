@@ -1,4 +1,4 @@
-import { useStoreState } from "@store/GuiBuilder";
+import { useStoreState } from "@/store/GuiBuilder";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 import { useBeforeunload } from "react-beforeunload";

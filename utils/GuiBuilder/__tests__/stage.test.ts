@@ -1,4 +1,4 @@
-import { Stage, StageDataMap, StageDependencyMap, StageKind } from "@types";
+import { Stage, StageDataMap, StageDependencyMap, StageKind } from "@/types";
 import * as jsYaml from "js-yaml";
 import * as uuid from "uuid";
 import {

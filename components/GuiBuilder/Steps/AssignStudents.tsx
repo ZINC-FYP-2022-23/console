@@ -1,10 +1,10 @@
+import { AssignedStudents, CourseWideAssignStudents, UnassignedStudents } from "@/components/Config/Users";
+import { Spinner } from "@/components/Spinner";
+import { GET_STUDENTS_FOR_CONFIG } from "@/graphql/queries/user";
+import { useStoreState } from "@/store/GuiBuilder";
+import { AssignmentConfig } from "@/types";
 import { useSubscription } from "@apollo/client";
-import { AssignedStudents, CourseWideAssignStudents, UnassignedStudents } from "@components/Config/Users";
-import { Spinner } from "@components/Spinner";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { GET_STUDENTS_FOR_CONFIG } from "@graphql/queries/user";
-import { useStoreState } from "@store/GuiBuilder";
-import { AssignmentConfig } from "@types";
 import LockedStep from "./LockedStep";
 
 function AssignStudents() {

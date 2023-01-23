@@ -1,4 +1,4 @@
-import { useStoreState } from "@store/GuiBuilder";
+import { useStoreState } from "@/store/GuiBuilder";
 import LockedStep from "./LockedStep";
 
 function UploadFiles() {

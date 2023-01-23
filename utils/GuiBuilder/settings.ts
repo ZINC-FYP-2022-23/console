@@ -2,8 +2,8 @@
  * @file Utilities for the `Settings` type.
  */
 
-import { defaultSettings } from "@constants/GuiBuilder/defaults";
-import type { Settings, SettingsLang, SettingsRaw } from "@types";
+import { defaultSettings } from "@/constants/GuiBuilder/defaults";
+import type { Settings, SettingsLang, SettingsRaw } from "@/types";
 import cloneDeep from "lodash/cloneDeep";
 import isEqual from "lodash/isEqual";
 import { v4 as uuidv4 } from "uuid";

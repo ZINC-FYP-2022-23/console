@@ -24,17 +24,17 @@
     "incremental": true,
     "baseUrl": ".",
     "paths": {
-      "@components/*": ["components/*"],
-      "@constants/*": ["constants/*"],
-      "@contexts/*": ["contexts/*"],
-      "@graphql/*": ["graphql/*"],
-      "@hooks/*": ["hooks/*"],
-      "@layout": ["layout/"],
-      "@lib/*": ["lib/*"],
-      "@store/*": ["store/*"],
-      "@types": ["types/"],
-      "@types/*": ["types/*"],
-      "@utils/*": ["utils/*"]
+      "@/components/*": ["components/*"],
+      "@/constants/*": ["constants/*"],
+      "@/contexts/*": ["contexts/*"],
+      "@/graphql/*": ["graphql/*"],
+      "@/hooks/*": ["hooks/*"],
+      "@/layout": ["layout/"],
+      "@/lib/*": ["lib/*"],
+      "@/store/*": ["store/*"],
+      "@/types": ["types/"],
+      "@/types/*": ["types/*"],
+      "@/utils/*": ["utils/*"]
     }
   },
   "exclude": [

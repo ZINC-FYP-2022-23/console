@@ -1,5 +1,5 @@
+import { useStoreState } from "@/store/GuiBuilder";
 import { clsx } from "@mantine/core";
-import { useStoreState } from "@store/GuiBuilder";
 import { ReactFlowProvider } from "reactflow";
 import AddStagePanel, { AddStagePanelCollapsed } from "../AddStagePanel";
 import DeleteStageModal from "../PipelineEditor/DeleteStageModal";

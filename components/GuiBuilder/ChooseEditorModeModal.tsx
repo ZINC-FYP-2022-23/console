@@ -1,5 +1,5 @@
-import { ModalWithHeader } from "@components/Modal";
-import { useLayoutState } from "@contexts/layout";
+import { ModalWithHeader } from "@/components/Modal";
+import { useLayoutState } from "@/contexts/layout";
 import Image from "next/image";
 import Link from "next/link";
 import { Alert } from "./Diagnostics";

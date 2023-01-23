@@ -1,10 +1,10 @@
-import Button from "@components/Button";
-import supportedStages, { SupportedStage } from "@constants/GuiBuilder/supportedStages";
+import Button from "@/components/Button";
+import supportedStages, { SupportedStage } from "@/constants/GuiBuilder/supportedStages";
+import { AccordionState, useStoreActions, useStoreState } from "@/store/GuiBuilder";
+import { StageKind } from "@/types";
+import { configToYaml } from "@/utils/GuiBuilder";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Accordion, createStyles, Tooltip } from "@mantine/core";
-import { AccordionState, useStoreActions, useStoreState } from "@store/GuiBuilder";
-import { StageKind } from "@types";
-import { configToYaml } from "@utils/GuiBuilder";
 import { forwardRef, memo, useEffect, useRef, useState } from "react";
 import AddableStage from "./PipelineEditor/AddableStage";
 

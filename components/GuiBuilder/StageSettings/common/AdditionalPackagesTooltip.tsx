@@ -1,4 +1,4 @@
-import { InfoTooltip } from "@components/GuiBuilder/Diagnostics";
+import { InfoTooltip } from "@/components/GuiBuilder/Diagnostics";
 import { memo } from "react";
 
 /**

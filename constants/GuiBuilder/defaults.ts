@@ -1,4 +1,4 @@
-import type { Config, GradingPolicy, Schedule, Settings, TestCase } from "@types";
+import type { Config, GradingPolicy, Schedule, Settings, TestCase } from "@/types";
 import { addDays, set } from "date-fns";
 import { v4 as uuidv4 } from "uuid";
 

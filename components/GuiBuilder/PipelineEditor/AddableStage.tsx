@@ -1,5 +1,5 @@
-import { SupportedStage } from "@constants/GuiBuilder/supportedStages";
-import { useStoreActions } from "@store/GuiBuilder";
+import { SupportedStage } from "@/constants/GuiBuilder/supportedStages";
+import { useStoreActions } from "@/store/GuiBuilder";
 
 interface AddableStageProps {
   stageName: string;

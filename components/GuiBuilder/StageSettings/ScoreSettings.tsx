@@ -1,6 +1,6 @@
-import { NumberInput } from "@components/Input";
-import { useSelectedStageConfig } from "@hooks/GuiBuilder";
-import { Score } from "@types";
+import { NumberInput } from "@/components/Input";
+import { useSelectedStageConfig } from "@/hooks/GuiBuilder";
+import { Score } from "@/types";
 
 function ScoreSettings() {
   const [config, setConfig] = useSelectedStageConfig<Score>();

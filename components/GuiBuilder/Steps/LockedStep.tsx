@@ -1,6 +1,6 @@
-import Button from "@components/Button";
+import Button from "@/components/Button";
+import { useStoreActions } from "@/store/GuiBuilder";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useStoreActions } from "@store/GuiBuilder";
 
 /**
  * A locked step. Some steps are locked when creating a new config because they require

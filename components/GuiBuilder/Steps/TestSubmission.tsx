@@ -1,12 +1,12 @@
+import { ReportSlideOver } from "@/components/Report";
+import { SlideOver } from "@/components/SlideOver";
+import { Submission } from "@/components/Submission";
+import { SubmissionLoader } from "@/components/SubmissionLoader";
+import { useZinc } from "@/contexts/zinc";
+import { SUBMISSION_DETAIL, SUBMISSION_SUBSCRIPTION } from "@/graphql/queries/user";
+import { useStoreState } from "@/store/GuiBuilder";
+import { AssignmentConfig, Course, Submission as SubmissionType, User } from "@/types";
 import { useQuery, useSubscription } from "@apollo/client";
-import { ReportSlideOver } from "@components/Report";
-import { SlideOver } from "@components/SlideOver";
-import { Submission } from "@components/Submission";
-import { SubmissionLoader } from "@components/SubmissionLoader";
-import { useZinc } from "@contexts/zinc";
-import { SUBMISSION_DETAIL, SUBMISSION_SUBSCRIPTION } from "@graphql/queries/user";
-import { useStoreState } from "@store/GuiBuilder";
-import { AssignmentConfig, Course, Submission as SubmissionType, User } from "@types";
 import { ModalContent, Upload } from "pages/courses/[courseId]/assignments/[assignmentConfigId]/submissions";
 import LockedStep from "./LockedStep";
 

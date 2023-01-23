@@ -1,8 +1,8 @@
-import { TextInput } from "@components/Input";
-import supportedStages, { SupportedStage } from "@constants/GuiBuilder/supportedStages";
+import { TextInput } from "@/components/Input";
+import supportedStages, { SupportedStage } from "@/constants/GuiBuilder/supportedStages";
+import { useStoreActions, useStoreState } from "@/store/GuiBuilder";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { clsx, Tooltip } from "@mantine/core";
-import { useStoreActions, useStoreState } from "@store/GuiBuilder";
 import Image from "next/image";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import UnsupportedStage from "./UnsupportedStage";

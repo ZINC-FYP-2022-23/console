@@ -1,5 +1,5 @@
+import { useStoreActions, useStoreState } from "@/store/GuiBuilder";
 import { useHotkeys } from "@mantine/hooks";
-import { useStoreActions, useStoreState } from "@store/GuiBuilder";
 
 /**
  * Handles custom keyboard shortcuts in the Pipeline Editor.

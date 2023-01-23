@@ -2,8 +2,8 @@
  * @file Utilities for converting between raw and tidied configs.
  */
 
-import { valgrindDefaultConfig } from "@constants/GuiBuilder/supportedStages";
-import { TestCase, TestCaseRaw, Valgrind, ValgrindRaw } from "@types";
+import { valgrindDefaultConfig } from "@/constants/GuiBuilder/supportedStages";
+import { TestCase, TestCaseRaw, Valgrind, ValgrindRaw } from "@/types";
 
 /**
  * Converts a raw test case config obtained from parsing the YAML into a tidied test case config.

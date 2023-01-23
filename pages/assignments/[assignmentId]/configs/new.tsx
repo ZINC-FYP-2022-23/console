@@ -12,7 +12,7 @@ import { GET_ASSIGNMENT, GET_INSTRUCTORS } from "../../../../graphql/queries/use
 import { useMutation, useQuery } from "@apollo/client";
 import { CREATE_ASSIGNMENT_CONFIG, UPDATE_ASSIGNMENTCONFIG_NOTI } from "../../../../graphql/mutations/user";
 import { useZinc } from "../../../../contexts/zinc";
-import { Checkbox, DateInput } from "@components/Input";
+import { Checkbox, DateInput } from "@/components/Input";
 
 interface AssignmentConfig {
   assignment_id: Number;

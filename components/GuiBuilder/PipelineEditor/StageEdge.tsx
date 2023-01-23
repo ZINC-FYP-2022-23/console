@@ -1,6 +1,6 @@
+import { useStoreActions } from "@/store/GuiBuilder";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { clsx } from "@mantine/core";
-import { useStoreActions } from "@store/GuiBuilder";
 import { useState } from "react";
 import { EdgeLabelRenderer, EdgeProps, getBezierPath } from "reactflow";
 import "reactflow/dist/style.css";

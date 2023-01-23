@@ -1,6 +1,6 @@
-import { SwitchGroup } from "@components/Input";
-import NumberInput from "@components/Input/NumberInput";
-import { useStoreActions, useStoreState } from "@store/GuiBuilder";
+import { SwitchGroup } from "@/components/Input";
+import NumberInput from "@/components/Input/NumberInput";
+import { useStoreActions, useStoreState } from "@/store/GuiBuilder";
 import { memo } from "react";
 import { InfoTooltip } from "../Diagnostics";
 

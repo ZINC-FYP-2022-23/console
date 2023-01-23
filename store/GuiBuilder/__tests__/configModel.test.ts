@@ -1,6 +1,6 @@
 /// <reference types="jest-extended" />
-import { AssignmentConfig, Config, GradingPolicy, Schedule, Stage, StageKind } from "@types";
-import * as configUtils from "@utils/GuiBuilder/config";
+import { AssignmentConfig, Config, GradingPolicy, Schedule, Stage, StageKind } from "@/types";
+import * as configUtils from "@/utils/GuiBuilder/config";
 import { createStore } from "easy-peasy";
 import "jest-extended";
 import cloneDeep from "lodash/cloneDeep";

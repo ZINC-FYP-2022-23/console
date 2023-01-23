@@ -3,7 +3,7 @@
  * {@link SupportedStage.configToRaw}.
  */
 
-import supportedStages, { SupportedStage, valgrindDefaultConfig } from "@constants/GuiBuilder/supportedStages";
+import supportedStages, { SupportedStage, valgrindDefaultConfig } from "@/constants/GuiBuilder/supportedStages";
 import {
   Compile,
   CompileRaw,
@@ -17,7 +17,7 @@ import {
   TestCaseRaw,
   Valgrind,
   ValgrindRaw,
-} from "@types";
+} from "@/types";
 import * as uuid from "uuid";
 import { configsToConfigsRaw, parseStages } from "../stage";
 import * as stageRawConfig from "../stageRawConfig";

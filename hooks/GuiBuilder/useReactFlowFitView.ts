@@ -1,4 +1,4 @@
-import { useStoreActions, useStoreState } from "@store/GuiBuilder";
+import { useStoreActions, useStoreState } from "@/store/GuiBuilder";
 import { useEffect } from "react";
 import { useReactFlow } from "reactflow";
 

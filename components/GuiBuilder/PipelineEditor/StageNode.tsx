@@ -1,7 +1,7 @@
+import { useStoreActions, useStoreState } from "@/store/GuiBuilder";
+import { StageNodeData } from "@/types";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { clsx, Tooltip } from "@mantine/core";
-import { useStoreActions, useStoreState } from "@store/GuiBuilder";
-import { StageNodeData } from "@types";
 import { DragEventHandler, useState } from "react";
 import { Handle, NodeProps, Position } from "reactflow";
 

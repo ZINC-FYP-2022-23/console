@@ -1,4 +1,4 @@
-import guiBuilderSteps, { GuiBuilderStep } from "@components/GuiBuilder/Steps/GuiBuilderSteps";
+import guiBuilderSteps, { GuiBuilderStep } from "@/components/GuiBuilder/Steps/GuiBuilderSteps";
 import { action, Action } from "easy-peasy";
 import set from "lodash/set";
 

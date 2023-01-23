@@ -1,5 +1,5 @@
+import { useStoreActions, useStoreState } from "@/store/GuiBuilder";
 import { createStyles, Stepper as StepperMantine } from "@mantine/core";
-import { useStoreActions, useStoreState } from "@store/GuiBuilder";
 import { memo } from "react";
 import guiBuilderSteps from "./GuiBuilderSteps";
 

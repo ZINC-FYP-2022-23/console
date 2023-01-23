@@ -5,7 +5,7 @@ import { LayoutProvider, useLayoutDispatch } from "../../../../contexts/layout";
 import { Layout } from "../../../../layout";
 import { GET_CONFIGS_FOR_ASSIGNMENT } from "../../../../graphql/queries/user";
 import { useRouter } from "next/router";
-import ChooseEditorModeModal from "@components/GuiBuilder/ChooseEditorModeModal";
+import ChooseEditorModeModal from "@/components/GuiBuilder/ChooseEditorModeModal";
 
 function AssignmentConfigs({ configs }) {
   const router = useRouter();

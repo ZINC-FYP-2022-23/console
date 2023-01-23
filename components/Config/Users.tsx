@@ -1,7 +1,7 @@
 import { useSubscription, useMutation } from "@apollo/client";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useClickOutside } from "@mantine/hooks";
-import { AssignmentConfig, Section } from "@types";
+import { AssignmentConfig, Section } from "@/types";
 import { useRouter } from "next/router";
 import { useLayoutDispatch } from "../../contexts/layout";
 import {

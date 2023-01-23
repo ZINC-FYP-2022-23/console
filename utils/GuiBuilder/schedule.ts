@@ -1,4 +1,4 @@
-import { Schedule } from "@types";
+import { Schedule } from "@/types";
 import { isEqual } from "date-fns";
 
 /**

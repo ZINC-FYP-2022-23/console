@@ -1,4 +1,4 @@
-import { Spinner } from "@components/Spinner";
+import { Spinner } from "@/components/Spinner";
 import {
   CompileRaw,
   FileStructureValidation,
@@ -9,8 +9,8 @@ import {
   TestCaseRaw,
   Valgrind,
   ValgrindRaw,
-} from "@types";
-import { testCaseFromRaw, testCaseToRaw, valgrindFromRaw, valgrindToRaw } from "@utils/GuiBuilder/stageRawConfig";
+} from "@/types";
+import { testCaseFromRaw, testCaseToRaw, valgrindFromRaw, valgrindToRaw } from "@/utils/GuiBuilder/stageRawConfig";
 import dynamic from "next/dynamic";
 import { ComponentType } from "react";
 

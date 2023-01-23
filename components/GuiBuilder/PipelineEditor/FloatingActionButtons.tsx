@@ -1,6 +1,6 @@
+import { useStoreActions } from "@/store/GuiBuilder";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Tooltip } from "@mantine/core";
-import { useStoreActions } from "@store/GuiBuilder";
 import { memo } from "react";
 
 /**

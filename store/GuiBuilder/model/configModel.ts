@@ -1,4 +1,4 @@
-import { defaultConfig, defaultPolicy, defaultSchedule } from "@constants/GuiBuilder/defaults";
+import { defaultConfig, defaultPolicy, defaultSchedule } from "@/constants/GuiBuilder/defaults";
 import {
   AssignmentConfig,
   Config,
@@ -8,8 +8,8 @@ import {
   Stage,
   StageDataMap,
   StageDependencyMap,
-} from "@types";
-import { configToYaml, isConfigEqual, isScheduleEqual, parseConfigYaml } from "@utils/GuiBuilder";
+} from "@/types";
+import { configToYaml, isConfigEqual, isScheduleEqual, parseConfigYaml } from "@/utils/GuiBuilder";
 import { action, Action, computed, Computed, thunk, Thunk } from "easy-peasy";
 import cloneDeep from "lodash/cloneDeep";
 import isEqual from "lodash/isEqual";

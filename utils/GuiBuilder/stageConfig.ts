@@ -2,7 +2,7 @@
  * @file Utilities for manipulating stage configs.
  */
 
-import { TestCase } from "@types";
+import { TestCase } from "@/types";
 
 /**
  * @returns The largest test case ID in the given test cases.

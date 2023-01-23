@@ -1,4 +1,4 @@
-import { Spinner } from "@components/Spinner";
+import { Spinner } from "@/components/Spinner";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import dynamic from "next/dynamic";
 

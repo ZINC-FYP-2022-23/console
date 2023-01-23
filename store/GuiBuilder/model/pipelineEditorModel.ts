@@ -1,6 +1,6 @@
-import supportedStages, { SupportedStage } from "@constants/GuiBuilder/supportedStages";
-import { Stage, StageNode } from "@types";
-import { deleteStageFromDeps } from "@utils/GuiBuilder";
+import supportedStages, { SupportedStage } from "@/constants/GuiBuilder/supportedStages";
+import { Stage, StageNode } from "@/types";
+import { deleteStageFromDeps } from "@/utils/GuiBuilder";
 import { coordQuad, dagConnect, sugiyama } from "d3-dag";
 import { action, Action, computed, Computed, thunk, Thunk, thunkOn, ThunkOn } from "easy-peasy";
 import camelCase from "lodash/camelCase";

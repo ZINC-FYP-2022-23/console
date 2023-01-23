@@ -1,6 +1,6 @@
 /// <reference types="jest-extended" />
-import supportedStages from "@constants/GuiBuilder/supportedStages";
-import { StageDataMap, StageKind, StageNode } from "@types";
+import supportedStages from "@/constants/GuiBuilder/supportedStages";
+import { StageDataMap, StageKind, StageNode } from "@/types";
 import { computed, createStore, thunkOn } from "easy-peasy";
 import "jest-extended";
 import * as uuid from "uuid";

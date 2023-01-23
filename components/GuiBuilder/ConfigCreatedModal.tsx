@@ -1,7 +1,7 @@
-import Button from "@components/Button";
+import Button from "@/components/Button";
+import { useStoreActions, useStoreState } from "@/store/GuiBuilder";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Modal, useMantineTheme } from "@mantine/core";
-import { useStoreActions, useStoreState } from "@store/GuiBuilder";
 import { useRouter } from "next/router";
 
 /**

@@ -1,4 +1,4 @@
-import { useStoreState, useStoreActions } from "@store/GuiBuilder";
+import { useStoreActions, useStoreState } from "@/store/GuiBuilder";
 
 /**
  * Returns the config of the currently selected stage, and a function to update it.

@@ -1,4 +1,4 @@
-import type { Settings, SettingsRaw, StageDataMap, StageDependencyMap } from "@types";
+import type { Settings, SettingsRaw, StageDataMap, StageDependencyMap } from "@/types";
 
 /**
  * The grading pipeline configuration of an assignment. It models an assignment configuration YAML.

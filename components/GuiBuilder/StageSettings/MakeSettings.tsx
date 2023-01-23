@@ -1,6 +1,6 @@
-import { TagsInput, Textarea } from "@components/Input";
-import { useSelectedStageConfig } from "@hooks/GuiBuilder";
-import { Make } from "@types";
+import { TagsInput, Textarea } from "@/components/Input";
+import { useSelectedStageConfig } from "@/hooks/GuiBuilder";
+import { Make } from "@/types";
 import { FocusEventHandler, memo } from "react";
 import { InfoTooltip } from "../Diagnostics";
 import { AdditionalPackagesTooltip, InfoAccordion } from "./common";

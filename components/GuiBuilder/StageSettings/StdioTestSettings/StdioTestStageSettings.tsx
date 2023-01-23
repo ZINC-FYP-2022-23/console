@@ -1,7 +1,7 @@
-import { MultiSelect, TagsInput } from "@components/Input";
-import { useSelectedStageConfig } from "@hooks/GuiBuilder";
-import { useStoreState } from "@store/GuiBuilder";
-import { StdioTest } from "@types";
+import { MultiSelect, TagsInput } from "@/components/Input";
+import { useSelectedStageConfig } from "@/hooks/GuiBuilder";
+import { useStoreState } from "@/store/GuiBuilder";
+import { StdioTest } from "@/types";
 import { FocusEventHandler, memo } from "react";
 import { InfoTooltip } from "../../Diagnostics";
 import { diffIgnoreFlagOptions } from "./inputOptions";
