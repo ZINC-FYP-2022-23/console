@@ -1,5 +1,5 @@
 import { useQuery } from "@apollo/client";
-import AppealsTable from "@components/Appeal/AppealsTable";
+import AppealsTable from "@/components/Appeal/AppealsTable";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Menu, Tab, Transition } from "@headlessui/react";
 import DotsVerticalIcon from "@heroicons/react/solid/DotsVerticalIcon";

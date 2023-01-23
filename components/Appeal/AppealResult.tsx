@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { AppealStatus } from "@types";
+import { AppealStatus } from "@/types";
 
 export function AppealResult({ appealResult }: { appealResult: AppealStatus }) {
   switch (appealResult) {

@@ -4,7 +4,7 @@ import { SubmissionWindowStatus } from "../SubmissionWindowStatus";
 import { useLayoutDispatch } from "../../contexts/layout";
 import { Menu, Transition } from "@headlessui/react";
 import { DotsVerticalIcon } from "@heroicons/react/solid";
-import { AssignmentConfig, Section } from "@types";
+import { AssignmentConfig, Section } from "@/types";
 import { Tooltip } from "@mantine/core";
 
 interface AssignmentsProps {

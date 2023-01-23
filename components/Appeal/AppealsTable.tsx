@@ -9,7 +9,7 @@ import {
   SortingState,
   useReactTable,
 } from "@tanstack/react-table";
-import { AppealStatus, Appeal } from "@types";
+import { AppealStatus, Appeal } from "@/types";
 import Link from "next/link";
 import { useState } from "react";
 import AppealStatusBadge from "./AppealStatusBadge";

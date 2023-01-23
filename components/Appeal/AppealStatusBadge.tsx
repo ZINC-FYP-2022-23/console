@@ -1,4 +1,4 @@
-import { AppealStatus } from "@types";
+import { AppealStatus } from "@/types";
 import React from "react";
 
 interface AppealStatusBadgeProps {

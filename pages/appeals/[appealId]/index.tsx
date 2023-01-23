@@ -1,11 +1,11 @@
-import { AppealResult } from "@components/Appeal/AppealResult";
-import RichTextEditor from "@components/RichTextEditor";
-import { LayoutProvider, useLayoutState } from "@contexts/layout";
+import { AppealResult } from "@/components/Appeal/AppealResult";
+import RichTextEditor from "@/components/RichTextEditor";
+import { LayoutProvider, useLayoutState } from "@/contexts/layout";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Tab } from "@headlessui/react";
-import { Layout } from "@layout";
+import { Layout } from "@/layout";
 import { Alert } from "@mantine/core";
-import { Appeal, AppealStatus } from "@types";
+import { Appeal, AppealStatus } from "@/types";
 import { GetServerSideProps } from "next";
 import Link from "next/link";
 import { useState } from "react";
