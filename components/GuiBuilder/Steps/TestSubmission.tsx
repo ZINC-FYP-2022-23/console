@@ -8,6 +8,7 @@ import { useStoreState } from "@/store/GuiBuilder";
 import { AssignmentConfig, Course, Submission as SubmissionType, User } from "@/types";
 import { useQuery, useSubscription } from "@apollo/client";
 import { ModalContent, Upload } from "pages/courses/[courseId]/assignments/[assignmentConfigId]/submissions";
+import { Alert } from "../Diagnostics";
 import LockedStep from "./LockedStep";
 
 function TestSubmission() {
@@ -15,6 +16,7 @@ function TestSubmission() {
 
   const configId = useStoreState((state) => state.config.configId);
   const courseId = useStoreState((state) => state.config.courseId);
+  const isEdited = useStoreState((state) => state.config.isEdited);
 
   const { data: submissionDetail } = useQuery<{
     user: User;
@@ -40,9 +42,18 @@ function TestSubmission() {
 
   return (
     <div className="h-full mt-1 flex flex-col">
-      <div className="ml-4 pb-2 flex items-center gap-2">
-        <h2 className="font-semibold leading-9 text-2xl text-gray-900">Your Submissions</h2>
-        <Upload userId={user} assignmentConfigId={configId} />
+      <div className="ml-4 pb-2">
+        <div className="flex items-center gap-2">
+          <h2 className="font-semibold leading-9 text-2xl text-gray-900">Your Submissions</h2>
+          <Upload userId={user} assignmentConfigId={configId} />
+        </div>
+        {isEdited && (
+          <div className="w-max mt-4 drop-shadow-sm">
+            <Alert severity="warning">
+              You have unsaved changes. Please save them before testing your submissions.
+            </Alert>
+          </div>
+        )}
       </div>
       <ul className="w-full flex-1 overflow-y-auto">
         {loading && <SubmissionLoader />}
