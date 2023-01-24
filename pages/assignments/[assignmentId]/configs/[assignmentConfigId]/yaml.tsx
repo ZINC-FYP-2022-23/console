@@ -34,6 +34,7 @@ function SlideOverContent() {
 
 function ModalContent() {
   const { modalType } = useLayoutState();
+  const dispatch = useLayoutDispatch();
   switch (modalType) {
     case "yaml":
       return (
@@ -50,7 +51,7 @@ function ModalContent() {
           rootClassNames="h-uploader"
         >
           <FilesProvider>
-            <AssignmentSupportingFilesUploader />
+            <AssignmentSupportingFilesUploader onSaveSuccess={() => dispatch({ type: "closeModal" })} />
           </FilesProvider>
         </ModalWithHeader>
       );
