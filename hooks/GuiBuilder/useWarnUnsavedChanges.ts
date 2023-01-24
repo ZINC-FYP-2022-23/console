@@ -7,19 +7,19 @@ import { useBeforeunload } from "react-beforeunload";
  * Opens a browser dialog to warn if the user wishes to leave the page without saving changes.
  */
 export default function useWarnUnsavedChanges() {
-  const isEdited = useStoreState((state) => state.config.isEdited);
+  const isEditedAny = useStoreState((state) => state.config.isEdited.any);
   const router = useRouter();
 
   // Handle document unload (e.g. browser tab close)
   useBeforeunload((event) => {
-    if (isEdited) {
+    if (isEditedAny) {
       event.preventDefault();
     }
   });
 
   // Handle change in in-app (Next.js) route
   useEffect(() => {
-    if (isEdited) {
+    if (isEditedAny) {
       const routeChangeStart = () => {
         const ok = confirm("You have unsaved changes. Are you sure you want to leave this page?");
         if (!ok) {
@@ -34,5 +34,5 @@ export default function useWarnUnsavedChanges() {
         router.events.off("routeChangeStart", routeChangeStart);
       };
     }
-  }, [isEdited, router.events]);
+  }, [isEditedAny, router.events]);
 }

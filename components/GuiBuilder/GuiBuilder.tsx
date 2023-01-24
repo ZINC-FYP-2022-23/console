@@ -12,6 +12,7 @@ import { useHotkeys } from "@mantine/hooks";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import ConfigCreatedModal from "./ConfigCreatedModal";
+import RegradePromptModal from "./RegradePromptModal";
 import guiBuilderSteps from "./Steps/GuiBuilderSteps";
 import Stepper from "./Steps/Stepper";
 
@@ -62,7 +63,7 @@ function GUIAssignmentBuilder({ data, configId: configIdProp }: GUIAssignmentBui
   }, [data, configIdProp, initializeAssignment]);
 
   const isNewAssignment = configId === null;
-  const disableSave = !isNewAssignment && !isEdited;
+  const disableSave = !isNewAssignment && !isEdited.any;
   const StepComponent = guiBuilderSteps[step].component;
 
   useHotkeys([
@@ -119,14 +120,18 @@ function GUIAssignmentBuilder({ data, configId: configIdProp }: GUIAssignmentBui
         await updateConfig({
           variables: { id: configId, update: configsToSave },
         });
-        dispatch({
-          type: "showNotification",
-          payload: {
-            success: true,
-            title: "Assignment Config Updated",
-            message: "Changes to the assignment config has been saved",
-          },
-        });
+        if (isEdited.config) {
+          setModal({ path: "regradePrompt", value: true });
+        } else {
+          dispatch({
+            type: "showNotification",
+            payload: {
+              success: true,
+              title: "Assignment Config Updated",
+              message: "Changes to the assignment config has been saved",
+            },
+          });
+        }
       }
       setInitConfigsToEditing();
     } catch (error: any) {
@@ -164,6 +169,7 @@ function GUIAssignmentBuilder({ data, configId: configIdProp }: GUIAssignmentBui
         <StepComponent />
       </div>
       <ConfigCreatedModal />
+      <RegradePromptModal />
     </div>
   );
 }

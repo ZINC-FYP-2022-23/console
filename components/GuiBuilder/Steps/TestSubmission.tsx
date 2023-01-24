@@ -16,7 +16,7 @@ function TestSubmission() {
 
   const configId = useStoreState((state) => state.config.configId);
   const courseId = useStoreState((state) => state.config.courseId);
-  const isEdited = useStoreState((state) => state.config.isEdited);
+  const isAnyEdited = useStoreState((state) => state.config.isEdited.any);
 
   const { data: submissionDetail } = useQuery<{
     user: User;
@@ -47,7 +47,7 @@ function TestSubmission() {
           <h2 className="font-semibold leading-9 text-2xl text-gray-900">Your Submissions</h2>
           <Upload userId={user} assignmentConfigId={configId} />
         </div>
-        {isEdited && (
+        {isAnyEdited && (
           <div className="w-max mt-4 drop-shadow-sm">
             <Alert severity="warning">
               You have unsaved changes. Please save them before testing your submissions.

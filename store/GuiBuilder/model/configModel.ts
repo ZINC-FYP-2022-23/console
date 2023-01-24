@@ -47,8 +47,16 @@ interface ConfigModelState {
 interface ConfigModelComputed {
   /** Whether the pipeline has a stage given its name. */
   hasStage: Computed<ConfigModel, (stageName: string) => boolean>;
-  /** Whether the config has been edited. */
-  isEdited: Computed<ConfigModel, boolean>;
+  /** Whether the assignment config has been edited. */
+  isEdited: Computed<
+    ConfigModel,
+    {
+      /** Whether any of the pipeline config, policy, or schedule is edited. */
+      any: boolean;
+      /** Whether the pipeline config is edited. */
+      config: boolean;
+    }
+  >;
   /**
    * Returns a callback that check whether another stage with the same `stageName` (e.g. `"DiffWithSkeleton"`)
    * has a non-empty {@link Stage.label label} that is equal to the provided `label`.
@@ -172,7 +180,10 @@ const configModelComputed: ConfigModelComputed = {
     const isConfigEdited = !isConfigEqual(state.initConfig, state.editingConfig);
     const isPolicyEdited = !isEqual(state.initPolicy, state.editingPolicy);
     const isScheduleEdited = !isScheduleEqual(state.initSchedule, state.editingSchedule);
-    return isConfigEdited || isPolicyEdited || isScheduleEdited;
+    return {
+      any: isConfigEdited || isPolicyEdited || isScheduleEdited,
+      config: isConfigEdited,
+    };
   }),
   isStageLabelDuplicate: computed((state) => {
     return (stageName: string, label: string) => {

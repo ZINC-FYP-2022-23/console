@@ -54,6 +54,8 @@ export interface ModalState {
   configCreated: boolean;
   /** Delete stage confirmation modal in "Pipeline Stages" step. */
   deleteStage: boolean;
+  /** Regrade prompt modal after saving a change in the pipeline config. */
+  regradePrompt: boolean;
   /** Help information for stage label input box in "Pipeline Stages" step. */
   stageLabelInfo: boolean;
 }
@@ -70,6 +72,7 @@ const layoutModelState: LayoutModelState = {
   modal: {
     configCreated: false,
     deleteStage: false,
+    regradePrompt: false,
     stageLabelInfo: false,
   },
   addStageSearchString: "",

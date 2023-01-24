@@ -22,7 +22,7 @@ interface ZincContextState {
     /** Stringified object of type {@link ConfigError}. */
     configError?: string;
   }>;
-  triggerManualGrading: (configId: string, usersBeingGraded: Array<number>) => Promise<any>;
+  triggerManualGrading: (configId: string, usersBeingGraded?: Array<number>) => Promise<any>;
 }
 
 interface ZincProviderProps {
