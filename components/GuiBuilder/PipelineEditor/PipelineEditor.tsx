@@ -1,5 +1,6 @@
 import { usePipelineEditorHotKeys, useReactFlowFitView } from "@/hooks/GuiBuilder";
 import { PipelineEditorModel, useStoreActions, useStoreState } from "@/store/GuiBuilder";
+import { Transition } from "@headlessui/react";
 import { clsx } from "@mantine/core";
 import { DragEvent, DragEventHandler, memo, useCallback, useRef } from "react";
 import ReactFlow, {
@@ -153,6 +154,18 @@ function PipelineEditor() {
         <Controls showInteractive={false} />
         <Background variant={BackgroundVariant.Dots} gap={GRID_SIZE} className="bg-gray-50" />
       </ReactFlow>
+      <Transition
+        show={!!dragging}
+        enter="transition-opacity ease-in-out duration-200"
+        enterFrom="opacity-0"
+        enterTo="opacity-100"
+        leave="transition-opacity ease-in-out duration-200"
+        leaveFrom="opacity-100"
+        leaveTo="opacity-0"
+        className="w-64 mx-auto p-1 absolute left-0 right-0 bottom-0 bg-blue-400 font-medium rounded-t text-center text-sm text-white"
+      >
+        Drop the stage block on this canvas
+      </Transition>
     </div>
   );
 }

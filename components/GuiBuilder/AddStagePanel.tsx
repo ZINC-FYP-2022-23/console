@@ -4,7 +4,7 @@ import { AccordionState, useStoreActions, useStoreState } from "@/store/GuiBuild
 import { StageKind } from "@/types";
 import { configToYaml } from "@/utils/GuiBuilder";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Accordion, createStyles, Tooltip } from "@mantine/core";
+import { Accordion, createStyles, ScrollArea, Tooltip } from "@mantine/core";
 import { forwardRef, memo, useEffect, useRef, useState } from "react";
 import AddableStage from "./PipelineEditor/AddableStage";
 
@@ -113,7 +113,13 @@ function AddStagePanel() {
   }, [searchString, setAccordionWithSearch]);
 
   return (
-    <>
+    <ScrollArea
+      type="hover"
+      styles={{
+        root: { height: "100%" },
+        scrollbar: { zIndex: 999 },
+      }}
+    >
       <div className="pl-2 pr-3 py-2 flex items-center justify-between border-b border-gray-300">
         <Tooltip label="Collapse panel">
           <button
@@ -205,7 +211,7 @@ function AddStagePanel() {
           </p>
         </div>
       )}
-    </>
+    </ScrollArea>
   );
 }
 
@@ -217,7 +223,7 @@ const AddStageSearchBar = forwardRef<HTMLInputElement>((_, ref) => {
   const setSearchString = useStoreActions((action) => action.layout.setAddStageSearchString);
 
   return (
-    <div className="group flex items-center border border-gray-300 bg-white rounded-md shadow-sm focus-within:border-blue-300 focus-within:ring focus-within:ring-blue-100">
+    <div className="flex items-center border border-gray-300 bg-white rounded-md shadow-sm focus-within:border-blue-300 focus-within:ring focus-within:ring-blue-100">
       <div className="pl-2 pr-1 flex items-center text-gray-400">
         <FontAwesomeIcon icon={["fas", "search"]} />
       </div>

@@ -67,7 +67,7 @@ export interface ModalState {
 const layoutModelState: LayoutModelState = {
   step: 0,
   accordion: {
-    addNewStage: [],
+    addNewStage: ["preCompile", "compile", "grading", "miscStages"],
   },
   modal: {
     configCreated: false,

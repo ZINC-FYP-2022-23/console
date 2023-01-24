@@ -22,7 +22,7 @@ function PipelineStages() {
           <StageSettings />
         </div>
       </div>
-      <div className={clsx("bg-white rounded-md shadow overflow-y-auto", !isAddStageCollapsed && "w-2/6")}>
+      <div className={clsx("bg-white rounded-md shadow", !isAddStageCollapsed && "w-2/6")}>
         {isAddStageCollapsed ? <AddStagePanelCollapsed /> : <AddStagePanel />}
       </div>
       <DeleteStageModal />
