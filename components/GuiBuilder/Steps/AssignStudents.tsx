@@ -5,6 +5,7 @@ import { useStoreState } from "@/store/GuiBuilder";
 import { AssignmentConfig } from "@/types";
 import { useSubscription } from "@apollo/client";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { ScrollArea } from "@mantine/core";
 import LockedStep from "./LockedStep";
 
 function AssignStudents() {
@@ -22,7 +23,7 @@ function AssignStudents() {
 
   return (
     <div className="h-full flex justify-center">
-      <div className="w-1/2 h-full bg-cool-gray-50 drop-shadow overflow-y-auto rounded-md">
+      <ScrollArea type="auto" className="w-1/2 h-full bg-cool-gray-50 drop-shadow rounded-md">
         {loading && (
           <div className="mt-16 flex justify-center">
             <Spinner className="h-16 w-16 text-cse-500" />
@@ -67,7 +68,7 @@ function AssignStudents() {
             </div>
           </>
         )}
-      </div>
+      </ScrollArea>
     </div>
   );
 }

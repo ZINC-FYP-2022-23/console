@@ -419,7 +419,7 @@ function AssignmentSupportingFilesUploader({ onSaveSuccess }: AssignmentSupporti
           </div>
         </DndProvider>
       </div>
-      <div className="w-full flex justify-center ">
+      <div className="w-full mt-4 flex justify-center">
         <button
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-1/4"
           onClick={handleSubmit()}

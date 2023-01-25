@@ -7,6 +7,7 @@ import { SUBMISSION_DETAIL, SUBMISSION_SUBSCRIPTION } from "@/graphql/queries/us
 import { useStoreState } from "@/store/GuiBuilder";
 import { AssignmentConfig, Course, Submission as SubmissionType, User } from "@/types";
 import { useQuery, useSubscription } from "@apollo/client";
+import { ScrollArea } from "@mantine/core";
 import { ModalContent, Upload } from "pages/courses/[courseId]/assignments/[assignmentConfigId]/submissions";
 import { Alert } from "../Diagnostics";
 import LockedStep from "./LockedStep";
@@ -55,14 +56,16 @@ function TestSubmission() {
           </div>
         )}
       </div>
-      <ul className="w-full flex-1 overflow-y-auto">
-        {loading && <SubmissionLoader />}
-        {data &&
-          submissionDetail &&
-          data.submissions.map((submission) => (
-            <Submission key={submission.id} submission={{ ...submission, user: submissionDetail.user }} />
-          ))}
-      </ul>
+      <ScrollArea type="auto">
+        <ul className="w-full flex-1">
+          {loading && <SubmissionLoader />}
+          {data &&
+            submissionDetail &&
+            data.submissions.map((submission) => (
+              <Submission key={submission.id} submission={{ ...submission, user: submissionDetail.user }} />
+            ))}
+        </ul>
+      </ScrollArea>
       <SlideOver>
         <ReportSlideOver />
       </SlideOver>

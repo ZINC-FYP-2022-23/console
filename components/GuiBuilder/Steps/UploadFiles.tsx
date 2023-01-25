@@ -2,6 +2,7 @@ import AssignmentSupportingFilesUploader from "@/components/AssignmentSupporting
 import { FilesProvider } from "@/contexts/assignmentSupportingFiles";
 import { useLayoutDispatch, useLayoutState } from "@/contexts/layout";
 import { useStoreState } from "@/store/GuiBuilder";
+import { ScrollArea } from "@mantine/core";
 import { useEffect } from "react";
 import LockedStep from "./LockedStep";
 
@@ -26,7 +27,7 @@ function UploadFiles() {
   }
 
   return (
-    <div className="py-6 bg-cool-gray-50 drop-shadow rounded-md space-y-4">
+    <ScrollArea type="auto" className="h-full py-6 bg-cool-gray-50 drop-shadow rounded-md">
       <FilesProvider>
         {assignmentConfigId !== undefined && (
           <AssignmentSupportingFilesUploader
@@ -42,7 +43,7 @@ function UploadFiles() {
           />
         )}
       </FilesProvider>
-    </div>
+    </ScrollArea>
   );
 }
 

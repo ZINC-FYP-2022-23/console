@@ -2,7 +2,7 @@ import { TextInput } from "@/components/Input";
 import supportedStages, { SupportedStage } from "@/constants/GuiBuilder/supportedStages";
 import { useStoreActions, useStoreState } from "@/store/GuiBuilder";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { clsx, Tooltip } from "@mantine/core";
+import { clsx, createStyles, ScrollArea, Tooltip } from "@mantine/core";
 import Image from "next/image";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import UnsupportedStage from "./UnsupportedStage";
@@ -43,6 +43,7 @@ const getLabelAlertStyles = (alert: keyof StageLabelAlert | null, styles: { warn
  * Settings panel for an individual stage in the pipeline.
  */
 function StageSettings() {
+  const { classes } = useScrollAreaStyles();
   const labelInputRef = useRef<HTMLInputElement>(null!);
   const [labelAlert, setLabelAlert] = useState<keyof StageLabelAlert | null>(null);
 
@@ -133,12 +134,19 @@ function StageSettings() {
           </div>
         </div>
       </div>
-      <div className="flex-1 overflow-y-auto">
+      <ScrollArea type="auto" classNames={classes}>
         <StageSettings />
-      </div>
+      </ScrollArea>
     </div>
   );
 }
+
+const useScrollAreaStyles = createStyles(() => ({
+  root: { flex: 1 },
+  viewport: {
+    "& > div": { height: "100%" },
+  },
+}));
 
 function NoStageSelected() {
   return (

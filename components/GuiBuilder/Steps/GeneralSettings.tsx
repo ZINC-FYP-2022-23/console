@@ -1,4 +1,4 @@
-import { clsx } from "@mantine/core";
+import { clsx, ScrollArea } from "@mantine/core";
 import PipelineSettings from "../Settings/PipelineSettings";
 import Policy from "../Settings/Policy";
 import Scheduling from "../Settings/Scheduling";
@@ -24,7 +24,7 @@ function GeneralSettings() {
 interface GeneralSettingsCardProps {
   title: string;
   children: React.ReactNode;
-  /** Additional classes to apply to root of the card.  */
+  /** Additional classes to apply to root of the card. */
   className?: string;
 }
 
@@ -32,7 +32,9 @@ function GeneralSettingsCard({ title, children, className }: GeneralSettingsCard
   return (
     <div className={clsx("flex flex-col bg-white rounded-md shadow overflow-y-hidden", className)}>
       <h2 className="px-4 py-2 text-xl font-semibold bg-blue-50 border-b border-gray-300">{title}</h2>
-      <div className="flex-1 p-4 pb-6 overflow-y-auto">{children}</div>
+      <ScrollArea type="auto" offsetScrollbars className="flex-1 p-4 pb-6">
+        {children}
+      </ScrollArea>
     </div>
   );
 }

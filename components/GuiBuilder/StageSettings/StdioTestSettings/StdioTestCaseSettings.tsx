@@ -516,7 +516,7 @@ interface MonacoEditorCardProps extends ControlledEditorProps {
  */
 function MonacoEditorCard({ cardTitle, ...props }: MonacoEditorCardProps) {
   return (
-    <div className="h-80 mb-3 mx-2 p-3 pt-1 pb-8 bg-gray-50 rounded-lg drop-shadow">
+    <div className="h-80 mb-3 p-3 pt-1 pb-8 bg-gray-50 rounded-lg drop-shadow">
       <p className="mb-1 text-gray-600 text-sm">{cardTitle}</p>
       <ControlledEditor options={{ fontSize: 12.5 }} {...props} />
     </div>

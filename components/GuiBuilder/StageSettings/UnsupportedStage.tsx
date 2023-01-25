@@ -9,7 +9,7 @@ function UnsupportedStage() {
   const [config, setConfig] = useSelectedStageConfig<string>();
 
   return (
-    <div className="p-3 h-full flex flex-col gap-3 overflow-y-hidden">
+    <div className="p-3 h-full flex flex-col gap-3">
       <Alert severity="warning">
         This stage does not have a GUI yet. Edit this stage&apos;s raw YAML config at your own risk!
       </Alert>
