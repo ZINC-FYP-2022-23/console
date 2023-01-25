@@ -8,7 +8,7 @@ import { Alert, InfoTooltip } from "../../Diagnostics";
 import { checksFilterOptions, visibilityOptions } from "./inputOptions";
 
 function ValgrindSettings() {
-  const [config, setConfig] = useSelectedStageConfig<Valgrind>();
+  const [config, setConfig] = useSelectedStageConfig("Valgrind");
   const hasStdioTestStage = useStoreState((state) => state.config.hasStage("StdioTest"));
   const setAddStageSearchString = useStoreActions((actions) => actions.layout.setAddStageSearchString);
 

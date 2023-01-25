@@ -23,7 +23,7 @@ const excludeFromProvidedDesc = (
 );
 
 function DiffWithSkeletonSettings() {
-  const [config, setConfig] = useSelectedStageConfig<DiffWithSkeleton>();
+  const [config, setConfig] = useSelectedStageConfig("DiffWithSkeleton");
   const setStep = useStoreActions((actions) => actions.layout.setStep);
 
   if (!config) return null;

@@ -6,7 +6,7 @@ import { InfoTooltip } from "../Diagnostics";
 import { AdditionalPackagesTooltip, InfoAccordion } from "./common";
 
 function MakeSettings() {
-  const [config, setConfig] = useSelectedStageConfig<Make>();
+  const [config, setConfig] = useSelectedStageConfig("Make");
 
   if (!config) return null;
 

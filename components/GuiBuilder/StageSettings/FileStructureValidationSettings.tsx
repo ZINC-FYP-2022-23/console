@@ -7,7 +7,7 @@ import { v4 as uuidv4 } from "uuid";
 import { InfoAccordion } from "./common";
 
 function FileStructureValidationSettings() {
-  const [config, setConfig] = useSelectedStageConfig<FileStructureValidation>();
+  const [config, setConfig] = useSelectedStageConfig("FileStructureValidation");
   const setStep = useStoreActions((actions) => actions.layout.setStep);
 
   const [ignoredFiles, setIgnoredFiles] = useState<{ id: string; name: string }[]>(

@@ -3,7 +3,7 @@ import { useSelectedStageConfig } from "@/hooks/GuiBuilder";
 import { Score } from "@/types";
 
 function ScoreSettings() {
-  const [config, setConfig] = useSelectedStageConfig<Score>();
+  const [config, setConfig] = useSelectedStageConfig("Score");
 
   if (!config) return null;
 

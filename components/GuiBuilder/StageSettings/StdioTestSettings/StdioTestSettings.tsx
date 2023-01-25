@@ -12,7 +12,7 @@ import StdioTestStageSettings from "./StdioTestStageSettings";
 
 function StdioTestSettings() {
   const { classes } = useStyles();
-  const [config, setConfig] = useSelectedStageConfig<StdioTest>();
+  const [config, setConfig] = useSelectedStageConfig("StdioTest");
 
   const [modalOpened, setModalOpened] = useState(false);
   /**

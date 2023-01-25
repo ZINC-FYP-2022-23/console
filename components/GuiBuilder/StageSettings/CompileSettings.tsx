@@ -53,7 +53,7 @@ const getConfigMetadata = (lang: string): ConfigMetadata => {
 };
 
 function CompileSettings() {
-  const [config, setConfig] = useSelectedStageConfig<Compile>();
+  const [config, setConfig] = useSelectedStageConfig("Compile");
   const language = useStoreState((state) => state.config.editingConfig._settings.lang.language);
 
   if (!config) return null;

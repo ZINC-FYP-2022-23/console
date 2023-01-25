@@ -5,38 +5,68 @@ import useSelectedStageConfig from "../useSelectedStageConfig";
 import renderHookWithStore from "./utils/renderHookWithStore";
 
 describe("GuiBuilder: useSelectedStageConfig()", () => {
-  it("returns the selected stage's config and its update function", () => {
-    const model = getThreeStageModel();
-    model.pipelineEditor.nodes[0].selected = true;
-    const store = createStore(model);
+  describe("returns the selected stage's config and its update function", () => {
+    test("if the selected stage's name matches the given stage name", () => {
+      const model = getThreeStageModel();
+      model.pipelineEditor.nodes[0].selected = true; // Select 1st stage (DiffWithSkeleton)
+      const store = createStore(model);
 
-    const { result } = renderHookWithStore(store, () => useSelectedStageConfig());
-    const [config, setConfig] = result.current;
+      const { result } = renderHookWithStore(store, () => useSelectedStageConfig("DiffWithSkeleton"));
+      const [config, setConfig] = result.current;
 
-    expect(config).toStrictEqual(model.config.editingConfig.stageData["stage-0"].config);
+      expect(config).toStrictEqual(model.config.editingConfig.stageData["stage-0"].config);
 
-    const newConfig = { exclude_from_provided: false };
-    act(() => setConfig(newConfig));
-    expect(store.getState().config.editingConfig.stageData["stage-0"].config).toStrictEqual(newConfig);
+      const newConfig = { exclude_from_provided: false };
+      act(() => setConfig(newConfig));
+      expect(store.getState().config.editingConfig.stageData["stage-0"].config).toStrictEqual(newConfig);
+    });
+
+    test("if a stage is selected but we didn't provide the stage name", () => {
+      const model = getThreeStageModel();
+      model.pipelineEditor.nodes[0].selected = true; // Select 1st stage (DiffWithSkeleton)
+      const store = createStore(model);
+
+      const { result } = renderHookWithStore(store, () => useSelectedStageConfig());
+      const [config, setConfig] = result.current;
+
+      expect(config).toStrictEqual(model.config.editingConfig.stageData["stage-0"].config);
+
+      const newConfig = { exclude_from_provided: false };
+      act(() => setConfig(newConfig));
+      expect(store.getState().config.editingConfig.stageData["stage-0"].config).toStrictEqual(newConfig);
+    });
   });
 
-  it("returns undefined and a function doing nothing if no stages are selected", () => {
-    const model = getThreeStageModel();
-    model.pipelineEditor.nodes = model.pipelineEditor.nodes.map((node) => ({ ...node, selected: false }));
-    const store = createStore(model);
-    const consoleWarnMock = jest.spyOn(console, "warn").mockImplementation();
+  describe("returns null and a function doing nothing", () => {
+    test("if no stage is selected", () => {
+      const model = getThreeStageModel();
+      model.pipelineEditor.nodes = model.pipelineEditor.nodes.map((node) => ({ ...node, selected: false }));
+      const store = createStore(model);
 
-    const { result } = renderHookWithStore(store, () => useSelectedStageConfig());
-    const [config, setConfig] = result.current;
+      const { result } = renderHookWithStore(store, () => useSelectedStageConfig("DiffWithSkeleton"));
+      const [config, setConfig] = result.current;
 
-    expect(config).toBeUndefined();
+      expect(config).toBeNull();
 
-    const newConfig = { exclude_from_provided: false };
-    act(() => setConfig(newConfig));
-    expect(store.getState().config.editingConfig.stageData["stage-0"].config).toStrictEqual(
-      model.config.editingConfig.stageData["stage-0"].config,
-    );
+      act(() => setConfig({ exclude_from_provided: false }));
+      expect(store.getState().config.editingConfig.stageData).toStrictEqual(model.config.editingConfig.stageData);
+    });
 
-    consoleWarnMock.mockRestore();
+    test("if the selected stage's name does not match the given stage name", () => {
+      const model = getThreeStageModel();
+      model.pipelineEditor.nodes[1].selected = true; // Select the 2nd stage (FileStructureValidation)
+      const store = createStore(model);
+
+      const { result } = renderHookWithStore(store, () => useSelectedStageConfig("DiffWithSkeleton"));
+      const [config, setConfig] = result.current;
+
+      expect(config).toBeNull();
+
+      // We pass "DiffWithSkeleton" as the argument to useSelectedStageConfig() to specify that we expect
+      // the selected stage is DiffWithSkeleton. Since the actual selected stage is FileStructureValidation,
+      // the update function should do nothing to avoid unexpected changes.
+      act(() => setConfig({ exclude_from_provided: false }));
+      expect(store.getState().config.editingConfig.stageData).toStrictEqual(model.config.editingConfig.stageData);
+    });
   });
 });

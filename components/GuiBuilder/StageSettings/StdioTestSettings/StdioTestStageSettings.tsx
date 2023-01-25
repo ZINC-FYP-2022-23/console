@@ -10,7 +10,7 @@ import { diffIgnoreFlagOptions } from "./inputOptions";
  * Stage Settings page for the "Standard I/O Test" settings panel.
  */
 function StdioTestStageSettings() {
-  const [config, setConfig] = useSelectedStageConfig<StdioTest>();
+  const [config, setConfig] = useSelectedStageConfig("StdioTest");
   const language = useStoreState((state) => state.config.editingConfig._settings.lang.language);
 
   if (!config) return null;

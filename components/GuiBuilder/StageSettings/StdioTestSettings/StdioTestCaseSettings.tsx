@@ -30,7 +30,7 @@ interface StdioTestCaseSettingsProps {
  * Test case settings page for the "Standard I/O Test" settings panel.
  */
 function StdioTestCaseSettings({ caseId, closeModal, setPage }: StdioTestCaseSettingsProps) {
-  const [config, setConfig] = useSelectedStageConfig<StdioTest>();
+  const [config, setConfig] = useSelectedStageConfig("StdioTest");
   const hasValgrindStage = useStoreState((state) => state.config.hasStage("Valgrind"));
   const setAddStageSearchString = useStoreActions((actions) => actions.layout.setAddStageSearchString);
 

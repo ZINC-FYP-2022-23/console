@@ -6,7 +6,7 @@ import { Alert } from "../Diagnostics";
  * For stages that are not yet supported by the GUI Assignment Builder.
  */
 function UnsupportedStage() {
-  const [config, setConfig] = useSelectedStageConfig<string>();
+  const [config, setConfig] = useSelectedStageConfig() as [string, (val: string) => void];
 
   return (
     <div className="p-3 h-full flex flex-col gap-3">
