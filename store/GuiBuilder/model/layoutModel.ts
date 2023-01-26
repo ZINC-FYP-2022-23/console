@@ -14,6 +14,8 @@ interface LayoutModelState {
   step: number;
   /** Which accordion components are opened. */
   accordion: AccordionState;
+  /** Which alerts are shown. */
+  alert: AlertState;
   /** Which modals are opened. */
   modal: ModalState;
   /** Value of the search bar in "Add New Stage" panel. */
@@ -32,6 +34,14 @@ interface LayoutModelAction {
       value: string[];
     }
   >;
+  setAlert: Action<
+    LayoutModel,
+    {
+      /** Path to update the `alert` state. */
+      path: keyof AlertState;
+      value: boolean;
+    }
+  >;
   setModal: Action<
     LayoutModel,
     {
@@ -47,6 +57,11 @@ interface LayoutModelAction {
 export interface AccordionState {
   /** Which accordion items are opened in Add New Stage panel. */
   addNewStage: ("preCompile" | "compile" | "grading" | "miscStages")[];
+}
+
+export interface AlertState {
+  /** Warning that the stage is unsupported. */
+  unsupportedStage: boolean;
 }
 
 export interface ModalState {
@@ -69,6 +84,9 @@ const layoutModelState: LayoutModelState = {
   accordion: {
     addNewStage: ["preCompile", "compile", "grading", "miscStages"],
   },
+  alert: {
+    unsupportedStage: true,
+  },
   modal: {
     configCreated: false,
     deleteStage: false,
@@ -85,6 +103,9 @@ const layoutModelAction: LayoutModelAction = {
   }),
   setAccordion: action((state, payload) => {
     set(state.accordion, payload.path, payload.value);
+  }),
+  setAlert: action((state, payload) => {
+    state.alert[payload.path] = payload.value;
   }),
   setModal: action((state, payload) => {
     state.modal[payload.path] = payload.value;
