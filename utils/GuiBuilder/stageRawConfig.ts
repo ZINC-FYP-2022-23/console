@@ -6,6 +6,17 @@ import { valgrindDefaultConfig } from "@/constants/GuiBuilder/supportedStages";
 import { TestCase, TestCaseRaw, Valgrind, ValgrindRaw } from "@/types";
 
 /**
+ * Splits a string by the `separator` into an array of strings, then removes empty string elements.
+ * @param separator Defaults to empty space (`" "`).
+ */
+export const splitStringToArray = (str?: string, separator = " "): string[] | undefined => {
+  return str
+    ?.trim()
+    .split(separator)
+    .filter((arg) => arg !== "");
+};
+
+/**
  * Converts a raw test case config obtained from parsing the YAML into a tidied test case config.
  */
 export const testCaseFromRaw = (testCaseRaw: TestCaseRaw): TestCase => {
@@ -36,10 +47,7 @@ export const testCaseToRaw = (testCase: TestCase): TestCaseRaw => {
   const { _stdinInputMode, _expectedInputMode, _valgrindOverride, ...testRest } = testCase;
   const output: TestCaseRaw = {
     ...testRest,
-    args: testCase.args
-      ?.trim()
-      .split(" ")
-      .filter((arg) => arg !== ""),
+    args: splitStringToArray(testCase.args),
     stdin: _stdinInputMode === "text" ? testCase.stdin : undefined,
     file_stdin: _stdinInputMode === "file" ? testCase.file_stdin?.trim() : undefined,
     expected: _expectedInputMode === "text" ? testCase.expected : undefined,
@@ -71,10 +79,7 @@ export const valgrindToRaw = (valgrind: Valgrind): ValgrindRaw => {
   const { args } = valgrind;
   const output: ValgrindRaw = {
     ...valgrind,
-    args: args
-      ?.trim()
-      .split(" ")
-      .filter((arg) => arg !== ""),
+    args: splitStringToArray(args),
   };
   return output;
 };

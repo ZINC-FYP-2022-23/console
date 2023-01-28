@@ -10,6 +10,8 @@ import {
   FileStructureValidation,
   Make,
   MakeRaw,
+  PyTest,
+  PyTestRaw,
   StageDataMap,
   StdioTest,
   StdioTestRaw,
@@ -120,6 +122,34 @@ describe("GuiBuilder: Raw stage configs conversion", () => {
         });
         const _stage = configsToConfigsRaw(stage);
         expect(_stage[UUID].config.args).toEqual(["-f", "Makefile"]);
+      });
+    });
+  });
+
+  describe("PyTest", () => {
+    describe("configFromRaw", () => {
+      it("converts nullable arrays to empty arrays", () => {
+        const stage = createRawStage<PyTestRaw>("pyTest", {});
+        const config = parseStages(stage)[1][UUID].config;
+        expect(config.additional_pip_packages).toEqual([]);
+      });
+
+      it("converts `args` array to a string", () => {
+        const stage = createRawStage<PyTestRaw>("pyTest", {
+          args: ["--version", "-h"],
+        });
+        expect(parseStages(stage)[1][UUID].config.args).toBe("--version -h");
+      });
+    });
+
+    describe("configToRaw", () => {
+      it("converts `args` to string array", () => {
+        const stage = createStage<PyTest>("PyTest", {
+          args: "  --version -h  ",
+          additional_pip_packages: [],
+        });
+        const _stage = configsToConfigsRaw(stage);
+        expect(_stage[UUID].config.args).toEqual(["--version", "-h"]);
       });
     });
   });

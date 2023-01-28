@@ -3,6 +3,7 @@ import {
   CompileRaw,
   FileStructureValidation,
   MakeRaw,
+  PyTestRaw,
   StageConfig,
   StageKind,
   StdioTestRaw,
@@ -10,7 +11,13 @@ import {
   Valgrind,
   ValgrindRaw,
 } from "@/types";
-import { testCaseFromRaw, testCaseToRaw, valgrindFromRaw, valgrindToRaw } from "@/utils/GuiBuilder/stageRawConfig";
+import {
+  splitStringToArray,
+  testCaseFromRaw,
+  testCaseToRaw,
+  valgrindFromRaw,
+  valgrindToRaw,
+} from "@/utils/GuiBuilder/stageRawConfig";
 import dynamic from "next/dynamic";
 import { ComponentType } from "react";
 
@@ -80,10 +87,7 @@ const supportedStages: SupportedStages = {
     configToRaw: (config): CompileRaw => ({
       ...config,
       output: config.output?.trim(),
-      flags: config.flags
-        ?.trim()
-        .split(" ")
-        .filter((flag) => flag !== ""),
+      flags: splitStringToArray(config.flags),
     }),
     stageSettings: dynamic(() => import("../../components/GuiBuilder/StageSettings/CompileSettings"), {
       loading: () => <StageSettingsLoading />,
@@ -130,12 +134,30 @@ const supportedStages: SupportedStages = {
     }),
     configToRaw: (config): MakeRaw => ({
       ...config,
-      args: config.args
-        ?.trim()
-        .split(" ")
-        .filter((arg) => arg !== ""),
+      args: splitStringToArray(config.args),
     }),
     stageSettings: dynamic(() => import("../../components/GuiBuilder/StageSettings/MakeSettings"), {
+      loading: () => <StageSettingsLoading />,
+    }),
+  },
+  PyTest: {
+    nameInUI: "PyTest",
+    kind: StageKind.GRADING,
+    description: "Grades Python programs with PyTest framework",
+    defaultConfig: {
+      args: "",
+      additional_pip_packages: [],
+    },
+    configFromRaw: (raw: PyTestRaw) => ({
+      ...raw,
+      args: raw.args?.join(" ") ?? "",
+      additional_pip_packages: raw.additional_pip_packages ?? [],
+    }),
+    configToRaw: (config): PyTestRaw => ({
+      ...config,
+      args: splitStringToArray(config.args),
+    }),
+    stageSettings: dynamic(() => import("../../components/GuiBuilder/StageSettings/PyTestSettings"), {
       loading: () => <StageSettingsLoading />,
     }),
   },

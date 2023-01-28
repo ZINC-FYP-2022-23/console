@@ -3,14 +3,14 @@ import { defaultTestCase } from "@/constants/GuiBuilder/defaults";
 import { useSelectedStageConfig } from "@/hooks/GuiBuilder";
 import { getTestCasesLargestId } from "@/utils/GuiBuilder/stageConfig";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { clsx, createStyles, Modal, ScrollArea } from "@mantine/core";
+import { clsx, ScrollArea } from "@mantine/core";
 import cloneDeep from "lodash/cloneDeep";
 import { ButtonHTMLAttributes, useState } from "react";
+import { StageConfigModal } from "../common";
 import StdioTestCaseSettings from "./StdioTestCaseSettings";
 import StdioTestStageSettings from "./StdioTestStageSettings";
 
 function StdioTestSettings() {
-  const { classes } = useStyles();
   const [config, setConfig] = useSelectedStageConfig("StdioTest");
 
   const [modalOpened, setModalOpened] = useState(false);
@@ -33,7 +33,7 @@ function StdioTestSettings() {
   return (
     <>
       <div className="h-full py-20 flex flex-col items-center gap-5">
-        <p className="text-lg text-gray-600">To edit stage settings and test cases, press the button below.</p>
+        <p className="text-lg text-gray-500">To edit stage settings and test cases, press the button below.</p>
         <Button
           className="bg-cse-700 text-white text-lg hover:bg-cse-500"
           icon={<FontAwesomeIcon icon={["far", "arrow-up-right-from-square"]} />}
@@ -42,14 +42,10 @@ function StdioTestSettings() {
           Edit Stage Configuration
         </Button>
       </div>
-      <Modal
+      <StageConfigModal
         opened={modalOpened}
         onClose={() => setModalOpened(false)}
         title="Standard I/O Test Configuration"
-        overflow="inside"
-        size="70%"
-        transitionDuration={200}
-        classNames={classes}
       >
         <div className="flex h-full">
           <div className="w-44 h-full flex flex-col bg-gray-100 rounded-lg space-y-3">
@@ -87,29 +83,10 @@ function StdioTestSettings() {
             )}
           </ScrollArea>
         </div>
-      </Modal>
+      </StageConfigModal>
     </>
   );
 }
-
-const useStyles = createStyles((theme) => ({
-  inner: {
-    padding: "60px 16px",
-  },
-  modal: {
-    height: "100%",
-    display: "flex",
-    flexDirection: "column",
-  },
-  title: {
-    color: theme.colors.blue[4],
-    fontSize: theme.fontSizes.xl,
-    fontWeight: 600,
-  },
-  body: {
-    height: "100%",
-  },
-}));
 
 interface TestCaseButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   caseId: number;

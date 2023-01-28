@@ -6,6 +6,7 @@ interface StageConfig {
   DiffWithSkeleton: DiffWithSkeleton;
   FileStructureValidation: FileStructureValidation;
   Make: Make;
+  PyTest: PyTest;
   Score: Score;
   StdioTest: StdioTest;
   Valgrind: Valgrind;
@@ -53,6 +54,23 @@ export interface Make {
   targets: string[];
   args: string;
   additional_packages: string[];
+}
+
+/**
+ * The shape of `PyTest` stage's config returned by the backend
+ * ({@link https://docs.zinc.ust.dev/user/pipeline/docker/PyTest.html Reference}).
+ */
+export interface PyTestRaw {
+  args?: string[];
+  additional_pip_packages?: string[];
+  // score?: number;
+  // treatDenormalScore?: DenormalPolicy;
+  // scoreWeighting?: ScoreWeighting<XUnitOverride>;
+}
+
+export interface PyTest {
+  args: string;
+  additional_pip_packages: string[];
 }
 
 export interface Score {
