@@ -1,6 +1,5 @@
 import { NumberInput } from "@/components/Input";
 import { useSelectedStageConfig } from "@/hooks/GuiBuilder";
-import { Score } from "@/types";
 
 function ScoreSettings() {
   const [config, setConfig] = useSelectedStageConfig("Score");
@@ -12,7 +11,7 @@ function ScoreSettings() {
 
   return (
     <div className="p-3">
-      <div className="flex gap-2">
+      <div className="flex gap-3">
         <div className="flex-1">
           <label htmlFor="normalizedTo">Normalize maximum score to</label>
           <ul className="mx-5 list-disc text-xs text-gray-500">
@@ -29,7 +28,7 @@ function ScoreSettings() {
           className="flex-1"
         />
       </div>
-      <div className="mt-6 flex gap-2">
+      <div className="mt-6 flex gap-3">
         <div className="flex-1">
           <p>Limit the final score within a range</p>
           <ul className="mx-5 list-disc text-xs text-gray-500">

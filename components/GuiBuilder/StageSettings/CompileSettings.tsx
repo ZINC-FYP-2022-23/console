@@ -1,7 +1,6 @@
 import { TagsInput, Textarea, TextInput } from "@/components/Input";
 import { useSelectedStageConfig } from "@/hooks/GuiBuilder";
 import { useStoreState } from "@/store/GuiBuilder";
-import { Compile } from "@/types";
 import { FocusEventHandler, memo } from "react";
 import { InfoTooltip } from "../Diagnostics";
 import { AdditionalPackagesTooltip } from "./common";
@@ -74,8 +73,8 @@ function CompileSettings() {
 
   return (
     <div className="p-3 space-y-4">
-      <div className="flex items-center">
-        <label htmlFor="input" className="w-1/3">
+      <div className="flex gap-3">
+        <label htmlFor="input" className="mt-2 flex-1">
           Input files
         </label>
         <TagsInput
@@ -84,11 +83,11 @@ function CompileSettings() {
           onChange={(tags) => setConfig({ ...config, input: tags })}
           onBlur={onTagInputBlur("input")}
           placeHolder={config.input.length === 0 ? metadata.input.placeholder : ""}
-          className="flex-1 font-mono text-sm"
+          className="flex-[2] font-mono text-sm"
         />
       </div>
-      <div className="flex items-center">
-        <label htmlFor="output" className="w-1/3">
+      <div className="flex gap-3 items-center">
+        <label htmlFor="output" className="mt-2 flex-1">
           Output file name
         </label>
         <TextInput
@@ -97,13 +96,15 @@ function CompileSettings() {
           onChange={(e) => setConfig({ ...config, output: e.target.value })}
           placeholder={metadata.output.disabled ? "No need to specify" : metadata.output.defaultValue}
           disabled={metadata.output.disabled}
-          classNames={{ root: "flex-1", input: "font-mono placeholder:disabled:font-sans" }}
+          classNames={{ root: "flex-[2]", input: "font-mono placeholder:disabled:font-sans" }}
         />
       </div>
-      <div className="flex items-center">
-        <div className="w-1/3 flex items-center gap-1">
-          <label htmlFor="flags">Command-line flags</label>
-          <FlagsTooltip />
+      <div className="flex gap-3">
+        <div className="flex-1">
+          <div className="flex items-center gap-1">
+            <label htmlFor="flags">Command-line flags</label>
+            <FlagsTooltip />
+          </div>
         </div>
         <Textarea
           id="flags"
@@ -111,13 +112,15 @@ function CompileSettings() {
           onChange={(e) => setConfig({ ...config, flags: e.target.value })}
           placeholder={metadata.flags.defaultValue ?? "e.g. -verbose -nowarn"}
           monospace
-          styles={{ root: { flex: 1 } }}
+          styles={{ root: { flex: 2 } }}
         />
       </div>
-      <div className="flex items-center">
-        <div className="w-1/3 flex items-center gap-1">
-          <label htmlFor="additional_packages">Additional packages</label>
-          <AdditionalPackagesTooltip />
+      <div className="flex gap-3">
+        <div className="flex-1">
+          <div className="flex items-center gap-1">
+            <label htmlFor="additional_packages">Additional packages</label>
+            <AdditionalPackagesTooltip />
+          </div>
         </div>
         <TagsInput
           name="additional_packages"
@@ -125,7 +128,7 @@ function CompileSettings() {
           onChange={(tags) => setConfig({ ...config, additional_packages: tags })}
           onBlur={onTagInputBlur("additional_packages")}
           placeHolder={config.additional_packages.length === 0 ? "e.g. curl" : ""}
-          className="flex-1 font-mono text-sm"
+          className="flex-[2] font-mono text-sm"
         />
       </div>
     </div>

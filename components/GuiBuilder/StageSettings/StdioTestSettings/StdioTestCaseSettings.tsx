@@ -3,7 +3,7 @@ import { MultiSelect, NumberInput, Select, SwitchGroup, Textarea, TextInput } fr
 import supportedStages, { valgrindDefaultConfig } from "@/constants/GuiBuilder/supportedStages";
 import { useSelectedStageConfig } from "@/hooks/GuiBuilder";
 import { useStoreActions, useStoreState } from "@/store/GuiBuilder";
-import { StdioTest, TestCase } from "@/types";
+import { TestCase } from "@/types";
 import { getTestCasesLargestId } from "@/utils/GuiBuilder/stageConfig";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { clsx, Tooltip } from "@mantine/core";
@@ -242,16 +242,14 @@ function StdioTestCaseSettings({ caseId, closeModal, setPage }: StdioTestCaseSet
               <label htmlFor="args" className="mt-2 flex-[2]">
                 Command-line arguments
               </label>
-              <div className="flex-[3] flex">
-                <Textarea
-                  id="flags"
-                  value={caseConfig.args ?? ""}
-                  onChange={(e) => updateTestCase((testCase) => (testCase.args = e.target.value))}
-                  placeholder="e.g. 1"
-                  monospace
-                  styles={{ root: { width: "100%" } }}
-                />
-              </div>
+              <Textarea
+                id="flags"
+                value={caseConfig.args ?? ""}
+                onChange={(e) => updateTestCase((testCase) => (testCase.args = e.target.value))}
+                placeholder="e.g. 1"
+                monospace
+                styles={{ root: { flex: 3 } }}
+              />
             </div>
             <div>
               <div className="flex items-center gap-2">
@@ -440,22 +438,20 @@ function StdioTestCaseSettings({ caseId, closeModal, setPage }: StdioTestCaseSet
               >
                 Valgrind command-line options
               </label>
-              <div className="flex-[3] flex">
-                <Textarea
-                  id="valgrind.args"
-                  value={caseConfig.valgrind?.args ?? ""}
-                  onChange={(e) => {
-                    updateTestCase((testCase) => {
-                      if (!testCase.valgrind) testCase.valgrind = cloneDeep(valgrindDefaultConfig);
-                      testCase.valgrind.args = e.target.value;
-                    });
-                  }}
-                  placeholder="e.g. --leak-check=full"
-                  disabled={!caseConfig._valgrindOverride}
-                  monospace
-                  styles={{ root: { width: "100%" } }}
-                />
-              </div>
+              <Textarea
+                id="valgrind.args"
+                value={caseConfig.valgrind?.args ?? ""}
+                onChange={(e) => {
+                  updateTestCase((testCase) => {
+                    if (!testCase.valgrind) testCase.valgrind = cloneDeep(valgrindDefaultConfig);
+                    testCase.valgrind.args = e.target.value;
+                  });
+                }}
+                placeholder="e.g. --leak-check=full"
+                disabled={!caseConfig._valgrindOverride}
+                monospace
+                styles={{ root: { flex: 3 } }}
+              />
             </div>
           </div>
         </div>

@@ -1,7 +1,6 @@
 import Button from "@/components/Button";
 import { defaultTestCase } from "@/constants/GuiBuilder/defaults";
 import { useSelectedStageConfig } from "@/hooks/GuiBuilder";
-import { StdioTest } from "@/types";
 import { getTestCasesLargestId } from "@/utils/GuiBuilder/stageConfig";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { clsx, createStyles, Modal, ScrollArea } from "@mantine/core";

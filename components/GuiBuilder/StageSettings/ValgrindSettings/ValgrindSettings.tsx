@@ -2,7 +2,6 @@ import { MultiSelect, NumberInput, Select, SwitchGroup, Textarea } from "@/compo
 import supportedStages, { valgrindDefaultConfig } from "@/constants/GuiBuilder/supportedStages";
 import { useSelectedStageConfig } from "@/hooks/GuiBuilder";
 import { useStoreActions, useStoreState } from "@/store/GuiBuilder";
-import { Valgrind } from "@/types";
 import { memo } from "react";
 import { Alert, InfoTooltip } from "../../Diagnostics";
 import { checksFilterOptions, visibilityOptions } from "./inputOptions";
@@ -35,7 +34,7 @@ function ValgrindSettings() {
         checked={config.enabled}
         onChange={(value) => setConfig({ ...config, enabled: value })}
       />
-      <div className="flex items-center">
+      <div className="flex items-center gap-3">
         <div className="flex-1 flex items-center gap-1">
           <label htmlFor="score">Default Valgrind score</label>
           <ScoreTooltip />
@@ -51,7 +50,7 @@ function ValgrindSettings() {
           className="flex-[2]"
         />
       </div>
-      <div className="flex items-center">
+      <div className="flex items-center gap-3">
         <label htmlFor="visibility" className="flex-1">
           Visibility to students
         </label>
@@ -67,7 +66,7 @@ function ValgrindSettings() {
           maxDropdownHeight={320}
         />
       </div>
-      <div className="flex items-center">
+      <div className="flex items-center gap-3">
         <label htmlFor="checksFilter" className="flex-1">
           Errors to check
         </label>
@@ -80,20 +79,18 @@ function ValgrindSettings() {
           />
         </div>
       </div>
-      <div className="flex">
+      <div className="flex gap-3">
         <label htmlFor="args" className="mt-2 flex-1">
           Valgrind command-line options
         </label>
-        <div className="flex-[2] flex">
-          <Textarea
-            id="args"
-            value={config.args ?? ""}
-            onChange={(e) => setConfig({ ...config, args: e.target.value })}
-            placeholder="e.g. --leak-check=full"
-            monospace
-            styles={{ root: { width: "100%" } }}
-          />
-        </div>
+        <Textarea
+          id="args"
+          value={config.args ?? ""}
+          onChange={(e) => setConfig({ ...config, args: e.target.value })}
+          placeholder="e.g. --leak-check=full"
+          monospace
+          styles={{ root: { flex: 2 } }}
+        />
       </div>
     </div>
   );

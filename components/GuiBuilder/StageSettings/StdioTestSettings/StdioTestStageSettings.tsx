@@ -1,7 +1,6 @@
 import { MultiSelect, TagsInput } from "@/components/Input";
 import { useSelectedStageConfig } from "@/hooks/GuiBuilder";
 import { useStoreState } from "@/store/GuiBuilder";
-import { StdioTest } from "@/types";
 import { FocusEventHandler, memo } from "react";
 import { InfoTooltip } from "../../Diagnostics";
 import { diffIgnoreFlagOptions } from "./inputOptions";
@@ -51,9 +50,11 @@ function StdioTestStageSettings() {
           </div>
         </div>
         <div className="flex gap-3">
-          <div className="flex-[2] flex items-center gap-1">
-            <label htmlFor="additional_packages">Additional packages</label>
-            <AdditionalPackagesTooltip />
+          <div className="flex-[2]">
+            <div className="flex items-center gap-1">
+              <label htmlFor="additional_packages">Additional packages</label>
+              <AdditionalPackagesTooltip />
+            </div>
           </div>
           <TagsInput
             name="additional_packages"
@@ -65,30 +66,30 @@ function StdioTestStageSettings() {
           />
         </div>
         <div className="flex gap-3">
-          <div className="flex-[2] flex items-center gap-1">
-            <label htmlFor="additional_pip_packages">Additional pip packages</label>
-            <AdditionalPipPackagesTooltip />
+          <div className="flex-[2]">
+            <div className="flex items-center gap-1">
+              <label htmlFor="additional_pip_packages">Additional pip packages</label>
+              <AdditionalPipPackagesTooltip />
+            </div>
           </div>
-          <div className="flex-[3]">
-            <TagsInput
-              name="additional_pip_packages"
-              value={config.additional_pip_packages}
-              onChange={(tags) => setConfig({ ...config, additional_pip_packages: tags })}
-              onBlur={onTagInputBlur("additional_pip_packages")}
-              disabled={isPipDisabled}
-              placeHolder={
-                isPipDisabled && config.additional_pip_packages.length === 0
-                  ? "Add `python3-pip` to 'Additional packages' first"
-                  : ""
-              }
-              className="flex-[3] font-mono text-sm"
-            />
-            {isPipDisabled && config.additional_pip_packages.length > 0 && (
-              <p className="text-xs mt-1 text-orange-600">
-                Please add <code>python3-pip</code> to &quot;Additional packages&quot; first
-              </p>
-            )}
-          </div>
+          <TagsInput
+            name="additional_pip_packages"
+            value={config.additional_pip_packages}
+            onChange={(tags) => setConfig({ ...config, additional_pip_packages: tags })}
+            onBlur={onTagInputBlur("additional_pip_packages")}
+            disabled={isPipDisabled}
+            placeHolder={
+              isPipDisabled && config.additional_pip_packages.length === 0
+                ? "Add `python3-pip` to 'Additional packages' first"
+                : ""
+            }
+            className="flex-[3] font-mono text-sm"
+          />
+          {isPipDisabled && config.additional_pip_packages.length > 0 && (
+            <p className="text-xs mt-1 text-orange-600">
+              Please add <code>python3-pip</code> to &quot;Additional packages&quot; first
+            </p>
+          )}
         </div>
       </div>
     </div>

@@ -1,7 +1,6 @@
 import ListInput from "@/components/Input/ListInput";
 import { useSelectedStageConfig } from "@/hooks/GuiBuilder";
 import { useStoreActions } from "@/store/GuiBuilder";
-import { FileStructureValidation } from "@/types";
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { InfoAccordion } from "./common";
