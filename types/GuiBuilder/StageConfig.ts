@@ -63,14 +63,26 @@ export interface Make {
 export interface PyTestRaw {
   args?: string[];
   additional_pip_packages?: string[];
-  // score?: number;
-  // treatDenormalScore?: DenormalPolicy;
-  // scoreWeighting?: ScoreWeighting<XUnitOverride>;
+  score?: number;
+  treatDenormalScore?: DenormalPolicy;
+  scoreWeighting?: ScoreWeighting<XUnitOverride>;
 }
 
 export interface PyTest {
   args: string;
   additional_pip_packages: string[];
+
+  /**
+   * Helper field to indicate which {@link https://docs.zinc.ust.dev/user/pipeline/Scorable.html Scorable}
+   * type is used. It's `"disable"` if this stage won't contribute to the final score.
+   *
+   * It determines which score-related fields to keep when converting the config back to raw.
+   */
+  _scorePolicy: "total" | "weighted" | "disable";
+
+  score: number;
+  treatDenormalScore?: DenormalPolicy;
+  scoreWeighting: ScoreWeighting<XUnitOverride>;
 }
 
 export interface Score {
@@ -115,7 +127,70 @@ export interface Valgrind {
 
 // #endregion
 
-// #region Helper Types
+// #region Scorable-related Types (https://docs.zinc.ust.dev/user/pipeline/Scorable.html)
+
+/**
+ * Scoring policies of {@link https://docs.zinc.ust.dev/user/pipeline/Scorable.html Scorable} stages.
+ * - `total` - {@link https://docs.zinc.ust.dev/user/pipeline/Scorable.html#total-based-scorable Total-Based Scorable}
+ * - `perElement` - {@link https://docs.zinc.ust.dev/user/pipeline/Scorable.html#per-element-scorable Per-Element Scorable}
+ * - `weighted` - {@link https://docs.zinc.ust.dev/user/pipeline/Scorable.html#weighted-scorable Weighted Scorable}
+ * - `disabled` - The stage won't contribute to the final score.
+ */
+export type ScorablePolicy = "total" | "perElement" | "weighted" | "disable";
+
+// #region Total-Based Scorable
+
+export type DenormalPolicy = "IGNORE" | "FAILURE" | "SUCCESS";
+
+// #endregion
+
+// #region Weighted Scorable
+
+export type JoinPolicy = "AND" | "OR";
+
+/** See {@link https://docs.zinc.ust.dev/user/pipeline/Scorable.html#weighted-scorable Weighted Scorable}. */
+export type ScoreWeighting<TOverride> = {
+  default: number;
+  limit?: number;
+  overrides?: TOverride[];
+};
+
+/** See {@link https://docs.zinc.ust.dev/user/pipeline/docker/XUnit.html#weighted-scorable XUnit Weighted Scorable} */
+export type XUnitOverride = {
+  score: number;
+  joinPolicy?: JoinPolicy;
+  className?: PredicateString;
+  testName?: PredicateString;
+  message?: PredicateString;
+};
+
+// #endregion
+
+// #region Predicates (used in Weighted Scorable)
+
+/** See {@link https://docs.zinc.ust.dev/user/pipeline/Scorable.html#predicates Predicates}. */
+export type Predicate<TValue, TOp> = {
+  value: TValue;
+  op: TOp;
+};
+
+export type PredicateBoolean = Predicate<boolean, PredicateOpEqual>;
+/**
+ * Represents both `Predicate.Integral` and `Predicate.FP` as described in
+ * {@link https://docs.zinc.ust.dev/user/pipeline/Scorable.html#compareop the docs}.
+ */
+export type PredicateNumber = Predicate<number, PredicateOpCompare>;
+export type PredicateString = Predicate<string, PredicateOpString>;
+
+export type PredicateOpEqual = "EQ" | "NOT_EQ";
+export type PredicateOpCompare = "EQ" | "NOT_EQ" | "LT" | "LT_EQ" | "GT" | "GT_EQ";
+export type PredicateOpString = "EQ" | "NOT_EQ" | "CASE_IGNORE_EQ" | "CASE_IGNORE_NOT_EQ" | "REGEX_EQ" | "REGEX_NOT_EQ";
+
+// #endregion
+
+// #endregion
+
+// #region Misc Shared Types
 
 export type ChecksFilter = "*" | "Leak_*" | "Uninit*" | "*Free";
 

@@ -2,7 +2,7 @@
  * @file Utilities for converting between raw and tidied configs.
  */
 
-import { valgrindDefaultConfig } from "@/constants/GuiBuilder/supportedStages";
+import { defaultValgrindConfig } from "@/constants/GuiBuilder/defaults";
 import { TestCase, TestCaseRaw, Valgrind, ValgrindRaw } from "@/types";
 
 /**
@@ -63,10 +63,10 @@ export const testCaseToRaw = (testCase: TestCase): TestCaseRaw => {
 export const valgrindFromRaw = (valgrindRaw: ValgrindRaw): Valgrind => {
   const { enabled, args, checksFilter, visibility, score } = valgrindRaw;
   const output: Valgrind = {
-    enabled: enabled ?? valgrindDefaultConfig.enabled,
+    enabled: enabled ?? defaultValgrindConfig.enabled,
     args: args?.join(" "),
-    checksFilter: checksFilter ?? valgrindDefaultConfig.checksFilter,
-    visibility: visibility ?? valgrindDefaultConfig.visibility,
+    checksFilter: checksFilter ?? defaultValgrindConfig.checksFilter,
+    visibility: visibility ?? defaultValgrindConfig.visibility,
     score,
   };
   return output;

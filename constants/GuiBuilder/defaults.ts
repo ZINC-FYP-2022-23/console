@@ -1,4 +1,13 @@
-import type { Config, GradingPolicy, Schedule, Settings, TestCase } from "@/types";
+import type {
+  Config,
+  GradingPolicy,
+  Schedule,
+  ScoreWeighting,
+  Settings,
+  TestCase,
+  Valgrind,
+  XUnitOverride,
+} from "@/types";
 import { addDays, set } from "date-fns";
 import { v4 as uuidv4 } from "uuid";
 
@@ -50,6 +59,10 @@ export const defaultSchedule: Schedule = {
   releaseGradeAt: set(addDays(new Date(), 7), { hours: 23, minutes: 59 }).toISOString(),
 };
 
+export const defaultScoreWeightingXUnit: ScoreWeighting<XUnitOverride> = {
+  default: 1,
+};
+
 export const defaultTestCase: TestCase = {
   id: 0,
   file: "",
@@ -58,4 +71,20 @@ export const defaultTestCase: TestCase = {
   _expectedInputMode: "text",
   expected: "",
   _valgrindOverride: false,
+};
+
+/**
+ * Default total score of a {@link https://docs.zinc.ust.dev/user/pipeline/Scorable.html#total-based-scorable Total-Based Scorable}
+ * stage.
+ */
+export const defaultTotalScorableScore = 10;
+
+/**
+ * Default config values for Valgrind stage.
+ * ({@link https://docs.zinc.ust.dev/user/pipeline/docker/Valgrind.html Reference}).
+ */
+export const defaultValgrindConfig: Valgrind = {
+  enabled: true,
+  checksFilter: ["*"],
+  visibility: "INHERIT",
 };

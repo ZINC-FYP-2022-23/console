@@ -3,7 +3,13 @@
  * {@link SupportedStage.configToRaw}.
  */
 
-import supportedStages, { SupportedStage, valgrindDefaultConfig } from "@/constants/GuiBuilder/supportedStages";
+/// <reference types="jest-extended" />
+import {
+  defaultScoreWeightingXUnit,
+  defaultTotalScorableScore,
+  defaultValgrindConfig,
+} from "@/constants/GuiBuilder/defaults";
+import supportedStages, { SupportedStage } from "@/constants/GuiBuilder/supportedStages";
 import {
   Compile,
   CompileRaw,
@@ -20,6 +26,7 @@ import {
   Valgrind,
   ValgrindRaw,
 } from "@/types";
+import "jest-extended";
 import * as uuid from "uuid";
 import { configsToConfigsRaw, parseStages } from "../stage";
 import * as stageRawConfig from "../stageRawConfig";
@@ -128,28 +135,77 @@ describe("GuiBuilder: Raw stage configs conversion", () => {
 
   describe("PyTest", () => {
     describe("configFromRaw", () => {
-      it("converts nullable arrays to empty arrays", () => {
-        const stage = createRawStage<PyTestRaw>("pyTest", {});
-        const config = parseStages(stage)[1][UUID].config;
-        expect(config.additional_pip_packages).toEqual([]);
-      });
-
       it("converts `args` array to a string", () => {
         const stage = createRawStage<PyTestRaw>("pyTest", {
           args: ["--version", "-h"],
         });
         expect(parseStages(stage)[1][UUID].config.args).toBe("--version -h");
       });
+
+      it("populates missing fields", () => {
+        const stage = createRawStage<PyTestRaw>("pyTest", {});
+        expect(parseStages(stage)[1][UUID].config).toStrictEqual({
+          args: "",
+          additional_pip_packages: [],
+          _scorePolicy: "disable",
+          score: defaultTotalScorableScore,
+          scoreWeighting: defaultScoreWeightingXUnit,
+        });
+      });
+
+      it("initializes the helper `_scorePolicy` field", () => {
+        // Total-Based policy
+        const stageTotal = createRawStage<PyTestRaw>("pyTest", { score: 20 });
+        const configTotal = parseStages(stageTotal)[1][UUID].config as PyTest;
+        expect(configTotal._scorePolicy).toBe("total");
+        expect(configTotal.score).toBe(20);
+
+        // Weighted policy
+        const stageWeighted = createRawStage<PyTestRaw>("pyTest", {
+          scoreWeighting: { default: 2 },
+        });
+        const configWeighted = parseStages(stageWeighted)[1][UUID].config as PyTest;
+        expect(configWeighted._scorePolicy).toBe("weighted");
+        expect(configWeighted.scoreWeighting).toStrictEqual({ default: 2 });
+      });
     });
 
     describe("configToRaw", () => {
-      it("converts `args` to string array", () => {
+      // TODO(Anson): Instead of using this PyTest-specific helper function, refactor `createStage()`
+      // so it directly returns a raw config.
+      const createConvertedPyTestStage = (_scorePolicy: PyTest["_scorePolicy"]) => {
         const stage = createStage<PyTest>("PyTest", {
           args: "  --version -h  ",
           additional_pip_packages: [],
+          _scorePolicy,
+          score: 20,
+          treatDenormalScore: "FAILURE",
+          scoreWeighting: { default: 2 },
         });
         const _stage = configsToConfigsRaw(stage);
-        expect(_stage[UUID].config.args).toEqual(["--version", "-h"]);
+        return _stage[UUID].config as PyTestRaw;
+      };
+
+      it("converts `args` to string array", () => {
+        const configRaw = createConvertedPyTestStage("total");
+        expect(configRaw.args).toEqual(["--version", "-h"]);
+      });
+
+      it("discards score-related fields according to `_scorePolicy`", () => {
+        // Total-Based policy
+        const configRawTotal = createConvertedPyTestStage("total");
+        expect(configRawTotal).toContainAllKeys(["args", "additional_pip_packages", "score", "treatDenormalScore"]);
+        expect(configRawTotal.score).toBe(20);
+        expect(configRawTotal.treatDenormalScore).toBe("FAILURE");
+
+        // Weighted policy
+        const configRawWeighted = createConvertedPyTestStage("weighted");
+        expect(configRawWeighted).toContainAllKeys(["args", "additional_pip_packages", "scoreWeighting"]);
+        expect(configRawWeighted.scoreWeighting).toStrictEqual({ default: 2 });
+
+        // Disable
+        const configRawDisable = createConvertedPyTestStage("disable");
+        expect(configRawDisable).toContainAllKeys(["args", "additional_pip_packages"]);
       });
     });
   });
@@ -325,7 +381,7 @@ describe("GuiBuilder: Raw stage configs conversion", () => {
     describe("valgrindFromRaw()", () => {
       it("populates missing fields", () => {
         const stage = createRawStage<ValgrindRaw>("valgrind", {});
-        expect(parseStages(stage)[1][UUID].config).toEqual(valgrindDefaultConfig);
+        expect(parseStages(stage)[1][UUID].config).toEqual(defaultValgrindConfig);
       });
 
       it("converts `args` from string array to string", () => {

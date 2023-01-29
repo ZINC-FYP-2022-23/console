@@ -4,7 +4,12 @@ import { useSelectedStageConfig } from "@/hooks/GuiBuilder";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ScrollArea, Tooltip } from "@mantine/core";
 import { FocusEventHandler, useState } from "react";
-import { StageConfigModal } from "./common";
+import {
+  ScorablePolicyRadioGroup,
+  StageConfigModal,
+  testCaseScorablePolicyOptions,
+  TotalScorableSettings,
+} from "./common";
 
 function PyTestSettings() {
   const [config, setConfig] = useSelectedStageConfig("PyTest");
@@ -80,8 +85,26 @@ function PyTestSettings() {
               />
             </div>
           </div>
-          <div className="mt-6">
-            <p className="mb-2 font-semibold text-lg">Scoring Policy</p>
+          <div className="mt-6 mx-1">
+            <p className="mb-3 font-semibold text-lg">Scoring Policy</p>
+            <div className="mb-7">
+              <ScorablePolicyRadioGroup
+                options={testCaseScorablePolicyOptions}
+                value={config._scorePolicy}
+                onChange={(value) => setConfig({ ...config, _scorePolicy: value })}
+              />
+            </div>
+            {config._scorePolicy === "total" && (
+              <TotalScorableSettings
+                score={config.score}
+                onChangeScore={(score) => {
+                  if (score === undefined) return;
+                  setConfig({ ...config, score });
+                }}
+                treatDenormalScore={config.treatDenormalScore ?? "IGNORE"}
+                onChangeTreatDenormalScore={(value) => setConfig({ ...config, treatDenormalScore: value ?? undefined })}
+              />
+            )}
           </div>
         </ScrollArea>
       </StageConfigModal>

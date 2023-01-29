@@ -9,7 +9,7 @@ import { getInputBoxWrapperStyles } from "./mantineStyles";
  *
  * It's similar to Mantine's `SelectItem` type but with generics support.
  */
-export interface SelectItem<TValue extends string> {
+export interface SelectItem<TValue extends string = string> {
   value: TValue;
   /** Label to show in the UI. */
   label?: string;

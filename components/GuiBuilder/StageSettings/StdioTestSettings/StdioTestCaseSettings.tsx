@@ -1,6 +1,7 @@
 import Button from "@/components/Button";
 import { MultiSelect, NumberInput, Select, SwitchGroup, Textarea, TextInput } from "@/components/Input";
-import supportedStages, { valgrindDefaultConfig } from "@/constants/GuiBuilder/supportedStages";
+import { defaultValgrindConfig } from "@/constants/GuiBuilder/defaults";
+import supportedStages from "@/constants/GuiBuilder/supportedStages";
 import { useSelectedStageConfig } from "@/hooks/GuiBuilder";
 import { useStoreActions, useStoreState } from "@/store/GuiBuilder";
 import { TestCase } from "@/types";
@@ -324,7 +325,7 @@ function StdioTestCaseSettings({ caseId, closeModal, setPage }: StdioTestCaseSet
                   updateTestCase((testCase) => {
                     testCase._valgrindOverride = value;
                     if (value && !testCase.valgrind) {
-                      testCase.valgrind = cloneDeep(valgrindDefaultConfig);
+                      testCase.valgrind = cloneDeep(defaultValgrindConfig);
                     }
                   })
                 }
@@ -350,10 +351,10 @@ function StdioTestCaseSettings({ caseId, closeModal, setPage }: StdioTestCaseSet
             </div>
             <SwitchGroup
               label="Run Valgrind on this test case"
-              checked={caseConfig.valgrind?.enabled ?? valgrindDefaultConfig.enabled}
+              checked={caseConfig.valgrind?.enabled ?? defaultValgrindConfig.enabled}
               onChange={(value) =>
                 updateTestCase((testCase) => {
-                  if (!testCase.valgrind) testCase.valgrind = cloneDeep(valgrindDefaultConfig);
+                  if (!testCase.valgrind) testCase.valgrind = cloneDeep(defaultValgrindConfig);
                   testCase.valgrind.enabled = value;
                 })
               }
@@ -373,7 +374,7 @@ function StdioTestCaseSettings({ caseId, closeModal, setPage }: StdioTestCaseSet
                 value={caseConfig.valgrind?.score}
                 onChange={(value) =>
                   updateTestCase((testCase) => {
-                    if (!testCase.valgrind) testCase.valgrind = cloneDeep(valgrindDefaultConfig);
+                    if (!testCase.valgrind) testCase.valgrind = cloneDeep(defaultValgrindConfig);
                     testCase.valgrind.score = value;
                   })
                 }
@@ -395,11 +396,11 @@ function StdioTestCaseSettings({ caseId, closeModal, setPage }: StdioTestCaseSet
               <Select
                 id="valgrind.visibility"
                 data={valgrindVisibilityOptions}
-                value={caseConfig.valgrind?.visibility ?? valgrindDefaultConfig.visibility}
+                value={caseConfig.valgrind?.visibility ?? defaultValgrindConfig.visibility}
                 onChange={(value) => {
                   updateTestCase((testCase) => {
                     if (!value) return;
-                    if (!testCase.valgrind) testCase.valgrind = cloneDeep(valgrindDefaultConfig);
+                    if (!testCase.valgrind) testCase.valgrind = cloneDeep(defaultValgrindConfig);
                     testCase.valgrind.visibility = value;
                   });
                 }}
@@ -418,10 +419,10 @@ function StdioTestCaseSettings({ caseId, closeModal, setPage }: StdioTestCaseSet
               <div className="flex-[3]">
                 <MultiSelect
                   data={valgrindChecksFilterOptions}
-                  value={caseConfig.valgrind?.checksFilter ?? valgrindDefaultConfig.checksFilter}
+                  value={caseConfig.valgrind?.checksFilter ?? defaultValgrindConfig.checksFilter}
                   onChange={(value) => {
                     updateTestCase((testCase) => {
-                      if (!testCase.valgrind) testCase.valgrind = cloneDeep(valgrindDefaultConfig);
+                      if (!testCase.valgrind) testCase.valgrind = cloneDeep(defaultValgrindConfig);
                       testCase.valgrind.checksFilter = value;
                     });
                   }}
@@ -443,7 +444,7 @@ function StdioTestCaseSettings({ caseId, closeModal, setPage }: StdioTestCaseSet
                 value={caseConfig.valgrind?.args ?? ""}
                 onChange={(e) => {
                   updateTestCase((testCase) => {
-                    if (!testCase.valgrind) testCase.valgrind = cloneDeep(valgrindDefaultConfig);
+                    if (!testCase.valgrind) testCase.valgrind = cloneDeep(defaultValgrindConfig);
                     testCase.valgrind.args = e.target.value;
                   });
                 }}

@@ -8,7 +8,6 @@ import {
   StageKind,
   StdioTestRaw,
   TestCaseRaw,
-  Valgrind,
   ValgrindRaw,
 } from "@/types";
 import {
@@ -20,6 +19,7 @@ import {
 } from "@/utils/GuiBuilder/stageRawConfig";
 import dynamic from "next/dynamic";
 import { ComponentType } from "react";
+import { defaultScoreWeightingXUnit, defaultTotalScorableScore, defaultValgrindConfig } from "./defaults";
 
 export interface SupportedStage<TConfig = any> {
   /** Label to be shown in the UI. */
@@ -56,16 +56,6 @@ const StageSettingsLoading = () => (
     <Spinner className="h-14 w-14 text-cse-500" />
   </div>
 );
-
-/**
- * Default config values for Valgrind stage.
- * ({@link https://docs.zinc.ust.dev/user/pipeline/docker/Valgrind.html Reference}).
- */
-export const valgrindDefaultConfig: Valgrind = {
-  enabled: true,
-  checksFilter: ["*"],
-  visibility: "INHERIT",
-};
 
 /**
  * Pipeline stages supported by the GUI Assignment Builder.
@@ -147,16 +137,34 @@ const supportedStages: SupportedStages = {
     defaultConfig: {
       args: "",
       additional_pip_packages: [],
+      _scorePolicy: "total",
+      score: defaultTotalScorableScore,
+      scoreWeighting: defaultScoreWeightingXUnit,
     },
     configFromRaw: (raw: PyTestRaw) => ({
       ...raw,
       args: raw.args?.join(" ") ?? "",
       additional_pip_packages: raw.additional_pip_packages ?? [],
+      _scorePolicy: (() => {
+        if (raw.scoreWeighting) return "weighted";
+        if (raw.score) return "total";
+        return "disable";
+      })(),
+
+      // Populate score fields with default values no matter what score policy is used. These values
+      // will be appropriately discarded when converting the config back to raw.
+      score: raw.score ?? defaultTotalScorableScore,
+      scoreWeighting: raw.scoreWeighting ?? defaultScoreWeightingXUnit,
     }),
-    configToRaw: (config): PyTestRaw => ({
-      ...config,
-      args: splitStringToArray(config.args),
-    }),
+    configToRaw: (config): PyTestRaw => {
+      const { _scorePolicy, score, treatDenormalScore, scoreWeighting, ..._config } = config;
+      return {
+        ..._config,
+        args: splitStringToArray(_config.args),
+        ...(_scorePolicy === "total" && { score, treatDenormalScore }),
+        ...(_scorePolicy === "weighted" && { scoreWeighting }),
+      };
+    },
     stageSettings: dynamic(() => import("../../components/GuiBuilder/StageSettings/PyTestSettings"), {
       loading: () => <StageSettingsLoading />,
     }),
@@ -200,7 +208,7 @@ const supportedStages: SupportedStages = {
     nameInUI: "Valgrind",
     kind: StageKind.GRADING,
     description: "Memory checking with Valgrind",
-    defaultConfig: valgrindDefaultConfig,
+    defaultConfig: defaultValgrindConfig,
     configFromRaw: (raw: ValgrindRaw) => valgrindFromRaw(raw),
     configToRaw: (config): ValgrindRaw => valgrindToRaw(config),
     stageSettings: dynamic(() => import("../../components/GuiBuilder/StageSettings/ValgrindSettings"), {
