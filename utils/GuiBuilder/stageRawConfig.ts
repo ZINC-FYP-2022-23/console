@@ -3,7 +3,17 @@
  */
 
 import { defaultValgrindConfig } from "@/constants/GuiBuilder/defaults";
-import { TestCase, TestCaseRaw, Valgrind, ValgrindRaw } from "@/types";
+import {
+  Override,
+  OverrideRaw,
+  ScoreWeighting,
+  ScoreWeightingRaw,
+  TestCase,
+  TestCaseRaw,
+  Valgrind,
+  ValgrindRaw,
+} from "@/types";
+import { v4 as uuidv4 } from "uuid";
 
 /**
  * Splits a string by the `separator` into an array of strings, then removes empty string elements.
@@ -14,6 +24,41 @@ export const splitStringToArray = (str?: string, separator = " "): string[] | un
     ?.trim()
     .split(separator)
     .filter((arg) => arg !== "");
+};
+
+/**
+ * Converts a raw score weighting object obtained from parsing the YAML into a tidied score weighting object.
+ */
+export const scoreWeightingFromRaw = <
+  TOverrideRaw extends OverrideRaw,
+  TOverride extends TOverrideRaw & { _uuid: string },
+>(
+  scRaw: ScoreWeightingRaw<TOverrideRaw>,
+): ScoreWeighting<TOverride> => {
+  const overrides = scRaw.overrides?.map((override) => ({ ...override, _uuid: uuidv4() })) ?? [];
+  return {
+    ...scRaw,
+    overrides: overrides as TOverride[],
+  };
+};
+
+/**
+ * Converts a score weighting object into a raw score weighting object to be converted to YAML.
+ */
+export const scoreWeightingToRaw = <
+  TOverrideRaw extends OverrideRaw,
+  TOverride extends TOverrideRaw & { _uuid: string },
+>(
+  sc: ScoreWeighting<TOverride>,
+): ScoreWeightingRaw<TOverrideRaw> => {
+  const overrides = sc.overrides.map((override) => {
+    const { _uuid, ...overrideRest } = override;
+    // TypeScript complains if we directly write `overrideRest as TOverrideRaw` because it's not smart enough
+    // to understand that `Omit<TOverride, "_uuid">` is equal to `TOverrideRaw`. Hence, we cast `overrideRest`
+    // as `unknown` first before casting it to `TOverrideRaw`.
+    return overrideRest as unknown as TOverrideRaw;
+  });
+  return { ...sc, overrides };
 };
 
 /**

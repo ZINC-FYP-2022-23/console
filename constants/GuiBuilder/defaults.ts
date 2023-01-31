@@ -8,6 +8,7 @@ import type {
   Valgrind,
   XUnitOverride,
 } from "@/types";
+import { Required } from "utility-types";
 import { addDays, set } from "date-fns";
 import { v4 as uuidv4 } from "uuid";
 
@@ -61,6 +62,7 @@ export const defaultSchedule: Schedule = {
 
 export const defaultScoreWeightingXUnit: ScoreWeighting<XUnitOverride> = {
   default: 1,
+  overrides: [],
 };
 
 export const defaultTestCase: TestCase = {
@@ -87,4 +89,11 @@ export const defaultValgrindConfig: Valgrind = {
   enabled: true,
   checksFilter: ["*"],
   visibility: "INHERIT",
+};
+
+export const defaultXUnitOverride: Required<XUnitOverride, "joinPolicy"> = {
+  _uuid: uuidv4(),
+  score: 1,
+  joinPolicy: "AND",
+  testName: { op: "EQ", value: "" },
 };

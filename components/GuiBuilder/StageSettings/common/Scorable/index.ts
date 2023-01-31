@@ -6,3 +6,4 @@
 export * from "./inputOptions";
 export * from "./ScorablePolicyRadioGroup";
 export { default as TotalScorableSettings } from "./TotalScorableSettings";
+export * from "./WeightedScorableOverrides";

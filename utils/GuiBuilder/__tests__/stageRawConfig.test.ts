@@ -166,7 +166,33 @@ describe("GuiBuilder: Raw stage configs conversion", () => {
         });
         const configWeighted = parseStages(stageWeighted)[1][UUID].config as PyTest;
         expect(configWeighted._scorePolicy).toBe("weighted");
-        expect(configWeighted.scoreWeighting).toStrictEqual({ default: 2 });
+        expect(configWeighted.scoreWeighting).toStrictEqual({
+          default: 2,
+          overrides: [],
+        });
+      });
+
+      it("generates UUID for each override in `scoreWeighting`", () => {
+        jest
+          .spyOn(uuid, "v4")
+          .mockReturnValueOnce(UUID) // PyTest stage's UUID in `parseStages()`
+          .mockReturnValueOnce("mock-uuid-2") // UUID of 1st override
+          .mockReturnValueOnce("mock-uuid-3"); // UUID of 2nd override
+
+        const stage = createRawStage<PyTestRaw>("pyTest", {
+          scoreWeighting: {
+            default: 1,
+            overrides: [
+              { score: 2, className: { op: "EQ", value: "Foo" } },
+              { score: 3, className: { op: "EQ", value: "Bar" } },
+            ],
+          },
+        });
+        const config = parseStages(stage)[1][UUID].config as PyTest;
+        expect(config.scoreWeighting.overrides).toStrictEqual([
+          { _uuid: "mock-uuid-2", score: 2, className: { op: "EQ", value: "Foo" } },
+          { _uuid: "mock-uuid-3", score: 3, className: { op: "EQ", value: "Bar" } },
+        ]);
       });
     });
 
@@ -180,7 +206,13 @@ describe("GuiBuilder: Raw stage configs conversion", () => {
           _scorePolicy,
           score: 20,
           treatDenormalScore: "FAILURE",
-          scoreWeighting: { default: 2 },
+          scoreWeighting: {
+            default: 1,
+            overrides: [
+              { _uuid: "mock-uuid-2", score: 2, className: { op: "EQ", value: "Foo" } },
+              { _uuid: "mock-uuid-3", score: 3, className: { op: "EQ", value: "Bar" } },
+            ],
+          },
         });
         const _stage = configsToConfigsRaw(stage);
         return _stage[UUID].config as PyTestRaw;
@@ -201,7 +233,13 @@ describe("GuiBuilder: Raw stage configs conversion", () => {
         // Weighted policy
         const configRawWeighted = createConvertedPyTestStage("weighted");
         expect(configRawWeighted).toContainAllKeys(["args", "additional_pip_packages", "scoreWeighting"]);
-        expect(configRawWeighted.scoreWeighting).toStrictEqual({ default: 2 });
+        expect(configRawWeighted.scoreWeighting).toStrictEqual({
+          default: 1,
+          overrides: [
+            { score: 2, className: { op: "EQ", value: "Foo" } },
+            { score: 3, className: { op: "EQ", value: "Bar" } },
+          ],
+        });
 
         // Disable
         const configRawDisable = createConvertedPyTestStage("disable");

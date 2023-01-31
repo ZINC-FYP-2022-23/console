@@ -11,6 +11,8 @@ import {
   ValgrindRaw,
 } from "@/types";
 import {
+  scoreWeightingFromRaw,
+  scoreWeightingToRaw,
   splitStringToArray,
   testCaseFromRaw,
   testCaseToRaw,
@@ -141,28 +143,30 @@ const supportedStages: SupportedStages = {
       score: defaultTotalScorableScore,
       scoreWeighting: defaultScoreWeightingXUnit,
     },
-    configFromRaw: (raw: PyTestRaw) => ({
-      ...raw,
-      args: raw.args?.join(" ") ?? "",
-      additional_pip_packages: raw.additional_pip_packages ?? [],
-      _scorePolicy: (() => {
-        if (raw.scoreWeighting) return "weighted";
-        if (raw.score) return "total";
-        return "disable";
-      })(),
-
-      // Populate score fields with default values no matter what score policy is used. These values
-      // will be appropriately discarded when converting the config back to raw.
-      score: raw.score ?? defaultTotalScorableScore,
-      scoreWeighting: raw.scoreWeighting ?? defaultScoreWeightingXUnit,
-    }),
+    configFromRaw: (raw: PyTestRaw) => {
+      const { args, additional_pip_packages, score, scoreWeighting, ..._raw } = raw;
+      return {
+        ..._raw,
+        args: args?.join(" ") ?? "",
+        additional_pip_packages: additional_pip_packages ?? [],
+        _scorePolicy: (() => {
+          if (scoreWeighting) return "weighted";
+          if (score) return "total";
+          return "disable";
+        })(),
+        // Populate score fields with default values no matter what score policy is used. These values
+        // will be appropriately discarded when converting the config back to raw.
+        score: score ?? defaultTotalScorableScore,
+        scoreWeighting: scoreWeighting ? scoreWeightingFromRaw(scoreWeighting) : defaultScoreWeightingXUnit,
+      };
+    },
     configToRaw: (config): PyTestRaw => {
       const { _scorePolicy, score, treatDenormalScore, scoreWeighting, ..._config } = config;
       return {
         ..._config,
         args: splitStringToArray(_config.args),
         ...(_scorePolicy === "total" && { score, treatDenormalScore }),
-        ...(_scorePolicy === "weighted" && { scoreWeighting }),
+        ...(_scorePolicy === "weighted" && { scoreWeighting: scoreWeightingToRaw(scoreWeighting) }),
       };
     },
     stageSettings: dynamic(() => import("../../components/GuiBuilder/StageSettings/PyTestSettings"), {

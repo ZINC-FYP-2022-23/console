@@ -1,14 +1,19 @@
 import Button from "@/components/Button";
-import { TagsInput, Textarea } from "@/components/Input";
+import { NumberInput, TagsInput, Textarea } from "@/components/Input";
+import { defaultXUnitOverride } from "@/constants/GuiBuilder/defaults";
 import { useSelectedStageConfig } from "@/hooks/GuiBuilder";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ScrollArea, Tooltip } from "@mantine/core";
+import cloneDeep from "lodash/cloneDeep";
 import { FocusEventHandler, useState } from "react";
+import { v4 as uuidv4 } from "uuid";
 import {
   ScorablePolicyRadioGroup,
   StageConfigModal,
   testCaseScorablePolicyOptions,
   TotalScorableSettings,
+  WeightedScorableOverrides,
+  xUnitOverridePredicatesData,
 } from "./common";
 
 function PyTestSettings() {
@@ -104,6 +109,65 @@ function PyTestSettings() {
                 treatDenormalScore={config.treatDenormalScore ?? "IGNORE"}
                 onChangeTreatDenormalScore={(value) => setConfig({ ...config, treatDenormalScore: value ?? undefined })}
               />
+            )}
+            {config._scorePolicy === "weighted" && (
+              <>
+                <div className="space-y-4">
+                  <div className="flex gap-3 items-center">
+                    <label htmlFor="scoreWeighting.default" className="flex-1">
+                      Default score of each test case <span className="text-red-600 text-xs">(required)</span>
+                    </label>
+                    <NumberInput
+                      id="scoreWeighting.default"
+                      value={config.scoreWeighting?.default}
+                      onChange={(value) => {
+                        if (value === undefined) return;
+                        setConfig({ ...config, scoreWeighting: { ...config.scoreWeighting, default: value } });
+                      }}
+                      min={0}
+                      placeholder="e.g. 1"
+                      className="flex-1"
+                    />
+                  </div>
+                  <div className="flex gap-3">
+                    <div className="mt-2 flex-1">
+                      <label htmlFor="scoreWeighting.limit">Upper limit of this stage&apos;s score</label>
+                      <p className="text-gray-500 text-xs">Leave blank to disable upper limit</p>
+                    </div>
+                    <NumberInput
+                      id="scoreWeighting.limit"
+                      value={config.scoreWeighting?.limit}
+                      onChange={(value) => {
+                        setConfig({ ...config, scoreWeighting: { ...config.scoreWeighting, limit: value } });
+                      }}
+                      min={0}
+                      placeholder="No upper limit"
+                      className="flex-1"
+                    />
+                  </div>
+                </div>
+                <div className="mt-6 space-y-5">
+                  <div>
+                    <p className="font-semibold">Score Overrides</p>
+                    <p className="leading-none text-gray-500 text-xs">
+                      Specify which test cases should contribute more/less marks
+                    </p>
+                  </div>
+                  <WeightedScorableOverrides
+                    data={xUnitOverridePredicatesData}
+                    overrides={config.scoreWeighting.overrides}
+                    setOverrides={(overrides) => {
+                      setConfig({ ...config, scoreWeighting: { ...config.scoreWeighting, overrides } });
+                    }}
+                    onAddOverride={() => {
+                      const newOverride = cloneDeep(defaultXUnitOverride);
+                      newOverride._uuid = uuidv4();
+                      const overrides = [...config.scoreWeighting.overrides, newOverride];
+                      setConfig({ ...config, scoreWeighting: { ...config.scoreWeighting, overrides } });
+                    }}
+                  />
+                </div>
+              </>
             )}
           </div>
         </ScrollArea>

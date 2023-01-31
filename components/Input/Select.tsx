@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { createStyles, Select as MantineSelect, SelectProps as MantineSelectProps } from "@mantine/core";
+import { clsx, createStyles, Select as MantineSelect, SelectProps as MantineSelectProps } from "@mantine/core";
 import { forwardRef } from "react";
 import { getInputBoxWrapperStyles } from "./mantineStyles";
 
@@ -44,6 +44,9 @@ const useStyles = createStyles((theme) => ({
       },
     },
   },
+  rightSection: {
+    pointerEvents: "none",
+  },
 }));
 
 const rightChevron = <FontAwesomeIcon icon={["fas", "chevron-down"]} className="text-sm text-gray-400" />;
@@ -71,12 +74,17 @@ function Select<TValue extends string>({ data, value, onChange, ...props }: Sele
 interface SelectItemProps extends React.ComponentPropsWithoutRef<"div"> {
   label: string;
   description?: string;
+  disabled?: boolean;
 }
 
-const SelectItem = forwardRef<HTMLDivElement, SelectItemProps>(({ label, description, ...props }, ref) => (
+const SelectItem = forwardRef<HTMLDivElement, SelectItemProps>(({ label, description, disabled, ...props }, ref) => (
   <div ref={ref} {...props}>
     <p>{label}</p>
-    {description && <p className="text-xs text-gray-500 font-normal">{description}</p>}
+    {description && (
+      <p className={clsx("text-xs font-normal", disabled === true ? "text-gray-400" : "text-gray-500")}>
+        {description}
+      </p>
+    )}
   </div>
 ));
 SelectItem.displayName = "SelectItem";

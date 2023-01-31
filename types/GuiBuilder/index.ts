@@ -11,3 +11,4 @@ export * from "./Stage";
 export type { default as Stage } from "./Stage";
 export * from "./StageConfig";
 export type { default as StageConfig } from "./StageConfig";
+export * from "./StageConfigScorable";
