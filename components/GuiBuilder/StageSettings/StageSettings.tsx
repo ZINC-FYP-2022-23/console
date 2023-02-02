@@ -33,19 +33,12 @@ const labelAlerts: StageLabelAlert = {
 };
 
 /**
- * @returns class names related to the stage label alert based on the alert's severity.
- */
-const getLabelAlertStyles = (alert: keyof StageLabelAlert | null, styles: { warning: string; error: string }) => {
-  return alert === null ? "" : styles[labelAlerts[alert].severity];
-};
-
-/**
  * Settings panel for an individual stage in the pipeline.
  */
 function StageSettings() {
   const { classes } = useScrollAreaStyles();
   const labelInputRef = useRef<HTMLInputElement>(null!);
-  const [labelAlert, setLabelAlert] = useState<keyof StageLabelAlert | null>(null);
+  const [labelAlertKey, setLabelAlertKey] = useState<keyof StageLabelAlert | null>(null);
 
   const selectedStage = useStoreState((state) => state.pipelineEditor.selectedStage);
   const isStageLabelDuplicate = useStoreState((state) => state.config.isStageLabelDuplicate);
@@ -57,13 +50,13 @@ function StageSettings() {
   const validateStageLabel = useCallback(
     (label: string) => {
       if (label.includes(":")) {
-        setLabelAlert("hasColon");
+        setLabelAlertKey("hasColon");
       } else if (label.match(/[^a-zA-Z0-9]/)) {
-        setLabelAlert("discouragedChars");
+        setLabelAlertKey("discouragedChars");
       } else if (selectedStage && isStageLabelDuplicate(selectedStage.name, label)) {
-        setLabelAlert("duplicateName");
+        setLabelAlertKey("duplicateName");
       } else {
-        setLabelAlert(null);
+        setLabelAlertKey(null);
       }
     },
     [isStageLabelDuplicate, selectedStage],
@@ -90,6 +83,7 @@ function StageSettings() {
   const stageName = selectedStage.name;
   const supportedStage: SupportedStage | undefined = supportedStages[stageName];
   const StageSettings = supportedStage?.stageSettings ?? UnsupportedStage;
+  const labelAlert = labelAlertKey ? labelAlerts[labelAlertKey] : null;
 
   return (
     <div className="h-full flex flex-col bg-white rounded-md shadow overflow-y-hidden">
@@ -109,7 +103,7 @@ function StageSettings() {
                 validateStageLabel(value);
                 updateSelectedStage({ path: "label", value });
               }}
-              alertLevel={labelAlert ? labelAlerts[labelAlert].severity : undefined}
+              alertLevel={labelAlert?.severity}
               classNames={{ root: "w-36 mx-2", input: "!px-2 !py-1 !leading-4" }}
             />
             <Tooltip label="Open help dialog" openDelay={500}>
@@ -124,14 +118,17 @@ function StageSettings() {
         </div>
         <div className="flex justify-between">
           <div className="text-xs text-gray-500">{supportedStage && <p>{supportedStage.description}</p>}</div>
-          <div
-            className={clsx(
-              "mr-8 text-xs font-medium",
-              getLabelAlertStyles(labelAlert, { warning: "text-orange-500", error: "text-red-500" }),
-            )}
-          >
-            {labelAlert && labelAlerts[labelAlert].message}
-          </div>
+          {labelAlertKey && (
+            <div
+              className={clsx(
+                "mr-8 text-xs font-medium",
+                labelAlert?.severity === "warning" && "text-orange-500",
+                labelAlert?.severity === "error" && "text-red-500",
+              )}
+            >
+              {labelAlert?.message}
+            </div>
+          )}
         </div>
       </div>
       <ScrollArea type="auto" classNames={classes}>
