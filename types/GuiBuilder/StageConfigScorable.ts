@@ -22,6 +22,9 @@ export type DenormalPolicy = "IGNORE" | "FAILURE" | "SUCCESS";
 
 // #region Weighted Scorable
 
+/**
+ * How to join multiple predicates in an {@link https://docs.zinc.ust.dev/user/pipeline/Scorable.html#override Override}.
+ */
 export type JoinPolicy = "AND" | "OR";
 
 /**

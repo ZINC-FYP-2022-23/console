@@ -1,6 +1,9 @@
 import type {
   Config,
   GradingPolicy,
+  JoinPolicy,
+  Predicate,
+  PredicateSupportedValueTypes,
   Schedule,
   ScoreWeighting,
   Settings,
@@ -8,8 +11,8 @@ import type {
   Valgrind,
   XUnitOverride,
 } from "@/types";
-import { Required } from "utility-types";
 import { addDays, set } from "date-fns";
+import { Required } from "utility-types";
 import { v4 as uuidv4 } from "uuid";
 
 /**
@@ -46,10 +49,21 @@ export const defaultConfig: Config = {
   stageData: {},
 };
 
+export const defaultJoinPolicy: JoinPolicy = "AND";
+
 export const defaultPolicy: GradingPolicy = {
   attemptLimits: null,
   gradeImmediately: false,
   showImmediateScores: false,
+};
+
+export const defaultPredicate: Predicate<Record<PredicateSupportedValueTypes, string | boolean | number>, "EQ"> = {
+  op: "EQ", // "EQ" is chosen since it's found in all types of predicate operations
+  value: {
+    string: "",
+    boolean: true,
+    number: 0,
+  },
 };
 
 export const defaultSchedule: Schedule = {
@@ -94,6 +108,6 @@ export const defaultValgrindConfig: Valgrind = {
 export const defaultXUnitOverride: Required<XUnitOverride, "joinPolicy"> = {
   _uuid: uuidv4(),
   score: 1,
-  joinPolicy: "AND",
+  joinPolicy: defaultJoinPolicy,
   testName: { op: "EQ", value: "" },
 };

@@ -1,6 +1,6 @@
 import Button from "@/components/Button";
 import { NumberInput, Select } from "@/components/Input";
-import { defaultXUnitOverride } from "@/constants/GuiBuilder/defaults";
+import { defaultJoinPolicy, defaultPredicate, defaultXUnitOverride } from "@/constants/GuiBuilder/defaults";
 import { Override, Predicate, Predicates, PredicateSupportedValueTypes } from "@/types/GuiBuilder";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import cloneDeep from "lodash/cloneDeep";
@@ -27,9 +27,9 @@ interface WeightedScorableOverridesProps<TPredicates extends Predicates> {
   /** Actual value of every overrides. */
   overrides: Override<TPredicates>[];
   /** Callback when the overrides are updated in this component. */
-  setOverrides: (overrides: Override<TPredicates>[]) => void;
-  /** Callback when te user presses the "Add Override" button. */
-  onAddOverride: () => void;
+  setOverrides?: (overrides: Override<TPredicates>[]) => void;
+  /** Callback when the user presses the "Add Override" button. */
+  onAddOverride?: () => void;
 }
 
 /**
@@ -50,7 +50,7 @@ function WeightedScorableOverrides<TPredicates extends Predicates>({
   const updateOverride = (index: number, callback: (override: Override<TPredicates>) => void) => {
     const override = cloneDeep(overrides[index]);
     callback(override);
-    setOverrides([...overrides.slice(0, index), override, ...overrides.slice(index + 1)]);
+    setOverrides && setOverrides([...overrides.slice(0, index), override, ...overrides.slice(index + 1)]);
   };
 
   const predicateKeys = data.map((d) => d.key);
@@ -97,7 +97,7 @@ function WeightedScorableOverrides<TPredicates extends Predicates>({
               <button
                 title="Delete score override"
                 onClick={() => {
-                  setOverrides(overrides.filter((o) => o._uuid !== override._uuid));
+                  setOverrides && setOverrides(overrides.filter((o) => o._uuid !== override._uuid));
                 }}
                 className="w-8 h-8 ml-auto flex justify-center items-center text-white text-base bg-red-500 drop-shadow rounded-full transition hover:bg-red-700"
               >
@@ -124,7 +124,7 @@ function WeightedScorableOverrides<TPredicates extends Predicates>({
                   updateOverride(index, (override) => {
                     // Grader will emit error if no join policy is set when there are >1 predicates
                     if (!override.joinPolicy) {
-                      override.joinPolicy = defaultXUnitOverride.joinPolicy;
+                      override.joinPolicy = defaultJoinPolicy;
                     }
                     // Set a predicate that is not set yet
                     for (const key of predicateKeys) {
@@ -133,17 +133,8 @@ function WeightedScorableOverrides<TPredicates extends Predicates>({
                         const dataType = predicateData?.type ?? "string";
                         // @ts-ignore
                         override[key] = {
-                          op: "EQ", // "EQ" is chosen since it's found in all types of predicate operations
-                          value: (() => {
-                            switch (dataType) {
-                              case "string":
-                                return "";
-                              case "boolean":
-                                return false;
-                              case "number":
-                                return 0;
-                            }
-                          })(),
+                          op: defaultPredicate.op,
+                          value: defaultPredicate.value[dataType],
                         };
                         return;
                       }
