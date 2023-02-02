@@ -143,6 +143,7 @@ function PipelineEditor() {
         onConnect={onStageConnect}
         onDragOver={onDragOver}
         onDrop={onDrop}
+        connectionRadius={30}
         snapGrid={[GRID_SIZE, GRID_SIZE]}
         snapToGrid
         deleteKeyCode={null} // Custom deletion logic is handled in `usePipelineEditorHotKeys()` instead

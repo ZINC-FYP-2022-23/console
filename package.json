@@ -70,7 +70,7 @@
     "react-nice-dates": "^3.0.7",
     "react-tag-input-component": "^2.0.2",
     "react-transition-group": "^4.4.1",
-    "reactflow": "^11.3.2",
+    "reactflow": "^11.5.3",
     "redis": "^3.1.2",
     "subscriptions-transport-ws": "^0.9.18",
     "uuid": "^8.3.2"
