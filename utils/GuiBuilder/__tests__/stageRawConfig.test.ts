@@ -3,7 +3,6 @@
  * {@link SupportedStage.configToRaw}.
  */
 
-/// <reference types="jest-extended" />
 import {
   defaultScoreWeightingXUnit,
   defaultTotalScorableScore,

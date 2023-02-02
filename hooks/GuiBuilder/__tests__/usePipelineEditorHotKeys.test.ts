@@ -1,4 +1,3 @@
-/// <reference types="jest-extended" />
 import { getThreeStageModel } from "@/store/GuiBuilder/__tests__/utils/storeTestUtils";
 import { act } from "@testing-library/react-hooks";
 import { createStore } from "easy-peasy";

@@ -13,7 +13,7 @@ const { compilerOptions } = require("./tsconfig")
  * https://nextjs.org/docs/testing#setting-up-jest-with-babel 
  */
 module.exports = {
-  setupFilesAfterEnv: ["jest-extended/all"],
+  setupFilesAfterEnv: ["<rootDir>/jest.setup.js"],
 
   // Calls `jest.clearAllMocks()` before each test
   clearMocks: true,

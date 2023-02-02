@@ -1,4 +1,3 @@
-/// <reference types="jest-extended" />
 import { AssignmentConfig, Config, GradingPolicy, Schedule, Stage, StageKind } from "@/types";
 import * as configUtils from "@/utils/GuiBuilder/config";
 import { createStore } from "easy-peasy";
