@@ -1,5 +1,6 @@
 import { MultiSelect, NumberInput, Select, SwitchGroup, Textarea } from "@/components/Input";
-import supportedStages, { valgrindDefaultConfig } from "@/constants/GuiBuilder/supportedStages";
+import { defaultValgrindConfig } from "@/constants/GuiBuilder/defaults";
+import supportedStages from "@/constants/GuiBuilder/supportedStages";
 import { useSelectedStageConfig } from "@/hooks/GuiBuilder";
 import { useStoreActions, useStoreState } from "@/store/GuiBuilder";
 import { memo } from "react";
@@ -57,7 +58,7 @@ function ValgrindSettings() {
         <Select
           id="visibility"
           data={visibilityOptions}
-          value={config.visibility ?? valgrindDefaultConfig.visibility}
+          value={config.visibility ?? defaultValgrindConfig.visibility}
           onChange={(value) => {
             if (!value) return;
             setConfig({ ...config, visibility: value });
@@ -73,7 +74,7 @@ function ValgrindSettings() {
         <div className="flex-[2]">
           <MultiSelect
             data={checksFilterOptions}
-            value={config.checksFilter ?? valgrindDefaultConfig.checksFilter}
+            value={config.checksFilter ?? defaultValgrindConfig.checksFilter}
             onChange={(value) => setConfig({ ...config, checksFilter: value })}
             placeholder="Select errors..."
           />
