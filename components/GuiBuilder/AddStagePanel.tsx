@@ -89,9 +89,9 @@ function AddStagePanel() {
   const { classes } = useStyles();
   const searchBarRef = useRef<HTMLInputElement>(null);
 
-  const editingConfig = useStoreState((state) => state.config.editingConfig);
   const accordion = useStoreState((state) => state.layout.accordion.addNewStage);
   const searchString = useStoreState((state) => state.layout.addStageSearchString);
+  const getEditingConfig = useStoreActions((action) => action.config.getEditingConfig);
   const setAccordion = useStoreActions((action) => action.layout.setAccordion);
   const toggleAddStageCollapsed = useStoreActions((action) => action.layout.toggleAddStageCollapsed);
 
@@ -130,12 +130,14 @@ function AddStagePanel() {
           </button>
         </Tooltip>
         <div className="flex items-center justify-end gap-2">
-          <Button
-            className="text-violet-600 border border-violet-600 hover:bg-violet-100 active:bg-violet-200"
-            onClick={() => console.log(configToYaml(editingConfig))}
-          >
-            Debug: Log YAML
-          </Button>
+          {process.env.NODE_ENV === "development" && (
+            <Button
+              className="text-violet-600 border border-violet-600 hover:bg-violet-100 active:bg-violet-200"
+              onClick={() => console.log(configToYaml(getEditingConfig()))}
+            >
+              Debug: Log YAML
+            </Button>
+          )}
         </div>
       </div>
       <div className="px-3 pt-2 pb-4 sticky top-0 z-10 bg-blue-50 border-b border-gray-300 shadow-sm">

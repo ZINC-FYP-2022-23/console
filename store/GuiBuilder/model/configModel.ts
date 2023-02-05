@@ -140,6 +140,8 @@ interface ConfigModelThunk {
    * it will cause unnecessary re-renders whenever the user edits the config.
    */
   getConfigsToSave: Thunk<ConfigModel, undefined, undefined, GuiBuilderModel, ConfigsToSave>;
+  /** Lazily gets {@link ConfigModel.editingConfig}. */
+  getEditingConfig: Thunk<ConfigModel, undefined, undefined, GuiBuilderModel, Config>;
   /** Updates a non-readonly field of the selected stage. */
   updateSelectedStage: Thunk<
     ConfigModel,
@@ -289,6 +291,9 @@ const configModelThunk: ConfigModelThunk = {
       ...editingSchedule,
       config_yaml: configToYaml(editingConfig),
     };
+  }),
+  getEditingConfig: thunk((_actions, _payload, { getState }) => {
+    return getState().editingConfig;
   }),
   updateSelectedStage: thunk((actions, { path, value }, { getStoreState }) => {
     const selectedNode = getStoreState().pipelineEditor.nodes.find((node) => node.selected);
