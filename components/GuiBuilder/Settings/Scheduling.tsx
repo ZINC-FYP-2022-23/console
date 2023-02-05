@@ -17,7 +17,7 @@ function Scheduling() {
   const setSchedule = useStoreActions((state) => state.config.setSchedule);
 
   return (
-    <div className="space-y-4">
+    <div className="px-1 space-y-4">
       <div className="flex flex-col space-y-2">
         <label htmlFor="showAt" className="text-sm font-medium leading-5 text-gray-900">
           Announce

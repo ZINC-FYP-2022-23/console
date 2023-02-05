@@ -70,7 +70,7 @@ function PipelineSettings() {
   const updateSettings = useStoreActions((actions) => actions.config.updateSettings);
 
   return (
-    <div className="flex flex-col gap-8 text-sm">
+    <div className="px-1 flex flex-col gap-8 text-sm">
       {/* Language */}
       <div>
         <h3 className="mb-3 font-semibold text-base">Language</h3>
