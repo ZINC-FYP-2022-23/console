@@ -229,7 +229,7 @@ function StdioTestCaseSettings({ caseId, closeModal, setPage }: StdioTestCaseSet
           <div className="space-y-3">
             <div className="flex items-center gap-2">
               <label htmlFor="file" className="flex-[2]">
-                File to run <span className="text-red-600">*</span>
+                File to run <span className="text-red-600 text-xs">(required)</span>
               </label>
               <TextInput
                 id="file"

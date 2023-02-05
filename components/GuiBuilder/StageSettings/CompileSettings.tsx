@@ -75,7 +75,7 @@ function CompileSettings() {
     <div className="p-3 space-y-4">
       <div className="flex gap-3">
         <label htmlFor="input" className="mt-2 flex-1">
-          Input files
+          Input files <span className="text-red-600 text-xs">(required)</span>
         </label>
         <TagsInput
           name="input"

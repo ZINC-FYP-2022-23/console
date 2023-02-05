@@ -74,33 +74,45 @@ function PipelineSettings() {
       {/* Language */}
       <div>
         <h3 className="mb-3 font-semibold text-base">Language</h3>
-        <div className="flex items-center gap-3">
-          <Select
-            data={ACCEPTED_LANG.map(({ lang: value, label }) => ({ value, label }))}
-            value={settingsLangToString(_settings.lang).split(":")[0]}
-            onChange={(value) => {
-              if (value === null) return;
-              const values = value.split("/");
-              const language = values[0];
-              const compiler = values.length > 1 ? values[1] : null;
-              updateSettings((_settings) => {
-                _settings.lang.language = language;
-                _settings.lang.compiler = compiler;
-              });
-            }}
-            maxDropdownHeight={320}
-            styles={{ root: { flexGrow: 1 } }}
-          />
-          <span className="flex-none text-gray-500">version</span>
-          <TextInput
-            value={_settings.lang.version}
-            onChange={(event) => {
-              const value = event.target.value;
-              updateSettings((_settings) => (_settings.lang.version = value));
-            }}
-            classNames={{ root: "flex-1" }}
-          />
-          <LangVersionTooltip />
+        <div className="space-y-3">
+          <div className="flex items-center gap-4">
+            <label htmlFor="lang" className="flex-1">
+              Language (and Compiler)
+            </label>
+            <Select
+              id="lang"
+              data={ACCEPTED_LANG.map(({ lang: value, label }) => ({ value, label }))}
+              value={settingsLangToString(_settings.lang).split(":")[0]}
+              onChange={(value) => {
+                if (value === null) return;
+                const values = value.split("/");
+                const language = values[0];
+                const compiler = values.length > 1 ? values[1] : null;
+                updateSettings((_settings) => {
+                  _settings.lang.language = language;
+                  _settings.lang.compiler = compiler;
+                });
+              }}
+              maxDropdownHeight={320}
+              className="flex-[2]"
+            />
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="flex-1 flex items-center gap-1">
+              <label htmlFor="lang_version">
+                Version <span className="text-red-600 text-xs">(required)</span>
+              </label>
+              <LangVersionTooltip />
+            </div>
+            <TextInput
+              value={_settings.lang.version}
+              onChange={(event) => {
+                const value = event.target.value;
+                updateSettings((_settings) => (_settings.lang.version = value));
+              }}
+              classNames={{ root: "flex-[2]" }}
+            />
+          </div>
         </div>
       </div>
       {/* Helper Files */}
