@@ -4,6 +4,7 @@ import {
   FileStructureValidation,
   MakeRaw,
   PyTestRaw,
+  ShellExecRaw,
   StageConfig,
   StageKind,
   StdioTestRaw,
@@ -181,6 +182,22 @@ const supportedStages: SupportedStages = {
       normalizedTo: undefined,
     },
     stageSettings: dynamic(() => import("../../components/GuiBuilder/StageSettings/ScoreSettings"), {
+      loading: () => <StageSettingsLoading />,
+    }),
+  },
+  ShellExec: {
+    nameInUI: "Shell Command",
+    kind: StageKind.CONSTANT,
+    description: "Executes an arbitrary shell command",
+    defaultConfig: {
+      cmd: "",
+      additional_packages: [],
+    },
+    configFromRaw: (raw: ShellExecRaw) => ({
+      ...raw,
+      additional_packages: raw.additional_packages ?? [],
+    }),
+    stageSettings: dynamic(() => import("../../components/GuiBuilder/StageSettings/ShellExecSettings"), {
       loading: () => <StageSettingsLoading />,
     }),
   },

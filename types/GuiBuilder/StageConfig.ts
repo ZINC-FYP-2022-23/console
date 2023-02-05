@@ -16,6 +16,7 @@ interface StageConfig {
   Make: Make;
   PyTest: PyTest;
   Score: Score;
+  ShellExec: ShellExec;
   StdioTest: StdioTest;
   Valgrind: Valgrind;
 }
@@ -97,6 +98,20 @@ export interface Score {
   normalizedTo?: number;
   minScore?: number;
   maxScore?: number;
+}
+
+/**
+ * The shape of `ShellExec` stage's config returned by the backend
+ * ({@link https://docs.zinc.ust.dev/user/pipeline/docker/ShellExec.html#config Reference}).
+ */
+export interface ShellExecRaw {
+  cmd: string;
+  additional_packages?: string[];
+}
+
+export interface ShellExec {
+  cmd: string;
+  additional_packages: string[];
 }
 
 /**

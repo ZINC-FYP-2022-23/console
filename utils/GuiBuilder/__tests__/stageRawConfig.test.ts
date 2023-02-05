@@ -19,6 +19,8 @@ import {
   PyTestRaw,
   ScoreWeighting,
   ScoreWeightingRaw,
+  ShellExec,
+  ShellExecRaw,
   StdioTest,
   StdioTestRaw,
   TestCase,
@@ -68,7 +70,7 @@ const convertConfigToRaw = <TConfig, TRaw = TConfig>(name: string, config: TConf
 
 describe("GuiBuilder: Raw stage configs conversion", () => {
   describe("Compile", () => {
-    it("configFromRaw", () => {
+    test("configFromRaw", () => {
       const config = parseConfigFromRaw<CompileRaw, Compile>("compile", {
         input: ["*.cpp"],
         output: "a.out",
@@ -82,7 +84,7 @@ describe("GuiBuilder: Raw stage configs conversion", () => {
       });
     });
 
-    it("configToRaw", () => {
+    test("configToRaw", () => {
       const configRaw = convertConfigToRaw<Compile, CompileRaw>("Compile", {
         input: ["*.cpp"],
         output: "  a.out  ",
@@ -99,7 +101,7 @@ describe("GuiBuilder: Raw stage configs conversion", () => {
   });
 
   describe("FileStructureValidation", () => {
-    it("configToRaw", () => {
+    test("configToRaw", () => {
       const configRaw = convertConfigToRaw<FileStructureValidation>("FileStructureValidation", {
         ignore_in_submission: ["  a.txt", "", "b.txt  "],
       });
@@ -110,7 +112,7 @@ describe("GuiBuilder: Raw stage configs conversion", () => {
   });
 
   describe("Make", () => {
-    it("configFromRaw", () => {
+    test("configFromRaw", () => {
       // Test populate missing fields
       const configEmpty = parseConfigFromRaw<MakeRaw, Make>("make", {});
       expect(configEmpty).toStrictEqual({
@@ -132,7 +134,7 @@ describe("GuiBuilder: Raw stage configs conversion", () => {
       });
     });
 
-    it("configToRaw", () => {
+    test("configToRaw", () => {
       const configRaw = convertConfigToRaw<Make, MakeRaw>("Make", {
         targets: ["all"],
         args: "  -f Makefile  ",
@@ -184,7 +186,7 @@ describe("GuiBuilder: Raw stage configs conversion", () => {
       });
     });
 
-    it("configToRaw", () => {
+    test("configToRaw", () => {
       const scoreWeighting: ScoreWeighting<XUnitOverride> = {
         default: 1,
         overrides: [
@@ -223,6 +225,18 @@ describe("GuiBuilder: Raw stage configs conversion", () => {
       expect(configRawDisable).toStrictEqual({
         args: ["--version", "-h"],
         additional_pip_packages: [],
+      });
+    });
+  });
+
+  describe("ShellExec", () => {
+    test("configFromRaw", () => {
+      const config = parseConfigFromRaw<ShellExecRaw, ShellExec>("shellExec", {
+        cmd: "echo hello",
+      });
+      expect(config).toStrictEqual({
+        cmd: "echo hello",
+        additional_packages: [], // Populate missing
       });
     });
   });
@@ -314,7 +328,7 @@ describe("GuiBuilder: Raw stage configs conversion", () => {
   });
 
   describe("Valgrind", () => {
-    it("configFromRaw/valgrindFromRaw()", () => {
+    test("configFromRaw/valgrindFromRaw()", () => {
       // Test populate missing fields
       const configEmpty = parseConfigFromRaw<ValgrindRaw, Valgrind>("valgrind", {});
       expect(configEmpty).toEqual(defaultValgrindConfig);
@@ -336,7 +350,7 @@ describe("GuiBuilder: Raw stage configs conversion", () => {
       });
     });
 
-    it("configToRaw/valgrindToRaw()", () => {
+    test("configToRaw/valgrindToRaw()", () => {
       const configRaw = convertConfigToRaw<Valgrind, ValgrindRaw>("Valgrind", {
         enabled: true,
         args: "  --leak-check=full    --show-leak-kinds=all    ",
