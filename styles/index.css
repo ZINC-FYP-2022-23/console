@@ -171,3 +171,20 @@
 .tag-input .rti--tag > button {
   @apply pl-3 pr-1 font-bold text-gray-500 hover:text-red-500;
 }
+
+/* boarding.js (highlight element in the page with pverlay) */
+.boarding-close-btn, .boarding-prev-btn, .boarding-next-btn {
+  @apply px-2 py-1 bg-gray-100 font-sans rounded-sm text-xs !important;
+}
+
+.boarding-popover-description {
+  @apply font-sans text-sm !important;
+}
+
+.boarding-popover-footer {
+  @apply mt-4 !important;
+}
+
+.boarding-popover-title {
+  @apply mb-4 font-sans font-semibold text-lg !important;
+}

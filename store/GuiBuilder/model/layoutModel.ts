@@ -1,4 +1,5 @@
 import guiBuilderSteps, { GuiBuilderStep } from "@/components/GuiBuilder/Steps/GuiBuilderSteps";
+import { HighlightableElementsKey } from "@/constants/GuiBuilder/highlightableElements";
 import { action, Action } from "easy-peasy";
 import set from "lodash/set";
 
@@ -22,6 +23,8 @@ interface LayoutModelState {
   addStageSearchString: string;
   /** Whether the "Add New Stage" panel is collapsed. */
   isAddStageCollapsed: boolean;
+  /** Which element on the page should be highlighted. */
+  elementToHighlight?: HighlightableElementsKey;
 }
 
 interface LayoutModelAction {
@@ -52,6 +55,7 @@ interface LayoutModelAction {
   >;
   setAddStageSearchString: Action<LayoutModel, string>;
   toggleAddStageCollapsed: Action<LayoutModel>;
+  setElementToHighlight: Action<LayoutModel, HighlightableElementsKey | undefined>;
 }
 
 export interface AccordionState {
@@ -115,6 +119,9 @@ const layoutModelAction: LayoutModelAction = {
   }),
   toggleAddStageCollapsed: action((state) => {
     state.isAddStageCollapsed = !state.isAddStageCollapsed;
+  }),
+  setElementToHighlight: action((state, elementKey) => {
+    state.elementToHighlight = elementKey;
   }),
 };
 

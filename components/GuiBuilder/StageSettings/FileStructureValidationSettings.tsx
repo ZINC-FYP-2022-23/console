@@ -1,12 +1,15 @@
+import Button from "@/components/Button";
 import ListInput from "@/components/Input/ListInput";
 import { useSelectedStageConfig } from "@/hooks/GuiBuilder";
 import { useStoreActions } from "@/store/GuiBuilder";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { InfoAccordion } from "./common";
 
 function FileStructureValidationSettings() {
   const [config, setConfig] = useSelectedStageConfig("FileStructureValidation");
+  const setElementToHighlight = useStoreActions((actions) => actions.layout.setElementToHighlight);
   const setStep = useStoreActions((actions) => actions.layout.setStep);
 
   const [ignoredFiles, setIgnoredFiles] = useState<{ id: string; name: string }[]>(
@@ -134,13 +137,17 @@ function FileStructureValidationSettings() {
       </InfoAccordion>
       <InfoAccordion title="How to specify what files should students submit?">
         <div className="space-y-2">
-          <p>To specify the file structure that this stage will validate students&apos; submissions against, go to:</p>
-          <p>
-            <button onClick={() => setStep("settings")} className="underline text-blue-500">
-              General Settings
-            </button>{" "}
-            &gt; Pipeline Settings &gt; Helper Files &gt; “Specify files that students should submit”
-          </p>
+          <p>This can be done in the General Settings step:</p>
+          <Button
+            icon={<FontAwesomeIcon icon={["fas", "compass"]} />}
+            onClick={() => {
+              setStep("settings");
+              setElementToHighlight("useTemplate");
+            }}
+            className="border border-cse-600 text-cse-600 hover:bg-blue-100 active:bg-blue-200"
+          >
+            Show me the location
+          </Button>
         </div>
       </InfoAccordion>
     </div>

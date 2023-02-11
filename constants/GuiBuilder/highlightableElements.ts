@@ -1,0 +1,62 @@
+import { BoardingStepDefinition } from "boarding.js/dist/boarding-types";
+
+/**
+ * IDs for the HTML elements that can be highlighted.
+ *
+ * By storing the IDs in a map, we can avoid hard-coding the IDs in the component code.
+ */
+export const highlightableElementIds = {
+  useTemplateWrapper: "use-template-wrapper",
+} as const;
+
+/** Keys of the {@link highlightableElements} map. */
+export type HighlightableElementsKey = "useTemplate";
+
+/**
+ * There are 2 modes of highlighting (specified by the `mode` property):
+ *  - `single`: highlight a single element on the page.
+ *  - `multi`: create a multi-step highlighting sequence.
+ */
+type HighlightableElementsValue =
+  | {
+      /** The highlighting mode for highlighting a single element. */
+      mode: "single";
+      /**
+       * The selector for the element to highlight.
+       *
+       * See the {@link https://josias-r.github.io/boarding.js/#single-element-with-popover Boarding.js docs}
+       * for more details.
+       */
+      selector: BoardingStepDefinition;
+    }
+  | {
+      /** The highlighting mode for creating a multi-step highlighting sequence. */
+      mode: "multiple";
+      /**
+       * Sequences of steps to highlight different elements.
+       *
+       * See the {@link https://josias-r.github.io/boarding.js/#run-multi-element-popovers example in Boarding.js docs}.
+       */
+      steps: BoardingStepDefinition[];
+    };
+
+type HighlightableElements = Record<HighlightableElementsKey, HighlightableElementsValue>;
+
+/**
+ * A map of highlightable elements in the GUI Assignment Builder.
+ *
+ * We can "highlight" an element on the page by dimming the rest of the page except for the element.
+ * This is useful for guiding the user to a specific element on the page.
+ *
+ * {@link https://josias-r.github.io/boarding.js/ Boarding.js} is used as the highlighting engine.
+ */
+const highlightableElements: HighlightableElements = {
+  useTemplate: {
+    mode: "single",
+    selector: {
+      element: `#${highlightableElementIds.use_template_wrapper}`,
+    },
+  },
+};
+
+export default highlightableElements;

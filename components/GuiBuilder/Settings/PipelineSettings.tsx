@@ -2,6 +2,7 @@ import Button from "@/components/Button";
 import { Checkbox, NumberInput, Select, SelectItem, SwitchGroup, TextInput } from "@/components/Input";
 import ListInput from "@/components/Input/ListInput";
 import { ACCEPTED_LANG } from "@/constants/GuiBuilder/acceptedLang";
+import { highlightableElementIds } from "@/constants/GuiBuilder/highlightableElements";
 import supportedStages from "@/constants/GuiBuilder/supportedStages";
 import { useStoreActions, useStoreState } from "@/store/GuiBuilder";
 import { SettingsFeatures, SettingsGpuDevice, SettingsUseTemplate } from "@/types";
@@ -133,7 +134,7 @@ function PipelineSettings() {
               updateSettings((_settings) => (_settings.use_provided = value));
             }}
           />
-          <div>
+          <div id={highlightableElementIds.useTemplateWrapper}>
             <div className="mt-4 flex items-center gap-2">
               <div className="pr-2 flex-1 flex items-center gap-1">
                 <label htmlFor="use_template">Specify files that students should submit</label>

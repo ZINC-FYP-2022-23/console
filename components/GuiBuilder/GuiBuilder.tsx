@@ -3,12 +3,14 @@ import { Spinner } from "@/components/Spinner";
 import { useLayoutDispatch } from "@/contexts/layout";
 import { useZinc } from "@/contexts/zinc";
 import { CREATE_ASSIGNMENT_CONFIG, UPDATE_ASSIGNMENT_CONFIG } from "@/graphql/mutations/user";
-import { useWarnUnsavedChanges } from "@/hooks/GuiBuilder";
+import { useHighlightElement, useWarnUnsavedChanges } from "@/hooks/GuiBuilder";
 import { useStoreActions, useStoreState } from "@/store/GuiBuilder";
 import { Assignment, AssignmentConfig } from "@/types";
 import { useMutation } from "@apollo/client";
 import { Tooltip } from "@mantine/core";
 import { useHotkeys } from "@mantine/hooks";
+import "boarding.js/styles/main.css";
+import "boarding.js/styles/themes/basic.css";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import ConfigCreatedModal from "./ConfigCreatedModal";
@@ -51,6 +53,7 @@ function GUIAssignmentBuilder({ data, configId: configIdProp }: GUIAssignmentBui
 
   const [isSaving, setIsSaving] = useState(false);
 
+  useHighlightElement();
   useWarnUnsavedChanges();
 
   // Initialize store

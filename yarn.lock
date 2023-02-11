@@ -3311,6 +3311,11 @@ bn.js@^5.1.1:
   resolved "https://registry.npmjs.org/bn.js/-/bn.js-5.1.2.tgz"
   integrity sha512-40rZaf3bUNKTVYu9sIeeEGOg7g14Yvnj9kH7b50EiwX0Q7A6umbvfI5tvHaOERH0XigqKkfLkFQxzb4e6CIXnA==
 
+boarding.js@^3.4.0:
+  version "3.4.0"
+  resolved "https://registry.yarnpkg.com/boarding.js/-/boarding.js-3.4.0.tgz#758eeef528b1c19de22232daeb826bb90cfb7376"
+  integrity sha512-fSul3o7Qy2jFonJEGBMksAWVbRk3FF88uHwNRD0rDmRtp9Nj9VUSnUaRZaLTNgPNePplQYxqYJyrk0HX5WagJQ==
+
 body-parser@1.19.0:
   version "1.19.0"
   resolved "https://registry.npmjs.org/body-parser/-/body-parser-1.19.0.tgz"
