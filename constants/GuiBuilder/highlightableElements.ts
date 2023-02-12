@@ -6,11 +6,13 @@ import { BoardingStepDefinition } from "boarding.js/dist/boarding-types";
  * By storing the IDs in a map, we can avoid hard-coding the IDs in the component code.
  */
 export const highlightableElementIds = {
+  addStagePanel: "add-stage-panel",
+  pipelineEditor: "pipeline-editor",
   useTemplateWrapper: "use-template-wrapper",
 } as const;
 
 /** Keys of the {@link highlightableElements} map. */
-export type HighlightableElementsKey = "useTemplate";
+export type HighlightableElementsKey = "addStageTutorial" | "useTemplate";
 
 /**
  * There are 2 modes of highlighting (specified by the `mode` property):
@@ -51,10 +53,38 @@ type HighlightableElements = Record<HighlightableElementsKey, HighlightableEleme
  * {@link https://josias-r.github.io/boarding.js/ Boarding.js} is used as the highlighting engine.
  */
 const highlightableElements: HighlightableElements = {
+  addStageTutorial: {
+    mode: "multiple",
+    steps: [
+      {
+        element: `#${highlightableElementIds.addStagePanel}`,
+        popover: {
+          title: "Add New Stage Panel (1/3)",
+          description: "It contains different stage blocks that you can add to your grading pipeline.",
+        },
+      },
+      {
+        element: `#${highlightableElementIds.pipelineEditor}`,
+        popover: {
+          title: "Pipeline Editor Canvas (2/3)",
+          description:
+            "This is where you place the stage blocks. You can connect different stage blocks together to specify the stage execution order.",
+        },
+      },
+      {
+        element: `#${highlightableElementIds.addStagePanel}`,
+        popover: {
+          title: "Try It! (3/3)",
+          description:
+            "Press 'Done' to end the tutorial, and try dragging a stage block from this panel to the canvas at the left!",
+        },
+      },
+    ],
+  },
   useTemplate: {
     mode: "single",
     selector: {
-      element: `#${highlightableElementIds.use_template_wrapper}`,
+      element: `#${highlightableElementIds.useTemplateWrapper}`,
     },
   },
 };

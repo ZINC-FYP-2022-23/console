@@ -1,4 +1,5 @@
 import Button from "@/components/Button";
+import { highlightableElementIds } from "@/constants/GuiBuilder/highlightableElements";
 import supportedStages, { SupportedStage } from "@/constants/GuiBuilder/supportedStages";
 import { AccordionState, useStoreActions, useStoreState } from "@/store/GuiBuilder";
 import { StageKind } from "@/types";
@@ -114,6 +115,7 @@ function AddStagePanel() {
 
   return (
     <ScrollArea
+      id={highlightableElementIds.addStagePanel}
       type="hover"
       styles={{
         root: { height: "100%" },

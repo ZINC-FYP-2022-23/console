@@ -48,6 +48,8 @@ interface PipelineEditorModelState {
 }
 
 interface PipelineEditorModelComputed {
+  /** Number of stage nodes in the editor. */
+  numOfNodes: Computed<PipelineEditorModel, number>;
   /** Which stage is selected in the pipeline editor. */
   selectedStage: Computed<
     PipelineEditorModel,
@@ -142,6 +144,7 @@ const pipelineEditorState: PipelineEditorModelState = {
 };
 
 const pipelineEditorComputed: PipelineEditorModelComputed = {
+  numOfNodes: computed((state) => state.nodes.length),
   selectedStage: computed(
     [(state) => state.nodes, (_, storeState) => storeState.config.editingConfig.stageData],
     (nodes, stageData) => {

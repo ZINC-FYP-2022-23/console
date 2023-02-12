@@ -1,3 +1,4 @@
+import Button from "@/components/Button";
 import { TextInput } from "@/components/Input";
 import supportedStages, { SupportedStage } from "@/constants/GuiBuilder/supportedStages";
 import { useStoreActions, useStoreState } from "@/store/GuiBuilder";
@@ -42,6 +43,7 @@ function StageSettings() {
 
   const selectedStage = useStoreState((state) => state.pipelineEditor.selectedStage);
   const isStageLabelDuplicate = useStoreState((state) => state.config.isStageLabelDuplicate);
+  const numOfNodes = useStoreState((state) => state.pipelineEditor.numOfNodes);
   const shouldFocusLabelInput = useStoreState((state) => state.pipelineEditor.shouldFocusLabelInput);
   const updateSelectedStage = useStoreActions((actions) => actions.config.updateSelectedStage);
   const setModal = useStoreActions((actions) => actions.layout.setModal);
@@ -76,6 +78,9 @@ function StageSettings() {
     }
   }, [shouldFocusLabelInput, setShouldFocusLabelInput]);
 
+  if (numOfNodes === 0) {
+    return <AddStageHint />;
+  }
   if (selectedStage === null) {
     return <NoStageSelected />;
   }
@@ -144,6 +149,27 @@ const useScrollAreaStyles = createStyles(() => ({
     "& > div": { height: "100%" },
   },
 }));
+
+function AddStageHint() {
+  const setElementToHighlight = useStoreActions((actions) => actions.layout.setElementToHighlight);
+  return (
+    <div className="h-full flex flex-col items-center justify-center gap-5 bg-white rounded-md shadow">
+      <div className="flex items-center gap-3 text-lg text-blue-500">
+        <FontAwesomeIcon icon={["far", "circle-question"]} />
+        <p className="font-medium">To learn how to add stages to your grading pipeline:</p>
+      </div>
+      <Button
+        icon={<FontAwesomeIcon icon={["fas", "compass"]} />}
+        onClick={() => {
+          setElementToHighlight("addStageTutorial");
+        }}
+        className="border border-cse-600 text-cse-600 text-lg hover:bg-blue-100 active:bg-blue-200"
+      >
+        Start Tutorial
+      </Button>
+    </div>
+  );
+}
 
 function NoStageSelected() {
   return (

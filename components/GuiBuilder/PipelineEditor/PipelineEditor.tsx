@@ -1,3 +1,4 @@
+import { highlightableElementIds } from "@/constants/GuiBuilder/highlightableElements";
 import { usePipelineEditorHotKeys, useReactFlowFitView } from "@/hooks/GuiBuilder";
 import { PipelineEditorModel, useStoreActions, useStoreState } from "@/store/GuiBuilder";
 import { Transition } from "@headlessui/react";
@@ -124,6 +125,7 @@ function PipelineEditor() {
 
   return (
     <div
+      id={highlightableElementIds.pipelineEditor}
       className={clsx(
         "h-full relative rounded-md shadow overflow-hidden transition duration-200 ease-in-out",
         dragging && "ring ring-blue-400",

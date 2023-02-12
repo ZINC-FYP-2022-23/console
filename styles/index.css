@@ -177,8 +177,16 @@
   @apply px-2 py-1 bg-gray-100 font-sans rounded-sm text-xs !important;
 }
 
+.boarding-navigation-btns {
+  @apply space-x-1;
+}
+
 .boarding-popover-description {
   @apply font-sans text-sm !important;
+}
+
+#boarding-popover-item {
+  @apply max-w-sm !important;
 }
 
 .boarding-popover-footer {
@@ -186,5 +194,5 @@
 }
 
 .boarding-popover-title {
-  @apply mb-4 font-sans font-semibold text-lg !important;
+  @apply mb-3 font-sans font-semibold text-lg !important;
 }

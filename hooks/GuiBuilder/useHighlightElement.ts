@@ -16,7 +16,7 @@ export default function useHighlightElement() {
     if (!elementToHighlight) return;
 
     const boarding = new Boarding({
-      opacity: 0.5,
+      opacity: 0.4,
       closeBtnText: "Close",
       onDeselected: () => setElementToHighlight(undefined),
     });
