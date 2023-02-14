@@ -1,11 +1,12 @@
 import Button from "@/components/Button";
+import { Select, SelectItem } from "@/components/Input";
 import { defaultTestCase } from "@/constants/GuiBuilder/defaults";
 import { useSelectedStageConfig } from "@/hooks/GuiBuilder";
 import { getTestCaseNeighborIds, getTestCasesLargestId } from "@/utils/GuiBuilder/stageConfig";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { clsx, createStyles, Modal } from "@mantine/core";
+import { clsx, createStyles, Modal, SelectProps } from "@mantine/core";
 import cloneDeep from "lodash/cloneDeep";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import StdioTestCaseSettings from "./StdioTestCaseSettings";
 import StdioTestCasesTable from "./StdioTestCasesTable";
 
@@ -32,6 +33,12 @@ function StdioTestTestCasesPanel({ view, setView, closeModal }: StdioTestTestCas
   const [deleteAllModalOpened, setDeleteAllModalOpened] = useState(false);
 
   const { classes } = useStyles();
+
+  /** Options for selecting which test case to view. */
+  const testCaseIdSelectOptions: SelectItem[] = useMemo(() => {
+    if (config === null) return [];
+    return config.testCases.map((t): SelectItem => ({ value: t.id.toString(), label: t.id.toString() }));
+  }, [config]);
 
   if (!config) return null;
 
@@ -128,37 +135,60 @@ function StdioTestTestCasesPanel({ view, setView, closeModal }: StdioTestTestCas
           >
             Back to Table View
           </Button>
-          <p className="text-cool-gray-500">Test Case #{view}</p>
-          <div className="flex items-center gap-1">
-            <Button
+          <div className="flex items-center gap-3">
+            <button
+              title="Previous test case"
               onClick={() => {
                 prevId !== null && setView(prevId);
               }}
               disabled={prevId === null}
-              icon={<FontAwesomeIcon icon={["far", "arrow-left"]} />}
               className={clsx(
+                "w-8 h-8 flex items-center justify-center rounded-full text-lg transition",
                 prevId === null
                   ? "cursor-not-allowed text-gray-400"
                   : "text-blue-600 hover:bg-blue-100 active:bg-blue-200",
               )}
             >
-              Previous
-            </Button>
-            <Button
+              <FontAwesomeIcon icon={["fas", "arrow-left"]} />
+            </button>
+            <div className="flex items-center gap-2">
+              <p className="font-medium text-cool-gray-500">Test Case #</p>
+              <Select
+                id="selected-test-case-id"
+                data={testCaseIdSelectOptions}
+                value={view.toString()}
+                onChange={(id) => {
+                  if (id === null) return;
+                  setView(parseInt(id));
+                }}
+                maxDropdownHeight={350}
+                styles={testCaseIdSelectStyles}
+              />
+            </div>
+            <button
+              title="Next test case"
               onClick={() => {
                 nextId !== null && setView(nextId);
               }}
               disabled={nextId === null}
-              icon={<FontAwesomeIcon icon={["far", "arrow-right"]} />}
               className={clsx(
+                "w-8 h-8 flex items-center justify-center rounded-full text-lg transition",
+
                 nextId === null
                   ? "cursor-not-allowed text-gray-400"
                   : "text-blue-600 hover:bg-blue-100 active:bg-blue-200",
               )}
             >
-              Next
-            </Button>
+              <FontAwesomeIcon icon={["fas", "arrow-right"]} />
+            </button>
           </div>
+          <Button
+            onClick={addTestCase}
+            icon={<FontAwesomeIcon icon={["fas", "add"]} />}
+            className="text-green-600 hover:bg-green-100 active:bg-green-200"
+          >
+            Add Test Case
+          </Button>
         </div>
         <StdioTestCaseSettings caseId={view} closeModal={closeModal} setView={setView} />
       </div>
@@ -174,5 +204,12 @@ const useStyles = createStyles((theme) => ({
     fontWeight: 600,
   },
 }));
+
+/** Styles for the select item to choose the test case ID to view. */
+const testCaseIdSelectStyles: SelectProps["styles"] = {
+  wrapper: { maxWidth: "5rem" },
+  input: { minHeight: "2rem !important", padding: "0.25rem 0.5rem !important" },
+  item: { padding: "0.25rem 0.5rem" },
+};
 
 export default StdioTestTestCasesPanel;

@@ -12,7 +12,7 @@ import { getInputBoxWrapperStyles } from "./mantineStyles";
 export interface SelectItem<TValue extends string = string> {
   value: TValue;
   /** Label to show in the UI. */
-  label?: string;
+  label: string;
   /** Description of the item. */
   description?: string;
   disabled?: boolean;
