@@ -1,39 +1,26 @@
 import Button from "@/components/Button";
-import { defaultTestCase } from "@/constants/GuiBuilder/defaults";
-import { useSelectedStageConfig } from "@/hooks/GuiBuilder";
-import { getTestCasesLargestId } from "@/utils/GuiBuilder/stageConfig";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Tab } from "@headlessui/react";
 import { clsx, ScrollArea } from "@mantine/core";
-import cloneDeep from "lodash/cloneDeep";
-import { ButtonHTMLAttributes, useState } from "react";
+import { useState } from "react";
 import { StageConfigModal } from "../common";
-import StdioTestCaseSettings from "./StdioTestCaseSettings";
 import StdioTestStageSettings from "./StdioTestStageSettings";
+import StdioTestTestCasesPanel from "./StdioTestTestCasesPanel";
 
 function StdioTestSettings() {
-  const [config, setConfig] = useSelectedStageConfig("StdioTest");
-
   const [modalOpened, setModalOpened] = useState(false);
+  const [tabIndex, setTabIndex] = useState(0);
   /**
-   * - "settings" = Stage settings
-   * - `number` = Test case ID
-   * - `null` = No test case is selected (i.e. empty page)
+   * The view to show in "Test Cases" panel. Either:
+   * - "table" = Table view
+   * - `number` = Test case ID that is being edited
    */
-  const [page, setPage] = useState<"settings" | number | null>("settings");
-
-  if (!config) return null;
-
-  const addTestCase = () => {
-    const testCase = cloneDeep(defaultTestCase);
-    testCase.id = getTestCasesLargestId(config.testCases) + 1;
-    setConfig({ ...config, testCases: [...config.testCases, testCase] });
-    setPage(testCase.id);
-  };
+  const [testCasesView, setTestCasesView] = useState<"table" | number>("table");
 
   return (
     <>
       <div className="h-full py-20 flex flex-col items-center gap-5">
-        <p className="text-lg text-gray-500">To edit stage settings and test cases, press the button below.</p>
+        <p className="text-lg text-gray-500">To edit the stage settings, press the button below.</p>
         <Button
           className="bg-cse-700 text-white text-lg hover:bg-cse-500"
           icon={<FontAwesomeIcon icon={["far", "arrow-up-right-from-square"]} />}
@@ -47,63 +34,54 @@ function StdioTestSettings() {
         onClose={() => setModalOpened(false)}
         title="Standard I/O Test Configuration"
       >
-        <div className="flex h-full">
-          <div className="w-44 h-full flex flex-col bg-gray-100 rounded-lg space-y-3">
-            <div className="p-3 flex flex-col gap-2">
-              <Button
-                icon={<FontAwesomeIcon icon={["fas", "gear"]} />}
-                className="!justify-start bg-cse-700 text-white hover:bg-cse-500"
-                onClick={() => setPage("settings")}
+        <div className="flex flex-col h-full">
+          <Tab.Group defaultIndex={tabIndex} onChange={(index) => setTabIndex(index)}>
+            <Tab.List className="px-6 flex font-medium border-b border-gray-200">
+              <Tab
+                className={({ selected }) =>
+                  clsx(
+                    "px-4 pt-1 pb-2 flex items-center gap-2 border-b-2 transition",
+                    selected
+                      ? "border-cse-500 text-cse-600"
+                      : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700",
+                  )
+                }
               >
-                Settings
-              </Button>
-              <Button
-                onClick={addTestCase}
-                icon={<FontAwesomeIcon icon={["fas", "add"]} />}
-                className="!justify-start bg-green-600 text-white hover:bg-green-700"
+                <FontAwesomeIcon icon={["fas", "vial"]} />
+                <span>Test Cases</span>
+              </Tab>
+              <Tab
+                className={({ selected }) =>
+                  clsx(
+                    "px-4 pt-1 pb-2 flex items-center gap-2 border-b-2 transition",
+                    selected
+                      ? "border-cse-500 text-cse-600"
+                      : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700",
+                  )
+                }
               >
-                Add Test
-              </Button>
-            </div>
-            <ScrollArea type="auto" className="px-3 pb-3">
-              <div className="flex flex-col gap-1">
-                {config.testCases
-                  .sort((a, b) => a.id - b.id)
-                  .map(({ id }) => (
-                    <TestCaseButton key={id} caseId={id} isSelected={page === id} onClick={() => setPage(id)} />
-                  ))}
-              </div>
+                <FontAwesomeIcon icon={["fas", "gear"]} />
+                <span>Overall Settings</span>
+              </Tab>
+            </Tab.List>
+            <ScrollArea type="auto" className="flex-1">
+              <Tab.Panels className="px-3 flex flex-col">
+                <Tab.Panel>
+                  <StdioTestTestCasesPanel
+                    view={testCasesView}
+                    setView={setTestCasesView}
+                    closeModal={() => setModalOpened(false)}
+                  />
+                </Tab.Panel>
+                <Tab.Panel className="mt-4">
+                  <StdioTestStageSettings />
+                </Tab.Panel>
+              </Tab.Panels>
             </ScrollArea>
-          </div>
-          <ScrollArea type="auto" offsetScrollbars className="flex-1 pr-1 pl-5">
-            {page === "settings" ? (
-              <StdioTestStageSettings />
-            ) : (
-              <StdioTestCaseSettings caseId={page} closeModal={() => setModalOpened(false)} setPage={setPage} />
-            )}
-          </ScrollArea>
+          </Tab.Group>
         </div>
       </StageConfigModal>
     </>
-  );
-}
-
-interface TestCaseButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  caseId: number;
-  isSelected: boolean;
-}
-
-function TestCaseButton({ caseId, isSelected, ...props }: TestCaseButtonProps) {
-  return (
-    <Button
-      className={clsx(
-        "!px-3 !justify-start hover:bg-blue-100 active:bg-blue-200",
-        isSelected ? "bg-blue-200 text-blue-800" : "text-black",
-      )}
-      {...props}
-    >
-      Test #{caseId}
-    </Button>
   );
 }
 

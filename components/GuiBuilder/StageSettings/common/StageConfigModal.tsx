@@ -24,7 +24,7 @@ const useStyles = createStyles((theme) => ({
     flexDirection: "column",
   },
   title: {
-    color: theme.colors.blue[4],
+    color: theme.colors.blue[3],
     fontSize: theme.fontSizes.xl,
     fontWeight: 600,
   },

@@ -21,16 +21,16 @@ import { hiddenItemOptions, inputModeOptions, visibilityOptions } from "./inputO
 interface StdioTestCaseSettingsProps {
   /** Test case ID. It's `null` when no test case is selected. */
   caseId: number | null;
-  /** A callback that closes the current modal. */
+  /** A callback that closes the parent modal. */
   closeModal: () => void;
-  /** Sets the page to display. */
-  setPage: (page: "settings" | number | null) => void;
+  /** Sets the view to display. */
+  setView: (page: "table" | number) => void;
 }
 
 /**
- * Test case settings page for the "Standard I/O Test" settings panel.
+ * Settings for a single test case in `StdioTest` stage.
  */
-function StdioTestCaseSettings({ caseId, closeModal, setPage }: StdioTestCaseSettingsProps) {
+function StdioTestCaseSettings({ caseId, closeModal, setView }: StdioTestCaseSettingsProps) {
   const [config, setConfig] = useSelectedStageConfig("StdioTest");
   const hasValgrindStage = useStoreState((state) => state.config.hasStage("Valgrind"));
   const setAddStageSearchString = useStoreActions((actions) => actions.layout.setAddStageSearchString);
@@ -48,7 +48,7 @@ function StdioTestCaseSettings({ caseId, closeModal, setPage }: StdioTestCaseSet
   const deleteTestCase = () => {
     const testCases = config.testCases.filter((test) => test.id !== caseId);
     setConfig({ ...config, testCases });
-    setPage(null);
+    setView("table");
     setIsEditingId(false);
   };
 
@@ -56,7 +56,7 @@ function StdioTestCaseSettings({ caseId, closeModal, setPage }: StdioTestCaseSet
     const newTestCase = cloneDeep(caseConfig);
     newTestCase.id = getTestCasesLargestId(config.testCases) + 1;
     setConfig({ ...config, testCases: [...config.testCases, newTestCase] });
-    setPage(newTestCase.id);
+    setView(newTestCase.id);
     setIsEditingId(false);
   };
 
@@ -91,7 +91,7 @@ function StdioTestCaseSettings({ caseId, closeModal, setPage }: StdioTestCaseSet
       testCase.id = newId;
     });
     setIsEditingId(false);
-    setPage(newId);
+    setView(newId);
   };
 
   return (
@@ -124,6 +124,7 @@ function StdioTestCaseSettings({ caseId, closeModal, setPage }: StdioTestCaseSet
                       ? "bg-gray-300 text-gray-500"
                       : "bg-green-600 text-white hover:bg-green-700 active:bg-green-800",
                   )}
+                  title="Save new ID"
                   disabled={isNewIdInvalid}
                 >
                   <FontAwesomeIcon icon={["fas", "check"]} />
@@ -133,6 +134,7 @@ function StdioTestCaseSettings({ caseId, closeModal, setPage }: StdioTestCaseSet
                     setIsEditingId(false);
                     setNewId(caseId);
                   }}
+                  title="Cancel"
                   className="w-7 h-7 flex items-center justify-center bg-red-500 text-white rounded-full transition hover:bg-red-600 active:bg-red-700"
                 >
                   <FontAwesomeIcon icon={["fas", "close"]} />
@@ -252,7 +254,7 @@ function StdioTestCaseSettings({ caseId, closeModal, setPage }: StdioTestCaseSet
                 styles={{ root: { flex: 3 } }}
               />
             </div>
-            <div>
+            <div className="flex flex-col gap-3">
               <div className="flex items-center gap-2">
                 <label htmlFor="_stdinInputMode" className="flex-[2]">
                   Standard input

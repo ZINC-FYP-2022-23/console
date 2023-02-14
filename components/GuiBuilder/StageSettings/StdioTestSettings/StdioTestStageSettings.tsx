@@ -6,7 +6,7 @@ import { InfoTooltip } from "../../Diagnostics";
 import { diffIgnoreFlagOptions } from "./inputOptions";
 
 /**
- * Stage Settings page for the "Standard I/O Test" settings panel.
+ * Overall stage settings for the `StdioTest` stage.
  */
 function StdioTestStageSettings() {
   const [config, setConfig] = useSelectedStageConfig("StdioTest");
@@ -32,7 +32,6 @@ function StdioTestStageSettings() {
 
   return (
     <div>
-      <p className="mb-4 font-semibold text-xl">Stage Settings</p>
       <div className="space-y-4">
         <div className="flex gap-3">
           <div className="flex-[2]">
@@ -108,7 +107,7 @@ const AdditionalPackagesTooltip = memo(() => (
 AdditionalPackagesTooltip.displayName = "AdditionalPackagesTooltip";
 
 const AdditionalPipPackagesTooltip = memo(() => (
-  <InfoTooltip width={500}>
+  <InfoTooltip width={540}>
     <ul className="px-3 text-sm list-disc">
       <li>
         <a href="https://pypi.org/project/pip/" target="_blank" rel="noreferrer" className="underline text-blue-700">
