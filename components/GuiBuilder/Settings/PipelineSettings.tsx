@@ -5,7 +5,7 @@ import { ACCEPTED_LANG } from "@/constants/GuiBuilder/acceptedLang";
 import { highlightableElementIds } from "@/constants/GuiBuilder/highlightableElements";
 import supportedStages from "@/constants/GuiBuilder/supportedStages";
 import { useStoreActions, useStoreState } from "@/store/GuiBuilder";
-import { SettingsFeatures, SettingsGpuDevice, SettingsUseTemplate } from "@/types";
+import { SettingsFeatures, SettingsGpuDevice, SettingsUseTemplate } from "@/types/GuiBuilder";
 import { settingsLangToString } from "@/utils/GuiBuilder";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { memo } from "react";

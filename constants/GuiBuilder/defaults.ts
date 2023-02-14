@@ -1,4 +1,4 @@
-import type {
+import {
   Config,
   GradingPolicy,
   JoinPolicy,
@@ -10,7 +10,7 @@ import type {
   TestCase,
   Valgrind,
   XUnitOverride,
-} from "@/types";
+} from "@/types/GuiBuilder";
 import { addDays, set } from "date-fns";
 import { Required } from "utility-types";
 import { v4 as uuidv4 } from "uuid";

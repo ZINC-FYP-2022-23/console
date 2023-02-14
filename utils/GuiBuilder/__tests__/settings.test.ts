@@ -1,4 +1,4 @@
-import { Settings, SettingsGpuDevice, SettingsLang, SettingsRaw, SettingsUseTemplate } from "@/types";
+import { Settings, SettingsGpuDevice, SettingsLang, SettingsRaw, SettingsUseTemplate } from "@/types/GuiBuilder";
 import * as uuid from "uuid";
 import {
   isSettingsEqual,

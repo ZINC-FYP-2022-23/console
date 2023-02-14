@@ -29,7 +29,7 @@ import {
   ValgrindRaw,
   XUnitOverride,
   XUnitOverrideRaw,
-} from "@/types";
+} from "@/types/GuiBuilder";
 import "jest-extended";
 import * as uuid from "uuid";
 import { configsToConfigsRaw, parseStages } from "../stage";

@@ -2,7 +2,7 @@
  * @file Utilities for the `Config` type.
  */
 
-import type { Config, ParsedConfig } from "@/types";
+import { Config, ParsedConfig } from "@/types/GuiBuilder";
 import { dump, load } from "js-yaml";
 import isEqual from "lodash/isEqual";
 import { isSettingsEqual, settingsRawToSettings, settingsToSettingsRaw } from "./settings";

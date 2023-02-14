@@ -2,7 +2,7 @@ import Button from "@/components/Button";
 import { highlightableElementIds } from "@/constants/GuiBuilder/highlightableElements";
 import supportedStages, { SupportedStage } from "@/constants/GuiBuilder/supportedStages";
 import { AccordionState, useStoreActions, useStoreState } from "@/store/GuiBuilder";
-import { StageKind } from "@/types";
+import { StageKind } from "@/types/GuiBuilder";
 import { configToYaml } from "@/utils/GuiBuilder";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Accordion, createStyles, ScrollArea, Tooltip } from "@mantine/core";

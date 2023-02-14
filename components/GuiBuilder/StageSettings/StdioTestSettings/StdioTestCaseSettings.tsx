@@ -4,7 +4,7 @@ import { defaultValgrindConfig } from "@/constants/GuiBuilder/defaults";
 import supportedStages from "@/constants/GuiBuilder/supportedStages";
 import { useSelectedStageConfig } from "@/hooks/GuiBuilder";
 import { useStoreActions, useStoreState } from "@/store/GuiBuilder";
-import { TestCase } from "@/types";
+import { TestCase } from "@/types/GuiBuilder";
 import { getTestCasesLargestId } from "@/utils/GuiBuilder/stageConfig";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { clsx, Tooltip } from "@mantine/core";

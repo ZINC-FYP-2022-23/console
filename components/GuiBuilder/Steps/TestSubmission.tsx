@@ -5,7 +5,7 @@ import { SubmissionLoader } from "@/components/SubmissionLoader";
 import { useZinc } from "@/contexts/zinc";
 import { SUBMISSION_DETAIL, SUBMISSION_SUBSCRIPTION } from "@/graphql/queries/user";
 import { useStoreState } from "@/store/GuiBuilder";
-import { AssignmentConfig, Course, Submission as SubmissionType, User } from "@/types";
+import { AssignmentConfig, Course, Submission as SubmissionType, User } from "@/types/tables";
 import { useQuery, useSubscription } from "@apollo/client";
 import { ScrollArea } from "@mantine/core";
 import { ModalContent, Upload } from "pages/courses/[courseId]/assignments/[assignmentConfigId]/submissions";

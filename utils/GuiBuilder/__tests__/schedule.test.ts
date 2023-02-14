@@ -1,4 +1,4 @@
-import { Schedule } from "@/types";
+import { Schedule } from "@/types/GuiBuilder";
 import { appendZToIsoString, isScheduleEqual } from "../schedule";
 
 describe("Schedule utils", () => {

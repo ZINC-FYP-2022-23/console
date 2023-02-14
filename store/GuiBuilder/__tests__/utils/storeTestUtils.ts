@@ -1,5 +1,5 @@
 import supportedStages from "@/constants/GuiBuilder/supportedStages";
-import { StageKind } from "@/types";
+import { StageKind } from "@/types/GuiBuilder";
 import cloneDeep from "lodash/cloneDeep";
 import { GuiBuilderModel, guiBuilderModel } from "../../guiBuilderModel";
 

@@ -3,7 +3,7 @@
  */
 
 import supportedStages, { SupportedStage } from "@/constants/GuiBuilder/supportedStages";
-import { StageDataMap, StageDependencyMap, StageKind } from "@/types";
+import { StageDataMap, StageDependencyMap, StageKind } from "@/types/GuiBuilder";
 import { dump, load } from "js-yaml";
 import camelCase from "lodash/camelCase";
 import cloneDeep from "lodash/cloneDeep";

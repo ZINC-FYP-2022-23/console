@@ -2,7 +2,7 @@ import { AssignedStudents, CourseWideAssignStudents, UnassignedStudents } from "
 import { Spinner } from "@/components/Spinner";
 import { GET_STUDENTS_FOR_CONFIG } from "@/graphql/queries/user";
 import { useStoreState } from "@/store/GuiBuilder";
-import { AssignmentConfig } from "@/types";
+import { AssignmentConfig } from "@/types/tables";
 import { useSubscription } from "@apollo/client";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ScrollArea } from "@mantine/core";

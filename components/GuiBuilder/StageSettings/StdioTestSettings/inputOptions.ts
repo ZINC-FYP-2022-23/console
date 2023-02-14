@@ -1,5 +1,5 @@
 import { MultiSelectData, SelectItem } from "@/components/Input";
-import { DiffIgnoreFlag, HiddenItem, VisibilityTestCase } from "@/types";
+import { DiffIgnoreFlag, HiddenItem, VisibilityTestCase } from "@/types/GuiBuilder";
 
 export const diffIgnoreFlagOptions: MultiSelectData<DiffIgnoreFlag>[] = [
   {

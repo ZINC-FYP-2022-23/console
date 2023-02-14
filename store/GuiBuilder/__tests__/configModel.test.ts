@@ -1,4 +1,5 @@
-import { AssignmentConfig, Config, GradingPolicy, Schedule, Stage, StageKind } from "@/types";
+import { Config, GradingPolicy, Schedule, Stage, StageKind } from "@/types/GuiBuilder";
+import { AssignmentConfig } from "@/types/tables";
 import * as configUtils from "@/utils/GuiBuilder/config";
 import { createStore } from "easy-peasy";
 import "jest-extended";

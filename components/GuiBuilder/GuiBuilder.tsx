@@ -5,7 +5,7 @@ import { useZinc } from "@/contexts/zinc";
 import { CREATE_ASSIGNMENT_CONFIG, UPDATE_ASSIGNMENT_CONFIG } from "@/graphql/mutations/user";
 import { useHighlightElement, useWarnUnsavedChanges } from "@/hooks/GuiBuilder";
 import { useStoreActions, useStoreState } from "@/store/GuiBuilder";
-import { Assignment, AssignmentConfig } from "@/types";
+import { Assignment, AssignmentConfig } from "@/types/tables";
 import { useMutation } from "@apollo/client";
 import { Tooltip } from "@mantine/core";
 import { useHotkeys } from "@mantine/hooks";

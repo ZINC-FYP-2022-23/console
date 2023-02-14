@@ -1,5 +1,5 @@
 import { MultiSelectData, SelectItem } from "@/components/Input";
-import { ChecksFilter, VisibilityValgrind } from "@/types";
+import { ChecksFilter, VisibilityValgrind } from "@/types/GuiBuilder";
 
 export const checksFilterOptions: MultiSelectData<ChecksFilter>[] = [
   {

@@ -10,7 +10,7 @@ import {
   StdioTestRaw,
   TestCaseRaw,
   ValgrindRaw,
-} from "@/types";
+} from "@/types/GuiBuilder";
 import {
   scoreWeightingFromRaw,
   scoreWeightingToRaw,

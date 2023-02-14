@@ -4,7 +4,7 @@ import { GET_PIPELINE_CONFIG_FOR_ASSIGNMENT } from "@/graphql/queries/user";
 import { Layout } from "@/layout";
 import { initializeApollo } from "@/lib/apollo";
 import { guiBuilderModel } from "@/store/GuiBuilder";
-import { Assignment, AssignmentConfig } from "@/types";
+import { Assignment, AssignmentConfig } from "@/types/tables";
 import { useQuery } from "@apollo/client";
 import { MantineProvider, MantineThemeOverride } from "@mantine/core";
 import { createStore, StoreProvider } from "easy-peasy";

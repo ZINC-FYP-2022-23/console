@@ -1,4 +1,4 @@
-import { TestCase } from "@/types";
+import { TestCase } from "@/types/GuiBuilder";
 import { getTestCaseNeighborIds, getTestCasesLargestId } from "../stageConfig";
 
 /**

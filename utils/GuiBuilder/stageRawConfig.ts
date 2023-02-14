@@ -4,7 +4,6 @@
 
 import { defaultValgrindConfig } from "@/constants/GuiBuilder/defaults";
 import {
-  Override,
   OverrideRaw,
   ScoreWeighting,
   ScoreWeightingRaw,
@@ -12,7 +11,7 @@ import {
   TestCaseRaw,
   Valgrind,
   ValgrindRaw,
-} from "@/types";
+} from "@/types/GuiBuilder";
 import { v4 as uuidv4 } from "uuid";
 
 /**
