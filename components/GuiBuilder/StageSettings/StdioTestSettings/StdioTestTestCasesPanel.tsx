@@ -3,8 +3,9 @@ import { defaultTestCase } from "@/constants/GuiBuilder/defaults";
 import { useSelectedStageConfig } from "@/hooks/GuiBuilder";
 import { getTestCaseNeighborIds, getTestCasesLargestId } from "@/utils/GuiBuilder/stageConfig";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { clsx } from "@mantine/core";
+import { clsx, createStyles, Modal } from "@mantine/core";
 import cloneDeep from "lodash/cloneDeep";
+import { useState } from "react";
 import StdioTestCaseSettings from "./StdioTestCaseSettings";
 import StdioTestCasesTable from "./StdioTestCasesTable";
 
@@ -26,6 +27,11 @@ interface StdioTestTestCasesPanelProps {
  */
 function StdioTestTestCasesPanel({ view, setView, closeModal }: StdioTestTestCasesPanelProps) {
   const [config, setConfig] = useSelectedStageConfig("StdioTest");
+
+  /** Whether the confirmation modal for "Delete All Test Cases" is opened. */
+  const [deleteAllModalOpened, setDeleteAllModalOpened] = useState(false);
+
+  const { classes } = useStyles();
 
   if (!config) return null;
 
@@ -54,7 +60,7 @@ function StdioTestTestCasesPanel({ view, setView, closeModal }: StdioTestTestCas
   if (view === "table") {
     return (
       <div className="mt-4 space-y-4">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-5">
           <Button
             onClick={addTestCase}
             icon={<FontAwesomeIcon icon={["fas", "add"]} />}
@@ -62,7 +68,13 @@ function StdioTestTestCasesPanel({ view, setView, closeModal }: StdioTestTestCas
           >
             Add Test Case
           </Button>
-          {/* TODO(Anson): Add a "Delete All Test Cases" button. It should display a confirmation modal. */}
+          <Button
+            onClick={() => setDeleteAllModalOpened(true)}
+            icon={<FontAwesomeIcon icon={["fas", "trash-can"]} />}
+            className="text-red-500 hover:bg-red-100 active:bg-red-200"
+          >
+            Delete All Test Cases
+          </Button>
         </div>
         <StdioTestCasesTable
           testCases={config.testCases}
@@ -70,6 +82,36 @@ function StdioTestTestCasesPanel({ view, setView, closeModal }: StdioTestTestCas
           onDelete={(testCaseId) => deleteTestCase(testCaseId)}
           onVisit={(testCaseId) => setView(testCaseId)}
         />
+        {/* Confirmation modal for Delete All Test Cases */}
+        <Modal
+          title="Delete all test cases?"
+          opened={deleteAllModalOpened}
+          onClose={() => setDeleteAllModalOpened(false)}
+          centered
+          size="md"
+          classNames={classes}
+        >
+          <div className="space-y-5">
+            <p className="text-gray-800">Are you sure you want to delete all test cases?</p>
+            <div className="w-full flex items-center justify-end gap-3">
+              <Button
+                onClick={() => setDeleteAllModalOpened(false)}
+                className="!font-normal text-gray-600 hover:bg-gray-200"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={() => {
+                  setConfig({ ...config, testCases: [] });
+                  () => setDeleteAllModalOpened(false);
+                }}
+                className="bg-red-500 text-white hover:bg-red-600 active:bg-red-700"
+              >
+                Delete
+              </Button>
+            </div>
+          </div>
+        </Modal>
       </div>
     );
   }
@@ -123,5 +165,14 @@ function StdioTestTestCasesPanel({ view, setView, closeModal }: StdioTestTestCas
     );
   }
 }
+
+/** Styles for the Delete All Test Cases confirmation modal. */
+const useStyles = createStyles((theme) => ({
+  title: {
+    color: theme.colors.red[7],
+    fontSize: theme.fontSizes.xl,
+    fontWeight: 600,
+  },
+}));
 
 export default StdioTestTestCasesPanel;
