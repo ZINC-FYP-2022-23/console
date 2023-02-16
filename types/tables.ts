@@ -177,7 +177,7 @@ export type User = {
   initials: string;
   isAdmin: boolean;
   itsc: string;
-  name: String;
+  name: string;
   sections: SectionUser[];
   submissions: Submission[];
   updatedAt: string;

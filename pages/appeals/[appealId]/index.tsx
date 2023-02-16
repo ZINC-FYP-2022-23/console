@@ -5,77 +5,56 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Tab } from "@headlessui/react";
 import { Layout } from "@/layout";
 import { Alert } from "@mantine/core";
-import { Appeal, AppealStatus } from "@/types";
+import { AppealStatus, DisplayedAppealInfo } from "@/types";
 import { GetServerSideProps } from "next";
 import Link from "next/link";
 import { useState } from "react";
 import { ReactGhLikeDiff } from "react-gh-like-diff";
+import { DisplayMessageType, AppealLog } from "@/types/appeal";
+import { Submission as SubmissionType } from "@/types/tables";
+import { AppealLogMessage } from "@/components/Appeal/AppealLogMessage";
+import { AppealTextMessage } from "@/components/Appeal/AppealTextMessage";
+import { sort, transformToAppealLog } from "@/utils/appealUtils";
+import { messageList, appealAttempts, changeLogList, courseId, appealInfo, fullScore } from "@/utils/dummyData";
 
-type IconProps = {
-  name: String;
-  type: "Student" | "Teaching Assistant";
+type ActivityLogTabProps = {
+  activityLogList: (
+    | (SubmissionType & { _type: "submission" })
+    | (DisplayMessageType & { _type: "appealMessage" })
+    | (AppealLog & { _type: "appealLog" })
+  )[];
 };
 
-function Icon({ name, type }: IconProps) {
-  let backgroundColor: string;
-  switch (type) {
-    case "Student":
-      backgroundColor = "bg-blue-700";
-      break;
-    case "Teaching Assistant":
-      backgroundColor = "bg-red-800";
-      break;
-    default:
-      backgroundColor = "bg-gray-800";
-  }
-
-  const css = "w-10 h-10 leading-10 rounded-full text-white font-bold text-lg text-center " + backgroundColor;
-  return <div className={css}>{name.charAt(0)}</div>;
-}
-
-type Message = {
-  id: number;
-  name: String;
-  type: "Student" | "Teaching Assistant";
-  content: String;
-  time: String;
-};
-
-function SingleMessage({ message }: { message: Message }) {
-  const { name, type, time, content } = message;
-
-  return (
-    <div className="flex flex-row space-x-2">
-      <Icon name={name} type={type} />
-      <div className="overflow-x-auto">
-        <div className="flex flex-row space-x-2">
-          <p className="font-bold text-lg">{name}</p>
-          <p className="text-gray-500">({type})</p>
-          <p className="text-green-700">{time}</p>
-        </div>
-        <p>{message.content}</p>
-      </div>
-    </div>
-  );
-}
-
-type MessagingTabProps = {
-  messageList: Message[];
-};
-
-function MessagingTab({ messageList }: MessagingTabProps) {
+/**
+ * Return a component that shows the Activity Log under the Activity Log Tab to show all appeal messages and appeal logs
+ * @param {
+ *  | ((SubmissionType & { _type: "submission" })
+ *  | (DisplayMessageType & { _type: "appealMessage" })
+ *  | (AppealLog & { _type: "appealLog" }))[]
+ * } activityLogList - A list of logs that may include appeal messages and appeal logs
+ */
+function ActivityLogTab({ activityLogList }: ActivityLogTabProps) {
   const [comments, setComments] = useState("");
 
   return (
     <div className="flex flex-col space-y-2">
-      <div className="space-y-4">
-        {messageList.map((message: Message) => (
-          <div key={message.id}>
-            <SingleMessage message={message} />
-          </div>
-        ))}
+      <div>
+        {activityLogList.map(
+          (
+            log:
+              | (SubmissionType & { _type: "submission" })
+              | (DisplayMessageType & { _type: "appealMessage" })
+              | (AppealLog & { _type: "appealLog" }),
+          ) => {
+            if (log._type === "appealLog") {
+              return <AppealLogMessage key={log.id} log={log} showButton={false} />;
+            } else if (log._type === "appealMessage") {
+              return <AppealTextMessage key={log.id} message={log} />;
+            }
+          },
+        )}
       </div>
-      <div className="mb-2 sticky bottom-0 object-bottom">
+      <div className="mb-6 sticky bottom-0 object-bottom">
         {/* @ts-ignore */}
         <RichTextEditor
           id="rte"
@@ -93,6 +72,10 @@ function MessagingTab({ messageList }: MessagingTabProps) {
 
 type CodeComparisonTabProps = {};
 
+/**
+ * Show the difference between new and old file submissions under the Code Comparison Tab by using ReactGhLikeDiff
+ */
+// TODO(ANSON): Complete the Code Comparison Tab
 function CodeComparisonTab({}: CodeComparisonTabProps) {
   const { stdioTestCase } = useLayoutState();
 
@@ -104,7 +87,7 @@ function CodeComparisonTab({}: CodeComparisonTabProps) {
           updatedFileName: "New Submission",
           outputFormat: "side-by-side",
         }}
-        // TODO(Bryan): Fix diffString error
+        // TODO(Bryan): Fix diffString error for Code Comparison Tab
         //diffString={stdioTestCase.diff.join("\n")}
       />
     </div>
@@ -113,12 +96,33 @@ function CodeComparisonTab({}: CodeComparisonTabProps) {
 
 type AppealDetailsProps = {
   courseId: number;
-  appealInfo: Appeal | null;
+  assignmentId: number;
+  appealSubmitted: boolean;
+  allowAccess: boolean;
+  appealInfo: DisplayedAppealInfo | null;
   fullScore: number;
-  messageList: Message[];
+  activityLogList: (
+    | (SubmissionType & { _type: "submission" })
+    | (DisplayMessageType & { _type: "appealMessage" })
+    | (AppealLog & { _type: "appealLog" })
+  )[];
 };
 
-function AppealDetails({ courseId, appealInfo, fullScore, messageList }: AppealDetailsProps) {
+/**
+ * Returns the entire Appeal Details page
+ * @param {number}  courseId - The course ID that the appeal is related to
+ * @param {number}  assignmentId - The assignment ID that the appeal is related to
+ * @param {boolean} appealSubmitted - Is the appeal ID valid
+ * @param {boolean} allowAccess - Is the student allowed to access the appeal
+ * @param {DisplayedAppealInfo | null} appealInfo - The information of the appeal
+ * @param {number}  fullScore - Maximum score of the assignment
+ * @param {
+ *  | ((SubmissionType & { _type: "submission" })
+ *  | (DisplayMessageType & { _type: "appealMessage" })
+ *  | (AppealLog & { _type: "appealLog" }))[]
+ * } activityLogList - A list of log that includes appeal messages and appeal logs
+ */
+function AppealDetails({ courseId, appealInfo, fullScore, activityLogList }: AppealDetailsProps) {
   const [appealStatus, setAppealStatus] = useState(appealInfo?.status);
 
   return (
@@ -213,7 +217,7 @@ function AppealDetails({ courseId, appealInfo, fullScore, messageList }: AppealD
                         }`
                       }
                     >
-                      Messaging
+                      Activity Log
                     </Tab>
                     <Tab
                       className={({ selected }) =>
@@ -228,9 +232,9 @@ function AppealDetails({ courseId, appealInfo, fullScore, messageList }: AppealD
                     </Tab>
                   </Tab.List>
                   <Tab.Panels>
-                    {/* "Messaging" tab panel */}
+                    {/* "Activity Log" tab panel */}
                     <Tab.Panel>
-                      <MessagingTab messageList={messageList} />
+                      <ActivityLogTab activityLogList={activityLogList} />
                     </Tab.Panel>
                     {/* "Code Comparison" tab panel */}
                     <Tab.Panel>
@@ -260,61 +264,17 @@ function AppealDetails({ courseId, appealInfo, fullScore, messageList }: AppealD
 
 export const getServerSideProps: GetServerSideProps = async () => {
   // TODO(BRYAN): Retrieve the data from server once it's updated
-  const courseId = 3;
-  //const appealInfo: Appeal | null = null;
-  const appealInfo: Appeal | null = {
-    id: 2,
-    name: "Peter Chan",
-    itsc: "ptr",
-    status: AppealStatus.Pending,
-    updatedAt: "Today LOL",
-    originalScore: 70,
-  };
-  const fullScore: number = 100;
-  const messageList: Message[] = [
-    {
-      id: 1,
-      name: "Lo Kwok Yan Bryan",
-      type: "Student",
-      time: "14 Nov 2022, 18:11",
-      content: "Hi TA, I want to submit a grade appeal.",
-    },
-    {
-      id: 2,
-      name: "Gilbert Chan",
-      type: "Teaching Assistant",
-      time: "15 Nov 2022, 20:59",
-      content: "Dear Bryan, Nice to Meet You!",
-    },
-    {
-      id: 3,
-      name: "Lo Kwok Yan Bryan",
-      type: "Student",
-      time: "14 Nov 2022, 18:11",
-      content: "Hi TA, I want to submit a grade appeal.",
-    },
-    {
-      id: 4,
-      name: "Gilbert Chan",
-      type: "Teaching Assistant",
-      time: "15 Nov 2022, 20:59",
-      content: "Okie, chekcing!",
-    },
-    {
-      id: 5,
-      name: "Lo Kwok Yan Bryan",
-      type: "Student",
-      time: "14 Nov 2022, 18:11",
-      content: "Thank you.",
-    },
-    {
-      id: 6,
-      name: "Gilbert Chan",
-      type: "Teaching Assistant",
-      time: "15 Nov 2022, 20:59",
-      content: "Still in process!",
-    },
-  ];
+
+  let log: AppealLog[] = transformToAppealLog({ appeals: appealAttempts, changeLog: changeLogList });
+
+  let activityLogList: (
+    | (SubmissionType & { _type: "submission" })
+    | (DisplayMessageType & { _type: "appealMessage" })
+    | (AppealLog & { _type: "appealLog" })
+  )[] = sort({
+    messages: messageList,
+    appealLog: log,
+  });
 
   return {
     props: { courseId, appealInfo, fullScore, messageList },
