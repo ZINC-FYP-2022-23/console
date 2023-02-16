@@ -1,6 +1,10 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { AppealStatus } from "@/types";
 
+/**
+ * Returns a component of a box that shows the latest appeal status
+ * @param appealResult - The latest appeal status
+ */
 export function AppealResult({ appealResult }: { appealResult: AppealStatus }) {
   switch (appealResult) {
     case AppealStatus.Accept: {
