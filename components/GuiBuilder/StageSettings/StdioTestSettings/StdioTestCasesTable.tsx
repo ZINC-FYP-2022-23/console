@@ -1,4 +1,5 @@
-import { TestCase, VisibilityTestCase } from "@/types/GuiBuilder";
+import { useStoreState } from "@/store/GuiBuilder";
+import { TestCase, Valgrind, VisibilityTestCase } from "@/types/GuiBuilder";
 import { getHeaderColumnSortIcon } from "@/utils/tanstackTable";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { clsx } from "@mantine/core";
@@ -45,7 +46,15 @@ function useStdioTestCasesTableContext() {
 /**
  * Type definition of each row in the Standard I/O test cases table.
  */
-type StdioTestCasesTableType = Pick<TestCase, "id" | "score" | "visibility" | "_valgrindOverride">;
+type StdioTestCasesTableType = Pick<TestCase, "id" | "score" | "visibility"> & {
+  /**
+   * Whether this test case will run Valgrind. The logic of computing this value is as follows:
+   *  - If the pipeline does not have Valgrind stage, this value is always false.
+   *  - If the test case overrides config from Valgrind stage, use the value from the override.
+   *  - Otherwise, use the value from the Valgrind stage.
+   */
+  runValgrind: boolean;
+};
 
 const columnHelper = createColumnHelper<StdioTestCasesTableType>();
 
@@ -67,8 +76,8 @@ const columns = [
     header: "Visibility",
     cell: (props) => <VisibilityBadge value={props.getValue()} />,
   }),
-  columnHelper.accessor("_valgrindOverride", {
-    header: "Has Valgrind Override",
+  columnHelper.accessor("runValgrind", {
+    header: "Run Valgrind",
     cell: (props) => {
       const value = props.getValue();
       return (
@@ -89,16 +98,48 @@ const columns = [
 
 const defaultSorting: SortingState = [{ id: "id", desc: false }];
 
+//////////////////// Utilities ////////////////////
+
+/**
+ * @param testCases Test cases to map. This array is not mutated.
+ * @param valgrind Data of the Valgrind stage if this stage exists in the pipeline.
+ */
+export const mapTestCasesToTableData = (
+  testCases: TestCase[],
+  valgrind: Valgrind | null,
+): StdioTestCasesTableType[] => {
+  return testCases.map(
+    (testCase): StdioTestCasesTableType => ({
+      id: testCase.id,
+      score: testCase.score,
+      visibility: testCase.visibility,
+      runValgrind: (() => {
+        if (!valgrind) return false;
+        if (testCase._valgrindOverride && testCase.valgrind) return testCase.valgrind.enabled;
+        return valgrind.enabled;
+      })(),
+    }),
+  );
+};
+
 //////////////////// Components ////////////////////
 
 /**
  * A table for showing all Standard I/O test cases.
  */
 function StdioTestCasesTable({ testCases, onDuplicate, onDelete, onVisit }: StdioTestCasesTableProps) {
+  const editingConfig = useStoreState((state) => state.config.editingConfig);
+
   const [sorting, setSorting] = useState<SortingState>(defaultSorting);
 
   const table = useReactTable({
-    data: testCases,
+    data: mapTestCasesToTableData(
+      testCases,
+      (() => {
+        const valgrindStage = Object.values(editingConfig.stageData).find((stage) => stage.name === "Valgrind");
+        return valgrindStage ? (valgrindStage.config as Valgrind) : null;
+      })(),
+    ),
     columns,
     state: {
       sorting,

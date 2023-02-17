@@ -79,7 +79,7 @@ export const testCaseFromRaw = (testCaseRaw: TestCaseRaw): TestCase => {
       if (!test.expected && !test.file_expected) return "none";
       return test.expected ? "text" : "file";
     })(),
-    _valgrindOverride: valgrind !== undefined,
+    _valgrindOverride: !!valgrind,
   };
   return output;
 };
