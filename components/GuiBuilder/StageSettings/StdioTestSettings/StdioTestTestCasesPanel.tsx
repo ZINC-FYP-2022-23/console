@@ -29,6 +29,8 @@ interface StdioTestTestCasesPanelProps {
 function StdioTestTestCasesPanel({ view, setView, closeModal }: StdioTestTestCasesPanelProps) {
   const [config, setConfig] = useSelectedStageConfig("StdioTest");
 
+  /** Which test case to delete. It shows a confirmation modal if it's value is not null. */
+  const [testCaseIdToDelete, setTestCaseIdToDelete] = useState<number | null>(null);
   /** Whether the confirmation modal for "Delete All Test Cases" is opened. */
   const [deleteAllModalOpened, setDeleteAllModalOpened] = useState(false);
 
@@ -52,6 +54,7 @@ function StdioTestTestCasesPanel({ view, setView, closeModal }: StdioTestTestCas
   const deleteTestCase = (id: number) => {
     const testCases = config.testCases.filter((test) => test.id !== id);
     setConfig({ ...config, testCases });
+    setTestCaseIdToDelete(null);
   };
 
   const duplicateTestCase = (id: number) => {
@@ -86,9 +89,36 @@ function StdioTestTestCasesPanel({ view, setView, closeModal }: StdioTestTestCas
         <StdioTestCasesTable
           testCases={config.testCases}
           onDuplicate={(testCaseId) => duplicateTestCase(testCaseId)}
-          onDelete={(testCaseId) => deleteTestCase(testCaseId)}
+          onDelete={(testCaseId) => setTestCaseIdToDelete(testCaseId)}
           onVisit={(testCaseId) => setView(testCaseId)}
         />
+        {/* Confirmation modal for Delete Single Test Case */}
+        <Modal
+          title={`Delete test case #${testCaseIdToDelete}?`}
+          opened={testCaseIdToDelete !== null}
+          onClose={() => setTestCaseIdToDelete(null)}
+          centered
+          size="md"
+          classNames={classes}
+        >
+          <div className="space-y-5">
+            <p className="text-gray-800">Are you sure you want to delete test case #{testCaseIdToDelete}?</p>
+            <div className="w-full flex items-center justify-end gap-3">
+              <Button
+                onClick={() => setTestCaseIdToDelete(null)}
+                className="!font-normal text-gray-600 hover:bg-gray-200"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={() => deleteTestCase(testCaseIdToDelete!)}
+                className="bg-red-500 text-white hover:bg-red-600 active:bg-red-700"
+              >
+                Delete
+              </Button>
+            </div>
+          </div>
+        </Modal>
         {/* Confirmation modal for Delete All Test Cases */}
         <Modal
           title="Delete all test cases?"
