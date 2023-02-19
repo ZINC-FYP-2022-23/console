@@ -5,38 +5,40 @@ import { configToYaml, parseConfigYaml } from "../config";
 import * as settingsUtils from "../settings";
 import * as stageUtils from "../stage";
 
-describe("Config utils", () => {
-  describe("parseConfigYaml()", () => {
-    it("parses a YAML config", () => {
-      const yaml = `
+describe("GuiBuilder: Utils - Config", () => {
+  test("parseConfigYaml()", () => {
+    const yaml = `
         _settings:
           lang: cpp/g++:8
           use_template: PATH
           use_skeleton: true
+          cpus: null
         compile:
           input: [ "*.cpp" ]
           output: a.out
+          flags: null
         score:
           normalizedTo: 100.0
       `;
-      const settingsMock = jest.spyOn(settingsUtils, "settingsRawToSettings");
-      const stagesMock = jest.spyOn(stageUtils, "parseStages");
-      parseConfigYaml(yaml);
+    const settingsMock = jest.spyOn(settingsUtils, "settingsRawToSettings");
+    const stagesMock = jest.spyOn(stageUtils, "parseStages");
+    parseConfigYaml(yaml);
 
-      expect(settingsMock).toBeCalledWith({
-        lang: "cpp/g++:8",
-        use_template: "PATH",
-        use_skeleton: true,
-      });
-      expect(stagesMock).toBeCalledWith({
-        compile: {
-          input: ["*.cpp"],
-          output: "a.out",
-        },
-        score: {
-          normalizedTo: 100.0,
-        },
-      });
+    expect(settingsMock).toBeCalledWith({
+      lang: "cpp/g++:8",
+      use_template: "PATH",
+      use_skeleton: true,
+      cpus: undefined, // null is converted to undefined
+    });
+    expect(stagesMock).toBeCalledWith({
+      compile: {
+        input: ["*.cpp"],
+        output: "a.out",
+        flags: undefined,
+      },
+      score: {
+        normalizedTo: 100.0,
+      },
     });
   });
 

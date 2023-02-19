@@ -2,7 +2,7 @@
  * @file Utilities for the `Config` type.
  */
 
-import { Config, ParsedConfig } from "@/types/GuiBuilder";
+import { Config, ConfigRaw } from "@/types/GuiBuilder";
 import { dump, load } from "js-yaml";
 import isEqual from "lodash/isEqual";
 import { isSettingsEqual, settingsRawToSettings, settingsToSettingsRaw } from "./settings";
@@ -13,9 +13,17 @@ import { isStageDependencyEqual, parseStages, stagesToYamlObj } from "./stage";
  * @param yaml It's assumed that the YAML has already been validated by the grader.
  */
 export function parseConfigYaml(yaml: string): Config {
-  const { _settings: settingsRaw, ...stagesRaw } = load(yaml) as ParsedConfig;
+  const parsedYaml = load(yaml);
+
+  // Recursively convert fields with value `null` to `undefined`. This makes it easier to model the YAML
+  // schema with TypeScript type definitions because we can simply mark nullable fields with `?:` operator
+  // instead of `| null`.
+  const configRaw = JSON.parse(JSON.stringify(parsedYaml), (_, v) => (v === null ? undefined : v)) as ConfigRaw;
+
+  const { _settings: settingsRaw, ...stagesRaw } = configRaw;
   const _settings = settingsRawToSettings(settingsRaw);
   const [stageDeps, stageData] = parseStages(stagesRaw);
+
   return { _settings, stageDeps, stageData };
 }
 

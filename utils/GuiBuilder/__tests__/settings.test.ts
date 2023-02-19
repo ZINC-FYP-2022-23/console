@@ -36,7 +36,7 @@ function getMockSettings(): Settings {
   };
 }
 
-describe("Settings utils", () => {
+describe("GuiBuilder: Utils - Settings", () => {
   describe("settingsRawToSettings()", () => {
     it("converts a SettingsRaw object to Settings", () => {
       const settingsRaw: SettingsRaw = {
@@ -44,7 +44,6 @@ describe("Settings utils", () => {
         use_template: SettingsUseTemplate.FILENAMES,
         template: ["foo.cpp", "bar.cpp"],
         cpus: 2.5,
-        mem_gb: null,
       };
       const expected: Settings = {
         lang: {

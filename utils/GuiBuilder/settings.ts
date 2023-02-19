@@ -15,13 +15,13 @@ import { v4 as uuidv4 } from "uuid";
 export function settingsRawToSettings(sr: SettingsRaw): Settings {
   return {
     lang: parseLangString(sr.lang),
-    use_template: sr.use_template ?? undefined,
+    use_template: sr.use_template,
     template: sr.template?.map((t) => ({ id: uuidv4(), name: t })) ?? defaultSettings.template,
     use_skeleton: sr.use_skeleton ?? defaultSettings.use_skeleton,
     use_provided: sr.use_provided ?? defaultSettings.use_provided,
-    stage_wait_duration_secs: sr.stage_wait_duration_secs ?? undefined,
-    cpus: sr.cpus ?? undefined,
-    mem_gb: sr.mem_gb ?? undefined,
+    stage_wait_duration_secs: sr.stage_wait_duration_secs,
+    cpus: sr.cpus,
+    mem_gb: sr.mem_gb,
     early_return_on_throw: sr.early_return_on_throw ?? defaultSettings.early_return_on_throw,
     enable_features: {
       network: sr.enable_features?.network ?? defaultSettings.enable_features.network,

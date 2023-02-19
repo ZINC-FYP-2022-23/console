@@ -18,10 +18,13 @@ interface Config {
 /**
  * Shape of the raw object returned from parsing the YAML string. It will be further
  * transformed to {@link Config}.
+ *
+ * We model all nullable fields in the YAML string as union with `undefined` instead of union with `null`.
  */
-export interface ParsedConfig {
+export interface ConfigRaw {
   _settings: SettingsRaw;
-  [key: string]: any;
+  /** Stage IDs (e.g. `"stdioTest:hidden"`). */
+  [stageId: string]: any;
 }
 
 export default Config;

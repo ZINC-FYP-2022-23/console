@@ -23,25 +23,25 @@ interface Settings {
 }
 
 /**
- * The shape of `_settings` from an input config YAML (e.g. loaded from database).
+ * The shape of `_settings` from an input config YAML (e.g. loaded from database). Its shape is based from
+ * {@link https://docs.zinc.ust.dev/user/model/Config.html#settings the one in the Grader docs}.
  *
  * During parsing of config YAML, the `SettingsRaw` object will be transformed to {@link Settings}.
- * Its shape is based from {@link https://docs.zinc.ust.dev/user/model/Config.html#settings the one in the Grader docs}.
  */
 export interface SettingsRaw {
   lang: string;
-  use_template?: SettingsUseTemplate | null;
-  template?: string[] | null;
-  use_skeleton?: boolean | null;
-  use_provided?: boolean | null;
-  stage_wait_duration_secs?: number | null;
-  cpus?: number | null;
-  mem_gb?: number | null;
-  early_return_on_throw?: boolean | null;
+  use_template?: SettingsUseTemplate;
+  template?: string[];
+  use_skeleton?: boolean;
+  use_provided?: boolean;
+  stage_wait_duration_secs?: number;
+  cpus?: number;
+  mem_gb?: number;
+  early_return_on_throw?: boolean;
   enable_features?: {
-    network?: boolean | null;
-    gpu_device?: SettingsGpuDevice[] | "ANY" | null;
-  } | null;
+    network?: boolean;
+    gpu_device?: SettingsGpuDevice[] | "ANY";
+  };
 }
 
 /**
