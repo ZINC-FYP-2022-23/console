@@ -1,5 +1,5 @@
 import { defaultSettings } from "@/constants/GuiBuilder/defaults";
-import { Config, StageDataMap, StageDependencyMap, StageKind } from "@/types/GuiBuilder";
+import { Config, StageDataMap, StageDependencyGraph, StageKind } from "@/types/GuiBuilder";
 import cloneDeep from "lodash/cloneDeep";
 import { configToYaml, parseConfigYaml } from "../config";
 import * as settingsUtils from "../settings";
@@ -44,7 +44,7 @@ describe("GuiBuilder: Utils - Config", () => {
 
   describe("configToYaml()", () => {
     it("de-serializes config to a YAML string", () => {
-      const stageDeps: StageDependencyMap = {
+      const stageDeps: StageDependencyGraph = {
         "mock-uuid-1": [],
       };
       const stageData: StageDataMap = {
@@ -76,7 +76,7 @@ describe("GuiBuilder: Utils - Config", () => {
     it("converts undefined fields to null", () => {
       const _settings = cloneDeep(defaultSettings);
       _settings.use_template = undefined;
-      const stageDeps: StageDependencyMap = {
+      const stageDeps: StageDependencyGraph = {
         "mock-uuid-1": [],
       };
       const stageData: StageDataMap = {

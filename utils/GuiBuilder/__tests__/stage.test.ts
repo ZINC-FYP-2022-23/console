@@ -1,15 +1,13 @@
-import { Stage, StageDataMap, StageDependencyMap, StageKind } from "@/types/GuiBuilder";
+import { Stage, StageDataMap, StageDependencyGraph, StageKind } from "@/types/GuiBuilder";
 import * as jsYaml from "js-yaml";
 import * as uuid from "uuid";
 import {
   configsToConfigsRaw,
-  deleteStageFromDeps,
   generateStageLabels,
   getStageNameAndLabel,
   isStageDependencyEqual,
   parseStages,
   stagesToYamlObj,
-  transposeStageDeps,
 } from "../stage";
 
 jest.mock("js-yaml");
@@ -29,7 +27,7 @@ const yamlObj = {
   },
 };
 
-const stageDeps: StageDependencyMap = {
+const stageDeps: StageDependencyGraph = {
   "mock-uuid-1": [],
   "mock-uuid-2": ["mock-uuid-1"],
   "mock-uuid-3": ["mock-uuid-2"],
@@ -64,7 +62,7 @@ const stageData: StageDataMap = {
   },
 };
 
-describe("Stage utils", () => {
+describe("GuiBuilder: Utils - Stage", () => {
   describe("getStageNameAndLabel()", () => {
     it("gets the stage name and label", () => {
       expect(getStageNameAndLabel("compile")).toEqual(["Compile", ""]);
@@ -106,114 +104,13 @@ describe("Stage utils", () => {
     });
   });
 
-  describe("transposeStageDeps()", () => {
-    it("transposes a linked list graph", () => {
-      // C <- B <- A
-      const stageDeps: StageDependencyMap = {
-        A: ["B"],
-        B: ["C"],
-        C: [],
-      };
-      // C -> B -> A
-      const expected = {
-        A: [],
-        B: ["A"],
-        C: ["B"],
-      };
-      const output = transposeStageDeps(stageDeps);
-      expect(output).toEqual(expected);
-    });
-
-    it("transposes a branched directed acyclic graph", () => {
-      //     ┌─ B <─┐
-      // D <─┴─ C <─┴─ A
-      const stageDeps: StageDependencyMap = {
-        A: ["B", "C"],
-        B: ["D"],
-        C: ["D"],
-        D: [],
-      };
-      //     ┌─> B ─┐
-      // D ──┴─> C ─┴─> A
-      const expected = {
-        A: [],
-        B: ["A"],
-        C: ["A"],
-        D: ["B", "C"],
-      };
-      const output = transposeStageDeps(stageDeps);
-      expect(output).toEqual(expected);
-    });
-  });
-
-  describe("deleteStageFromDeps()", () => {
-    it("deletes a stage located at the middle of linked list", () => {
-      // C <- B <- A
-      const stageDeps: StageDependencyMap = {
-        A: ["B"],
-        B: ["C"],
-        C: [],
-      };
-      const output = deleteStageFromDeps("B", stageDeps);
-      expect(output).toEqual({
-        A: [],
-        C: [],
-      });
-    });
-
-    it("deletes a stage located at the end of linked list", () => {
-      // C <- B <- A
-      const stageDeps: StageDependencyMap = {
-        A: ["B"],
-        B: ["C"],
-        C: [],
-      };
-      const output = deleteStageFromDeps("C", stageDeps);
-      expect(output).toEqual({
-        A: ["B"],
-        B: [],
-      });
-    });
-
-    it("deletes a stage at the middle of a branched DAG", () => {
-      //     ┌─ B <─┐
-      // D <─┴─ C <─┴─ A
-      const stageDeps: StageDependencyMap = {
-        A: ["B", "C"],
-        B: ["D"],
-        C: ["D"],
-        D: [],
-      };
-      const output = deleteStageFromDeps("C", stageDeps);
-      expect(output).toEqual({
-        A: ["B"],
-        B: ["D"],
-        D: [],
-      });
-    });
-
-    it("handles deleting a stage that does not exist", () => {
-      // B <- A
-      const stageDeps: StageDependencyMap = {
-        A: ["B"],
-        B: [],
-      };
-      const consoleWarnMock = jest.spyOn(console, "warn").mockImplementation();
-      const output = deleteStageFromDeps("C", stageDeps);
-      expect(output).toEqual(stageDeps); // Remains unchanged
-      expect(consoleWarnMock).toHaveBeenCalled();
-
-      consoleWarnMock.mockRestore();
-    });
-  });
-
   describe("stagesToYamlObj()", () => {
     it("converts stage order and data to a config YAML object", () => {
       expect(stagesToYamlObj(stageDeps, stageData)).toEqual(yamlObj);
     });
 
-    it("orders stage correctly when key order of stage dependency map is shuffled", () => {
-      const shuffledStageDeps: StageDependencyMap = {
+    it("orders stage correctly when key order of stage dependency graph is shuffled", () => {
+      const shuffledStageDeps: StageDependencyGraph = {
         "mock-uuid-2": ["mock-uuid-1"],
         "mock-uuid-3": ["mock-uuid-2"],
         "mock-uuid-1": [],
@@ -222,7 +119,7 @@ describe("Stage utils", () => {
     });
 
     it("handles a single-staged pipeline", () => {
-      const stageDeps: StageDependencyMap = { "mock-uuid-1": [] };
+      const stageDeps: StageDependencyGraph = { "mock-uuid-1": [] };
       const stageData: StageDataMap = {
         "mock-uuid-1": {
           name: "DiffWithSkeleton",
@@ -246,19 +143,19 @@ describe("Stage utils", () => {
   describe("isStageDependencyEqual()", () => {
     it("handles linked list dependency graphs", () => {
       // 1 <- 2 <- 3
-      const deps1: StageDependencyMap = {
+      const deps1: StageDependencyGraph = {
         "1": [],
         "2": ["1"],
         "3": ["2"],
       };
       // 1 <- 2 <- 3
-      const deps2: StageDependencyMap = {
+      const deps2: StageDependencyGraph = {
         "3": ["2"],
         "2": ["1"],
         "1": [],
       };
       // 1 <- 2 <- 3 <- 4
-      const deps3: StageDependencyMap = {
+      const deps3: StageDependencyGraph = {
         "1": [],
         "2": ["1"],
         "3": ["2"],
@@ -272,7 +169,7 @@ describe("Stage utils", () => {
     it("handles branched directed acyclic dependency graphs", () => {
       //     ┌─ 2 <─┐
       // 4 <─┴─ 3 <─┴─ 1
-      const deps1: StageDependencyMap = {
+      const deps1: StageDependencyGraph = {
         "1": ["2", "3"],
         "2": ["4"],
         "3": ["4"],
@@ -280,7 +177,7 @@ describe("Stage utils", () => {
       };
       //     ┌─ 2 <─┐
       // 4 <─┴─ 3 <─┴─ 1
-      const deps2: StageDependencyMap = {
+      const deps2: StageDependencyGraph = {
         "2": ["4"],
         "4": [],
         "3": ["4"],
@@ -288,7 +185,7 @@ describe("Stage utils", () => {
       };
       //     ┌─ 2 <─┐
       // 1 <─┴─ 3 <─┴─ 4
-      const deps3: StageDependencyMap = {
+      const deps3: StageDependencyGraph = {
         "1": [],
         "2": ["1"],
         "3": ["1"],

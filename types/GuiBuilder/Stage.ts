@@ -1,3 +1,5 @@
+import { DirectedGraph } from "./Graph";
+
 /** A pipeline stage in the assignment configuration. */
 interface Stage<TConfig = any> {
   /** Stage name (e.g. `"StdioTest"`, `"Compile"`). */
@@ -17,14 +19,18 @@ interface Stage<TConfig = any> {
 }
 
 /**
- * How stages depends on each other. The key is the UUID of a stage, and the value is an array of
- * UUIDs of other stages that this stage depends on.
+ * A {@link DirectedGraph} that describes how stages depends on each other. The key is the UUID of a stage,
+ * and the value is an array of UUIDs of other stages that this stage depends on.
  *
- * It's an adjacency list that represents a directed acyclic graph (DAG) of how stages depends on each other.
+ * Transposing this graph gives the execution order of stages.
+ *
+ * @example
+ * const stageDeps: StageDependencyGraph = {
+ *   "A": [],
+ *   "B": ["A"],  // B depends on A, i.e. B should be executed after A
+ * }; // A <- B
  */
-export interface StageDependencyMap {
-  [id: string]: string[];
-}
+export type StageDependencyGraph = DirectedGraph;
 
 /** Mapping of a stage's UUID to its data. */
 export type StageDataMap = {

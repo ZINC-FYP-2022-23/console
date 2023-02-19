@@ -3,12 +3,13 @@
  */
 
 import supportedStages, { SupportedStage } from "@/constants/GuiBuilder/supportedStages";
-import { StageDataMap, StageDependencyMap, StageKind } from "@/types/GuiBuilder";
+import { StageDataMap, StageDependencyGraph, StageKind } from "@/types/GuiBuilder";
 import { dump, load } from "js-yaml";
 import camelCase from "lodash/camelCase";
 import cloneDeep from "lodash/cloneDeep";
 import isEqual from "lodash/isEqual";
 import { v4 as uuidv4 } from "uuid";
+import { transposeGraph } from "./graph";
 
 /**
  * @param id The stage id (e.g. `"stdioTest:hidden"`)
@@ -27,8 +28,8 @@ export function getStageNameAndLabel(id: string) {
  * Parses stages from a config YAML.
  * @param stages Object representation of the stages to be parsed.
  */
-export function parseStages(stages: { [key: string]: any }): [StageDependencyMap, StageDataMap] {
-  const stageDeps: StageDependencyMap = {};
+export function parseStages(stages: { [key: string]: any }): [StageDependencyGraph, StageDataMap] {
+  const stageDeps: StageDependencyGraph = {};
   const stageData: StageDataMap = {};
   let prevStage: string | null = null;
 
@@ -55,69 +56,15 @@ export function parseStages(stages: { [key: string]: any }): [StageDependencyMap
 }
 
 /**
- * Gets a transposed (reversed) stage dependency graph. The transposed graph is actually a DAG that
- * shows the execution order of stages.
- * @param stageDeps The adjacency list of the stage dependency graph. This object is not modified.
- * @returns An adjacency list of the transposed stage dependency graph.
- * @example
- * const stageDeps = { "A": ["B"], "B": ["C"], "C": [] }; // C <- B <- A (Dependency graph)
- * const transposed = transposeStageDeps(stageDeps); // C -> B -> A (Execution order)
- * console.log(transposed); // { A: [], B: ["A"], C: ["B"] }
- */
-export function transposeStageDeps(stageDeps: StageDependencyMap): { [id: string]: string[] } {
-  /** The key is UUID of a stage, and the value is UUIDs of other stages that are children of it. */
-  const stageChildren: { [id: string]: string[] } = {};
-
-  Object.entries(stageDeps).forEach(([id, dependsOn]) => {
-    if (!(id in stageChildren)) {
-      stageChildren[id] = [];
-    }
-    dependsOn.forEach((depId) => {
-      if (depId in stageChildren) {
-        stageChildren[depId].push(id);
-      } else {
-        stageChildren[depId] = [id];
-      }
-    });
-  });
-
-  return stageChildren;
-}
-
-/**
- * Deletes a stage from the stage dependency graph.
- * @param target The UUID of the stage to be deleted.
- * @param stageDeps The adjacency list of the stage dependency graph. This object will NOT be mutated.
- */
-export function deleteStageFromDeps(target: string, stageDeps: StageDependencyMap): StageDependencyMap {
-  const _stageDeps = cloneDeep(stageDeps);
-
-  if (!(target in stageDeps)) {
-    console.warn(`Cannot delete stage of ID "${target}" because it does not exist.`);
-    return _stageDeps;
-  }
-
-  // Delete the target stage
-  delete _stageDeps[target];
-
-  // Delete all edges pointing to the target stage
-  Object.entries(_stageDeps).forEach(([id, dependsOn]) => {
-    _stageDeps[id] = dependsOn.filter((depId) => depId !== target);
-  });
-
-  return _stageDeps;
-}
-
-/**
  * Converts to an object representation of the stages in the config YAML.
  * @param stageDeps Assume that the stage dependency graph has the shape of a **linked list**.
  */
-export function stagesToYamlObj(stageDeps: StageDependencyMap, stageData: StageDataMap): { [key: string]: any } {
+export function stagesToYamlObj(stageDeps: StageDependencyGraph, stageData: StageDataMap): { [key: string]: any } {
   const stageDataTidied = configsToConfigsRaw(generateStageLabels(stageData));
 
   // Currently the grader executes each stage sequentially. Hence, `stageDeps` is a linked list.
   // By transposing the graph, we are "reversing" the linked list to get the order of execution.
-  const executionOrderGraph = transposeStageDeps(stageDeps);
+  const executionOrderGraph = transposeGraph(stageDeps);
 
   const firstStagePair = Object.entries(stageDeps).find(([, dependsOn]) => dependsOn.length === 0);
   if (!firstStagePair) {
@@ -151,7 +98,7 @@ export function stagesToYamlObj(stageDeps: StageDependencyMap, stageData: StageD
 /**
  * Deep compares two stage dependency graphs. `deps1` and `deps2` can be linked list or branched DAGs.
  */
-export function isStageDependencyEqual(deps1: StageDependencyMap, deps2: StageDependencyMap) {
+export function isStageDependencyEqual(deps1: StageDependencyGraph, deps2: StageDependencyGraph) {
   const _deps1 = cloneDeep(deps1);
   const _deps2 = cloneDeep(deps2);
   for (const [id, dependsOn] of Object.entries(_deps1)) {

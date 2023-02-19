@@ -2,6 +2,7 @@ export * from "./Config";
 export type { default as Config } from "./Config";
 export * from "./GradingPolicy";
 export type { default as GradingPolicy } from "./GradingPolicy";
+export * from "./Graph";
 export * from "./PipelineEditor";
 export * from "./Schedule";
 export type { default as Schedule } from "./Schedule";

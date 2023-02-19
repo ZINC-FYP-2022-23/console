@@ -1,5 +1,13 @@
 import { defaultConfig, defaultPolicy, defaultSchedule } from "@/constants/GuiBuilder/defaults";
-import { Config, GradingPolicy, Schedule, Settings, Stage, StageDataMap, StageDependencyMap } from "@/types/GuiBuilder";
+import {
+  Config,
+  GradingPolicy,
+  Schedule,
+  Settings,
+  Stage,
+  StageDataMap,
+  StageDependencyGraph,
+} from "@/types/GuiBuilder";
 import { AssignmentConfig } from "@/types/tables";
 import { configToYaml, isConfigEqual, isScheduleEqual, parseConfigYaml } from "@/utils/GuiBuilder";
 import { action, Action, computed, Computed, thunk, Thunk } from "easy-peasy";
@@ -71,12 +79,12 @@ interface ConfigModelAction {
   setCourseId: Action<ConfigModel, number>;
   setPolicy: Action<ConfigModel, GradingPolicy>;
   setSchedule: Action<ConfigModel, Schedule>;
-  /** Sets the entire stage dependency map. */
-  setStageDeps: Action<ConfigModel, StageDependencyMap>;
+  /** Sets the entire stage dependency graph. */
+  setStageDeps: Action<ConfigModel, StageDependencyGraph>;
   /**
    * Sets the dependency data of a single stage given its UUID.
    *
-   * It creates a new entry in the {@link StageDependencyMap} if the UUID does not exist.
+   * It creates a new entry in the {@link StageDependencyGraph} if the UUID does not exist.
    */
   setSingleStageDeps: Action<ConfigModel, { stageId: string; deps: string[] }>;
   /**

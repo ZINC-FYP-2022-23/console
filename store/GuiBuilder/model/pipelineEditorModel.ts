@@ -1,6 +1,6 @@
 import supportedStages, { SupportedStage } from "@/constants/GuiBuilder/supportedStages";
 import { Stage, StageNode } from "@/types/GuiBuilder";
-import { deleteStageFromDeps } from "@/utils/GuiBuilder";
+import { deleteNodeFromGraph } from "@/utils/GuiBuilder";
 import { coordQuad, dagConnect, sugiyama } from "d3-dag";
 import { action, Action, computed, Computed, thunk, Thunk, thunkOn, ThunkOn } from "easy-peasy";
 import camelCase from "lodash/camelCase";
@@ -373,7 +373,7 @@ const pipelineEditorThunk: PipelineEditorModelThunk = {
 
     // Delete stage data from `editingConfig`
     getStoreActions().config.setSingleStageData({ stageId: id, stage: null });
-    const stageDepsNew = deleteStageFromDeps(id, getStoreState().config.editingConfig.stageDeps);
+    const stageDepsNew = deleteNodeFromGraph(id, getStoreState().config.editingConfig.stageDeps);
     getStoreActions().config.setStageDeps(stageDepsNew);
   }),
   deleteStageEdge: thunk((actions, id, { getState, getStoreState, getStoreActions }) => {
