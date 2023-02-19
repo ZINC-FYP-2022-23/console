@@ -27,6 +27,47 @@ export function deleteNodeFromGraph(target: string, graph: DirectedGraph) {
 }
 
 /**
+ * Determines if a directed graph is a linked list.
+ * @example
+ * const linkedListGraph = { A: ["B"], B: ["C"], C: [] };  // A -> B -> C
+ * const disconnectedGraph = { A: [], B: ["C"], C: [] };  // A  B -> C
+ * console.log(isLinkedList(linkedListGraph));  // true
+ * console.log(isLinkedList(disconnectedGraph));  // false
+ */
+export function isLinkedList(graph: DirectedGraph): boolean {
+  // The maximum out-degree of every node in a linked list is 1 (i.e. there are no branches)
+  if (Object.entries(graph).some(([, children]) => children.length > 1)) return false;
+
+  const nodesWithoutChildren = Object.entries(graph).reduce<string[]>((acc, [key, children]) => {
+    return children.length === 0 ? [...acc, key] : acc;
+  }, []);
+
+  // A linked list must have exactly one node without children (i.e. the tail)
+  if (nodesWithoutChildren.length !== 1) return false;
+
+  /** If the input graph is a linked list, the transposed graph must be a linked list */
+  const transposedGraph = transposeGraph(graph);
+  const transposedGraphHeadNode = nodesWithoutChildren[0];
+
+  // Traverse the transposed graph from the head node to make sure it's a linked list
+
+  /** Tracks each node in the transposed graph to see if it has been traversed. */
+  const visitedNodes: Record<string, boolean> = {};
+  Object.keys(transposedGraph).forEach((key) => (visitedNodes[key] = false));
+
+  let currentNode = transposedGraphHeadNode;
+  while (currentNode) {
+    visitedNodes[currentNode] = true;
+
+    const currentNodeChildren = transposedGraph[currentNode];
+    if (currentNodeChildren.length === 0) break;
+
+    currentNode = currentNodeChildren[0];
+  }
+  return Object.values(visitedNodes).every((visited) => visited);
+}
+
+/**
  * Transposes a directed graph by reversing all the edge directions.
  * @param graph The original graph (i.e. this object) will not be modified.
  * @returns An adjacency list of the transposed graph.

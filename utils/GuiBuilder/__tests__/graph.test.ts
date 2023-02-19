@@ -66,6 +66,47 @@ describe("GuiBuilder: Utils - Graph", () => {
     consoleWarnMock.mockRestore();
   });
 
+  test("isLinkedList()", () => {
+    expect(isLinkedList(singleNodeGraph)).toBe(true);
+    expect(isLinkedList(linkedListGraph)).toBe(true);
+
+    const twoLinkedListsGraph: DirectedGraph = {
+      // A -> B
+      // C -> D
+      A: ["B"],
+      B: [],
+      C: ["D"],
+      D: [],
+    };
+    const twoBranchesMergeToTailGraph: DirectedGraph = {
+      // A ─┐
+      // B ─┴─> C
+      A: ["C"],
+      B: ["C"],
+      C: [],
+    };
+    const cyclicGraph: DirectedGraph = {
+      // A -> B -> C ┐
+      // ^───────────┘
+      A: ["B"],
+      B: ["C"],
+      C: ["A"],
+    };
+    const disconnectedGraphWithCycle: DirectedGraph = {
+      // A   B ⇌ C
+      A: [],
+      B: ["C"],
+      C: ["B"],
+    };
+    expect(isLinkedList({})).toBe(false);
+    expect(isLinkedList(branchedDAG)).toBe(false);
+    expect(isLinkedList(twoLinkedListsGraph)).toBe(false);
+    expect(isLinkedList(twoBranchesMergeToTailGraph)).toBe(false);
+    expect(isLinkedList(cyclicGraph)).toBe(false);
+    expect(isLinkedList(disconnectedGraph)).toBe(false);
+    expect(isLinkedList(disconnectedGraphWithCycle)).toBe(false);
+  });
+
   test("transposeGraph()", () => {
     expect(transposeGraph(linkedListGraph)).toEqual({
       // A <- B <- C
