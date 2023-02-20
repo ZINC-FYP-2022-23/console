@@ -1,7 +1,7 @@
 import { Schedule } from "@/types/GuiBuilder";
 import { appendZToIsoString, isScheduleEqual } from "../schedule";
 
-describe("Schedule utils", () => {
+describe("GuiBuilder: Utils - Schedule", () => {
   describe("isScheduleEqual()", () => {
     it("returns true if two schedules are equal", () => {
       // s1 simulates a schedule object that comes from the Postgres database.

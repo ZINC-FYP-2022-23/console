@@ -17,12 +17,12 @@ function Scheduling() {
   const setSchedule = useStoreActions((state) => state.config.setSchedule);
 
   return (
-    <div className="px-1 space-y-4">
-      <div className="flex flex-col space-y-2">
-        <label htmlFor="showAt" className="text-sm font-medium leading-5 text-gray-900">
+    <div className="p-1 space-y-3">
+      <div className="flex items-center gap-3">
+        <label htmlFor="showAt" className="flex-1 text-sm">
           Announce
         </label>
-        <div className="rounded-md shadow-sm">
+        <div className="flex-[2]">
           <DateInput
             id="showAt"
             selected={getLocalDateFromString(schedule.showAt)}
@@ -33,14 +33,15 @@ function Scheduling() {
               });
             }}
             placeholderText="Assignment Announcement Date"
+            className="!border-solid border border-gray-300 shadow-sm"
           />
         </div>
       </div>
-      <div className="flex flex-col space-y-2">
-        <label htmlFor="startCollectionAt" className="text-sm font-medium leading-5 text-gray-900">
+      <div className="flex items-center gap-3">
+        <label htmlFor="startCollectionAt" className="flex-1 text-sm">
           Start Collection
         </label>
-        <div className="rounded-md shadow-sm">
+        <div className="flex-[2]">
           <DateInput
             id="startCollectionAt"
             selected={getLocalDateFromString(schedule.startCollectionAt)}
@@ -52,14 +53,15 @@ function Scheduling() {
               });
             }}
             placeholderText="Assignment Collection Start Date"
+            className="!border-solid border border-gray-300 shadow-sm"
           />
         </div>
       </div>
-      <div className="flex flex-col space-y-2">
-        <label htmlFor="dueAt" className="text-sm font-medium leading-5 text-gray-900">
+      <div className="flex items-center gap-3">
+        <label htmlFor="dueAt" className="flex-1 text-sm">
           Due
         </label>
-        <div className="rounded-md shadow-sm">
+        <div className="flex-[2]">
           <DateInput
             id="dueAt"
             selected={getLocalDateFromString(schedule.dueAt)}
@@ -80,14 +82,15 @@ function Scheduling() {
               }
             }}
             placeholderText="Assignment Grades Release Date"
+            className="!border-solid border border-gray-300 shadow-sm"
           />
         </div>
       </div>
-      <div className="flex flex-col space-y-2">
-        <label htmlFor="stopCollectionAt" className="text-sm font-medium leading-5 text-gray-900">
+      <div className="flex items-center gap-3">
+        <label htmlFor="stopCollectionAt" className="flex-1 text-sm">
           Stop Collection
         </label>
-        <div className="rounded-md shadow-sm">
+        <div className="flex-[2]">
           <DateInput
             id="stopCollectionAt"
             selected={getLocalDateFromString(schedule.stopCollectionAt)}
@@ -100,15 +103,16 @@ function Scheduling() {
               });
             }}
             placeholderText="Assignment Collection Closing Date"
+            className="!border-solid border border-gray-300 shadow-sm"
           />
         </div>
       </div>
       {!policy.showImmediateScores && (
-        <div className="flex flex-col space-y-2">
-          <label htmlFor="releaseGradeAt" className="text-sm font-medium leading-5 text-gray-900">
+        <div className="flex items-center gap-3">
+          <label htmlFor="releaseGradeAt" className="flex-1 text-sm">
             Release Grade
           </label>
-          <div className="rounded-md shadow-sm">
+          <div className="flex-[2]">
             <DateInput
               id="releaseGradeAt"
               selected={getLocalDateFromString(schedule.releaseGradeAt)}
@@ -119,6 +123,7 @@ function Scheduling() {
                 });
               }}
               placeholderText="Assignment Grades Release Date"
+              className="!border-solid border border-gray-300 shadow-sm"
             />
           </div>
         </div>
