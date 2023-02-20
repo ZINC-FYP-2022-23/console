@@ -490,7 +490,7 @@ function HelperFileInputCard({ value, onChange, placeholder }: HelperFileInputCa
         <li>
           Upload the helper file to{" "}
           <button onClick={() => setStep("upload")} className="underline text-blue-700">
-            Helper files used for grading
+            Additional files used for grading
           </button>
         </li>
         <li>Input the helper file name below:</li>

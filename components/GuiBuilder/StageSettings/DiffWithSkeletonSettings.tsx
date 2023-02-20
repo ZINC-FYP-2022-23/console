@@ -39,7 +39,7 @@ function DiffWithSkeletonSettings() {
           >
             Upload Files
           </button>{" "}
-          step.
+          step &gt; &quot;Files gave to the students&quot;.
         </p>
       </div>
       <div className="mt-6">

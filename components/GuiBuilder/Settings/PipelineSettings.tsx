@@ -189,15 +189,21 @@ function PipelineSettings() {
               </div>
             )}
             {_settings.use_template === SettingsUseTemplate.PATH && (
-              <div className="mt-4 mx-3 p-3 flex items-center gap-4 bg-gray-50 rounded-lg drop-shadow">
-                <p className="text-gray-700">Upload your files here:</p>
-                <Button
-                  onClick={() => setStep("upload")}
-                  icon={<FontAwesomeIcon icon={["fad", "upload"]} />}
-                  className="border border-cse-600 text-cse-600 hover:bg-blue-100 active:bg-blue-200"
-                >
-                  Upload files
-                </Button>
+              <div className="mt-4 mx-3 p-3 bg-gray-50 drop-shadow rounded-lg space-y-2 text-gray-700">
+                <p>To upload your files:</p>
+                <ol className="ml-6 list-decimal">
+                  <li>
+                    Visit the{" "}
+                    <button onClick={() => setStep("upload")} className="text-blue-600 underline">
+                      Upload Files
+                    </button>{" "}
+                    step
+                  </li>
+                  <li>
+                    Upload your files under{" "}
+                    <span className="font-medium">&quot;Files that the students need to submit&quot;</span>
+                  </li>
+                </ol>
               </div>
             )}
           </div>
