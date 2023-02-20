@@ -77,8 +77,7 @@ function GUIAssignmentBuilder({ data, configId: configIdProp }: GUIAssignmentBui
   ]);
 
   const saveConfig = async () => {
-    if (disableSave) return;
-
+    if (disableSave || isSaving) return;
     setIsSaving(true);
 
     // TODO(Anson): Validate pipeline graph first (e.g. make sure it's a linked list)
@@ -153,13 +152,19 @@ function GUIAssignmentBuilder({ data, configId: configIdProp }: GUIAssignmentBui
       <div className="flex items-center">
         <Stepper className="flex-1" />
         <Tooltip
-          label={disableSave ? "You didn't make any changes" : "You can also save with Ctrl+S / ⌘+S"}
+          label={(() => {
+            if (disableSave) return "You didn't make any changes";
+            if (isSaving) return "Saving changes...";
+            return "You can also save with Ctrl+S / ⌘+S";
+          })()}
           position="bottom-end"
           openDelay={500}
         >
           <div className="ml-8">
             <Button
-              onClick={() => saveConfig()}
+              onClick={() => {
+                !isSaving && saveConfig();
+              }}
               disabled={disableSave}
               className="w-20 !text-lg bg-green-500 text-white hover:bg-green-600 disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
