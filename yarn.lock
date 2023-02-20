@@ -1747,27 +1747,27 @@
   resolved "https://registry.npmjs.org/@react-dnd/shallowequal/-/shallowequal-2.0.0.tgz"
   integrity sha512-Pc/AFTdwZwEKJxFJvlxrSmGe/di+aAOBn60sremrpLo6VI/6cmiUYNNwlI5KNYttg7uypzA3ILPMPgxB2GYZEg==
 
-"@reactflow/background@11.1.5":
-  version "11.1.5"
-  resolved "https://registry.yarnpkg.com/@reactflow/background/-/background-11.1.5.tgz#e96a9d6b7e43ca49b045e6c1774fdb8afda2a9ad"
-  integrity sha512-px9Wp25ia1euApTu0pQ9zsBJWVj4+VoXLYd7Hw2s7PtZYKOoTsjR0q6M1woQciUTcP9I7930Ot8wGbYhK/8asQ==
+"@reactflow/background@11.1.8":
+  version "11.1.8"
+  resolved "https://registry.yarnpkg.com/@reactflow/background/-/background-11.1.8.tgz#e804eb82ade6f70ab5f218dc767051083497c0f7"
+  integrity sha512-NYZwiEeKVc1qJbDRrRX5RgHbMMzofhzOAqz3teWtUIGju5d+kEf/vcx/35bLM+CZuhucL+OvJpRgCjKmViiTIw==
   dependencies:
-    "@reactflow/core" "11.5.2"
+    "@reactflow/core" "11.5.5"
     classcat "^5.0.3"
     zustand "^4.3.1"
 
-"@reactflow/controls@11.1.5":
-  version "11.1.5"
-  resolved "https://registry.yarnpkg.com/@reactflow/controls/-/controls-11.1.5.tgz#bac303c28f2073c57f7c3947f218699771c7cea9"
-  integrity sha512-aXgLe3ZDaKfskWn4Hrv3ur3CtHKuayaI4N2/HJIjKjlhZWFOh4vBDpegRQyhqCxdfOM/fZbqKbfJ5kzlkMp10g==
+"@reactflow/controls@11.1.8":
+  version "11.1.8"
+  resolved "https://registry.yarnpkg.com/@reactflow/controls/-/controls-11.1.8.tgz#43c3756a53479382e34d495f4b123f45b8cf658f"
+  integrity sha512-QCG4q52HS/zmuBAFzmTFh4wkR6thmNDxSKHQPxTwfVIuQtV/oGpfz7zMaoU0ZSN84qSWl5UdzmV4PAC50tOAkQ==
   dependencies:
-    "@reactflow/core" "11.5.2"
+    "@reactflow/core" "11.5.5"
     classcat "^5.0.3"
 
-"@reactflow/core@11.5.2":
-  version "11.5.2"
-  resolved "https://registry.yarnpkg.com/@reactflow/core/-/core-11.5.2.tgz#b56ebc59759a8bb27ff28435293e94816324f841"
-  integrity sha512-AZghrSaj2VJzsVm3LhOWK8JVJF2alshibp9aNIV6qtcz4zMTIoyDtYcnKvENdlWAHiVscUzAiA071HUpeVgMOg==
+"@reactflow/core@11.5.5":
+  version "11.5.5"
+  resolved "https://registry.yarnpkg.com/@reactflow/core/-/core-11.5.5.tgz#bced11d76fc200b4dc301f2f2b882c4f4ec3dad3"
+  integrity sha512-/FPnpvO9I4E6/mmfZInbsVusR214gzIZ2e2xgl9XJdBo90cWaqHgo0c5F2YPXX19R3mItzxveN+WlENFEOvdPg==
   dependencies:
     "@types/d3" "^7.4.0"
     "@types/d3-drag" "^3.0.1"
@@ -1779,12 +1779,12 @@
     d3-zoom "^3.0.0"
     zustand "^4.3.1"
 
-"@reactflow/minimap@11.3.5":
-  version "11.3.5"
-  resolved "https://registry.yarnpkg.com/@reactflow/minimap/-/minimap-11.3.5.tgz#8d886181828c946e3321c9bc612ee8c4b667b8fd"
-  integrity sha512-8Wi3nfc4mHrs55mM2GBPL3plfWe9n2wrF6RSFZw6HSWkoij3hfAR9tGPbyK5nFuzwGKyLfp3T/ou/YHypk7Tmg==
+"@reactflow/minimap@11.3.8":
+  version "11.3.8"
+  resolved "https://registry.yarnpkg.com/@reactflow/minimap/-/minimap-11.3.8.tgz#f2324c2f038d75bf9f8b27d46d782f488038f341"
+  integrity sha512-hOW3FVP/ObRK3oZxvKSSKIIR/DRe1OR4KU+3AIHxTK6K2kt/D48zQU37fOmEasfohjBjsqEopK7Ux8tapTT0EA==
   dependencies:
-    "@reactflow/core" "11.5.2"
+    "@reactflow/core" "11.5.5"
     "@types/d3-selection" "^3.0.3"
     "@types/d3-zoom" "^3.0.1"
     classcat "^5.0.3"
@@ -1792,12 +1792,12 @@
     d3-zoom "^3.0.0"
     zustand "^4.3.1"
 
-"@reactflow/node-toolbar@1.1.5":
-  version "1.1.5"
-  resolved "https://registry.yarnpkg.com/@reactflow/node-toolbar/-/node-toolbar-1.1.5.tgz#c32f1ca85fde31e1987a1f52c82356cf3fbecb2f"
-  integrity sha512-vu2j9b2gO+SYPRrNI9KXkVlJdRkAcsKdKoJSBCunUdIVugCkaSTLiwpMjN7V21cgEPjtz5XocBh5bQS6hQNXHQ==
+"@reactflow/node-toolbar@1.1.8":
+  version "1.1.8"
+  resolved "https://registry.yarnpkg.com/@reactflow/node-toolbar/-/node-toolbar-1.1.8.tgz#36a97fb390b8c622fa98e7ffaf1b03c2f75f812a"
+  integrity sha512-/Aj5dfarrBRvPeyDk+CZef7InP4LXlhMnlMPw6hnT/P9lVVChe02knzzkeKiVGmiWKXWL/gOCDXBFp9tMtIAsQ==
   dependencies:
-    "@reactflow/core" "11.5.2"
+    "@reactflow/core" "11.5.5"
     classcat "^5.0.3"
     zustand "^4.3.1"
 
@@ -2105,6 +2105,11 @@
   integrity sha512-FcFaxOr2V5KZCviw1TnutEMVUVsGt4D2hP1TAfXZAMKuHYW3xQhe3jTxNPWutgCJ3/X1c5yX8ZoGVEItxKbwBg==
   dependencies:
     "@babel/types" "^7.3.0"
+
+"@types/bintrees@^1.0.3":
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@types/bintrees/-/bintrees-1.0.3.tgz#44723d00ec44cc9a6607efd93f6d9837b26d8c48"
+  integrity sha512-A/LCJoFzbF6TIfRZ6IzWHaxthLSGj2qiOXiIWn4xjjbaZIZ8+97SUzgIU8E/n1v2ozc2aDGdzwkA2hfXozgKNg==
 
 "@types/body-parser@*":
   version "1.19.0"
@@ -3298,6 +3303,11 @@ bindings@^1.5.0:
   integrity sha512-p2q/t/mhvuOj/UeLlV6566GD/guowlr0hHxClI0W9m7MWYkL1F0hLo+0Aexs9HSPCtR1SXQ0TD3MMKrXZajbiQ==
   dependencies:
     file-uri-to-path "1.0.0"
+
+bintrees@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/bintrees/-/bintrees-1.0.2.tgz#49f896d6e858a4a499df85c38fb399b9aff840f8"
+  integrity sha512-VOMgTMwjAaUG580SXn3LacVgjurrbMme7ZZNYGSSV7mmtY6QQRh0Eg3pwIcntQ77DErK1L0NxkbetjcoXzVwKw==
 
 bl@^4.0.3:
   version "4.1.0"
@@ -5283,6 +5293,11 @@ fast-levenshtein@^2.0.6, fast-levenshtein@~2.0.6:
   resolved "https://registry.npmjs.org/fast-levenshtein/-/fast-levenshtein-2.0.6.tgz"
   integrity sha1-PYpcZog6FqMMqGQ+hR8Zuqd5eRc=
 
+fast-string-compare@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/fast-string-compare/-/fast-string-compare-1.0.0.tgz#2bbb7efb6e9bf728aff7c46f92abc75acb4b237d"
+  integrity sha512-R0f7E2MvKy3LltU/eK7P9IYMc7kovnoaQIvWVvKx1LDDgHArVCrqgb4/6hlYJn6I9VYFn7mQoTKrsO3ELMVE8Q==
+
 fastpriorityqueue@0.7.2:
   version "0.7.2"
   resolved "https://registry.yarnpkg.com/fastpriorityqueue/-/fastpriorityqueue-0.7.2.tgz#64dfee2c2adbc18c076cf7552dc4bfbef7befe3f"
@@ -5757,6 +5772,15 @@ graceful-fs@^4.2.9:
   version "4.2.10"
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.10.tgz#147d3a006da4ca3ce14728c7aefc287c367d7a6c"
   integrity sha512-9ByhssR2fPVsNZj478qUUbKfmL0+t5BDVyjShtyZZLiK7ZDAArFFfopyOTj0M05wE2tJPisA4iTnnXl2YoPvOA==
+
+graph-cycles@^1.2.1:
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/graph-cycles/-/graph-cycles-1.2.1.tgz#a92652826e7cb800efe1a3bf4e3e069b2d7b2407"
+  integrity sha512-IJly1QJTKrACgy+HVQYELr9igxhCC6zGn78PbvEX9tj4AZBvv7ZNU45m9rOrhDgprrkLtJZYmOPyhY8exZLD/Q==
+  dependencies:
+    fast-string-compare "^1.0.0"
+    rotated-array-set "^1.0.0"
+    short-tree "^1.0.0"
 
 graphql-tag@^2.12.3:
   version "2.12.6"
@@ -9387,16 +9411,16 @@ react@^17.0.2:
     loose-envify "^1.1.0"
     object-assign "^4.1.1"
 
-reactflow@^11.5.3:
-  version "11.5.3"
-  resolved "https://registry.yarnpkg.com/reactflow/-/reactflow-11.5.3.tgz#e10b37d14b05e3d3fa5dc879def1781cd9e08de8"
-  integrity sha512-NM4s8pkomcUnYwpT8p/ToTAbGL98Xzmc31uED5dbHndGS5D7L0QW25/fvFuaiKQ92hZQrFNWxvC1XsJ1QvMq8A==
+reactflow@^11.5.6:
+  version "11.5.6"
+  resolved "https://registry.yarnpkg.com/reactflow/-/reactflow-11.5.6.tgz#744e2aa6cfb2c376b560633377063c2a576f3eec"
+  integrity sha512-my4LUKT7H7t2mK/qy4n+bfAMgjqhHOhYGYrvzSWB4yPhOhamPGjs0Ted9G8JWEw15Svn7pHf8DppTHUfk5zH2g==
   dependencies:
-    "@reactflow/background" "11.1.5"
-    "@reactflow/controls" "11.1.5"
-    "@reactflow/core" "11.5.2"
-    "@reactflow/minimap" "11.3.5"
-    "@reactflow/node-toolbar" "1.1.5"
+    "@reactflow/background" "11.1.8"
+    "@reactflow/controls" "11.1.8"
+    "@reactflow/core" "11.5.5"
+    "@reactflow/minimap" "11.3.8"
+    "@reactflow/node-toolbar" "1.1.8"
 
 read-cache@^1.0.0:
   version "1.0.0"
@@ -9721,6 +9745,11 @@ ripemd160@^2.0.0, ripemd160@^2.0.1:
     hash-base "^3.0.0"
     inherits "^2.0.1"
 
+rotated-array-set@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/rotated-array-set/-/rotated-array-set-1.0.0.tgz#e6d6e2c52465923ec6c1bb5a6af193c31d04f0eb"
+  integrity sha512-MmMz9ERrZw7DVn8e6V7U/wkAWzEaULiPySEBXLWh4nA/F5gwSFx96bu+As4wyDpZ9bdhc+flB1CyTYmStwZo8A==
+
 run-parallel@^1.1.9:
   version "1.2.0"
   resolved "https://registry.npmjs.org/run-parallel/-/run-parallel-1.2.0.tgz"
@@ -9908,6 +9937,14 @@ shell-quote@1.7.3:
   version "1.7.3"
   resolved "https://registry.npmjs.org/shell-quote/-/shell-quote-1.7.3.tgz"
   integrity sha512-Vpfqwm4EnqGdlsBFNmHhxhElJYrdfcxPThu+ryKS5J8L/fhAwLazFZtq+S+TWZ9ANj2piSQLGj6NQg+lKPmxrw==
+
+short-tree@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/short-tree/-/short-tree-1.0.0.tgz#bbf31c2f798ecbf48ecf6656b1bd62d202b43759"
+  integrity sha512-SPhGxbdypMMjYlmdVL/dzBUCT/5FboztmleoS4WPgvCI7DqZXv8xrLSTuJqzmmuAtCTkgxkIKzfZ+jfJR6ODZg==
+  dependencies:
+    "@types/bintrees" "^1.0.3"
+    bintrees "^1.0.2"
 
 side-channel@^1.0.4:
   version "1.0.4"
