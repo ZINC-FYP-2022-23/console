@@ -155,7 +155,7 @@ function PipelineSettings() {
             </div>
             {_settings.use_template === SettingsUseTemplate.FILENAMES && (
               <div className="mt-4 mx-3 p-3 bg-gray-50 rounded-lg drop-shadow">
-                <p className="mb-2 font-medium text-gray-600">Files to submit:</p>
+                <p className="mb-2 font-medium text-gray-600">Files to submit (one file per line):</p>
                 <ListInput>
                   {_settings.template.map((file, index) => (
                     <ListInput.Item

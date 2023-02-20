@@ -98,6 +98,7 @@ const Item = ({ index, onEnterKeyPressed, onDelete, ...inputProps }: ItemProps) 
         if (inputRefs.current[index]?.value === "") {
           onDelete();
           setInputIndexToFocus(index === 0 ? 0 : index - 1);
+          event.preventDefault(); // Prevent deleting a character from the previous input box
         }
         break;
     }
@@ -114,6 +115,7 @@ const Item = ({ index, onEnterKeyPressed, onDelete, ...inputProps }: ItemProps) 
       />
       <button
         onClick={onDelete}
+        title="Delete item"
         className="w-8 h-8 flex items-center justify-center text-xl text-red-500 rounded-full hover:bg-red-100 active:bg-red-200 transition"
       >
         <FontAwesomeIcon icon={["fas", "xmark"]} />
@@ -150,6 +152,7 @@ const AddButton = ({ onClick, ...props }: AddButtonProps) => {
         onClick();
         setIsClicked(true);
       }}
+      title="New item"
       className="w-7 h-7 mt-1 ml-2 flex items-center justify-center bg-green-500 text-base text-white rounded-full hover:bg-green-600 active:bg-green-700 transition"
       {...props}
     >

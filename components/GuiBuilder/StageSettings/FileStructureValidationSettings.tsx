@@ -26,7 +26,8 @@ function FileStructureValidationSettings() {
   return (
     <div className="p-3">
       <p className="mb-2">
-        Files/directories to <span className="font-semibold">ignore</span> checking:
+        Files/directories to <span className="font-semibold">ignore</span> checking{" "}
+        <span className="text-gray-500">(one file/directory per line)</span>:
       </p>
       <ListInput>
         {ignoredFiles.map((file, index) => (
