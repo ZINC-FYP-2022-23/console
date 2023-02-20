@@ -10,7 +10,7 @@ interface AddableStageProps {
  * Pipeline stage block that can be added to the pipeline editor.
  */
 function AddableStage({ stageName, stageData }: AddableStageProps) {
-  const setDragging = useStoreActions((action) => action.pipelineEditor.setDragging);
+  const setDragging = useStoreActions((action) => action.pipelineEditor.setDraggingNewStage);
 
   return (
     <div className="flex flex-col">

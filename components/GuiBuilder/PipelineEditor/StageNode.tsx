@@ -63,7 +63,7 @@ function StageNode({ id, data, selected }: NodeProps<StageNodeData>) {
 
   const stageData = useStoreState((state) => state.config.editingConfig.stageData);
   const stageDeps = useStoreState((state) => state.config.editingConfig.stageDeps);
-  const dragging = useStoreState((state) => state.pipelineEditor.dragging);
+  const draggingNewStage = useStoreState((state) => state.pipelineEditor.draggingNewStage);
   const setShouldFocusLabelInput = useStoreActions((actions) => actions.pipelineEditor.setShouldFocusLabelInput);
 
   const stageLabel = stageData[id]?.label ?? "";
@@ -104,7 +104,7 @@ function StageNode({ id, data, selected }: NodeProps<StageNodeData>) {
         />
         {/* When dragging a new stage on top of existing stage, adding "pointer-events-none" avoids firing `dragleave` event
          * in the parent when mouse is over the below div. */}
-        <div className={clsx("flex flex-col items-center gap-1", dragging && "pointer-events-none")}>
+        <div className={clsx("flex flex-col items-center gap-1", draggingNewStage && "pointer-events-none")}>
           <p className="font-medium text-center leading-5">{data.label}</p>
           {stageLabel !== "" && (
             <div

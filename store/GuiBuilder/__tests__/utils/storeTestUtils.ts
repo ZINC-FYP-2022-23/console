@@ -40,7 +40,7 @@ export function getThreeStageModel(): GuiBuilderModel {
       },
     },
   };
-  model.pipelineEditor.dragging = {
+  model.pipelineEditor.draggingNewStage = {
     stageName: "Score",
     stageData: supportedStages.Score,
   };

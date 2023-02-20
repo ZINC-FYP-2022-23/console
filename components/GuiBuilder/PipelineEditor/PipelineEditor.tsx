@@ -60,7 +60,7 @@ function PipelineEditor() {
   const reactFlowWrapper = useRef<HTMLDivElement>(null!);
   const { fitView, project } = useReactFlow();
 
-  const dragging = useStoreState((state) => state.pipelineEditor.dragging);
+  const draggingNewStage = useStoreState((state) => state.pipelineEditor.draggingNewStage);
   const nodes = useStoreState((state) => state.pipelineEditor.nodes);
   const edges = useStoreState((state) => state.pipelineEditor.edges);
 
@@ -128,7 +128,7 @@ function PipelineEditor() {
       id={highlightableElementIds.pipelineEditor}
       className={clsx(
         "h-full relative rounded-md shadow overflow-hidden transition duration-200 ease-in-out",
-        dragging && "ring ring-blue-400",
+        draggingNewStage && "ring ring-blue-400",
       )}
       ref={reactFlowWrapper}
     >
@@ -158,7 +158,7 @@ function PipelineEditor() {
         <Background variant={BackgroundVariant.Dots} gap={GRID_SIZE} className="bg-gray-50" />
       </ReactFlow>
       <Transition
-        show={!!dragging}
+        show={!!draggingNewStage}
         enter="transition-opacity ease-in-out duration-200"
         enterFrom="opacity-0"
         enterTo="opacity-100"

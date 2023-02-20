@@ -33,18 +33,19 @@ export type PipelineEditorModel = PipelineEditorModelState &
   PipelineEditorModelThunkOn;
 
 interface PipelineEditorModelState {
-  /** Data being dragged from Add Stage panel. */
-  dragging?: { stageName: string; stageData: SupportedStage };
   /** Pipeline stage nodes. */
   nodes: StageNode[];
   /** Edges that connect pipeline stage nodes. */
   edges: Edge[];
+
+  /** ID of a stage the user wishes to duplicate by pressing `Ctrl/Cmd + C`. */
+  copiedStageId?: string;
+  /** Data of the new stage being dragged from Add New Stage panel. */
+  draggingNewStage?: { stageName: string; stageData: SupportedStage };
   /** Whether the editor should fit view to the nodes on the pane. */
   shouldFitView: boolean;
   /** Whether to focus the selected stage's label input box. */
   shouldFocusLabelInput: boolean;
-  /** ID of a stage the user wishes to duplicate by pressing `Ctrl/Cmd + C`. */
-  copiedStageId?: string;
 }
 
 interface PipelineEditorModelComputed {
@@ -75,12 +76,12 @@ interface PipelineEditorModelAction {
    */
   layoutPipeline: Action<PipelineEditorModel>;
 
-  setDragging: Action<PipelineEditorModel, { stageName: string; stageData: SupportedStage } | undefined>;
   setNodes: Action<PipelineEditorModel, StageNode[]>;
   setEdges: Action<PipelineEditorModel, Edge[]>;
+  setCopiedStageId: Action<PipelineEditorModel, string | undefined>;
+  setDraggingNewStage: Action<PipelineEditorModel, { stageName: string; stageData: SupportedStage } | undefined>;
   setShouldFitView: Action<PipelineEditorModel, boolean>;
   setShouldFocusLabelInput: Action<PipelineEditorModel, boolean>;
-  setCopiedStageId: Action<PipelineEditorModel, string | undefined>;
 
   /** Called on drag, select and remove of stage nodes. */
   onStageNodesChange: Action<PipelineEditorModel, NodeChange[]>;
@@ -204,23 +205,23 @@ const pipelineEditorAction: PipelineEditorModelAction = {
     state.shouldFitView = true; // since coords of nodes have changed
   }),
 
-  setDragging: action((state, supportedStage) => {
-    state.dragging = supportedStage;
-  }),
   setNodes: action((state, nodes) => {
     state.nodes = nodes;
   }),
   setEdges: action((state, edges) => {
     state.edges = edges;
   }),
+  setCopiedStageId: action((state, stageId) => {
+    state.copiedStageId = stageId;
+  }),
+  setDraggingNewStage: action((state, supportedStage) => {
+    state.draggingNewStage = supportedStage;
+  }),
   setShouldFitView: action((state, shouldFitView) => {
     state.shouldFitView = shouldFitView;
   }),
   setShouldFocusLabelInput: action((state, shouldFocusLabelInput) => {
     state.shouldFocusLabelInput = shouldFocusLabelInput;
-  }),
-  setCopiedStageId: action((state, stageId) => {
-    state.copiedStageId = stageId;
   }),
 
   onStageNodesChange: action((state, changes) => {
@@ -285,7 +286,7 @@ const pipelineEditorThunk: PipelineEditorModelThunk = {
   }),
   addStageNode: thunk((actions, payload, { getState, getStoreState, getStoreActions }) => {
     const { position, parent } = payload;
-    const dragging = getState().dragging;
+    const dragging = getState().draggingNewStage;
     if (!dragging) return;
 
     // Update pipeline editor data
