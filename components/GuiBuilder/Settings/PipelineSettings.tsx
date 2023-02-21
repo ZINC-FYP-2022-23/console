@@ -1,16 +1,19 @@
-import Button from "@/components/Button";
 import { Checkbox, NumberInput, Select, SelectItem, SwitchGroup, TextInput } from "@/components/Input";
 import ListInput from "@/components/Input/ListInput";
-import { ACCEPTED_LANG } from "@/constants/GuiBuilder/acceptedLang";
 import { highlightableElementIds } from "@/constants/GuiBuilder/highlightableElements";
+import supportedLanguages from "@/constants/GuiBuilder/supportedLanguages";
 import supportedStages from "@/constants/GuiBuilder/supportedStages";
 import { useStoreActions, useStoreState } from "@/store/GuiBuilder";
 import { SettingsFeatures, SettingsGpuDevice, SettingsUseTemplate } from "@/types/GuiBuilder";
 import { settingsLangToString } from "@/utils/GuiBuilder";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { memo } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { InfoTooltip } from "../Diagnostics";
+
+const langSelectOptions: SelectItem[] = supportedLanguages.map(({ language, compiler, label }) => ({
+  value: `${language}${compiler ? `/${compiler}` : ""}`,
+  label,
+}));
 
 const useTemplateSelectOptions: SelectItem<"undefined" | SettingsUseTemplate>[] = [
   {
@@ -82,7 +85,7 @@ function PipelineSettings() {
             </label>
             <Select
               id="lang"
-              data={ACCEPTED_LANG.map(({ lang: value, label }) => ({ value, label }))}
+              data={langSelectOptions}
               value={settingsLangToString(_settings.lang).split(":")[0]}
               onChange={(value) => {
                 if (value === null) return;
@@ -128,7 +131,7 @@ function PipelineSettings() {
             }}
           />
           <SwitchGroup
-            label="Use driver programs for grading"
+            label="Use additional files for grading"
             checked={_settings.use_provided}
             onChange={(value) => {
               updateSettings((_settings) => (_settings.use_provided = value));
