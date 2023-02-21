@@ -35,12 +35,14 @@ export function deleteNodeFromGraph(target: string, graph: DirectedGraph) {
  * console.log(isLinkedList(disconnectedGraph));  // false
  */
 export function isLinkedList(graph: DirectedGraph): boolean {
-  // The maximum out-degree of every node in a linked list is 1 (i.e. there are no branches)
-  if (Object.entries(graph).some(([, children]) => children.length > 1)) return false;
+  /** List of node IDs where its out-degree is 0. */
+  const nodesWithoutChildren: string[] = [];
 
-  const nodesWithoutChildren = Object.entries(graph).reduce<string[]>((acc, [key, children]) => {
-    return children.length === 0 ? [...acc, key] : acc;
-  }, []);
+  for (const [key, children] of Object.entries(graph)) {
+    // The maximum out-degree of every node in a linked list is 1 (i.e. no branches)
+    if (children.length > 1) return false;
+    if (children.length === 0) nodesWithoutChildren.push(key);
+  }
 
   // A linked list must have exactly one node without children (i.e. the tail)
   if (nodesWithoutChildren.length !== 1) return false;

@@ -40,6 +40,7 @@ function GUIAssignmentBuilder({ data, configId: configIdProp }: GUIAssignmentBui
 
   const configId = useStoreState((state) => state.config.configId);
   const isEdited = useStoreState((state) => state.config.isEdited);
+  const isPipelineLayoutValid = useStoreState((state) => state.config.isPipelineLayoutValid);
   const step = useStoreState((state) => state.layout.step);
 
   const initializeAssignment = useStoreActions((actions) => actions.config.initializeAssignment);
@@ -78,10 +79,19 @@ function GUIAssignmentBuilder({ data, configId: configIdProp }: GUIAssignmentBui
 
   const saveConfig = async () => {
     if (disableSave || isSaving) return;
+    if (!isPipelineLayoutValid) {
+      dispatch({
+        type: "showNotification",
+        payload: {
+          success: false,
+          title: "Invalid Pipeline Layout",
+          message: 'Please fix the grading pipeline layout in the "Pipeline Stages" step.',
+        },
+      });
+      return;
+    }
+
     setIsSaving(true);
-
-    // TODO(Anson): Validate pipeline graph first (e.g. make sure it's a linked list)
-
     const configsToSave = getConfigsToSave();
     try {
       const { configError } = await validateAssignmentConfig(

@@ -17,6 +17,7 @@ import ReactFlow, {
   useReactFlow,
 } from "reactflow";
 import "reactflow/dist/style.css";
+import ConnectNodesTutorialModal from "./ConnectNodesTutorialModal";
 import FloatingActionButtons from "./FloatingActionButtons";
 import StageEdgeComponent from "./StageEdge";
 import StageNodeComponent from "./StageNode";
@@ -60,10 +61,12 @@ function PipelineEditor() {
   const reactFlowWrapper = useRef<HTMLDivElement>(null!);
   const { fitView, project } = useReactFlow();
 
+  const isPipelineLayoutValid = useStoreState((state) => state.config.isPipelineLayoutValid);
   const draggingNewStage = useStoreState((state) => state.pipelineEditor.draggingNewStage);
   const nodes = useStoreState((state) => state.pipelineEditor.nodes);
   const edges = useStoreState((state) => state.pipelineEditor.edges);
 
+  const setModal = useStoreActions((actions) => actions.layout.setModal);
   const layoutPipeline = useStoreActions((actions) => actions.pipelineEditor.layoutPipeline);
   const addStageNode = useStoreActions((actions) => actions.pipelineEditor.addStageNode);
   const onNodesChange = useStoreActions((actions) => actions.pipelineEditor.onStageNodesChange);
@@ -169,6 +172,26 @@ function PipelineEditor() {
       >
         Drop the stage block on this canvas
       </Transition>
+      <Transition
+        show={!draggingNewStage && !isPipelineLayoutValid}
+        enter="transition-opacity ease-in-out duration-200"
+        enterFrom="opacity-0"
+        enterTo="opacity-100"
+        leave="transition-opacity ease-in-out duration-200"
+        leaveFrom="opacity-100"
+        leaveTo="opacity-0"
+        className="w-[25rem] mx-auto p-1 absolute left-0 right-0 bottom-0 bg-red-500 font-medium rounded-t text-center text-sm text-white"
+      >
+        Please connect the stage blocks together (
+        <button
+          onClick={() => setModal({ path: "connectNodesTutorial", value: true })}
+          className="underline underline-offset-2"
+        >
+          Learn how
+        </button>
+        )
+      </Transition>
+      <ConnectNodesTutorialModal />
     </div>
   );
 }

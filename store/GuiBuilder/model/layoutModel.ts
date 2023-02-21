@@ -69,6 +69,8 @@ export interface AlertState {
 }
 
 export interface ModalState {
+  /** Modal that teaches how to create a connection between two nodes. */
+  connectNodesTutorial: boolean;
   /** Success modal after creating a new config. */
   configCreated: boolean;
   /** Delete stage confirmation modal in "Pipeline Stages" step. */
@@ -92,6 +94,7 @@ const layoutModelState: LayoutModelState = {
     unsupportedStage: true,
   },
   modal: {
+    connectNodesTutorial: false,
     configCreated: false,
     deleteStage: false,
     regradePrompt: false,

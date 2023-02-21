@@ -175,10 +175,10 @@ function NoStageSelected() {
       </div>
       <div className="overflow-hidden">
         <Image
-          src="/assets/gui_editor_select_stage.svg"
+          src="/assets/gui_editor_select_stage.png"
           alt="pipeline editor demo"
-          width={300}
-          height={150}
+          width={465}
+          height={165}
           className="rounded-xl"
         />
       </div>

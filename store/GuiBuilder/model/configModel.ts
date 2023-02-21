@@ -9,7 +9,7 @@ import {
   StageDependencyGraph,
 } from "@/types/GuiBuilder";
 import { AssignmentConfig } from "@/types/tables";
-import { configToYaml, isConfigEqual, isScheduleEqual, parseConfigYaml } from "@/utils/GuiBuilder";
+import { configToYaml, isConfigEqual, isLinkedList, isScheduleEqual, parseConfigYaml } from "@/utils/GuiBuilder";
 import { action, Action, computed, Computed, thunk, Thunk } from "easy-peasy";
 import cloneDeep from "lodash/cloneDeep";
 import isEqual from "lodash/isEqual";
@@ -57,6 +57,12 @@ interface ConfigModelComputed {
       config: boolean;
     }
   >;
+  /**
+   * Whether the grading pipeline's layout is valid.
+   *
+   * The pipeline is considered valid if stage nodes are connected in a linked list manner.
+   */
+  isPipelineLayoutValid: Computed<ConfigModel, boolean>;
   /**
    * Returns a callback that check whether another stage with the same `stageName` (e.g. `"DiffWithSkeleton"`)
    * has a non-empty {@link Stage.label label} that is equal to the provided `label`.
@@ -187,6 +193,7 @@ const configModelComputed: ConfigModelComputed = {
       config: isConfigEdited,
     };
   }),
+  isPipelineLayoutValid: computed((state) => isLinkedList(state.editingConfig.stageDeps)),
   isStageLabelDuplicate: computed((state) => {
     return (stageName: string, label: string) => {
       if (label === "") return false;
