@@ -8,12 +8,7 @@ import Image from "next/image";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import UnsupportedStage from "./UnsupportedStage";
 
-type StageLabelAlert = Record<
-  "duplicateName" | "hasColon" | "discouragedChars",
-  { severity: "warning" | "error"; message: React.ReactNode }
->;
-
-const labelAlerts: StageLabelAlert = {
+const labelAlerts = {
   duplicateName: {
     severity: "error",
     message: <p>This label is already in use.</p>,
@@ -31,7 +26,7 @@ const labelAlerts: StageLabelAlert = {
       </p>
     ),
   },
-};
+} as const;
 
 /**
  * Settings panel for an individual stage in the pipeline.
@@ -39,7 +34,7 @@ const labelAlerts: StageLabelAlert = {
 function StageSettings() {
   const { classes } = useScrollAreaStyles();
   const labelInputRef = useRef<HTMLInputElement>(null!);
-  const [labelAlertKey, setLabelAlertKey] = useState<keyof StageLabelAlert | null>(null);
+  const [labelAlertKey, setLabelAlertKey] = useState<keyof typeof labelAlerts | null>(null);
 
   const selectedStage = useStoreState((state) => state.pipelineEditor.selectedStage);
   const isStageLabelDuplicate = useStoreState((state) => state.config.isStageLabelDuplicate);

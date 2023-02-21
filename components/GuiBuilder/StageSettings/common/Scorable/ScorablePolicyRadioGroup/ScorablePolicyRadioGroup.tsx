@@ -4,11 +4,11 @@ import { RadioGroup } from "@headlessui/react";
 import { clsx } from "@mantine/core";
 
 /** An option for the {@link ScorablePolicyRadioGroup}. */
-export type ScorablePolicyRadioGroupOption<TPolicy extends ScorablePolicy> = {
-  readonly value: TPolicy;
-  readonly label: string;
-  readonly description: string;
-};
+export type ScorablePolicyRadioGroupOption<TPolicy extends ScorablePolicy> = Readonly<{
+  value: TPolicy;
+  label: string;
+  description: string;
+}>;
 
 export interface ScorablePolicyRadioGroupProps<TPolicy extends ScorablePolicy> {
   /** Scoring policy options to show (i.e. the policies supported by the stage). */

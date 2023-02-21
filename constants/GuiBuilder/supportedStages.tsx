@@ -24,31 +24,31 @@ import dynamic from "next/dynamic";
 import { ComponentType } from "react";
 import { defaultScoreWeightingXUnit, defaultTotalScorableScore, defaultValgrindConfig } from "./defaults";
 
-export interface SupportedStage<TConfig = any> {
+export type SupportedStage<TConfig = any> = Readonly<{
   /** Label to be shown in the UI. */
-  readonly nameInUI: string;
+  nameInUI: string;
   /** Stage kind. */
-  readonly kind: StageKind;
+  kind: StageKind;
   /** Description to be shown in the UI. */
-  readonly description: string;
+  description: string;
   /** Default configuration to use when a new stage is created. */
-  readonly defaultConfig: TConfig;
+  defaultConfig: TConfig;
   /**
    * @param raw The raw stage config object obtained from parsing the YAML.
    * @returns A tidied stage config object. Its shape can differ from the `raw` parameter to
    * facilitate GUI implementation.
    */
-  readonly configFromRaw?: (raw: any) => TConfig;
+  configFromRaw?: (raw: any) => TConfig;
   /**
    * @param config The stage config object to be converted to raw.
    * @returns A raw stage config object to be de-serialized to YAML.
    */
-  readonly configToRaw?: (config: TConfig) => any;
+  configToRaw?: (config: TConfig) => any;
   /**
    * Stage settings panel component. It should be dynamically imported to reduce the initial bundle size.
    */
-  readonly stageSettings: ComponentType<{}>;
-}
+  stageSettings: ComponentType<{}>;
+}>;
 
 export type SupportedStages = {
   [Stage in keyof StageConfig]: SupportedStage<StageConfig[Stage]>;

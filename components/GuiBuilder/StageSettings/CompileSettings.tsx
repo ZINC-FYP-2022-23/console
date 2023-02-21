@@ -2,10 +2,11 @@ import { TagsInput, Textarea, TextInput } from "@/components/Input";
 import { useSelectedStageConfig } from "@/hooks/GuiBuilder";
 import { useStoreState } from "@/store/GuiBuilder";
 import { FocusEventHandler, memo } from "react";
+import { DeepReadonly } from "utility-types";
 import { InfoTooltip } from "../Diagnostics";
 import { AdditionalPackagesTooltip } from "./common";
 
-interface ConfigMetadata {
+type ConfigMetadata = DeepReadonly<{
   input: {
     /** Placeholder text for the input files. */
     placeholder?: string;
@@ -20,7 +21,7 @@ interface ConfigMetadata {
     /** Default value for the command-line flags input box. */
     defaultValue?: string;
   };
-}
+}>;
 
 /**
  * Gets the language-specific metadata for each input field.

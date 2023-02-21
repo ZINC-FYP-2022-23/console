@@ -7,11 +7,11 @@ import { Node } from "reactflow";
 /**
  * Data stored by a stage node.
  */
-export type StageNodeData = {
+export type StageNodeData = Readonly<{
   /** Stage name (e.g. `"StdioTest"`, `"Compile"`). */
-  readonly name: string;
+  name: string;
   /** Label of the stage to be shown. */
-  readonly label: string;
-};
+  label: string;
+}>;
 
 export type StageNode = Node<StageNodeData>;

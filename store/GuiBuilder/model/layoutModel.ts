@@ -1,4 +1,4 @@
-import guiBuilderSteps, { GuiBuilderStep } from "@/components/GuiBuilder/Steps/GuiBuilderSteps";
+import guiBuilderSteps, { GuiBuilderStepSlug } from "@/components/GuiBuilder/Steps/GuiBuilderSteps";
 import { HighlightableElementsKey } from "@/constants/GuiBuilder/highlightableElements";
 import { action, Action } from "easy-peasy";
 import set from "lodash/set";
@@ -28,7 +28,7 @@ interface LayoutModelState {
 }
 
 interface LayoutModelAction {
-  setStep: Action<LayoutModel, GuiBuilderStep["slug"]>;
+  setStep: Action<LayoutModel, GuiBuilderStepSlug>;
   setAccordion: Action<
     LayoutModel,
     {

@@ -20,7 +20,7 @@ export type HighlightableElementsKey = "addStageTutorial" | "useTemplate";
  *  - `multi`: create a multi-step highlighting sequence.
  */
 type HighlightableElementsValue =
-  | {
+  | Readonly<{
       /** The highlighting mode for highlighting a single element. */
       mode: "single";
       /**
@@ -30,8 +30,8 @@ type HighlightableElementsValue =
        * for more details.
        */
       selector: BoardingStepDefinition;
-    }
-  | {
+    }>
+  | Readonly<{
       /** The highlighting mode for creating a multi-step highlighting sequence. */
       mode: "multiple";
       /**
@@ -40,7 +40,7 @@ type HighlightableElementsValue =
        * See the {@link https://josias-r.github.io/boarding.js/#run-multi-element-popovers example in Boarding.js docs}.
        */
       steps: BoardingStepDefinition[];
-    };
+    }>;
 
 type HighlightableElements = Record<HighlightableElementsKey, HighlightableElementsValue>;
 

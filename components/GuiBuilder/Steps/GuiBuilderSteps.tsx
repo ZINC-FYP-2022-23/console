@@ -2,8 +2,10 @@ import { Spinner } from "@/components/Spinner";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import dynamic from "next/dynamic";
 
-export type GuiBuilderStep = {
-  slug: "settings" | "pipeline" | "upload" | "test" | "assign";
+export type GuiBuilderStepSlug = "settings" | "pipeline" | "upload" | "test" | "assign";
+
+export type GuiBuilderStep = Readonly<{
+  slug: GuiBuilderStepSlug;
   label: string;
   icon: React.ReactNode;
   /**
@@ -19,7 +21,7 @@ export type GuiBuilderStep = {
    * It should be dynamically imported to reduce the bundle size.
    */
   component: React.ComponentType<{}>;
-};
+}>;
 
 const StepLoading = () => (
   <div className="my-20 flex flex-col items-center justify-center">
@@ -30,7 +32,7 @@ const StepLoading = () => (
 /**
  * Steps in the GUI Assignment Builder.
  */
-const guiBuilderSteps: GuiBuilderStep[] = [
+const guiBuilderSteps: readonly GuiBuilderStep[] = [
   {
     slug: "settings",
     label: "General Settings",
