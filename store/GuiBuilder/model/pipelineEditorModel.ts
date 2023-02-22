@@ -320,7 +320,6 @@ const pipelineEditorThunk: PipelineEditorModelThunk = {
       // Add `A -> N`
       actions.setEdges([
         ...getState().edges,
-        // Add `A -> N`
         {
           id: `reactflow__edge-${parent}-${stageId}`,
           source: parent,

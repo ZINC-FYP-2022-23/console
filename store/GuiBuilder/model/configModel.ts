@@ -60,7 +60,8 @@ interface ConfigModelComputed {
   /**
    * Whether the grading pipeline's layout is valid.
    *
-   * The pipeline is considered valid if stage nodes are connected in a linked list manner.
+   * The pipeline is considered valid if the pipeline has no stages, or the stage nodes are connected in
+   * a linked list manner.
    */
   isPipelineLayoutValid: Computed<ConfigModel, boolean>;
   /**
@@ -193,7 +194,9 @@ const configModelComputed: ConfigModelComputed = {
       config: isConfigEdited,
     };
   }),
-  isPipelineLayoutValid: computed((state) => isLinkedList(state.editingConfig.stageDeps)),
+  isPipelineLayoutValid: computed((state) => {
+    return Object.keys(state.editingConfig.stageDeps).length === 0 || isLinkedList(state.editingConfig.stageDeps);
+  }),
   isStageLabelDuplicate: computed((state) => {
     return (stageName: string, label: string) => {
       if (label === "") return false;
