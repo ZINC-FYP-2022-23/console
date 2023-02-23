@@ -17,6 +17,7 @@ import { SlideOver } from "../../../../../components/SlideOver";
 import { useState } from "react";
 import AssignmentSupportingFilesUploader from "../../../../../components/AssignmentSupportingFilesUploader";
 import { FilesProvider } from "../../../../../contexts/assignmentSupportingFiles";
+import { AppealConfig } from "@/components/Appeal/AppealConfig";
 
 function SlideOverContent() {
   const { configSlideOver } = useLayoutState();
@@ -147,6 +148,9 @@ function YAMLConfigEditor({ yamlString }) {
   async function updateYaml() {
     try {
       // const yaml = jsyaml.load(configYaml);
+      {
+        /* @ts-ignore */
+      }
       const { configError } = await validateAssignmentConfig(configYaml, assignmentConfigId);
       if (!configError) {
         await updatePipelineConfig({
@@ -266,7 +270,19 @@ function AssignmentConfigurationYAML() {
                   }}
                 />
                 <AssignedUsers />
-                Notificaion
+                <AppealConfig
+                  onChange={() =>
+                    refetch({
+                      assignmentConfigId,
+                    })
+                  }
+                  appealConfig={{
+                    isAppealAllowed: data.assignmentConfig.isAppealAllowed,
+                    appealLimits: data.assignmentConfig.appealLimits,
+                    appealDueAt: data.assignmentConfig.appealDueAt,
+                    isAppealStudentReplyAllowed: data.assignmentConfig.isAppealStudentReplyAllowed,
+                  }}
+                />
               </div>
             </div>
           </div>

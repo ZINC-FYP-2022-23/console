@@ -2,7 +2,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { ControlledEditor } from "@monaco-editor/react";
-import { setHours, setMinutes, addDays } from "date-fns";
+import { setHours, setMinutes, addDays, isYesterday } from "date-fns";
 import { zonedTimeToUtc } from "date-fns-tz";
 import { initializeApollo } from "../../../../lib/apollo";
 import { LayoutProvider, useLayoutDispatch, useLayoutState } from "../../../../contexts/layout";
@@ -13,6 +13,7 @@ import { useMutation, useQuery } from "@apollo/client";
 import { CREATE_ASSIGNMENT_CONFIG, UPDATE_ASSIGNMENTCONFIG_NOTI } from "../../../../graphql/mutations/user";
 import { useZinc } from "../../../../contexts/zinc";
 import { Checkbox, DateInput } from "components/Input";
+import { AppealConfig } from "@/components/Appeal/AppealConfig";
 
 interface AssignmentConfig {
   assignment_id: Number;
@@ -25,6 +26,11 @@ interface AssignmentConfig {
   attemptLimits?: Number | null;
   gradeImmediately: boolean;
   showImmediateScores: boolean;
+  // Appeal-related configs
+  isAppealAllowed: boolean;
+  appealLimits?: Number | null;
+  appealDueAt?: Date;
+  isAppealStudentReplyAllowed?: boolean;
 }
 
 function AssignmentConfigCreateSuccessModalContent() {
@@ -90,8 +96,14 @@ function AssignmentConfigCreation({ assignment }) {
     releaseGradeAt: setHours(setMinutes(addDays(new Date(), 7), 59), 23),
     gradeImmediately: false,
     showImmediateScores: false,
+    // Appeal-related settings
+    isAppealAllowed: true,
+    appealLimits: 1,
+    appealDueAt: setHours(setMinutes(addDays(new Date(), 14), 59), 23),
+    isAppealStudentReplyAllowed: true,
   };
   const [assignmentConfig, setAssignmentConfig] = useState(initialConfig);
+
   // store all userID of instructors that would be receive the notification
   // const [notificationList, setNotificationList] = useState([]);
   const [createAssignmentConfig, { loading }] = useMutation(CREATE_ASSIGNMENT_CONFIG);
@@ -264,6 +276,7 @@ function AssignmentConfigCreation({ assignment }) {
               />
             </div>
           </div>
+          {/* Configuration settings (right-side box) */}
           <div className="w-5/12">
             <div className="shadow sm:rounded-md mx-4">
               <div className="px-4 py-5 bg-white sm:rounded-md sm:p-6">
@@ -408,6 +421,16 @@ function AssignmentConfigCreation({ assignment }) {
                     )}
                   </div>
                 </fieldset>
+                <AppealConfig
+                  appealConfig={{
+                    stopCollectionAt: assignmentConfig.stopCollectionAt,
+                    isAppealAllowed: assignmentConfig.isAppealAllowed,
+                    appealLimits: assignmentConfig.appealLimits,
+                    appealDueAt: assignmentConfig.appealDueAt,
+                    isAppealStudentReplyAllowed: assignmentConfig.isAppealStudentReplyAllowed,
+                  }}
+                  setAssignmentConfig={setAssignmentConfig}
+                />
               </div>
             </div>
           </div>

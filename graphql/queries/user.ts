@@ -267,6 +267,10 @@ export const GET_PIPELINE_CONFIG_FOR_ASSIGNMENT = gql`
       dueAt
       stopCollectionAt
       releaseGradeAt
+      appealDueAt
+      appealLimits
+      isAppealAllowed
+      isAppealStudentReplyAllowed
     }
   }
 `;
