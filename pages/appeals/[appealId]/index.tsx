@@ -47,7 +47,11 @@ function ActivityLogTab({ activityLogList }: ActivityLogTabProps) {
               | (AppealLog & { _type: "appealLog" }),
           ) => {
             if (log._type === "appealLog") {
-              return <AppealLogMessage key={log.id} log={log} showButton={false} />;
+              return (
+                <div className="px-3">
+                  <AppealLogMessage key={log.id} log={log} showButton={false} />
+                </div>
+              );
             } else if (log._type === "appealMessage") {
               return <AppealTextMessage key={log.id} message={log} />;
             }
@@ -136,7 +140,7 @@ function AppealDetails({ courseId, appealInfo, fullScore, activityLogList }: App
             </a>
           </Link>
           {appealInfo ? (
-            <div>
+            <>
               <h1 className="text-2xl text-gray-900 font-bold leading-7">Appeal Details</h1>
               <div className="flex flex-row mt-8">
                 {/* Appeal Information */}
@@ -205,7 +209,7 @@ function AppealDetails({ courseId, appealInfo, fullScore, activityLogList }: App
                   </div>
                 </div>
               </div>
-              <div className="p-2 flex-1 space-y-2">
+              <div className="py-2 flex-1 space-y-2">
                 <Tab.Group>
                   <Tab.List className="mt-3 px-6 flex gap-6 text-sm border-b w-full">
                     <Tab
@@ -243,7 +247,7 @@ function AppealDetails({ courseId, appealInfo, fullScore, activityLogList }: App
                   </Tab.Panels>
                 </Tab.Group>
               </div>
-            </div>
+            </>
           ) : (
             <div className="my-6 mt-8 flex flex-col items-center self-center mb-4">
               <Alert
@@ -277,7 +281,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
   });
 
   return {
-    props: { courseId, appealInfo, fullScore, messageList },
+    props: { courseId, appealInfo, fullScore, messageList, activityLogList },
   };
 };
 

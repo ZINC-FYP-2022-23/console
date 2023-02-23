@@ -25,7 +25,7 @@ export function AppealLogMessage({ log, showButton }: AppealLogMessageType) {
   if (log.type === "APPEAL_SUBMISSION") {
     return (
       <>
-        <div className="mx-12 h-12 border-l-2"></div>
+        <div className="mx-12 h-8 border-l-2"></div>
         <div className="mx-8 flex justify-between">
           <div className="flex items-center">
             <div className="w-8 h-8 bg-blue-300 rounded-full flex justify-center items-center">
@@ -60,7 +60,7 @@ export function AppealLogMessage({ log, showButton }: AppealLogMessageType) {
   if (log.type === ChangeLogTypes.APPEAL_STATUS && log.updatedState) {
     return (
       <>
-        <div className="mx-12 h-12 border-l-2"></div>
+        <div className="mx-12 h-8 border-l-2"></div>
         <div className="mx-8 flex justify-between">
           <div className="flex items-center">
             <div
@@ -108,7 +108,7 @@ export function AppealLogMessage({ log, showButton }: AppealLogMessageType) {
   if (log.type === ChangeLogTypes.SCORE && log.updatedState) {
     return (
       <>
-        <div className="mx-12 h-12 border-l-2"></div>
+        <div className="mx-12 h-8 border-l-2"></div>
         <div className="mx-8 flex justify-between">
           <div className="flex items-center">
             <div
@@ -160,7 +160,7 @@ export function AppealLogMessage({ log, showButton }: AppealLogMessageType) {
   if (log.type === ChangeLogTypes.SUBMISSION) {
     return (
       <>
-        <div className="mx-12 h-12 border-l-2"></div>
+        <div className="mx-12 h-8 border-l-2"></div>
         <div className="mx-8 flex justify-between">
           <div className="flex items-center">
             <div
@@ -210,7 +210,7 @@ export function AppealLogMessage({ log, showButton }: AppealLogMessageType) {
   // Error for unidentified log
   return (
     <li className="list-none">
-      <div className="mx-12 h-12 border-l-2"></div>
+      <div className="mx-12 h-8 border-l-2"></div>
       <div className="mx-8 flex justify-between">
         <div className="flex items-center">
           <div
