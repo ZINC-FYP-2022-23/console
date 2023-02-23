@@ -1,9 +1,16 @@
 import { useMutation } from "@apollo/client";
 import { Checkbox, DateInput } from "components/Input";
-import { zonedTimeToUtc } from "date-fns-tz";
+import { utcToZonedTime, zonedTimeToUtc } from "date-fns-tz";
 import { useRouter } from "next/router";
 import { useLayoutDispatch } from "../../contexts/layout";
 import { UPDATE_ASSIGNMENT_CONFIG } from "../../graphql/mutations/user";
+
+const getLocalDate = (date: string) => {
+  if (date) {
+    return utcToZonedTime(`${date}Z`, "Asia/Hong_Kong");
+  }
+  return null;
+};
 
 type AppealConfigType = {
   stopCollectionAt?: Date;
@@ -14,12 +21,12 @@ type AppealConfigType = {
 };
 
 interface AppealConfigProps {
-  appealConfig: AppealConfigType;
+  assignmentConfig;
   setAssignmentConfig?; // Used when creating new config
   onChange?; // Used when updating config
 }
 
-export function AppealConfig({ appealConfig, setAssignmentConfig, onChange }: AppealConfigProps) {
+export function AppealConfig({ assignmentConfig, setAssignmentConfig, onChange }: AppealConfigProps) {
   const router = useRouter();
   const { assignmentConfigId } = router.query;
   const dispatch = useLayoutDispatch();
@@ -54,9 +61,9 @@ export function AppealConfig({ appealConfig, setAssignmentConfig, onChange }: Ap
       <div className="mt-4 flex items-start">
         <div className="flex items-center h-5">
           <Checkbox
-            checked={appealConfig.isAppealAllowed}
+            checked={assignmentConfig.isAppealAllowed}
             onChange={(e) => {
-              if (setAssignmentConfig) setAssignmentConfig({ ...appealConfig, isAppealAllowed: e.target.checked });
+              if (setAssignmentConfig) setAssignmentConfig({ ...assignmentConfig, isAppealAllowed: e.target.checked });
               else updateAppealConfig({ isAppealAllowed: e.target.checked });
             }}
             id="isAppealAllowed"
@@ -70,7 +77,7 @@ export function AppealConfig({ appealConfig, setAssignmentConfig, onChange }: Ap
         </div>
       </div>
       {/* Only show the fields related to appeal if `isAppealAllowed` is checked */}
-      {appealConfig.isAppealAllowed && (
+      {assignmentConfig.isAppealAllowed && (
         <div>
           {/* appealLimits */}
           <div className="mt-4 flex justify-between items-center">
@@ -83,7 +90,7 @@ export function AppealConfig({ appealConfig, setAssignmentConfig, onChange }: Ap
               onChange={(e) => {
                 if (setAssignmentConfig)
                   setAssignmentConfig({
-                    ...appealConfig,
+                    ...assignmentConfig,
                     appealLimits: parseInt(e.target.value, 10) || null,
                   });
                 else updateAppealConfig({ appealLimits: parseInt(e.target.value, 10) || null });
@@ -100,13 +107,13 @@ export function AppealConfig({ appealConfig, setAssignmentConfig, onChange }: Ap
             <div className="relative rounded-md shadow-sm">
               <DateInput
                 id="appealDueAt"
-                selected={appealConfig.appealDueAt}
+                selected={getLocalDate(assignmentConfig.appealDueAt)}
                 onChange={(date) => {
                   if (setAssignmentConfig)
-                    setAssignmentConfig({ ...appealConfig, appealDueAt: zonedTimeToUtc(date!, "Asia/Hong_Kong") });
-                  else updateAppealConfig({ appealDueAt: zonedTimeToUtc(date!, "Asia/Hong_Kong") });
+                    setAssignmentConfig({ ...assignmentConfig, appealDueAt: zonedTimeToUtc(date!, "Asia/Hong_Kong") });
+                  else if (date) updateAppealConfig({ appealDueAt: zonedTimeToUtc(date!, "Asia/Hong_Kong") });
                 }}
-                minDate={appealConfig.stopCollectionAt}
+                minDate={assignmentConfig.stopCollectionAt}
                 placeholderText="Appeal Submission Closing Date"
               />
             </div>
@@ -115,10 +122,10 @@ export function AppealConfig({ appealConfig, setAssignmentConfig, onChange }: Ap
           <div className="mt-4 flex items-start">
             <div className="flex items-center h-5">
               <Checkbox
-                checked={appealConfig.isAppealStudentReplyAllowed}
+                checked={assignmentConfig.isAppealStudentReplyAllowed}
                 onChange={(e) => {
                   if (setAssignmentConfig)
-                    setAssignmentConfig({ ...appealConfig, isAppealStudentReplyAllowed: e.target.checked });
+                    setAssignmentConfig({ ...assignmentConfig, isAppealStudentReplyAllowed: e.target.checked });
                   else updateAppealConfig({ isAppealStudentReplyAllowed: e.target.checked });
                 }}
                 id="isAppealStudentReplyAllowed"

@@ -421,16 +421,7 @@ function AssignmentConfigCreation({ assignment }) {
                     )}
                   </div>
                 </fieldset>
-                <AppealConfig
-                  appealConfig={{
-                    stopCollectionAt: assignmentConfig.stopCollectionAt,
-                    isAppealAllowed: assignmentConfig.isAppealAllowed,
-                    appealLimits: assignmentConfig.appealLimits,
-                    appealDueAt: assignmentConfig.appealDueAt,
-                    isAppealStudentReplyAllowed: assignmentConfig.isAppealStudentReplyAllowed,
-                  }}
-                  setAssignmentConfig={setAssignmentConfig}
-                />
+                <AppealConfig assignmentConfig={assignmentConfig} setAssignmentConfig={setAssignmentConfig} />
               </div>
             </div>
           </div>

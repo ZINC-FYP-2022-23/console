@@ -276,7 +276,7 @@ function AssignmentConfigurationYAML() {
                       assignmentConfigId,
                     })
                   }
-                  appealConfig={{
+                  assignmentConfig={{
                     isAppealAllowed: data.assignmentConfig.isAppealAllowed,
                     appealLimits: data.assignmentConfig.appealLimits,
                     appealDueAt: data.assignmentConfig.appealDueAt,
