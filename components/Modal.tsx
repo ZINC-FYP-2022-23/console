@@ -1,7 +1,8 @@
 import { Transition } from "@headlessui/react";
+import { clsx } from "@mantine/core";
 import { useLayoutDispatch, useLayoutState } from "../contexts/layout";
 
-type ModalSize = "regular" | "lg";
+type ModalSize = "regular" | "md" | "lg";
 
 interface ModalProps {
   children: React.ReactNode;
@@ -78,9 +79,12 @@ export function Modal({ children, size = "regular" }: ModalProps) {
             leave="ease-in duration-200"
             leaveFrom="opacity-100 translate-y-0 sm:scale-100"
             leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-            className={`inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle ${
-              size === "lg" ? "sm:max-w-5xl" : "sm:max-w-lg"
-            } sm:w-full pointer-events-auto`}
+            className={clsx(
+              "inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:w-full pointer-events-auto",
+              size === "regular" && "sm:max-w-lg",
+              size === "md" && "sm:max-w-3xl",
+              size === "lg" && "sm:max-w-5xl",
+            )}
             role="dialog"
             aria-modal="true"
             aria-labelledby="modal-headline"
@@ -98,14 +102,10 @@ export function Modal({ children, size = "regular" }: ModalProps) {
  */
 export function ModalWithHeader({ children, title, subtitle, size = "regular", rootClassNames }: ModalWithHeaderProps) {
   const dispatch = useLayoutDispatch();
-  let rootDivClasses = "space-y-4 flex flex-col shadow-xl bg-cool-gray-50 pb-4";
-  if (rootClassNames) {
-    rootDivClasses += ` ${rootClassNames}`;
-  }
 
   return (
     <Modal size={size}>
-      <div className={rootDivClasses}>
+      <div className={clsx("space-y-4 flex flex-col shadow-xl bg-cool-gray-50 pb-4", rootClassNames)}>
         <header className="space-y-1 py-6 bg-cse-600 sm:px-6">
           <div className="flex items-center justify-between space-x-3">
             <h2 className="text-lg leading-7 font-medium text-white">{title}</h2>

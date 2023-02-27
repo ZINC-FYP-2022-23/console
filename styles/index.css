@@ -97,6 +97,15 @@
     @apply outline-none;
   }
 
+  .react-datepicker__day--disabled {
+    @apply text-gray-400 cursor-not-allowed;
+  }
+
+  .react-datepicker__day--keyboard-selected,
+  .react-datepicker__day--keyboard-selected:hover {
+    @apply bg-transparent;
+  }
+
   .react-datepicker__time-container
     .react-datepicker__time
     .react-datepicker__time-box
@@ -111,6 +120,13 @@
     ul.react-datepicker__time-list
     li.react-datepicker__time-list-item--selected:hover {
     @apply bg-cse-400;
+  }
+
+  .react-datepicker__time-container,
+  .react-datepicker__time-container
+    .react-datepicker__time
+    .react-datepicker__time-box {
+    @apply w-24;
   }
 
   .ais-Highlight-highlighted {
@@ -133,4 +149,50 @@
 
 .mantine-RichTextEditor-root ol {
   list-style-type: decimal;
+}
+
+/* react-tag-input-component (Used in <TagsInput />) */
+.tag-input .rti--container {
+  @apply px-2 py-1 border-gray-300 shadow-sm transition focus-within:border-blue-300 focus-within:ring focus-within:ring-blue-100;
+}
+
+.tag-input.disabled .rti--container {
+  @apply cursor-not-allowed opacity-70 bg-gray-100;
+}
+
+.tag-input .rti--input {
+  @apply w-2/5 flex-grow px-1 py-1 transition-none placeholder:text-gray-400 focus:ring-0 focus:ring-transparent disabled:cursor-not-allowed disabled:opacity-70 disabled:bg-gray-100 disabled:placeholder:font-sans disabled:placeholder:text-gray-600;
+}
+
+.tag-input .rti--tag {
+  @apply bg-gray-200 px-2 py-1;
+}
+
+.tag-input .rti--tag > button {
+  @apply pl-3 pr-1 font-bold text-gray-500 hover:text-red-500;
+}
+
+/* boarding.js (highlight element in the page with pverlay) */
+.boarding-close-btn, .boarding-prev-btn, .boarding-next-btn {
+  @apply px-2 py-1 bg-gray-100 font-sans rounded-sm text-xs !important;
+}
+
+.boarding-navigation-btns {
+  @apply space-x-1;
+}
+
+.boarding-popover-description {
+  @apply font-sans text-sm !important;
+}
+
+#boarding-popover-item {
+  @apply max-w-sm !important;
+}
+
+.boarding-popover-footer {
+  @apply mt-4 !important;
+}
+
+.boarding-popover-title {
+  @apply mb-3 font-sans font-semibold text-lg !important;
 }

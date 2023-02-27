@@ -8,7 +8,7 @@ interface SlideOverProps {
 export function SlideOver({ children }: SlideOverProps) {
   const { showSlideOver } = useLayoutState();
   return (
-    <div className="fixed inset-0 overflow-hidden pointer-events-none">
+    <div className="fixed inset-0 overflow-hidden pointer-events-none z-20">
       <div className="absolute inset-0 overflow-hidden">
         <section className="absolute inset-y-0 pl-16 max-w-full right-0 flex">
           <Transition
