@@ -3,6 +3,8 @@ import { createContext, useContext } from "react";
 interface StdioTestSettingsContextType {
   /** Callback to close the parent modal. */
   closeModal: () => void;
+  /** Sets the index of the active tab. */
+  setTabIndex: (index: number) => void;
   /**
    * Which view to show in the "Test Cases" tab panel. Either:
    * - "table" = Table view

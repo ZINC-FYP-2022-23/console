@@ -23,11 +23,14 @@ export default function useHighlightElement() {
 
     const element = highlightableElements[elementToHighlight];
 
-    if (element.mode === "single") {
-      boarding.highlight(element.selector);
-    } else if (element.mode === "multiple") {
-      boarding.defineSteps(element.steps);
-      boarding.start();
-    }
+    // `setTimeout` buys time to let the DOM load the target elements before highlighting them
+    setTimeout(() => {
+      if (element.mode === "single") {
+        boarding.highlight(element.selector);
+      } else if (element.mode === "multiple") {
+        boarding.defineSteps(element.steps);
+        boarding.start();
+      }
+    }, 0);
   }, [elementToHighlight, setElementToHighlight]);
 }

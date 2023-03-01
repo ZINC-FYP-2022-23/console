@@ -28,11 +28,12 @@ interface StdioTestCaseSettingsProps {
  * Settings for a single test case in `StdioTest` stage.
  */
 function StdioTestCaseSettings({ caseId }: StdioTestCaseSettingsProps) {
-  const { closeModal, setTestCaseView } = useStdioTestSettingsContext();
+  const { closeModal, setTabIndex, setTestCaseView } = useStdioTestSettingsContext();
 
   const [config, setConfig] = useSelectedStageConfig("StdioTest");
   const hasValgrindStage = useStoreState((state) => state.config.hasStage("Valgrind"));
   const setAddStageSearchString = useStoreActions((actions) => actions.layout.setAddStageSearchString);
+  const setElementToHighlight = useStoreActions((actions) => actions.layout.setElementToHighlight);
 
   const [isEditingId, setIsEditingId] = useState(false);
   const [newId, setNewId] = useState<number | null>(caseId);
@@ -288,25 +289,42 @@ function StdioTestCaseSettings({ caseId }: StdioTestCaseSettingsProps) {
               <label htmlFor="_expectedInputMode" className="flex-[2]">
                 Expected output
               </label>
-              <Select
-                id="_expectedInputMode"
-                data={inputModeOptions}
-                value={caseConfig._expectedInputMode}
-                onChange={(value) => {
-                  if (value === null) return;
-                  updateTestCase((testCase) => (testCase._expectedInputMode = value));
-                }}
-                styles={{ root: { flex: 3 } }}
-              />
+              {config.generate_expected_output ? (
+                <div className="flex-[3] py-2 text-gray-500 text-sm">
+                  No need to specify because it is{" "}
+                  <button
+                    onClick={() => {
+                      setTabIndex(1);
+                      setElementToHighlight("generateExpectedOutput");
+                    }}
+                    title="Show me this setting"
+                    className="text-blue-700 underline"
+                  >
+                    auto-generated
+                  </button>
+                  .
+                </div>
+              ) : (
+                <Select
+                  id="_expectedInputMode"
+                  data={inputModeOptions}
+                  value={caseConfig._expectedInputMode}
+                  onChange={(value) => {
+                    if (value === null) return;
+                    updateTestCase((testCase) => (testCase._expectedInputMode = value));
+                  }}
+                  styles={{ root: { flex: 3 } }}
+                />
+              )}
             </div>
-            {caseConfig._expectedInputMode === "file" && (
+            {!config.generate_expected_output && caseConfig._expectedInputMode === "file" && (
               <HelperFileInputCard
                 value={caseConfig.file_expected ?? ""}
                 onChange={(e) => updateTestCase((testCase) => (testCase.file_expected = e.target.value))}
                 placeholder="e.g. expected_1.txt"
               />
             )}
-            {caseConfig._expectedInputMode === "text" && (
+            {!config.generate_expected_output && caseConfig._expectedInputMode === "text" && (
               <MonacoEditorCard
                 cardTitle="Content of expected output"
                 value={caseConfig.expected}

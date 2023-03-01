@@ -320,9 +320,22 @@ describe("GuiBuilder: Raw stage configs conversion", () => {
         expect(testCaseToRawMock).toHaveBeenNthCalledWith(1, testCases[0]);
       });
 
-      it("sets `experimentalModularize` to true if `generate_expected_output` is true", () => {
+      test("`generate_expected_output` is true", () => {
+        const testCases: TestCase[] = [
+          {
+            id: 1,
+            file: "a.out",
+            visibility: "ALWAYS_VISIBLE",
+            score: 5,
+            _stdinInputMode: "none",
+            _expectedInputMode: "text",
+            expected: "Hello World",
+            file_expected: "1.txt",
+            _valgrindOverride: false,
+          },
+        ];
         const baseConfig: Omit<StdioTest, "experimentalModularize" | "generate_expected_output"> = {
-          testCases: [],
+          testCases,
           diff_ignore_flags: [],
           additional_packages: [],
           additional_pip_packages: [],
@@ -334,6 +347,8 @@ describe("GuiBuilder: Raw stage configs conversion", () => {
           generate_expected_output: true,
         });
         expect(configRawWithGenerate.experimentalModularize).toBe(true);
+        expect(configRawWithGenerate.testCases[0].expected).toBeUndefined();
+        expect(configRawWithGenerate.testCases[0].file_expected).toBeUndefined();
 
         const configRawWithoutGenerate = convertConfigToRaw<StdioTest, StdioTestRaw>("StdioTest", {
           ...baseConfig,
@@ -341,6 +356,7 @@ describe("GuiBuilder: Raw stage configs conversion", () => {
           generate_expected_output: false,
         });
         expect(configRawWithoutGenerate.experimentalModularize).toBe(false);
+        expect(configRawWithoutGenerate.testCases[0].expected).toBe("Hello World");
       });
     });
   });

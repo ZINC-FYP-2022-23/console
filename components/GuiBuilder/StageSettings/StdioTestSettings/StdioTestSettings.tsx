@@ -22,6 +22,7 @@ function StdioTestSettings() {
     <StdioTestSettingsContext.Provider
       value={{
         closeModal: () => setModalOpened(false),
+        setTabIndex,
         testCaseView,
         setTestCaseView,
       }}
@@ -42,7 +43,7 @@ function StdioTestSettings() {
         title="Standard I/O Test Configuration"
       >
         <div className="flex flex-col h-full">
-          <Tab.Group defaultIndex={tabIndex} onChange={(index) => setTabIndex(index)}>
+          <Tab.Group selectedIndex={tabIndex} onChange={(index) => setTabIndex(index)}>
             <Tab.List className="px-6 flex font-medium border-b border-gray-200">
               <Tab
                 className={({ selected }) =>

@@ -221,12 +221,22 @@ const supportedStages: SupportedStages = {
       experimentalModularize: raw.experimentalModularize ?? false,
       generate_expected_output: raw.generate_expected_output ?? false,
     }),
-    configToRaw: (config): StdioTestRaw => ({
-      ...config,
-      testCases: config.testCases.sort((a, b) => a.id - b.id).map((test): TestCaseRaw => testCaseToRaw(test)),
-      // `experimentalModularize` must be true if `generate_expected_output` is true
-      experimentalModularize: config.generate_expected_output ? true : config.experimentalModularize,
-    }),
+    configToRaw: (config): StdioTestRaw => {
+      const configRaw: StdioTestRaw = {
+        ...config,
+        testCases: config.testCases.sort((a, b) => a.id - b.id).map((test): TestCaseRaw => testCaseToRaw(test)),
+      };
+      if (config.generate_expected_output) {
+        // Discards `expected` and `file_expected` in each test case
+        configRaw.testCases = configRaw.testCases.map((test) => {
+          const { expected, file_expected, ..._test } = test;
+          return _test;
+        });
+        configRaw.experimentalModularize = true;
+      }
+
+      return configRaw;
+    },
     stageSettings: dynamic(() => import("../../components/GuiBuilder/StageSettings/StdioTestSettings"), {
       loading: () => <StageSettingsLoading />,
     }),

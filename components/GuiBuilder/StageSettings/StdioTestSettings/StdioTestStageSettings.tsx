@@ -1,5 +1,6 @@
 import Button from "@/components/Button";
 import { MultiSelect, SwitchGroup, TagsInput } from "@/components/Input";
+import { highlightableElementIds } from "@/constants/GuiBuilder/highlightableElements";
 import { useSelectedStageConfig } from "@/hooks/GuiBuilder";
 import { useStoreActions, useStoreState } from "@/store/GuiBuilder";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -97,7 +98,7 @@ function StdioTestStageSettings() {
       </div>
       <div>
         <p className="mb-3 font-semibold text-lg">Experimental Features</p>
-        <div className="p-3 bg-gray-50 rounded-md drop-shadow">
+        <div id={highlightableElementIds.generateExpectedOutput} className="p-3 bg-gray-50 rounded-md drop-shadow">
           <SwitchGroup
             label="Auto-generate expected output of test cases"
             description={generateExpectedOutputDescription}
