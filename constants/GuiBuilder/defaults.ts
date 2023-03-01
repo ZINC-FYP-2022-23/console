@@ -29,7 +29,7 @@ export const defaultSettings: Settings = {
   use_template: undefined,
   template: [{ id: uuidv4(), name: "" }],
   use_skeleton: false,
-  use_provided: false,
+  use_provided: true,
   stage_wait_duration_secs: 60,
   cpus: 2.0,
   mem_gb: 4.0,
