@@ -4,6 +4,7 @@ import { Tab } from "@headlessui/react";
 import { clsx, ScrollArea } from "@mantine/core";
 import { useState } from "react";
 import { StageConfigModal } from "../common";
+import StdioTestSettingsContext from "./StdioTestSettingsContext";
 import StdioTestStageSettings from "./StdioTestStageSettings";
 import StdioTestTestCasesPanel from "./StdioTestTestCasesPanel";
 
@@ -15,10 +16,16 @@ function StdioTestSettings() {
    * - "table" = Table view
    * - `number` = Test case ID that is being edited
    */
-  const [testCasesView, setTestCasesView] = useState<"table" | number>("table");
+  const [testCaseView, setTestCaseView] = useState<"table" | number>("table");
 
   return (
-    <>
+    <StdioTestSettingsContext.Provider
+      value={{
+        closeModal: () => setModalOpened(false),
+        testCaseView,
+        setTestCaseView,
+      }}
+    >
       <div className="h-full py-20 flex flex-col items-center gap-5">
         <p className="text-lg text-gray-500">To edit the stage settings, press the button below.</p>
         <Button
@@ -67,11 +74,7 @@ function StdioTestSettings() {
             <ScrollArea type="auto" className="flex-1">
               <Tab.Panels className="px-3 flex flex-col">
                 <Tab.Panel>
-                  <StdioTestTestCasesPanel
-                    view={testCasesView}
-                    setView={setTestCasesView}
-                    closeModal={() => setModalOpened(false)}
-                  />
+                  <StdioTestTestCasesPanel />
                 </Tab.Panel>
                 <Tab.Panel className="mt-4">
                   <StdioTestStageSettings />
@@ -81,7 +84,7 @@ function StdioTestSettings() {
           </Tab.Group>
         </div>
       </StageConfigModal>
-    </>
+    </StdioTestSettingsContext.Provider>
   );
 }
 

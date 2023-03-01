@@ -9,24 +9,14 @@ import cloneDeep from "lodash/cloneDeep";
 import { useMemo, useState } from "react";
 import StdioTestCaseSettings from "./StdioTestCaseSettings";
 import StdioTestCasesTable from "./StdioTestCasesTable";
-
-interface StdioTestTestCasesPanelProps {
-  /**
-   * Which view to show. Either:
-   * - "table" = Table view
-   * - `number` = Test case ID that is being edited
-   */
-  view: "table" | number;
-  /** Setter for the `view` prop. */
-  setView: (view: "table" | number) => void;
-  /** A callback that closes the parent modal. */
-  closeModal: () => void;
-}
+import { useStdioTestSettingsContext } from "./StdioTestSettingsContext";
 
 /**
  * The "Test Cases" tab panel for the `StdioTest` stage.
  */
-function StdioTestTestCasesPanel({ view, setView, closeModal }: StdioTestTestCasesPanelProps) {
+function StdioTestTestCasesPanel() {
+  const { testCaseView, setTestCaseView } = useStdioTestSettingsContext();
+
   const [config, setConfig] = useSelectedStageConfig("StdioTest");
 
   /** Which test case to delete. It shows a confirmation modal if it's value is not null. */
@@ -48,7 +38,7 @@ function StdioTestTestCasesPanel({ view, setView, closeModal }: StdioTestTestCas
     const testCase = cloneDeep(defaultTestCase);
     testCase.id = getTestCasesLargestId(config.testCases) + 1;
     setConfig({ ...config, testCases: [...config.testCases, testCase] });
-    setView(testCase.id);
+    setTestCaseView(testCase.id);
   };
 
   const deleteTestCase = (id: number) => {
@@ -63,11 +53,11 @@ function StdioTestTestCasesPanel({ view, setView, closeModal }: StdioTestTestCas
     const newTestCase = cloneDeep(source);
     newTestCase.id = getTestCasesLargestId(config.testCases) + 1;
     setConfig({ ...config, testCases: [...config.testCases, newTestCase] });
-    setView(newTestCase.id);
+    setTestCaseView(newTestCase.id);
   };
 
   // Table View
-  if (view === "table") {
+  if (testCaseView === "table") {
     return (
       <div className="mt-4 space-y-4">
         <div className="flex items-center gap-5">
@@ -90,7 +80,7 @@ function StdioTestTestCasesPanel({ view, setView, closeModal }: StdioTestTestCas
           testCases={config.testCases}
           onDuplicate={(testCaseId) => duplicateTestCase(testCaseId)}
           onDelete={(testCaseId) => setTestCaseIdToDelete(testCaseId)}
-          onVisit={(testCaseId) => setView(testCaseId)}
+          onVisit={(testCaseId) => setTestCaseView(testCaseId)}
         />
         {/* Confirmation modal for Delete Single Test Case */}
         <Modal
@@ -154,12 +144,12 @@ function StdioTestTestCasesPanel({ view, setView, closeModal }: StdioTestTestCas
   }
   // Editing a single test case
   else {
-    const [prevId, nextId] = getTestCaseNeighborIds(config.testCases, view);
+    const [prevId, nextId] = getTestCaseNeighborIds(config.testCases, testCaseView);
     return (
       <div>
         <div className="mb-4 p-2 flex items-center justify-between sticky top-0 z-50 bg-blue-50 rounded-md drop-shadow">
           <Button
-            onClick={() => setView("table")}
+            onClick={() => setTestCaseView("table")}
             icon={<FontAwesomeIcon icon={["far", "table-list"]} />}
             className="text-blue-600 hover:bg-blue-100 active:bg-blue-200"
           >
@@ -169,7 +159,7 @@ function StdioTestTestCasesPanel({ view, setView, closeModal }: StdioTestTestCas
             <button
               title="Previous test case"
               onClick={() => {
-                prevId !== null && setView(prevId);
+                prevId !== null && setTestCaseView(prevId);
               }}
               disabled={prevId === null}
               className={clsx(
@@ -186,10 +176,10 @@ function StdioTestTestCasesPanel({ view, setView, closeModal }: StdioTestTestCas
               <Select
                 id="selected-test-case-id"
                 data={testCaseIdSelectOptions}
-                value={view.toString()}
+                value={testCaseView.toString()}
                 onChange={(id) => {
                   if (id === null) return;
-                  setView(parseInt(id));
+                  setTestCaseView(parseInt(id));
                 }}
                 maxDropdownHeight={350}
                 styles={testCaseIdSelectStyles}
@@ -198,7 +188,7 @@ function StdioTestTestCasesPanel({ view, setView, closeModal }: StdioTestTestCas
             <button
               title="Next test case"
               onClick={() => {
-                nextId !== null && setView(nextId);
+                nextId !== null && setTestCaseView(nextId);
               }}
               disabled={nextId === null}
               className={clsx(
@@ -220,7 +210,7 @@ function StdioTestTestCasesPanel({ view, setView, closeModal }: StdioTestTestCas
             Add Test Case
           </Button>
         </div>
-        <StdioTestCaseSettings caseId={view} closeModal={closeModal} setView={setView} />
+        <StdioTestCaseSettings caseId={testCaseView} />
       </div>
     );
   }

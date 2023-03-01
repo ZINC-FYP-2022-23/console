@@ -17,26 +17,25 @@ import {
   visibilityOptions as valgrindVisibilityOptions,
 } from "../ValgrindSettings";
 import { hiddenItemOptions, inputModeOptions, visibilityOptions } from "./inputOptions";
+import { useStdioTestSettingsContext } from "./StdioTestSettingsContext";
 
 interface StdioTestCaseSettingsProps {
-  /** Test case ID. It's `null` when no test case is selected. */
-  caseId: number | null;
-  /** A callback that closes the parent modal. */
-  closeModal: () => void;
-  /** Sets the view to display. */
-  setView: (page: "table" | number) => void;
+  /** Test case ID. */
+  caseId: number;
 }
 
 /**
  * Settings for a single test case in `StdioTest` stage.
  */
-function StdioTestCaseSettings({ caseId, closeModal, setView }: StdioTestCaseSettingsProps) {
+function StdioTestCaseSettings({ caseId }: StdioTestCaseSettingsProps) {
+  const { closeModal, setTestCaseView } = useStdioTestSettingsContext();
+
   const [config, setConfig] = useSelectedStageConfig("StdioTest");
   const hasValgrindStage = useStoreState((state) => state.config.hasStage("Valgrind"));
   const setAddStageSearchString = useStoreActions((actions) => actions.layout.setAddStageSearchString);
 
   const [isEditingId, setIsEditingId] = useState(false);
-  const [newId, setNewId] = useState(caseId);
+  const [newId, setNewId] = useState<number | null>(caseId);
 
   if (!config) return null;
 
@@ -48,7 +47,7 @@ function StdioTestCaseSettings({ caseId, closeModal, setView }: StdioTestCaseSet
   const deleteTestCase = () => {
     const testCases = config.testCases.filter((test) => test.id !== caseId);
     setConfig({ ...config, testCases });
-    setView("table");
+    setTestCaseView("table");
     setIsEditingId(false);
   };
 
@@ -56,7 +55,7 @@ function StdioTestCaseSettings({ caseId, closeModal, setView }: StdioTestCaseSet
     const newTestCase = cloneDeep(caseConfig);
     newTestCase.id = getTestCasesLargestId(config.testCases) + 1;
     setConfig({ ...config, testCases: [...config.testCases, newTestCase] });
-    setView(newTestCase.id);
+    setTestCaseView(newTestCase.id);
     setIsEditingId(false);
   };
 
@@ -91,7 +90,7 @@ function StdioTestCaseSettings({ caseId, closeModal, setView }: StdioTestCaseSet
       testCase.id = newId;
     });
     setIsEditingId(false);
-    setView(newId);
+    setTestCaseView(newId);
   };
 
   return (
