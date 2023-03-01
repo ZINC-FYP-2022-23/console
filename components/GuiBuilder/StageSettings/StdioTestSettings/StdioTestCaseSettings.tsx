@@ -42,7 +42,7 @@ function StdioTestCaseSettings({ caseId, closeModal, setView }: StdioTestCaseSet
 
   const caseConfig = config.testCases.find((test) => test.id === caseId);
   if (!caseConfig) {
-    return <TestCaseEmptyState />;
+    return null;
   }
 
   const deleteTestCase = () => {
@@ -459,16 +459,6 @@ function StdioTestCaseSettings({ caseId, closeModal, setView }: StdioTestCaseSet
           </div>
         </div>
       </div>
-    </div>
-  );
-}
-
-function TestCaseEmptyState() {
-  return (
-    <div className="mt-40 flex flex-col items-center text-gray-400">
-      <p className="mb-6 font-medium text-gray-500 text-xl">No test case selected</p>
-      <p>Please select a test case at the left sidebar.</p>
-      <p>You can also press the &quot;Add Test&quot; button to create one.</p>
     </div>
   );
 }
