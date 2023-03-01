@@ -115,11 +115,7 @@ describe("GuiBuilder: Raw stage configs conversion", () => {
     test("configFromRaw", () => {
       // Test populate missing fields
       const configEmpty = parseConfigFromRaw<MakeRaw, Make>("make", {});
-      expect(configEmpty).toStrictEqual({
-        targets: [],
-        args: "",
-        additional_packages: [],
-      });
+      expect(configEmpty).toStrictEqual(supportedStages.Make.defaultConfig);
 
       // Test conversion of populated fields
       const configWithData = parseConfigFromRaw<MakeRaw, Make>("make", {
@@ -247,12 +243,7 @@ describe("GuiBuilder: Raw stage configs conversion", () => {
         const config = parseConfigFromRaw<StdioTestRaw, StdioTest>("stdioTest", {
           testCases: [],
         });
-        expect(config).toStrictEqual({
-          testCases: [],
-          diff_ignore_flags: [],
-          additional_packages: [],
-          additional_pip_packages: [],
-        });
+        expect(config).toStrictEqual(supportedStages.StdioTest.defaultConfig);
       });
 
       it("calls testCaseFromRaw() on each test case", () => {
