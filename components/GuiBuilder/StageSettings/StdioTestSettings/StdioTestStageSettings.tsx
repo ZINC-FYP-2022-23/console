@@ -71,24 +71,26 @@ function StdioTestStageSettings() {
               <AdditionalPipPackagesTooltip />
             </div>
           </div>
-          <TagsInput
-            name="additional_pip_packages"
-            value={config.additional_pip_packages}
-            onChange={(tags) => setConfig({ ...config, additional_pip_packages: tags })}
-            onBlur={onTagInputBlur("additional_pip_packages")}
-            disabled={isPipDisabled}
-            placeHolder={
-              isPipDisabled && config.additional_pip_packages.length === 0
-                ? "Add `python3-pip` to 'Additional packages' first"
-                : ""
-            }
-            className="flex-[3] font-mono text-sm"
-          />
-          {isPipDisabled && config.additional_pip_packages.length > 0 && (
-            <p className="text-xs mt-1 text-orange-600">
-              Please add <code>python3-pip</code> to &quot;Additional packages&quot; first
-            </p>
-          )}
+          <div className="flex-[3]">
+            <TagsInput
+              name="additional_pip_packages"
+              value={config.additional_pip_packages}
+              onChange={(tags) => setConfig({ ...config, additional_pip_packages: tags })}
+              onBlur={onTagInputBlur("additional_pip_packages")}
+              disabled={isPipDisabled}
+              placeHolder={
+                isPipDisabled && config.additional_pip_packages.length === 0
+                  ? "Add `python3-pip` to 'Additional packages' first"
+                  : ""
+              }
+              className="font-mono text-sm"
+            />
+            {isPipDisabled && config.additional_pip_packages.length > 0 && (
+              <p className="text-xs mt-1 text-orange-600">
+                Please add <code>python3-pip</code> to &quot;Additional packages&quot; first
+              </p>
+            )}
+          </div>
         </div>
       </div>
     </div>
