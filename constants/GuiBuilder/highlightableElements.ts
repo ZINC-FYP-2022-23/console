@@ -9,10 +9,11 @@ export const highlightableElementIds = {
   addStagePanel: "add-stage-panel",
   pipelineEditor: "pipeline-editor",
   useTemplateWrapper: "use-template-wrapper",
+  useGeneratedWrapper: "use-generated-wrapper",
 } as const;
 
 /** Keys of the {@link highlightableElements} map. */
-export type HighlightableElementsKey = "addStageTutorial" | "useTemplate";
+export type HighlightableElementsKey = "addStageTutorial" | "useTemplate" | "useGenerated";
 
 /**
  * There are 2 modes of highlighting (specified by the `mode` property):
@@ -85,6 +86,12 @@ const highlightableElements: HighlightableElements = {
     mode: "single",
     selector: {
       element: `#${highlightableElementIds.useTemplateWrapper}`,
+    },
+  },
+  useGenerated: {
+    mode: "single",
+    selector: {
+      element: `#${highlightableElementIds.useGeneratedWrapper}`,
     },
   },
 };

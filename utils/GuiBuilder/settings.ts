@@ -19,6 +19,7 @@ export function settingsRawToSettings(sr: SettingsRaw): Settings {
     template: sr.template?.map((t) => ({ id: uuidv4(), name: t })) ?? defaultSettings.template,
     use_skeleton: sr.use_skeleton ?? defaultSettings.use_skeleton,
     use_provided: sr.use_provided ?? defaultSettings.use_provided,
+    use_generated: sr.use_generated ?? defaultSettings.use_generated,
     stage_wait_duration_secs: sr.stage_wait_duration_secs,
     cpus: sr.cpus,
     mem_gb: sr.mem_gb,

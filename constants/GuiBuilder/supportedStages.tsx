@@ -210,16 +210,22 @@ const supportedStages: SupportedStages = {
       diff_ignore_flags: [],
       additional_packages: [],
       additional_pip_packages: [],
+      experimentalModularize: false,
+      generate_expected_output: false,
     },
     configFromRaw: (raw: StdioTestRaw) => ({
       testCases: raw.testCases.sort((a, b) => a.id - b.id).map((testCase) => testCaseFromRaw(testCase)),
       diff_ignore_flags: raw.diff_ignore_flags ?? [],
       additional_packages: raw.additional_packages ?? [],
       additional_pip_packages: raw.additional_pip_packages ?? [],
+      experimentalModularize: raw.experimentalModularize ?? false,
+      generate_expected_output: raw.generate_expected_output ?? false,
     }),
     configToRaw: (config): StdioTestRaw => ({
       ...config,
       testCases: config.testCases.sort((a, b) => a.id - b.id).map((test): TestCaseRaw => testCaseToRaw(test)),
+      // `experimentalModularize` must be true if `generate_expected_output` is true
+      experimentalModularize: config.generate_expected_output ? true : config.experimentalModularize,
     }),
     stageSettings: dynamic(() => import("../../components/GuiBuilder/StageSettings/StdioTestSettings"), {
       loading: () => <StageSettingsLoading />,

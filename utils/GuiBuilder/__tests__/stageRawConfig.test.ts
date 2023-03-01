@@ -288,6 +288,8 @@ describe("GuiBuilder: Raw stage configs conversion", () => {
           diff_ignore_flags: [],
           additional_packages: [],
           additional_pip_packages: [],
+          experimentalModularize: false,
+          generate_expected_output: false,
         });
         const outputTestCaseIds = configRaw.testCases.map((testCase: TestCaseRaw) => testCase.id);
         expect(outputTestCaseIds).toEqual([1, 2, 3]);
@@ -311,9 +313,34 @@ describe("GuiBuilder: Raw stage configs conversion", () => {
           diff_ignore_flags: [],
           additional_packages: [],
           additional_pip_packages: [],
+          experimentalModularize: false,
+          generate_expected_output: false,
         });
         expect(testCaseToRawMock).toHaveBeenCalledTimes(1);
         expect(testCaseToRawMock).toHaveBeenNthCalledWith(1, testCases[0]);
+      });
+
+      it("sets `experimentalModularize` to true if `generate_expected_output` is true", () => {
+        const baseConfig: Omit<StdioTest, "experimentalModularize" | "generate_expected_output"> = {
+          testCases: [],
+          diff_ignore_flags: [],
+          additional_packages: [],
+          additional_pip_packages: [],
+        };
+
+        const configRawWithGenerate = convertConfigToRaw<StdioTest, StdioTestRaw>("StdioTest", {
+          ...baseConfig,
+          experimentalModularize: false,
+          generate_expected_output: true,
+        });
+        expect(configRawWithGenerate.experimentalModularize).toBe(true);
+
+        const configRawWithoutGenerate = convertConfigToRaw<StdioTest, StdioTestRaw>("StdioTest", {
+          ...baseConfig,
+          experimentalModularize: false,
+          generate_expected_output: false,
+        });
+        expect(configRawWithoutGenerate.experimentalModularize).toBe(false);
       });
     });
   });
