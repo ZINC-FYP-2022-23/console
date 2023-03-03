@@ -57,7 +57,7 @@ describe("GuiBuilder: Utils - Settings", () => {
           { id: "mock-uuid-2", name: "bar.cpp" },
         ],
         use_skeleton: false,
-        use_provided: false,
+        use_provided: true,
         cpus: 2.5,
         early_return_on_throw: false,
         enable_features: { network: true },
