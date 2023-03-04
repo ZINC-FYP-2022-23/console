@@ -4,7 +4,8 @@ import { highlightableElementIds } from "@/constants/GuiBuilder/highlightableEle
 import { useSelectedStageConfig } from "@/hooks/GuiBuilder";
 import { useStoreActions, useStoreState } from "@/store/GuiBuilder";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { FocusEventHandler, memo } from "react";
+import { IsGeneratedFolderEmptyResponse } from "pages/api/configs/[assignmentConfigId]/generated";
+import { FocusEventHandler, memo, useEffect, useState } from "react";
 import { InfoTooltip } from "../../Diagnostics";
 import { diffIgnoreFlagOptions } from "./inputOptions";
 
@@ -97,7 +98,10 @@ function StdioTestStageSettings() {
         </div>
       </div>
       <div>
-        <p className="mb-3 font-semibold text-lg">Experimental Features</p>
+        <p className="mb-3 flex items-center gap-2">
+          <span className="font-semibold text-lg">Experimental Features</span>
+          <span className="px-2 bg-green-500 font-semibold leading-5 text-xs text-white rounded-full">New</span>
+        </p>
         <div id={highlightableElementIds.generateExpectedOutput} className="p-3 bg-gray-50 rounded-md drop-shadow">
           <SwitchGroup
             label="Auto-generate expected output of test cases"
@@ -115,12 +119,31 @@ function StdioTestStageSettings() {
 const tickIcon = <FontAwesomeIcon icon={["far", "circle-check"]} className="text-xl text-green-600" />;
 const crossIcon = <FontAwesomeIcon icon={["far", "circle-xmark"]} className="text-xl text-red-600" />;
 
-/** Steps to complete if `config.generate_expected_output` is on. */
+/**
+ * Steps to complete if `config.generate_expected_output` is on.
+ */
 function GenerateExpectedOutputStepsToComplete() {
+  const configId = useStoreState((state) => state.config.configId);
   const settingsUseGenerated = useStoreState((state) => state.config.editingConfig._settings.use_generated);
   const updateSettings = useStoreActions((actions) => actions.config.updateSettings);
   const setElementToHighlight = useStoreActions((actions) => actions.layout.setElementToHighlight);
   const setStep = useStoreActions((actions) => actions.layout.setStep);
+
+  const [isGeneratedEmpty, setIsGeneratedEmpty] = useState(true);
+
+  useEffect(() => {
+    const checkIsGeneratedEmpty = async () => {
+      try {
+        const response = await fetch(`/api/configs/${configId}/generated`);
+        const data = (await response.json()) as IsGeneratedFolderEmptyResponse;
+        setIsGeneratedEmpty(data.isEmpty);
+      } catch (error) {
+        console.error("Error while checking if `generated` is empty", error);
+      }
+    };
+
+    if (configId !== null) checkIsGeneratedEmpty();
+  }, [configId]);
 
   return (
     <div className="ml-16 mt-3 space-y-3 text-sm text-gray-700">
@@ -154,9 +177,7 @@ function GenerateExpectedOutputStepsToComplete() {
         </div>
       </div>
       <div className="flex gap-3">
-        {/* TODO(Anson): Check the `generated/assignments` folder to see if test cases are generated */}
-        {/* TODO(Anson): Handle new assignments (where config ID is `"new"`) */}
-        {crossIcon}
+        {isGeneratedEmpty ? crossIcon : tickIcon}
         <p>
           Submit this assignment&apos;s solutions in{" "}
           <button onClick={() => setStep("test")} className="text-blue-700 underline">
