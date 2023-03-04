@@ -1,3 +1,4 @@
+export { default as GeneratedExpectedOutputCard } from "./GeneratedExpectedOutputCard";
 export * from "./inputOptions";
 export * from "./StdioTestCaseSettings";
 export { default as StdioTestCaseSettings } from "./StdioTestCaseSettings";

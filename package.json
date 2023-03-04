@@ -75,6 +75,7 @@
     "react-transition-group": "^4.4.1",
     "reactflow": "^11.5.6",
     "redis": "^3.1.2",
+    "sha256-uint8array": "^0.10.5",
     "subscriptions-transport-ws": "^0.9.18",
     "uuid": "^8.3.2"
   },

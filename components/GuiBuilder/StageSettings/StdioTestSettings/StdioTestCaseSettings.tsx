@@ -16,6 +16,7 @@ import {
   checksFilterOptions as valgrindChecksFilterOptions,
   visibilityOptions as valgrindVisibilityOptions,
 } from "../ValgrindSettings";
+import GeneratedExpectedOutputCard from "./GeneratedExpectedOutputCard";
 import { hiddenItemOptions, inputModeOptions, visibilityOptions } from "./inputOptions";
 import { useStdioTestSettingsContext } from "./StdioTestSettingsContext";
 
@@ -331,6 +332,7 @@ function StdioTestCaseSettings({ caseId }: StdioTestCaseSettingsProps) {
                 onChange={(_, val) => updateTestCase((testCase) => (testCase.expected = val))}
               />
             )}
+            {config.generate_expected_output && <GeneratedExpectedOutputCard caseId={caseId} />}
           </div>
         </div>
         <div>
