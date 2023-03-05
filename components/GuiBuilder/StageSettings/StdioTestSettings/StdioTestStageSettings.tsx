@@ -178,13 +178,23 @@ function GenerateExpectedOutputStepsToComplete() {
       </div>
       <div className="flex gap-3">
         {isGeneratedEmpty ? crossIcon : tickIcon}
-        <p>
-          Submit this assignment&apos;s solutions in{" "}
-          <button onClick={() => setStep("test")} className="text-blue-700 underline">
-            Test Submissions
-          </button>{" "}
-          step to generate expected output
-        </p>
+        <div className="space-y-1">
+          <p>Submit this assignment&apos;s solution to generate the expected outputs:</p>
+          <ol className="ml-5 list-decimal">
+            <li>
+              Visit the{" "}
+              <button onClick={() => setStep("test")} className="text-blue-700 underline">
+                Submissions
+              </button>{" "}
+              step
+            </li>
+            <li>
+              Press the <span className="font-semibold">Submit Assignment Solution</span> button to submit this
+              assignment&apos;s solution
+            </li>
+            <li>Wait for the Grader to process the solution</li>
+          </ol>
+        </div>
       </div>
     </div>
   );

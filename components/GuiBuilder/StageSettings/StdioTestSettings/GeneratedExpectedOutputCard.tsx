@@ -81,13 +81,23 @@ function NoGeneratedOutputCard() {
       <div className="flex flex-col items-center gap-3">
         <FontAwesomeIcon icon={["fad", "empty-set"]} size="3x" className="text-gray-500" />
         <p className="font-medium text-gray-600">No generated output found</p>
-        <p className="text-sm text-gray-500">
-          To generate expected output, submit this assignment&apos;s solutions in{" "}
-          <button onClick={() => setStep("test")} className="text-blue-700 underline">
-            Test Submissions
-          </button>{" "}
-          step.
-        </p>
+        <div className="space-y-1 text-sm text-gray-500">
+          <p>To generate expected output:</p>
+          <ol className="ml-5 list-decimal">
+            <li>
+              Visit the{" "}
+              <button onClick={() => setStep("test")} className="text-blue-700 underline">
+                Submissions
+              </button>{" "}
+              step
+            </li>
+            <li>
+              Press the <span className="font-semibold">Submit Assignment Solution</span> button to submit this
+              assignment&apos;s solution
+            </li>
+            <li>Wait for the Grader to process the solution</li>
+          </ol>
+        </div>
       </div>
     </div>
   );

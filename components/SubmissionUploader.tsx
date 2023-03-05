@@ -5,6 +5,18 @@ import { useDropzone } from "react-dropzone";
 
 interface SubmissionUploaderProps {
   assignmentConfigId: number;
+  /**
+   * Explicitly set the `isTest` flag in the Redis payload of the grading task. If not specified, `isTest` is set
+   * to true if the user is a TA.
+   *
+   * The Grader may process the pipeline differently when `isTest` is true. For example, the `StdioTest` stage
+   * has a feature called "auto-generate expected output of test cases". If the feature is enabled and `isTest`
+   * is true, the Grader will generate expected outputs and will not grade the assignment by diff-ing.
+   *
+   * Sometimes we may want to explicitly set `isTest` to false to simulate that the submission is uploaded by
+   * a student.
+   */
+  isTest?: boolean;
   /** It should be a `<button />` element. */
   children: React.ReactNode;
 }
@@ -12,7 +24,7 @@ interface SubmissionUploaderProps {
 /**
  * A wrapper for adding assignment submission functionality to a button.
  */
-function SubmissionUploader({ assignmentConfigId, children }: SubmissionUploaderProps) {
+function SubmissionUploader({ assignmentConfigId, isTest, children }: SubmissionUploaderProps) {
   const { user, submitFile } = useZinc();
   const dispatch = useLayoutDispatch();
 
@@ -31,6 +43,7 @@ function SubmissionUploader({ assignmentConfigId, children }: SubmissionUploader
       }
 
       try {
+        // TODO(Anson): Pass `isTest` to `submitFile()`
         const { status } = await submitFile(files, assignmentConfigId, user);
         if (status === "success") {
           dispatch({
