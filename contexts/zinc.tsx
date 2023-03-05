@@ -4,7 +4,7 @@ import { useQuery } from "@apollo/client";
 import * as Sentry from "@sentry/nextjs";
 import JSZip from "jszip";
 import { SIDEBAR } from "../graphql/queries/user";
-import { ConfigError } from "types";
+import { ConfigError } from "@/types/report";
 
 interface ZincContextState {
   user: number;
@@ -12,7 +12,7 @@ interface ZincContextState {
   activeSemester: number;
   useSidebar: () => any;
   isAdmin: boolean;
-  submitFile: (files, assignmentConfigId, userId) => Promise<void>;
+  submitFile: (files: any, assignmentConfigId: number, userId: number) => Promise<any>;
   uploadGradingPackage: (files, assignmentConfigId) => Promise<any>;
   validateAssignmentConfig: (
     yaml: string,
@@ -22,7 +22,7 @@ interface ZincContextState {
     /** Stringified object of type {@link ConfigError}. */
     configError?: string;
   }>;
-  triggerManualGrading: (configId: string, usersBeingGraded: Array<number>) => Promise<any>;
+  triggerManualGrading: (configId: string, usersBeingGraded?: Array<number>) => Promise<any>;
 }
 
 interface ZincProviderProps {
@@ -96,10 +96,10 @@ export const ZincProvider = ({ children, user, itsc, semester, isAdmin }: ZincPr
     }
   };
 
-  const submitFile = async (files, assignmentConfigId, userId) => {
+  const submitFile = async (files: any, assignmentConfigId: number, userId: number) => {
     const form = new FormData();
-    form.append("assignmentConfigId", assignmentConfigId);
-    form.append("userId", userId);
+    form.append("assignmentConfigId", assignmentConfigId.toString());
+    form.append("userId", userId.toString());
     if (
       files.length > 1 ||
       (files.length === 1 && supportedCodeSubmissionExtensions.includes(files[0].name.split(".").pop()))

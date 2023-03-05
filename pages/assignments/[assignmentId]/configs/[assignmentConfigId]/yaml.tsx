@@ -17,6 +17,7 @@ import { SlideOver } from "../../../../../components/SlideOver";
 import { useState } from "react";
 import AssignmentSupportingFilesUploader from "../../../../../components/AssignmentSupportingFilesUploader";
 import { FilesProvider } from "../../../../../contexts/assignmentSupportingFiles";
+import { Assignment, AssignmentConfig } from "@/types/tables";
 
 function SlideOverContent() {
   const { configSlideOver } = useLayoutState();
@@ -33,6 +34,7 @@ function SlideOverContent() {
 
 function ModalContent() {
   const { modalType } = useLayoutState();
+  const dispatch = useLayoutDispatch();
   switch (modalType) {
     case "yaml":
       return (
@@ -49,7 +51,7 @@ function ModalContent() {
           rootClassNames="h-uploader"
         >
           <FilesProvider>
-            <AssignmentSupportingFilesUploader />
+            <AssignmentSupportingFilesUploader onSaveSuccess={() => dispatch({ type: "closeModal" })} />
           </FilesProvider>
         </ModalWithHeader>
       );
@@ -147,7 +149,7 @@ function YAMLConfigEditor({ yamlString }) {
   async function updateYaml() {
     try {
       // const yaml = jsyaml.load(configYaml);
-      const { configError } = await validateAssignmentConfig(configYaml, assignmentConfigId);
+      const { configError } = await validateAssignmentConfig(configYaml, assignmentConfigId as string);
       if (!configError) {
         await updatePipelineConfig({
           variables: {
@@ -209,11 +211,15 @@ function AssignmentConfigurationYAML() {
   const router = useRouter();
   const { user } = useZinc();
   const assignmentConfigId = parseInt(router.query.assignmentConfigId as string, 10);
-  const { data, loading, refetch } = useQuery(GET_PIPELINE_CONFIG_FOR_ASSIGNMENT, {
-    variables: {
-      assignmentConfigId,
+  const { data, refetch } = useQuery<{ assignmentConfig: AssignmentConfig; assignment: Assignment }>(
+    GET_PIPELINE_CONFIG_FOR_ASSIGNMENT,
+    {
+      variables: {
+        assignmentConfigId,
+        assignmentId: parseInt(router.query.assignmentId as string, 10),
+      },
     },
-  });
+  );
 
   const { modalType } = useLayoutState();
 
@@ -221,13 +227,15 @@ function AssignmentConfigurationYAML() {
     <LayoutProvider>
       <Layout title="Assignment Configs">
         <div className="p-6 w-full flex overflow-y-auto">
-          <YAMLConfigEditor yamlString={data.assignmentConfig.config_yaml ?? ""} />
+          <YAMLConfigEditor yamlString={data!.assignmentConfig.config_yaml ?? ""} />
           <div className="w-5/12">
             <div className="shadow sm:rounded-md mx-4">
               <div className="px-4 py-5 bg-white sm:rounded-md sm:p-6">
                 <fieldset className="mt-6">
                   <Link
-                    href={`/courses/${data.assignmentConfig.assignment.course.id}/assignments/${assignmentConfigId}/submissions?userId=${user}`}
+                    href={`/courses/${
+                      data!.assignment.course.id
+                    }/assignments/${assignmentConfigId}/submissions?userId=${user}`}
                   >
                     <a
                       type="button"
@@ -245,9 +253,9 @@ function AssignmentConfigurationYAML() {
                     })
                   }
                   policy={{
-                    attemptLimits: data.assignmentConfig.attemptLimits,
-                    gradeImmediately: data.assignmentConfig.gradeImmediately,
-                    showImmediateScores: data.assignmentConfig.showImmediateScores,
+                    attemptLimits: data!.assignmentConfig.attemptLimits,
+                    gradeImmediately: data!.assignmentConfig.gradeImmediately,
+                    showImmediateScores: data!.assignmentConfig.showImmediateScores,
                   }}
                 />
                 <ScheduleConfig
@@ -257,12 +265,12 @@ function AssignmentConfigurationYAML() {
                     })
                   }
                   schedules={{
-                    showAt: data.assignmentConfig.showAt,
-                    startCollectionAt: data.assignmentConfig.startCollectionAt,
-                    dueAt: data.assignmentConfig.dueAt,
-                    stopCollectionAt: data.assignmentConfig.stopCollectionAt,
-                    releaseGradeAt: data.assignmentConfig.releaseGradeAt,
-                    showImmediateScores: data.assignmentConfig.showImmediateScores,
+                    showAt: data!.assignmentConfig.showAt,
+                    startCollectionAt: data!.assignmentConfig.startCollectionAt,
+                    dueAt: data!.assignmentConfig.dueAt,
+                    stopCollectionAt: data!.assignmentConfig.stopCollectionAt,
+                    releaseGradeAt: data!.assignmentConfig.releaseGradeAt,
+                    showImmediateScores: data!.assignmentConfig.showImmediateScores,
                   }}
                 />
                 <AssignedUsers />
@@ -286,6 +294,7 @@ export async function getServerSideProps(ctx) {
     query: GET_PIPELINE_CONFIG_FOR_ASSIGNMENT,
     variables: {
       assignmentConfigId: parseInt(ctx.query.assignmentConfigId, 10),
+      assignmentId: parseInt(ctx.query.assignmentId, 10),
     },
   });
   return {

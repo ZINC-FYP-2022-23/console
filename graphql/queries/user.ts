@@ -167,7 +167,7 @@ export const GET_STUDENTS_FOR_CONFIG = gql`
           sections {
             id
             name
-            students: users {
+            users {
               user {
                 id
                 name
@@ -251,13 +251,8 @@ export const GET_CONFIGS_FOR_ASSIGNMENT = gql`
 `;
 
 export const GET_PIPELINE_CONFIG_FOR_ASSIGNMENT = gql`
-  query getPipelineConfigForAssignment($assignmentConfigId: bigint!) {
+  query getPipelineConfigForAssignment($assignmentId: bigint!, $assignmentConfigId: bigint!) {
     assignmentConfig(id: $assignmentConfigId) {
-      assignment {
-        course {
-          id
-        }
-      }
       attemptLimits
       gradeImmediately
       showImmediateScores
@@ -267,6 +262,11 @@ export const GET_PIPELINE_CONFIG_FOR_ASSIGNMENT = gql`
       dueAt
       stopCollectionAt
       releaseGradeAt
+    }
+    assignment(id: $assignmentId) {
+      course {
+        id
+      }
     }
   }
 `;

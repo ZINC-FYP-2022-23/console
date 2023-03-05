@@ -17,8 +17,9 @@ import { Submission } from "../../../../../components/Submission";
 import { RegradingConfirmationDialog } from "../../../../../components/RegradingConfirmationDialog";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useZinc } from "../../../../../contexts/zinc";
+import SubmissionUploader from "@/components/SubmissionUploader";
 
-function ModalContent() {
+export function ModalContent() {
   const { modalType } = useLayoutState();
   switch (modalType) {
     case "stdiotest":
@@ -44,69 +45,6 @@ function ModalContent() {
   }
 }
 
-function Upload({ assignmentConfigId, userId }) {
-  const { submitFile } = useZinc();
-  const dispatch = useLayoutDispatch();
-
-  const onDrop = useCallback(
-    (files) => {
-      if (files.length === 0) {
-        dispatch({
-          type: "showNotification",
-          payload: {
-            title: "Invalid file type",
-            message: "Your submission contains file that are not supported, please try again",
-            success: false,
-          },
-        });
-      } else {
-        submitFile(files, assignmentConfigId, userId)
-          .then(({ status }: any) => {
-            if (status === "success") {
-              dispatch({
-                type: "showNotification",
-                payload: {
-                  title: "Submission upload completed",
-                  message: "Your work has been submitted successfully.",
-                  success: true,
-                },
-              });
-            }
-          })
-          .catch((error) => {
-            dispatch({
-              type: "showNotification",
-              payload: {
-                title: "Submission failed",
-                message: error.message,
-                success: false,
-              },
-            });
-          });
-      }
-    },
-    [assignmentConfigId, userId],
-  );
-  const { getRootProps, getInputProps } = useDropzone({
-    onDrop,
-    accept: ".h,.cpp,.rar,.zip,application/octet-stream,application/zip,application/x-zip,application/x-zip-compressed",
-  });
-  return (
-    <div {...getRootProps()} className="mt-4 flex-shrink-0 flex md:mt-0 md:ml-4">
-      <span className="ml-3 shadow-sm rounded-md">
-        <input {...getInputProps()} />
-        <button
-          type="button"
-          className="inline-flex items-center px-4 py-2 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-cse-600 hover:bg-cse-500 focus:outline-none focus:shadow-outline-blue focus:border-cse-700 active:bg-cse-700 transition duration-150 ease-in-out"
-        >
-          <FontAwesomeIcon className="mr-2 text-white" icon={["fad", "upload"]} />
-          Submit
-        </button>
-      </span>
-    </div>
-  );
-}
-
 function Assignment() {
   const router = useRouter();
   const { courseId, assignmentConfigId, userId } = router.query;
@@ -126,7 +64,7 @@ function Assignment() {
 
   return (
     <LayoutProvider>
-      <Layout title="Submssion History">
+      <Layout title="Submission History">
         <main className="flex-1 flex flex-col bg-gray-200 overflow-y-auto mb-6">
           <div className="px-6 mt-6">
             <div>
@@ -195,7 +133,12 @@ function Assignment() {
                   {!loadingDetail && submissionDetail.user.name}&apos;s Submissions
                 </h2>
               </div>
-              <Upload userId={userId} assignmentConfigId={assignmentConfigId} />
+              <SubmissionUploader assignmentConfigId={parseInt(assignmentConfigId as string)}>
+                <button className="flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-cse-600 hover:bg-cse-500 focus:outline-none focus:shadow-outline-blue focus:border-cse-700 active:bg-cse-700 transition duration-150 ease-in-out">
+                  <FontAwesomeIcon className="mr-2" icon={["fad", "upload"]} />
+                  Submit
+                </button>
+              </SubmissionUploader>
             </div>
           </div>
           <ul className="w-full">
