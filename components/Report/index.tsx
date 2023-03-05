@@ -13,6 +13,7 @@ import { MakeStageReportView } from "./MakeStageReport";
 import { GTestStageReportView } from "./GTestStageReport";
 import { JUnitStageReportView } from "./JUnitStageReport";
 import { PyTestStageReportView } from "./PyTestStageReport";
+import { RunStageReportView } from "./RunStageReport";
 
 export function Report({ report, user }) {
   const dispatch = useLayoutDispatch();
@@ -205,6 +206,12 @@ export function ReportSlideOver() {
                     {data.report.sanitizedReports !== null &&
                       Object.keys(data.report.sanitizedReports).includes("pyTest") && (
                         <PyTestStageReportView reports={data.report.sanitizedReports.pyTest} />
+                      )}
+                  </div>
+                  <div className="space-y-2">
+                    {data.report.sanitizedReports !== null &&
+                      Object.keys(data.report.sanitizedReports).includes("run") && (
+                        <RunStageReportView reports={data.report.sanitizedReports.run} />
                       )}
                   </div>
                   <div className="space-y-2">
