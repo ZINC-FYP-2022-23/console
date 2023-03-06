@@ -6,8 +6,8 @@ import { useDropzone } from "react-dropzone";
 interface SubmissionUploaderProps {
   assignmentConfigId: number;
   /**
-   * Explicitly set the `isTest` flag in the Redis payload of the grading task. If not specified, `isTest` is set
-   * to true if the user is a TA.
+   * Explicitly set the `isTest` flag in the Redis payload of the grading task. If not specified, `isTest` will
+   * be evaluated to true in the webhook if the user is a TA.
    *
    * The Grader may process the pipeline differently when `isTest` is true. For example, the `StdioTest` stage
    * has a feature called "auto-generate expected output of test cases". If the feature is enabled and `isTest`
@@ -43,8 +43,7 @@ function SubmissionUploader({ assignmentConfigId, isTest, children }: Submission
       }
 
       try {
-        // TODO(Anson): Pass `isTest` to `submitFile()`
-        const { status } = await submitFile(files, assignmentConfigId, user);
+        const { status } = await submitFile(files, assignmentConfigId, user, isTest);
         if (status === "success") {
           dispatch({
             type: "showNotification",
@@ -66,7 +65,7 @@ function SubmissionUploader({ assignmentConfigId, isTest, children }: Submission
         });
       }
     },
-    [assignmentConfigId, dispatch, submitFile, user],
+    [assignmentConfigId, dispatch, isTest, submitFile, user],
   );
 
   const { getRootProps, getInputProps } = useDropzone({

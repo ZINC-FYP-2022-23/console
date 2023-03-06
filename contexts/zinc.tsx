@@ -12,7 +12,7 @@ interface ZincContextState {
   activeSemester: number;
   useSidebar: () => any;
   isAdmin: boolean;
-  submitFile: (files: any, assignmentConfigId: number, userId: number) => Promise<any>;
+  submitFile: (files: any, assignmentConfigId: number, userId: number, isTest?: boolean) => Promise<any>;
   uploadGradingPackage: (files, assignmentConfigId) => Promise<any>;
   validateAssignmentConfig: (
     yaml: string,
@@ -96,7 +96,11 @@ export const ZincProvider = ({ children, user, itsc, semester, isAdmin }: ZincPr
     }
   };
 
-  const submitFile = async (files: any, assignmentConfigId: number, userId: number) => {
+  /**
+   * @param isTest Explicitly set the `isTest` flag in the Redis payload of the grading task. If not specified,
+   * `isTest` will be evaluated to true in the webhook if the user is a TA.
+   */
+  const submitFile = async (files: any, assignmentConfigId: number, userId: number, isTest?: boolean) => {
     const form = new FormData();
     form.append("assignmentConfigId", assignmentConfigId.toString());
     form.append("userId", userId.toString());
@@ -117,6 +121,9 @@ export const ZincProvider = ({ children, user, itsc, semester, isAdmin }: ZincPr
       const digest = await getChecksum(files[0]);
       form.append(`checksum;${files[0].name}`, digest);
       form.append("files", files[0], files[0].name);
+    }
+    if (isTest !== undefined) {
+      form.append("isTest", isTest.toString());
     }
     try {
       const response = await fetch("/api/submissions", {
