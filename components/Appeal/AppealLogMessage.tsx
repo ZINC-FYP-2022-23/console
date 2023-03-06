@@ -4,14 +4,12 @@ import { useRouter } from "next/router";
 import { AppealLog, AppealStatus, ChangeLogTypes } from "../../types/appeal";
 
 interface AppealLogMessageType {
-  log: AppealLog;
-  showButton: boolean;
+  log: AppealLog; // Log to be displayed
+  showButton: boolean; // Is the "View Appeal" button going to be shown
 }
 
 /**
  * Returns a component that shows a log message based on the log type
- * @param {AppealLog} log - Log to be displayed
- * @param {boolean} showButton - Is the "View Appeal" button going to be shown
  */
 export function AppealLogMessage({ log, showButton }: AppealLogMessageType) {
   const router = useRouter();

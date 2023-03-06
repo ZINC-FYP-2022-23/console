@@ -1,14 +1,12 @@
 import { DisplayMessageType } from "@/types/appeal";
 
 type IconProps = {
-  name: string;
-  type: "Student" | "Teaching Assistant";
+  name: string; // User name
+  type: "Student" | "Teaching Assistant"; // User type
 };
 
 /**
  * Returns a circular Icon representing the user
- * @param {string} name - User name
- * @param {"Student" | "Teaching Assistant"} type - User type
  */
 function Icon({ name, type }: IconProps) {
   let backgroundColor: string;

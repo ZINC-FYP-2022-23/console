@@ -9,7 +9,6 @@ export enum AppealStatus {
   Pending = "Pending",
 }
 
-// Any updates on `AppealAttempt` have to update function `isAppealAttempt()`
 export type AppealAttempt = {
   id: number;
   newFileSubmissionId?: string;
@@ -18,17 +17,6 @@ export type AppealAttempt = {
   latestStatus: AppealStatus;
   updatedAt: string;
 };
-
-export function isAppealAttempt(obj: any): obj is AppealAttempt {
-  return (
-    "id" in obj &&
-    "filePath" in obj &&
-    "submissionId" in obj &&
-    "createdAt" in obj &&
-    "status" in obj &&
-    "decisionTimestamp" in obj
-  );
-}
 
 export type AppealMessage = {
   id: number;
