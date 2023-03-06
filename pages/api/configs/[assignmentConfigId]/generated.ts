@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from "fs-extra";
+import { existsSync, readdirSync, readFileSync } from "fs-extra";
 import { NextApiRequest, NextApiResponse } from "next";
 
 /**
@@ -31,11 +31,15 @@ function isGeneratedFolderEmpty(req: NextApiRequest, res: NextApiResponse<IsGene
     const { assignmentConfigId } = req.query;
     const folderPath = `${process.env.NEXT_PUBLIC_UPLOAD_DIR}/generated/assignment/${assignmentConfigId}/src/`;
     try {
-      const isEmpty = !existsSync(folderPath);
-      res.send({ isEmpty, error: null });
+      if (!existsSync(folderPath)) {
+        res.send({ isEmpty: true, error: null });
+        resolve();
+      }
+      const isFolderEmpty = readdirSync(folderPath).length === 0;
+      res.send({ isEmpty: isFolderEmpty, error: null });
       resolve();
     } catch (error: any) {
-      res.status(500).send({ isEmpty: false, error: error.message });
+      res.status(500).send({ isEmpty: true, error: error.message });
       resolve();
     }
   });
