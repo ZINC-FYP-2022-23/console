@@ -115,7 +115,7 @@ function TestSubmission() {
   );
 }
 
-const SubmitAssignmentSolutionTooltip = memo(() => (
+export const SubmitAssignmentSolutionTooltip = memo(() => (
   <InfoTooltip position="bottom-end" width={600}>
     <ul className="px-3 list-disc font-normal text-sm">
       <li>

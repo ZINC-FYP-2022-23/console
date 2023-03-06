@@ -1,11 +1,9 @@
-import { useCallback } from "react";
 import { useSubscription, useQuery } from "@apollo/client";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { useDropzone } from "react-dropzone";
 import { SlideOver } from "../../../../../components/SlideOver";
 import { Modal } from "../../../../../components/Modal";
-import { LayoutProvider, useLayoutDispatch, useLayoutState } from "../../../../../contexts/layout";
+import { LayoutProvider, useLayoutState } from "../../../../../contexts/layout";
 import { Layout } from "../../../../../layout";
 import { initializeApollo } from "../../../../../lib/apollo";
 import { ReportSlideOver } from "../../../../../components/Report/index";
@@ -16,8 +14,8 @@ import { SubmissionLoader } from "../../../../../components/SubmissionLoader";
 import { Submission } from "../../../../../components/Submission";
 import { RegradingConfirmationDialog } from "../../../../../components/RegradingConfirmationDialog";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useZinc } from "../../../../../contexts/zinc";
 import SubmissionUploader from "@/components/SubmissionUploader";
+import { SubmitAssignmentSolutionTooltip } from "@/components/GuiBuilder/Steps/TestSubmission";
 
 export function ModalContent() {
   const { modalType } = useLayoutState();
@@ -133,18 +131,31 @@ function Assignment() {
                   {!loadingDetail && submissionDetail.user.name}&apos;s Submissions
                 </h2>
               </div>
-              <SubmissionUploader assignmentConfigId={parseInt(assignmentConfigId as string)}>
-                <button className="flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-cse-600 hover:bg-cse-500 focus:outline-none focus:shadow-outline-blue focus:border-cse-700 active:bg-cse-700 transition duration-150 ease-in-out">
-                  <FontAwesomeIcon className="mr-2" icon={["fad", "upload"]} />
-                  Submit
-                </button>
-              </SubmissionUploader>
+              <div className="flex items-center gap-8">
+                {/* Submit Assignment Solution */}
+                <div className="flex items-center gap-1">
+                  <SubmissionUploader assignmentConfigId={parseInt(assignmentConfigId as string)}>
+                    <button className="flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-500 focus:outline-none focus:shadow-outline-blue focus:border-purple-700 active:bg-purple-700 transition duration-150 ease-in-out">
+                      <FontAwesomeIcon className="mr-2" icon={["fad", "upload"]} />
+                      Submit Assignment Solution
+                    </button>
+                  </SubmissionUploader>
+                  <SubmitAssignmentSolutionTooltip />
+                </div>
+                {/* Test Student Submission */}
+                <SubmissionUploader assignmentConfigId={parseInt(assignmentConfigId as string)} isTest={false}>
+                  <button className="flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-cse-600 hover:bg-cse-500 focus:outline-none focus:shadow-outline-blue focus:border-cse-700 active:bg-cse-700 transition duration-150 ease-in-out">
+                    <FontAwesomeIcon className="mr-2" icon={["fad", "upload"]} />
+                    Test Student Submission
+                  </button>
+                </SubmissionUploader>
+              </div>
             </div>
           </div>
           <ul className="w-full">
             {loading && <SubmissionLoader />}
-            {!loading &&
-              !loadingDetail &&
+            {data &&
+              submissionDetail &&
               data.submissions.map((submission) => (
                 <Submission key={submission.id} submission={{ ...submission, user: submissionDetail.user }} />
               ))}
