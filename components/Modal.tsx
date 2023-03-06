@@ -1,5 +1,6 @@
 import { Transition } from "@headlessui/react";
 import { clsx } from "@mantine/core";
+import { useClickOutside } from "@mantine/hooks";
 import { useLayoutDispatch, useLayoutState } from "../contexts/layout";
 
 type ModalSize = "regular" | "md" | "lg";
@@ -56,9 +57,12 @@ export function ModalFooter({ variant, onConfirm }: ModalFooterProps) {
  */
 export function Modal({ children, size = "regular" }: ModalProps) {
   const { showModal } = useLayoutState();
+  const dispatch = useLayoutDispatch();
+  const ref = useClickOutside(() => dispatch({ type: "closeModal" }));
+
   return (
     <Transition show={showModal}>
-      <div className="fixed z-10 inset-0 overflow-y-auto pointer-events-none">
+      <div className="fixed z-50 inset-0 overflow-y-auto pointer-events-none">
         <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
           <Transition.Child
             enter="ease-out duration-300"
@@ -73,6 +77,7 @@ export function Modal({ children, size = "regular" }: ModalProps) {
           </Transition.Child>
           <span className="hidden sm:inline-block sm:align-middle sm:h-screen"></span>&#8203;
           <Transition.Child
+            ref={ref}
             enter="ease-out duration-300"
             enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             enterTo="opacity-100 translate-y-0 sm:scale-100"
