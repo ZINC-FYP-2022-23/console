@@ -29,7 +29,7 @@ export type IsGeneratedFolderEmptyResponse = {
 function isGeneratedFolderEmpty(req: NextApiRequest, res: NextApiResponse<IsGeneratedFolderEmptyResponse>) {
   return new Promise<void>((resolve) => {
     const { assignmentConfigId } = req.query;
-    const folderPath = `${process.env.NEXT_PUBLIC_UPLOAD_DIR}/generated/assignment/${assignmentConfigId}/src/`;
+    const folderPath = `${process.env.NEXT_PUBLIC_UPLOAD_DIR}/generated/assignment/${assignmentConfigId}`;
     try {
       if (!existsSync(folderPath)) {
         res.send({ isEmpty: true, error: null });
@@ -59,7 +59,7 @@ export type GetGeneratedFileResponse = {
 function getGeneratedFile(req: NextApiRequest, res: NextApiResponse<GetGeneratedFileResponse>) {
   return new Promise<void>((resolve) => {
     const { assignmentConfigId, fileName } = req.query;
-    const filePath = `${process.env.NEXT_PUBLIC_UPLOAD_DIR}/generated/assignment/${assignmentConfigId}/src/${fileName}`;
+    const filePath = `${process.env.NEXT_PUBLIC_UPLOAD_DIR}/generated/assignment/${assignmentConfigId}/${fileName}`;
 
     try {
       if (!existsSync(filePath)) {
