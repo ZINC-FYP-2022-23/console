@@ -23,11 +23,20 @@ export default function useHighlightElement() {
 
     const element = highlightableElements[elementToHighlight];
 
-    if (element.mode === "single") {
-      boarding.highlight(element.selector);
-    } else if (element.mode === "multiple") {
-      boarding.defineSteps(element.steps);
-      boarding.start();
-    }
+    // `setTimeout` buys time to let the DOM load the target elements before highlighting them
+    setTimeout(
+      () => {
+        if (element.mode === "single") {
+          boarding.highlight(element.selector);
+        } else if (element.mode === "multiple") {
+          boarding.defineSteps(element.steps);
+          boarding.start();
+        }
+      },
+      // TODO: Waiting for 400ms is a temporary hack to wait for the component to load (since step components
+      // are dynamically loaded). We should introduce a mechanism to highlight the element only after the
+      // component has dynamically loaded.
+      400,
+    );
   }, [elementToHighlight, setElementToHighlight]);
 }
