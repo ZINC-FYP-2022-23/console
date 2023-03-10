@@ -473,25 +473,23 @@ interface HelperFileInputCardProps {
  * A card for users to input the helper file name in "Standard input" and "Expected output".
  */
 function HelperFileInputCard({ value, onChange, placeholder }: HelperFileInputCardProps) {
-  const setStep = useStoreActions((actions) => actions.layout.setStep);
   return (
-    <div className="mb-3 mx-2 p-3 bg-gray-50 rounded-lg drop-shadow">
-      <ol className="pl-4 mb-2 text-gray-600 text-sm list-decimal">
-        <li>
-          Upload the helper file to{" "}
-          <button onClick={() => setStep("upload")} className="underline text-blue-700">
-            Additional files used for grading
-          </button>
-        </li>
-        <li>Input the helper file name below:</li>
-      </ol>
+    <div className="mb-3 mx-2 p-3 bg-gray-50 rounded-lg text-gray-600 text-sm drop-shadow">
+      <label htmlFor="file_stdin">Helper file name:</label>
       <TextInput
         id="file_stdin"
         value={value}
         onChange={onChange}
         placeholder={placeholder}
-        classNames={{ root: "ml-4", input: "font-mono" }}
+        classNames={{ root: "mt-2", input: "font-mono" }}
       />
+      <div className="mt-3 text-blue-500 flex items-center gap-2">
+        <FontAwesomeIcon icon={["far", "circle-info"]} />
+        <p>
+          Helper files should be uploaded later in the <span className="font-semibold">Upload Files</span> step &gt;
+          &quot;Additional files used for grading&quot;
+        </p>
+      </div>
     </div>
   );
 }
