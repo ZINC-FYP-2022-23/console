@@ -62,12 +62,12 @@ interface StepperProps {
 function Stepper({ className = "" }: StepperProps) {
   const { classes } = useStyles();
   const configId = useStoreState((state) => state.config.configId);
-  const step = useStoreState((state) => state.layout.step);
+  const stepIndex = useStoreState((state) => state.layout.stepIndex);
   const setStep = useStoreActions((actions) => actions.layout.setStep);
 
   return (
     <StepperMantine
-      active={step}
+      active={stepIndex}
       onStepClick={(stepIndex) => setStep(guiBuilderSteps[stepIndex].slug)}
       iconSize={36}
       orientation="horizontal"
