@@ -14,6 +14,10 @@ export type GuiBuilderQueryParams = {
 /**
  * Returns utility functions for synchronizing the page's query parameters with the GUI Assignment
  * Builder's store state.
+ *
+ * @deprecated Do **NOT** use this hook yet. When Anson tried using this hook to add the `step` query parameter,
+ * the GUI Assignment Builder page would randomly freeze. Calling `updateStep()` would also reset the entire store
+ * state for unknown reasons. Until the cause and the solution are found, this hook should **not** be used.
  */
 function useQueryParameters() {
   const router = useRouter();

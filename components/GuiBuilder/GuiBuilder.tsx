@@ -3,7 +3,7 @@ import { Spinner } from "@/components/Spinner";
 import { useLayoutDispatch } from "@/contexts/layout";
 import { useZinc } from "@/contexts/zinc";
 import { CREATE_ASSIGNMENT_CONFIG, UPDATE_ASSIGNMENT_CONFIG } from "@/graphql/mutations/user";
-import { useHighlightElement, useQueryParameters, useWarnUnsavedChanges } from "@/hooks/GuiBuilder";
+import { useHighlightElement, useWarnUnsavedChanges } from "@/hooks/GuiBuilder";
 import { useStoreActions, useStoreState } from "@/store/GuiBuilder";
 import { Assignment, AssignmentConfig } from "@/types/tables";
 import { useMutation } from "@apollo/client";
@@ -65,9 +65,6 @@ function GUIAssignmentBuilder({ data, configId: configIdProp }: GUIAssignmentBui
       config: data?.assignmentConfig ?? null,
     });
   }, [data, configIdProp, initializeAssignment]);
-
-  const { initializeStateFromQueryParams } = useQueryParameters();
-  initializeStateFromQueryParams();
 
   const isNewAssignment = configId === null;
   const disableSave = !isNewAssignment && !isEdited.any;
