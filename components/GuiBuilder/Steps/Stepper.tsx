@@ -8,18 +8,15 @@ const useStyles = createStyles((theme) => ({
     padding: "6px 8px",
     borderRadius: theme.radius.md,
     transition: "background-color 150ms ease",
-    "&:hover": {
-      backgroundColor: "#bfdbfe",
+    "&[data-completed]:not(.locked)": {
+      "&:hover": {
+        backgroundColor: "#bfdbfe",
+      },
+      "&:active": {
+        backgroundColor: "#93c5fd",
+      },
     },
-    "&.locked:hover": {
-      backgroundColor: theme.colors.gray[4],
-    },
-    "&:active": {
-      backgroundColor: "#93c5fd",
-    },
-    "&.locked:active": {
-      backgroundColor: theme.colors.gray[5],
-    },
+    // Selected step
     "&[data-progress]": {
       backgroundColor: "#bfdbfe",
       "&.locked": {
@@ -28,14 +25,17 @@ const useStyles = createStyles((theme) => ({
     },
   },
   separator: {
-    backgroundColor: "#b0b8c5",
+    backgroundColor: theme.colors.gray[5],
     marginLeft: 6,
     marginRight: 6,
   },
   stepLabel: {
-    color: theme.colors.blue[8],
+    color: theme.colors.gray[6],
     lineHeight: 1.1,
-    "button.locked &": {
+    "button[data-completed] &, button[data-progress] &": {
+      color: theme.colors.blue[8],
+    },
+    "button[data-completed].locked &, button[data-progress].locked &": {
       color: theme.colors.gray[6],
     },
   },
@@ -44,7 +44,7 @@ const useStyles = createStyles((theme) => ({
       backgroundColor: theme.colors.gray[2],
       borderColor: theme.colors.gray[2],
     },
-    "button.locked &[data-completed]": {
+    "button[data-completed].locked &": {
       backgroundColor: theme.colors.gray[5],
       borderColor: theme.colors.gray[5],
     },
@@ -69,21 +69,22 @@ function Stepper({ className = "" }: StepperProps) {
     <StepperMantine
       active={stepIndex}
       onStepClick={(stepIndex) => setStep(guiBuilderSteps[stepIndex].slug)}
-      iconSize={36}
+      iconSize={32}
+      allowNextStepsSelect={false}
       orientation="horizontal"
       classNames={classes}
       className={className}
     >
       {guiBuilderSteps.map((step, index) => {
-        const isLocked = configId === null && !step.lockedWhenNew;
-        const iconBlue = <div className={isLocked ? "text-gray-500" : "text-cse-700"}>{step.icon}</div>;
+        const isLockedWhenNew = configId === null && !step.lockedWhenNew;
+        const icon = <div className="text-sm">{step.icon}</div>;
         return (
           <StepperMantine.Step
             key={index}
             label={step.label}
-            icon={iconBlue}
+            icon={icon}
             completedIcon={step.icon}
-            className={isLocked ? "locked" : ""}
+            className={isLockedWhenNew ? "locked" : ""}
           />
         );
       })}
