@@ -1,4 +1,5 @@
-import { useStoreActions, useStoreState } from "@/store/GuiBuilder";
+import { useQueryParameters } from "@/hooks/GuiBuilder";
+import { useStoreState } from "@/store/GuiBuilder";
 import { createStyles, Stepper as StepperMantine } from "@mantine/core";
 import { memo } from "react";
 import guiBuilderSteps from "./GuiBuilderSteps";
@@ -63,12 +64,13 @@ function Stepper({ className = "" }: StepperProps) {
   const { classes } = useStyles();
   const configId = useStoreState((state) => state.config.configId);
   const stepIndex = useStoreState((state) => state.layout.stepIndex);
-  const setStep = useStoreActions((actions) => actions.layout.setStep);
+
+  const { updateStep } = useQueryParameters();
 
   return (
     <StepperMantine
       active={stepIndex}
-      onStepClick={(stepIndex) => setStep(guiBuilderSteps[stepIndex].slug)}
+      onStepClick={(stepIndex) => updateStep(guiBuilderSteps[stepIndex].slug)}
       iconSize={36}
       orientation="horizontal"
       classNames={classes}
