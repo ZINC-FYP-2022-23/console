@@ -1,6 +1,7 @@
 import guiBuilderSteps, { GuiBuilderStepSlug } from "@/components/GuiBuilder/Steps/GuiBuilderSteps";
 import { HighlightableElementsKey } from "@/constants/GuiBuilder/highlightableElements";
-import { action, Action } from "easy-peasy";
+import { useQueryParameters } from "@/hooks/GuiBuilder";
+import { action, Action, Computed, computed } from "easy-peasy";
 import set from "lodash/set";
 
 // #region Model Definition
@@ -8,11 +9,11 @@ import set from "lodash/set";
 /**
  * Model for the layout-related states in the GUI Assignment Builder.
  */
-export type LayoutModel = LayoutModelState & LayoutModelAction;
+export type LayoutModel = LayoutModelState & LayoutModelComputed & LayoutModelAction;
 
 interface LayoutModelState {
-  /** Zero-based index of which step the user is in. */
-  step: number;
+  /** Slug of which step the user is in. */
+  step: GuiBuilderStepSlug;
   /** Which accordion components are opened. */
   accordion: AccordionState;
   /** Which alerts are shown. */
@@ -27,7 +28,18 @@ interface LayoutModelState {
   elementToHighlight?: HighlightableElementsKey;
 }
 
+interface LayoutModelComputed {
+  /** Zero-based index of which step the user is in. */
+  stepIndex: Computed<LayoutModel, number>;
+}
+
 interface LayoutModelAction {
+  /**
+   * Do **NOT** call this directly to change the step. Instead, use `updateStep()` from
+   * {@link useQueryParameters} to update which step the user is in.
+   *
+   * This is because calling this directly will not update the `step` query parameter.
+   */
   setStep: Action<LayoutModel, GuiBuilderStepSlug>;
   setAccordion: Action<
     LayoutModel,
@@ -86,7 +98,7 @@ export interface ModalState {
 // #region Model Implementation
 
 const layoutModelState: LayoutModelState = {
-  step: 0,
+  step: "settings",
   accordion: {
     addNewStage: ["preCompile", "compile", "grading", "miscStages"],
   },
@@ -104,9 +116,15 @@ const layoutModelState: LayoutModelState = {
   isAddStageCollapsed: false,
 };
 
+const layoutModelComputed: LayoutModelComputed = {
+  stepIndex: computed((state) => {
+    return guiBuilderSteps.findIndex((step) => step.slug === state.step);
+  }),
+};
+
 const layoutModelAction: LayoutModelAction = {
   setStep: action((state, stepSlug) => {
-    state.step = guiBuilderSteps.findIndex((step) => step.slug === stepSlug);
+    state.step = stepSlug;
   }),
   setAccordion: action((state, payload) => {
     set(state.accordion, payload.path, payload.value);
@@ -130,6 +148,7 @@ const layoutModelAction: LayoutModelAction = {
 
 export const layoutModel: LayoutModel = {
   ...layoutModelState,
+  ...layoutModelComputed,
   ...layoutModelAction,
 };
 

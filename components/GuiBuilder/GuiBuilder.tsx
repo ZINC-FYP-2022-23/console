@@ -3,7 +3,7 @@ import { Spinner } from "@/components/Spinner";
 import { useLayoutDispatch } from "@/contexts/layout";
 import { useZinc } from "@/contexts/zinc";
 import { CREATE_ASSIGNMENT_CONFIG, UPDATE_ASSIGNMENT_CONFIG } from "@/graphql/mutations/user";
-import { useHighlightElement, useWarnUnsavedChanges } from "@/hooks/GuiBuilder";
+import { useHighlightElement, useQueryParameters, useWarnUnsavedChanges } from "@/hooks/GuiBuilder";
 import { useStoreActions, useStoreState } from "@/store/GuiBuilder";
 import { Assignment, AssignmentConfig } from "@/types/tables";
 import { useMutation } from "@apollo/client";
@@ -41,7 +41,7 @@ function GUIAssignmentBuilder({ data, configId: configIdProp }: GUIAssignmentBui
   const configId = useStoreState((state) => state.config.configId);
   const isEdited = useStoreState((state) => state.config.isEdited);
   const isPipelineLayoutValid = useStoreState((state) => state.config.isPipelineLayoutValid);
-  const step = useStoreState((state) => state.layout.step);
+  const stepIndex = useStoreState((state) => state.layout.stepIndex);
 
   const initializeAssignment = useStoreActions((actions) => actions.config.initializeAssignment);
   const getConfigsToSave = useStoreActions((actions) => actions.config.getConfigsToSave);
@@ -66,9 +66,12 @@ function GUIAssignmentBuilder({ data, configId: configIdProp }: GUIAssignmentBui
     });
   }, [data, configIdProp, initializeAssignment]);
 
+  const { initializeStateFromQueryParams } = useQueryParameters();
+  initializeStateFromQueryParams();
+
   const isNewAssignment = configId === null;
   const disableSave = !isNewAssignment && !isEdited.any;
-  const StepComponent = guiBuilderSteps[step].component;
+  const StepComponent = guiBuilderSteps[stepIndex].component;
 
   useHotkeys([
     [

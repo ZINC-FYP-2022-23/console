@@ -1,6 +1,5 @@
 import { SwitchGroup } from "@/components/Input";
 import { useSelectedStageConfig } from "@/hooks/GuiBuilder";
-import { useStoreActions } from "@/store/GuiBuilder";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const excludeFromProvidedLabel = (
@@ -23,7 +22,6 @@ const excludeFromProvidedDesc = (
 
 function DiffWithSkeletonSettings() {
   const [config, setConfig] = useSelectedStageConfig("DiffWithSkeleton");
-  const setStep = useStoreActions((actions) => actions.layout.setStep);
 
   if (!config) return null;
 
@@ -32,14 +30,8 @@ function DiffWithSkeletonSettings() {
       <div className="flex items-center text-blue-500 gap-4">
         <FontAwesomeIcon icon={["far", "circle-info"]} />
         <p>
-          Skeleton files are specified in the{" "}
-          <button
-            onClick={() => setStep("upload")}
-            className="border-b border-blue-600 text-blue-600 font-medium leading-5"
-          >
-            Upload Files
-          </button>{" "}
-          step &gt; &quot;Files gave to the students&quot;.
+          Skeleton files are specified in the <span className="font-semibold">Upload Files</span> step &gt; &quot;Files
+          gave to the students&quot;.
         </p>
       </div>
       <div className="mt-6">
