@@ -99,7 +99,7 @@ function useSave() {
           update: getPolicyAndSchedule(),
         },
       });
-      if (isEdited.any) {
+      if (isEdited.policy || isEdited.schedule) {
         dispatch({
           type: "showNotification",
           payload: {

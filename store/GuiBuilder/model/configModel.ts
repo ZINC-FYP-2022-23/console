@@ -53,8 +53,12 @@ interface ConfigModelComputed {
     {
       /** Whether any of the pipeline config, policy, or schedule is edited. */
       any: boolean;
-      /** Whether the pipeline config is edited. */
+      /** Whether the {@link Config pipeline config} is edited. */
       config: boolean;
+      /** Whether the {@link GradingPolicy grading policy} is edited. */
+      policy: boolean;
+      /** Whether the {@link Schedule schedule} is edited. */
+      schedule: boolean;
     }
   >;
   /**
@@ -195,6 +199,8 @@ const configModelComputed: ConfigModelComputed = {
     return {
       any: isConfigEdited || isPolicyEdited || isScheduleEdited,
       config: isConfigEdited,
+      policy: isPolicyEdited,
+      schedule: isScheduleEdited,
     };
   }),
   isPipelineLayoutValid: computed((state) => {
