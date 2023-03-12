@@ -46,6 +46,9 @@ function useQueryParameters() {
 
     /**
      * Changes which step the user is in by updating both the store state and the `step` query parameter.
+     *
+     * It is discouraged to jump >=2 steps ahead from the current step because users should complete each
+     * step one by one in order. Jumping multiple steps ahead may cause issues.
      */
     updateStep: (step: GuiBuilderStepSlug) => {
       setStep(step);
