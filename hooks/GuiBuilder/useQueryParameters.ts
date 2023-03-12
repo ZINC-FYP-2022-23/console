@@ -28,7 +28,16 @@ function useQueryParameters() {
     initializeStateFromQueryParams: () => {
       if (!isFirstLoad) return;
 
-      if (guiBuilderSteps.some((s) => s.slug === router.query.step)) {
+      // Set `step` query parameter
+      if (router.query.assignmentConfigId === "new") {
+        // Always start at first step when creating a new assignment
+        if (typeof window !== "undefined") {
+          router.replace({
+            pathname: router.pathname,
+            query: { ...router.query, step: guiBuilderSteps[0].slug },
+          });
+        }
+      } else if (guiBuilderSteps.some((s) => s.slug === router.query.step)) {
         setStep(router.query.step as GuiBuilderStepSlug);
       }
 

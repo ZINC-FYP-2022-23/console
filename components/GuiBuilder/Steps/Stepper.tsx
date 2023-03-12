@@ -9,7 +9,7 @@ const useStyles = createStyles((theme) => ({
     padding: "6px 8px",
     borderRadius: theme.radius.md,
     transition: "background-color 150ms ease",
-    "&[data-completed]:not(.locked)": {
+    "&[data-completed]": {
       "&:hover": {
         backgroundColor: "#bfdbfe",
       },
@@ -17,12 +17,8 @@ const useStyles = createStyles((theme) => ({
         backgroundColor: "#93c5fd",
       },
     },
-    // Selected step
     "&[data-progress]": {
       backgroundColor: "#bfdbfe",
-      "&.locked": {
-        backgroundColor: theme.colors.gray[4],
-      },
     },
   },
   separator: {
@@ -35,19 +31,6 @@ const useStyles = createStyles((theme) => ({
     lineHeight: 1.1,
     "button[data-completed] &, button[data-progress] &": {
       color: theme.colors.blue[8],
-    },
-    "button[data-completed].locked &, button[data-progress].locked &": {
-      color: theme.colors.gray[6],
-    },
-  },
-  stepIcon: {
-    "button.locked &": {
-      backgroundColor: theme.colors.gray[2],
-      borderColor: theme.colors.gray[2],
-    },
-    "button[data-completed].locked &": {
-      backgroundColor: theme.colors.gray[5],
-      borderColor: theme.colors.gray[5],
     },
   },
 }));
@@ -62,7 +45,6 @@ interface StepperProps {
  */
 function Stepper({ className = "" }: StepperProps) {
   const { classes } = useStyles();
-  const configId = useStoreState((state) => state.config.configId);
   const stepIndex = useStoreState((state) => state.layout.stepIndex);
 
   const { updateStep } = useQueryParameters();
@@ -77,7 +59,6 @@ function Stepper({ className = "" }: StepperProps) {
       className={className}
     >
       {guiBuilderSteps.map((step, index) => {
-        const isLockedWhenNew = configId === null && !step.lockedWhenNew;
         const icon = <div className="text-sm">{step.icon}</div>;
         return (
           <StepperMantine.Step
@@ -86,7 +67,6 @@ function Stepper({ className = "" }: StepperProps) {
             label={step.label}
             icon={icon}
             completedIcon={step.icon}
-            className={isLockedWhenNew ? "locked" : ""}
           />
         );
       })}
