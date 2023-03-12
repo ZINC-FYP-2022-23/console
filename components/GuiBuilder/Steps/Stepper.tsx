@@ -70,7 +70,6 @@ function Stepper({ className = "" }: StepperProps) {
       active={stepIndex}
       onStepClick={(stepIndex) => setStep(guiBuilderSteps[stepIndex].slug)}
       iconSize={32}
-      allowNextStepsSelect={false}
       orientation="horizontal"
       classNames={classes}
       className={className}
@@ -81,6 +80,7 @@ function Stepper({ className = "" }: StepperProps) {
         return (
           <StepperMantine.Step
             key={index}
+            allowStepSelect={stepIndex > index} // Only allow select previous steps
             label={step.label}
             icon={icon}
             completedIcon={step.icon}
