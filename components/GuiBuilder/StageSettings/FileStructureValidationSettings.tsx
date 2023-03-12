@@ -1,6 +1,6 @@
 import Button from "@/components/Button";
 import ListInput from "@/components/Input/ListInput";
-import { useSelectedStageConfig } from "@/hooks/GuiBuilder";
+import { useQueryParameters, useSelectedStageConfig } from "@/hooks/GuiBuilder";
 import { useStoreActions } from "@/store/GuiBuilder";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
@@ -9,9 +9,9 @@ import { InfoAccordion } from "./common";
 
 function FileStructureValidationSettings() {
   const [config, setConfig] = useSelectedStageConfig("FileStructureValidation");
+  const { updateStep } = useQueryParameters();
 
   const setElementToHighlight = useStoreActions((actions) => actions.layout.setElementToHighlight);
-  const setStep = useStoreActions((actions) => actions.layout.setStep);
 
   const [ignoredFiles, setIgnoredFiles] = useState<{ id: string; name: string }[]>(
     config?.ignore_in_submission?.map((name) => ({ id: uuidv4(), name })) ?? [],
@@ -143,7 +143,7 @@ function FileStructureValidationSettings() {
           <Button
             icon={<FontAwesomeIcon icon={["fas", "compass"]} />}
             onClick={() => {
-              setStep("settings");
+              updateStep("settings");
               setElementToHighlight("useTemplate");
             }}
             className="border border-cse-600 text-cse-600 hover:bg-blue-100 active:bg-blue-200"

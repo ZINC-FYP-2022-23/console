@@ -1,5 +1,4 @@
-import { Spinner } from "@/components/Spinner";
-import { useHighlightElement, useWarnUnsavedChanges } from "@/hooks/GuiBuilder";
+import { useHighlightElement, useQueryParameters, useWarnUnsavedChanges } from "@/hooks/GuiBuilder";
 import { useStoreActions, useStoreState } from "@/store/GuiBuilder";
 import { Assignment, AssignmentConfig } from "@/types/tables";
 import "boarding.js/styles/main.css";
@@ -38,6 +37,9 @@ function GUIAssignmentBuilder({ data, configId: configIdProp }: GUIAssignmentBui
     });
   }, [data, configIdProp, initializeAssignment]);
 
+  const { initializeStateFromQueryParams } = useQueryParameters();
+  initializeStateFromQueryParams();
+
   const StepComponent = guiBuilderSteps[stepIndex].component;
 
   return (
@@ -56,7 +58,5 @@ function GUIAssignmentBuilder({ data, configId: configIdProp }: GUIAssignmentBui
     </div>
   );
 }
-
-const SaveButtonSpinner = <Spinner className="w-7 h-7 p-1" />;
 
 export default GUIAssignmentBuilder;

@@ -1,7 +1,7 @@
 import Button from "@/components/Button";
 import { Spinner } from "@/components/Spinner";
-import { useSave } from "@/hooks/GuiBuilder";
-import { useStoreActions, useStoreState } from "@/store/GuiBuilder";
+import { useQueryParameters, useSave } from "@/hooks/GuiBuilder";
+import { useStoreState } from "@/store/GuiBuilder";
 import { getNextStepSlug } from "@/utils/GuiBuilder";
 
 const SavingSpinner = <Spinner className="w-7 h-7 p-1" />;
@@ -10,10 +10,10 @@ const SavingSpinner = <Spinner className="w-7 h-7 p-1" />;
  * Button to go to the next step. It will save the current step's data before going to the next step.
  */
 function NextStepButton() {
+  const { updateStep } = useQueryParameters();
   const { isSaving, saveData } = useSave();
 
   const currentStep = useStoreState((state) => state.layout.step);
-  const setStep = useStoreActions((actions) => actions.layout.setStep);
 
   const nextStep = getNextStepSlug(currentStep);
 
@@ -28,7 +28,7 @@ function NextStepButton() {
       // We can ask if the user wishes to regrade assignments if the config has been updated, or simply show
       // a button to regrade all assignments
     } else {
-      setStep(nextStep);
+      updateStep(nextStep);
     }
   };
 

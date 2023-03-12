@@ -1,5 +1,6 @@
 import guiBuilderSteps, { GuiBuilderStepSlug } from "@/components/GuiBuilder/Steps/GuiBuilderSteps";
 import { HighlightableElementsKey } from "@/constants/GuiBuilder/highlightableElements";
+import { useQueryParameters } from "@/hooks/GuiBuilder";
 import { action, Action, Computed, computed } from "easy-peasy";
 import set from "lodash/set";
 
@@ -33,6 +34,12 @@ interface LayoutModelComputed {
 }
 
 interface LayoutModelAction {
+  /**
+   * Do **NOT** call this directly to change the step. Instead, use `updateStep()` from
+   * {@link useQueryParameters} to update which step the user is in.
+   *
+   * This is because calling this directly will not update the `step` query parameter.
+   */
   setStep: Action<LayoutModel, GuiBuilderStepSlug>;
   setAccordion: Action<
     LayoutModel,
