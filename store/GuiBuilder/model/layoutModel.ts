@@ -84,12 +84,10 @@ export interface AlertState {
 export interface ModalState {
   /** Modal that teaches how to create a connection between two nodes. */
   connectNodesTutorial: boolean;
-  /** Success modal after creating a new config. */
-  configCreated: boolean;
   /** Delete stage confirmation modal in "Pipeline Stages" step. */
   deleteStage: boolean;
-  /** Regrade prompt modal after saving a change in the pipeline config. */
-  regradePrompt: boolean;
+  /** Modal after the user has finished all steps. */
+  finishedAllSteps: boolean;
   /** Help information for stage label input box in "Pipeline Stages" step. */
   stageLabelInfo: boolean;
 }
@@ -108,9 +106,8 @@ const layoutModelState: LayoutModelState = {
   },
   modal: {
     connectNodesTutorial: false,
-    configCreated: false,
     deleteStage: false,
-    regradePrompt: false,
+    finishedAllSteps: false,
     stageLabelInfo: false,
   },
   addStageSearchString: "",

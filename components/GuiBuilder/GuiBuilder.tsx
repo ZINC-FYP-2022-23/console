@@ -4,8 +4,7 @@ import { Assignment, AssignmentConfig } from "@/types/tables";
 import "boarding.js/styles/main.css";
 import "boarding.js/styles/themes/basic.css";
 import { useEffect } from "react";
-import ConfigCreatedModal from "./ConfigCreatedModal";
-import RegradePromptModal from "./RegradePromptModal";
+import FinishedAllStepsModal from "./FinishedAllStepsModal";
 import guiBuilderSteps from "./Steps/GuiBuilderSteps";
 import NextStepButton from "./Steps/NextStepButton";
 import Stepper from "./Steps/Stepper";
@@ -53,8 +52,7 @@ function GUIAssignmentBuilder({ data, configId: configIdProp }: GUIAssignmentBui
       <div className="flex-1 overflow-y-hidden">
         <StepComponent />
       </div>
-      <ConfigCreatedModal />
-      <RegradePromptModal />
+      <FinishedAllStepsModal />
     </div>
   );
 }
