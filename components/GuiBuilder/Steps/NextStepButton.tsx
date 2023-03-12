@@ -18,10 +18,9 @@ function NextStepButton() {
   const nextStep = getNextStepSlug(currentStep);
 
   const handleClick = async () => {
-    const isSuccessful = await saveData();
+    const shouldProceedNextStep = await saveData();
 
-    // Disallow going to the next step if there are errors saving the current step
-    if (!isSuccessful) return;
+    if (!shouldProceedNextStep) return;
 
     if (nextStep === null) {
       // TODO(Anson): Show dialog to inform that the assignment set-up has been completed

@@ -29,6 +29,7 @@ function useSave() {
   const getPolicyAndSchedule = useStoreActions((actions) => actions.config.getPolicyAndSchedule);
   const setConfigId = useStoreActions((actions) => actions.config.setConfigId);
   const setInitConfigsToEditing = useStoreActions((actions) => actions.config.setInitConfigsToEditing);
+  const setStep = useStoreActions((actions) => actions.layout.setStep);
 
   const [createConfig] = useMutation<CreateConfigReturnType, CreateConfigVariables>(CREATE_ASSIGNMENT_CONFIG);
   const [updateConfig] = useMutation<{ id: number }, UpdateConfigVariables>(UPDATE_ASSIGNMENT_CONFIG);
@@ -44,7 +45,7 @@ function useSave() {
    * It will create a new assignment config if current config ID is null. This ensures the subsequent steps
    * have a non-null config ID.
    *
-   * @returns Whether the save is successful.
+   * @returns Whether the page should proceed to next step.
    */
   const saveGeneralSettings = async (): Promise<boolean> => {
     // Validate `_settings` part of YAML first
@@ -84,7 +85,11 @@ function useSave() {
       if (data) {
         const newConfigId = data.createAssignmentConfig.id;
         setConfigId(newConfigId);
-        router.push(`/assignments/${assignmentId}/configs/${newConfigId}/gui`, undefined, { shallow: true });
+        setStep("pipeline");
+        await router.push(`/assignments/${assignmentId}/configs/${newConfigId}/gui?step=pipeline`, undefined, {
+          shallow: true,
+        });
+        return false; // since `router.push()` already proceeds to next step
       }
     } else {
       // Update existing assignment's policy and schedule
@@ -112,7 +117,7 @@ function useSave() {
 
   /**
    * Save handler for the "Pipeline Stages" step.
-   * @returns Whether the save is successful.
+   * @returns Whether the page should proceed to next step.
    */
   const savePipelineStages = async (): Promise<boolean> => {
     // Validate pipeline layout
@@ -180,7 +185,7 @@ function useSave() {
   };
 
   /**
-   * @returns Whether the operation is successful (i.e. no errors).
+   * @returns Whether the page should proceed to next step after saving.
    */
   const saveData = async (): Promise<boolean> => {
     if (isSaving) return false;
@@ -216,7 +221,7 @@ function useSave() {
      *
      * Other side effects (e.g. validate config YAML, create new assignment config) are also performed when necessary.
      *
-     * @returns Whether the operation is successful (i.e. no errors).
+     * @returns Whether the page should proceed to next step after saving.
      */
     saveData,
   };

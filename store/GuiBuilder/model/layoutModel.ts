@@ -38,7 +38,8 @@ interface LayoutModelAction {
    * Do **NOT** call this directly to change the step. Instead, use `updateStep()` from
    * {@link useQueryParameters} to update which step the user is in.
    *
-   * This is because calling this directly will not update the `step` query parameter.
+   * This is because calling this directly will not update the `step` query parameter. You may use
+   * this action only if you immediately update `step` after calling this.
    */
   setStep: Action<LayoutModel, GuiBuilderStepSlug>;
   setAccordion: Action<
