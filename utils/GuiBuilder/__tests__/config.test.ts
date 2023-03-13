@@ -67,10 +67,18 @@ describe("GuiBuilder: Utils - Config", () => {
 
       const settingsToRawMock = jest.spyOn(settingsUtils, "settingsToSettingsRaw");
       const stagesToYamlMock = jest.spyOn(stageUtils, "stagesToYamlObj");
-      configToYaml(config);
 
+      // Full de-serialization
+      configToYaml(config);
       expect(settingsToRawMock).toBeCalledWith(defaultSettings);
       expect(stagesToYamlMock).toBeCalledWith(stageDeps, stageData);
+      settingsToRawMock.mockClear();
+      stagesToYamlMock.mockClear();
+
+      // Only de-serialize `_settings`
+      configToYaml(config, true);
+      expect(settingsToRawMock).toBeCalledWith(defaultSettings);
+      expect(stagesToYamlMock).not.toHaveBeenCalled();
     });
 
     it("converts undefined fields to null", () => {

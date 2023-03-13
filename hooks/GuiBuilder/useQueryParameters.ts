@@ -28,7 +28,16 @@ function useQueryParameters() {
     initializeStateFromQueryParams: () => {
       if (!isFirstLoad) return;
 
-      if (guiBuilderSteps.some((s) => s.slug === router.query.step)) {
+      // Set `step` query parameter
+      if (router.query.assignmentConfigId === "new") {
+        // Always start at first step when creating a new assignment
+        if (typeof window !== "undefined") {
+          router.replace({
+            pathname: router.pathname,
+            query: { ...router.query, step: guiBuilderSteps[0].slug },
+          });
+        }
+      } else if (guiBuilderSteps.some((s) => s.slug === router.query.step)) {
         setStep(router.query.step as GuiBuilderStepSlug);
       }
 
@@ -37,6 +46,9 @@ function useQueryParameters() {
 
     /**
      * Changes which step the user is in by updating both the store state and the `step` query parameter.
+     *
+     * It is discouraged to jump >=2 steps ahead from the current step because users should complete each
+     * step one by one in order. Jumping multiple steps ahead may cause issues.
      */
     updateStep: (step: GuiBuilderStepSlug) => {
       setStep(step);
