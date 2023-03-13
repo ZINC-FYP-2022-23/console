@@ -4,7 +4,7 @@ import { act } from "@testing-library/react-hooks";
 import { createStore } from "easy-peasy";
 import mockRouter from "next-router-mock";
 import useQueryParameters from "../useQueryParameters";
-import renderHookWithStore from "./utils/renderHookWithStore";
+import renderHookWithContexts from "./utils/renderHookWithContexts";
 
 // See https://github.com/scottrippey/next-router-mock
 jest.mock("next/router", () => require("next-router-mock"));
@@ -18,7 +18,7 @@ describe("GuiBuilder: useQueryParameters()", () => {
       const model = getThreeStageModel();
       const store = createStore(model);
 
-      const { result } = renderHookWithStore(store, () => useQueryParameters());
+      const { result } = renderHookWithContexts(() => useQueryParameters(), { store });
       const { initializeStateFromQueryParams } = result.current;
       act(() => initializeStateFromQueryParams());
 
@@ -32,7 +32,7 @@ describe("GuiBuilder: useQueryParameters()", () => {
       const model = getThreeStageModel();
       const store = createStore(model);
 
-      const { result } = renderHookWithStore(store, () => useQueryParameters());
+      const { result } = renderHookWithContexts(() => useQueryParameters(), { store });
       const { initializeStateFromQueryParams } = result.current;
       act(() => initializeStateFromQueryParams());
 
@@ -48,7 +48,7 @@ describe("GuiBuilder: useQueryParameters()", () => {
     const model = getThreeStageModel();
     const store = createStore(model);
 
-    const { result } = renderHookWithStore(store, () => useQueryParameters());
+    const { result } = renderHookWithContexts(() => useQueryParameters(), { store });
     const { updateStep } = result.current;
     const stepNew: GuiBuilderStepSlug = "pipeline";
     act(() => updateStep(stepNew));

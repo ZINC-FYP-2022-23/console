@@ -3,7 +3,7 @@ import { act } from "@testing-library/react-hooks";
 import { createStore } from "easy-peasy";
 import "jest-extended";
 import usePipelineEditorHotKeys from "../usePipelineEditorHotKeys";
-import renderHookWithStore from "./utils/renderHookWithStore";
+import renderHookWithContexts from "./utils/renderHookWithContexts";
 
 const dispatchKeyboardEvent = (data: KeyboardEventInit) => {
   const event = new KeyboardEvent("keydown", data);
@@ -19,7 +19,7 @@ describe("GuiBuilder: usePipelineEditorHotKeys()", () => {
       model.pipelineEditor.nodes[0].selected = true;
       const store = createStore(model, { mockActions: true });
 
-      renderHookWithStore(store, () => usePipelineEditorHotKeys());
+      renderHookWithContexts(() => usePipelineEditorHotKeys(), { store });
       dispatchKeyboardEvent({ key: "Backspace" });
 
       expect(store.getMockedActions()).toEqual([
@@ -35,7 +35,7 @@ describe("GuiBuilder: usePipelineEditorHotKeys()", () => {
       model.pipelineEditor.edges[0].selected = true;
       const store = createStore(model, { mockActions: true });
 
-      renderHookWithStore(store, () => usePipelineEditorHotKeys());
+      renderHookWithContexts(() => usePipelineEditorHotKeys(), { store });
       dispatchKeyboardEvent({ key: "Backspace" });
 
       expect(store.getMockedActions()[0]).toEqual({
@@ -50,7 +50,7 @@ describe("GuiBuilder: usePipelineEditorHotKeys()", () => {
       model.pipelineEditor.edges = model.pipelineEditor.edges.map((edge) => ({ ...edge, selected: false }));
       const store = createStore(model, { mockActions: true });
 
-      renderHookWithStore(store, () => usePipelineEditorHotKeys());
+      renderHookWithContexts(() => usePipelineEditorHotKeys(), { store });
       dispatchKeyboardEvent({ key: "Backspace" });
 
       expect(store.getMockedActions()).toEqual([]);
@@ -63,7 +63,7 @@ describe("GuiBuilder: usePipelineEditorHotKeys()", () => {
       model.pipelineEditor.nodes[0].selected = true;
       const store = createStore(model);
 
-      renderHookWithStore(store, () => usePipelineEditorHotKeys());
+      renderHookWithContexts(() => usePipelineEditorHotKeys(), { store });
       dispatchKeyboardEvent({ key: "c", ctrlKey: true });
 
       expect(store.getState().pipelineEditor.copiedStageId).toBe(model.pipelineEditor.nodes[0].id);
@@ -74,7 +74,7 @@ describe("GuiBuilder: usePipelineEditorHotKeys()", () => {
       model.pipelineEditor.nodes = model.pipelineEditor.nodes.map((node) => ({ ...node, selected: false }));
       const store = createStore(model, { mockActions: true });
 
-      renderHookWithStore(store, () => usePipelineEditorHotKeys());
+      renderHookWithContexts(() => usePipelineEditorHotKeys(), { store });
       dispatchKeyboardEvent({ key: "c", ctrlKey: true });
 
       expect(store.getMockedActions()).toEqual([]);
@@ -88,7 +88,7 @@ describe("GuiBuilder: usePipelineEditorHotKeys()", () => {
       model.pipelineEditor.copiedStageId = copiedId;
       const store = createStore(model, { mockActions: true });
 
-      renderHookWithStore(store, () => usePipelineEditorHotKeys());
+      renderHookWithContexts(() => usePipelineEditorHotKeys(), { store });
       dispatchKeyboardEvent({ key: "v", ctrlKey: true });
 
       expect(store.getMockedActions()).toIncludeAllMembers([
@@ -108,7 +108,7 @@ describe("GuiBuilder: usePipelineEditorHotKeys()", () => {
       model.pipelineEditor.copiedStageId = undefined;
       const store = createStore(model, { mockActions: true });
 
-      renderHookWithStore(store, () => usePipelineEditorHotKeys());
+      renderHookWithContexts(() => usePipelineEditorHotKeys(), { store });
       dispatchKeyboardEvent({ key: "v", ctrlKey: true });
 
       expect(store.getMockedActions()).toEqual([]);
