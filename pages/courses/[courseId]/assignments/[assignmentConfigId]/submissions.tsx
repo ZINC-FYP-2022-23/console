@@ -15,7 +15,8 @@ import { Submission } from "../../../../../components/Submission";
 import { RegradingConfirmationDialog } from "../../../../../components/RegradingConfirmationDialog";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import SubmissionUploader from "@/components/SubmissionUploader";
-import { SubmitAssignmentSolutionTooltip } from "@/components/GuiBuilder/Steps/TestSubmission";
+import { memo } from "react";
+import { InfoTooltip } from "@/components/GuiBuilder/Diagnostics";
 
 export function ModalContent() {
   const { modalType } = useLayoutState();
@@ -169,6 +170,22 @@ function Assignment() {
     </LayoutProvider>
   );
 }
+
+const SubmitAssignmentSolutionTooltip = memo(() => (
+  <InfoTooltip position="bottom-end" width={600}>
+    <ul className="px-3 list-disc font-normal text-sm">
+      <li>
+        Some pipeline stages may require you to submit the assignment&apos;s solution first. This assists the Grader to
+        grade students&apos; submissions.
+      </li>
+      <li>
+        e.g. The &quot;Standard I/O Test&quot; stage has a feature that auto-generates expected output of test cases
+        from the assignment solution.
+      </li>
+    </ul>
+  </InfoTooltip>
+));
+SubmitAssignmentSolutionTooltip.displayName = "SubmitAssignmentSolutionTooltip";
 
 export async function getServerSideProps(ctx) {
   const apolloClient = initializeApollo(ctx.req.headers.cookie);

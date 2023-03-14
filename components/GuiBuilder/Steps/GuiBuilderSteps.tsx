@@ -71,7 +71,7 @@ const guiBuilderSteps: readonly GuiBuilderStep[] = [
   },
   {
     slug: "test",
-    label: "Test Submissions",
+    label: "Test Submission",
     icon: <FontAwesomeIcon icon={["fad", "flask"]} />,
     component: dynamic(() => import("./TestSubmission"), {
       loading: () => <StepLoading />,
