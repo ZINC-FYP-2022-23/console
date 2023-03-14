@@ -85,7 +85,7 @@ function NoGeneratedOutputCard() {
           <p>To generate expected output:</p>
           <ol className="ml-5 list-decimal">
             <li>
-              Visit the <span className="font-semibold">Submissions</span> step
+              Visit the <span className="font-semibold">Test Submissions</span> step
             </li>
             <li>
               Press the <span className="font-semibold">Submit Assignment Solution</span> button to submit this

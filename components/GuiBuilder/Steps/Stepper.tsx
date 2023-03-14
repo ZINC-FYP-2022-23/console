@@ -45,20 +45,26 @@ interface StepperProps {
  */
 function Stepper({ className = "" }: StepperProps) {
   const { classes } = useStyles();
-  const stepIndex = useStoreState((state) => state.layout.stepIndex);
+  const step = useStoreState((state) => state.layout.step);
+  const stageData = useStoreState((state) => state.config.editingConfig.stageData);
 
   const { updateStep } = useQueryParameters();
+
+  const stepsToShow = guiBuilderSteps.filter((step) => {
+    return step.showStep === undefined || step.showStep(stageData);
+  });
+  const stepIndex = stepsToShow.findIndex((s) => s.slug === step);
 
   return (
     <StepperMantine
       active={stepIndex}
-      onStepClick={(stepIndex) => updateStep(guiBuilderSteps[stepIndex].slug)}
+      onStepClick={(stepIndex) => updateStep(stepsToShow[stepIndex].slug)}
       iconSize={32}
       orientation="horizontal"
       classNames={classes}
       className={className}
     >
-      {guiBuilderSteps.map((step, index) => {
+      {stepsToShow.map((step, index) => {
         const icon = <div className="text-sm">{step.icon}</div>;
         return (
           <StepperMantine.Step
