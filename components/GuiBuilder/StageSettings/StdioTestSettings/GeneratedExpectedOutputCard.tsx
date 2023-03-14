@@ -1,6 +1,6 @@
 import { Spinner } from "@/components/Spinner";
 import { useSelectedStageConfig } from "@/hooks/GuiBuilder";
-import { useStoreActions, useStoreState } from "@/store/GuiBuilder";
+import { useStoreState } from "@/store/GuiBuilder";
 import { TestCase } from "@/types/GuiBuilder";
 import { getTestCaseExpectedOutputHash } from "@/utils/GuiBuilder/stageConfig";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -74,26 +74,16 @@ function GeneratedExpectedOutputCard({ caseId }: GeneratedExpectedOutputCardProp
  * The card to show when no generated output is found.
  */
 function NoGeneratedOutputCard() {
-  const setStep = useStoreActions((actions) => actions.layout.setStep);
   return (
     <div className="mb-3 px-3 pt-1 pb-5 bg-gray-50 rounded-lg drop-shadow">
       <p className="mb-3 text-gray-600 text-sm">Generated Expected Output (Read Only):</p>
       <div className="flex flex-col items-center gap-3">
         <FontAwesomeIcon icon={["fad", "empty-set"]} size="3x" className="text-gray-500" />
         <p className="font-medium text-gray-600">No generated output found</p>
-        <div className="space-y-1 text-sm text-gray-500">
-          <p>To generate expected output:</p>
-          <ol className="ml-5 list-decimal">
-            <li>
-              Visit the <span className="font-semibold">Test Submissions</span> step
-            </li>
-            <li>
-              Press the <span className="font-semibold">Submit Assignment Solution</span> button to submit this
-              assignment&apos;s solution
-            </li>
-            <li>Wait for the Grader to process the solution</li>
-          </ol>
-        </div>
+        <p className="space-y-1 text-sm text-gray-500">
+          Expected output are generated in the <span className="font-semibold">Generate Output</span> step, which you
+          will soon visit.
+        </p>
       </div>
     </div>
   );
