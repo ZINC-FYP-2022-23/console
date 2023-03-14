@@ -186,11 +186,7 @@ function GenerateExpectedOutputStepsToComplete() {
           <p>Submit this assignment&apos;s solution to generate the expected outputs:</p>
           <ol className="ml-5 list-decimal">
             <li>
-              Visit the{" "}
-              <button onClick={() => setStep("test")} className="text-blue-700 underline">
-                Submissions
-              </button>{" "}
-              step
+              Visit the <span className="font-semibold">Submissions</span> step
             </li>
             <li>
               Press the <span className="font-semibold">Submit Assignment Solution</span> button to submit this

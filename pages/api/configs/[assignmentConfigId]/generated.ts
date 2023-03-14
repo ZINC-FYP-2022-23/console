@@ -59,7 +59,9 @@ export type GetGeneratedFileResponse = {
 function getGeneratedFile(req: NextApiRequest, res: NextApiResponse<GetGeneratedFileResponse>) {
   return new Promise<void>((resolve) => {
     const { assignmentConfigId, fileName } = req.query;
-    const filePath = `${process.env.NEXT_PUBLIC_UPLOAD_DIR}/generated/assignment/${assignmentConfigId}/${fileName}`;
+
+    const generatedDir = process.env.GENERATED_EXPECTED_OUTPUT_FOLDER || "expectedOutput";
+    const filePath = `${process.env.NEXT_PUBLIC_UPLOAD_DIR}/generated/assignment/${assignmentConfigId}/${generatedDir}/${fileName}`;
 
     try {
       if (!existsSync(filePath)) {
