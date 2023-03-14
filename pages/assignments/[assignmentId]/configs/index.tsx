@@ -78,7 +78,7 @@ function AssignmentConfiguration() {
   return (
     <LayoutProvider>
       <Layout title="Assignment Configs">
-        <div className="p-6 flex flex-col w-full">
+        <div className="p-6 flex flex-col w-full overflow-y-auto">
           <div className="pb-5 border-b border-gray-200">
             <div>
               <div>

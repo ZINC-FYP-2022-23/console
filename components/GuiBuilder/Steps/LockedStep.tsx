@@ -1,5 +1,5 @@
 import Button from "@/components/Button";
-import { useStoreActions } from "@/store/GuiBuilder";
+import { useQueryParameters } from "@/hooks/GuiBuilder";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 /**
@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
  * a non-null config ID to work properly.
  */
 function LockedStep() {
-  const setStep = useStoreActions((actions) => actions.layout.setStep);
+  const { updateStep } = useQueryParameters();
 
   return (
     <div className="mt-20 flex flex-col items-center">
@@ -19,7 +19,7 @@ function LockedStep() {
       </div>
       <Button
         className="mt-12 bg-cse-500 text-white hover:bg-cse-600 active:bg-cse-700"
-        onClick={() => setStep("settings")}
+        onClick={() => updateStep("settings")}
       >
         Back to General Settings
       </Button>

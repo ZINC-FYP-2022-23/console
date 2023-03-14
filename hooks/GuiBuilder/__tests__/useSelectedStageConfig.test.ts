@@ -2,7 +2,7 @@ import { getThreeStageModel } from "@/store/GuiBuilder/__tests__/utils/storeTest
 import { act } from "@testing-library/react-hooks";
 import { createStore } from "easy-peasy";
 import useSelectedStageConfig from "../useSelectedStageConfig";
-import renderHookWithStore from "./utils/renderHookWithStore";
+import renderHookWithContexts from "./utils/renderHookWithContexts";
 
 describe("GuiBuilder: useSelectedStageConfig()", () => {
   describe("returns the selected stage's config and its update function", () => {
@@ -11,7 +11,7 @@ describe("GuiBuilder: useSelectedStageConfig()", () => {
       model.pipelineEditor.nodes[0].selected = true; // Select 1st stage (DiffWithSkeleton)
       const store = createStore(model);
 
-      const { result } = renderHookWithStore(store, () => useSelectedStageConfig("DiffWithSkeleton"));
+      const { result } = renderHookWithContexts(() => useSelectedStageConfig("DiffWithSkeleton"), { store });
       const [config, setConfig] = result.current;
 
       expect(config).toStrictEqual(model.config.editingConfig.stageData["stage-0"].config);
@@ -26,7 +26,7 @@ describe("GuiBuilder: useSelectedStageConfig()", () => {
       model.pipelineEditor.nodes[0].selected = true; // Select 1st stage (DiffWithSkeleton)
       const store = createStore(model);
 
-      const { result } = renderHookWithStore(store, () => useSelectedStageConfig());
+      const { result } = renderHookWithContexts(() => useSelectedStageConfig(), { store });
       const [config, setConfig] = result.current;
 
       expect(config).toStrictEqual(model.config.editingConfig.stageData["stage-0"].config);
@@ -43,7 +43,7 @@ describe("GuiBuilder: useSelectedStageConfig()", () => {
       model.pipelineEditor.nodes = model.pipelineEditor.nodes.map((node) => ({ ...node, selected: false }));
       const store = createStore(model);
 
-      const { result } = renderHookWithStore(store, () => useSelectedStageConfig("DiffWithSkeleton"));
+      const { result } = renderHookWithContexts(() => useSelectedStageConfig("DiffWithSkeleton"), { store });
       const [config, setConfig] = result.current;
 
       expect(config).toBeNull();
@@ -57,7 +57,7 @@ describe("GuiBuilder: useSelectedStageConfig()", () => {
       model.pipelineEditor.nodes[1].selected = true; // Select the 2nd stage (FileStructureValidation)
       const store = createStore(model);
 
-      const { result } = renderHookWithStore(store, () => useSelectedStageConfig("DiffWithSkeleton"));
+      const { result } = renderHookWithContexts(() => useSelectedStageConfig("DiffWithSkeleton"), { store });
       const [config, setConfig] = result.current;
 
       expect(config).toBeNull();

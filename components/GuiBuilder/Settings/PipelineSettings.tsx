@@ -2,7 +2,6 @@ import { Checkbox, NumberInput, Select, SelectItem, SwitchGroup, TextInput } fro
 import ListInput from "@/components/Input/ListInput";
 import { highlightableElementIds } from "@/constants/GuiBuilder/highlightableElements";
 import supportedLanguages from "@/constants/GuiBuilder/supportedLanguages";
-import supportedStages from "@/constants/GuiBuilder/supportedStages";
 import { useStoreActions, useStoreState } from "@/store/GuiBuilder";
 import { SettingsFeatures, SettingsGpuDevice, SettingsUseTemplate } from "@/types/GuiBuilder";
 import { settingsLangToString } from "@/utils/GuiBuilder";
@@ -70,7 +69,6 @@ const gpuVendorSelectOptions = [
 
 function PipelineSettings() {
   const _settings = useStoreState((state) => state.config.editingConfig._settings);
-  const setStep = useStoreActions((actions) => actions.layout.setStep);
   const updateSettings = useStoreActions((actions) => actions.config.updateSettings);
 
   return (
@@ -206,11 +204,7 @@ function PipelineSettings() {
                 <p>To upload your files:</p>
                 <ol className="ml-6 list-decimal">
                   <li>
-                    Visit the{" "}
-                    <button onClick={() => setStep("upload")} className="text-blue-600 underline">
-                      Upload Files
-                    </button>{" "}
-                    step
+                    Visit the <span className="font-semibold">Upload Files</span> step
                   </li>
                   <li>
                     Upload your files under{" "}
@@ -371,26 +365,12 @@ const LangVersionTooltip = memo(() => (
 LangVersionTooltip.displayName = "LangVersionTooltip";
 
 const UseTemplateTooltip = memo(() => {
-  const setStep = useStoreActions((actions) => actions.layout.setStep);
-  const setAccordion = useStoreActions((actions) => actions.layout.setAccordion);
-  const setAddStageSearchString = useStoreActions((actions) => actions.layout.setAddStageSearchString);
-
   return (
     <InfoTooltip width={520}>
       <p>
         To perform the actual checking, add the &quot;
-        <span className="font-semibold">File Structure Validation</span>&quot; stage in your{" "}
-        <button
-          onClick={() => {
-            setStep("pipeline");
-            setAccordion({ path: "addNewStage", value: ["preCompile"] });
-            setAddStageSearchString(supportedStages.FileStructureValidation.nameInUI);
-          }}
-          className="underline text-blue-700"
-        >
-          grading pipeline
-        </button>
-        .
+        <span className="font-semibold">File Structure Validation</span>&quot; stage to your grading pipeline in the{" "}
+        <span className="font-semibold">Pipeline Stages</span> step later.
       </p>
     </InfoTooltip>
   );

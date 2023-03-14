@@ -9,6 +9,7 @@ import { useQuery } from "@apollo/client";
 import { MantineProvider, MantineThemeOverride } from "@mantine/core";
 import { createStore, StoreProvider } from "easy-peasy";
 import { GetServerSideProps } from "next";
+import { useMemo } from "react";
 import defaultTheme from "tailwindcss/defaultTheme";
 
 /**
@@ -29,9 +30,9 @@ interface GUIAssignmentBuilderRootProps {
   assignmentId: number;
 }
 
-const guiBuilderStore = createStore(guiBuilderModel);
-
 function GUIAssignmentBuilderRoot({ configId, assignmentId }: GUIAssignmentBuilderRootProps) {
+  const guiBuilderStore = useMemo(() => createStore(guiBuilderModel), []);
+
   const { data, error } = useQuery<{ assignmentConfig: AssignmentConfig; assignment: Assignment }>(
     GET_PIPELINE_CONFIG_FOR_ASSIGNMENT,
     {

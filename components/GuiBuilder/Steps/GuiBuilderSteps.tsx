@@ -9,13 +9,6 @@ export type GuiBuilderStep = Readonly<{
   label: string;
   icon: React.ReactNode;
   /**
-   * Whether the step is locked when creating a brand new config.
-   *
-   * This is because some steps must require a non-null config ID in order to properly work,
-   * and config ID is `null` when creating a new config.
-   */
-  lockedWhenNew: boolean;
-  /**
    * The component to render in the step.
    *
    * It should be dynamically imported to reduce the bundle size.
@@ -37,7 +30,6 @@ const guiBuilderSteps: readonly GuiBuilderStep[] = [
     slug: "settings",
     label: "General Settings",
     icon: <FontAwesomeIcon icon={["fad", "gears"]} />,
-    lockedWhenNew: true,
     component: dynamic(() => import("./GeneralSettings"), {
       loading: () => <StepLoading />,
     }),
@@ -46,7 +38,6 @@ const guiBuilderSteps: readonly GuiBuilderStep[] = [
     slug: "pipeline",
     label: "Pipeline Stages",
     icon: <FontAwesomeIcon icon={["fad", "pipe-section"]} />,
-    lockedWhenNew: true,
     component: dynamic(() => import("./PipelineStages"), {
       loading: () => <StepLoading />,
     }),
@@ -55,7 +46,6 @@ const guiBuilderSteps: readonly GuiBuilderStep[] = [
     slug: "upload",
     label: "Upload Files",
     icon: <FontAwesomeIcon icon={["fad", "upload"]} />,
-    lockedWhenNew: false,
     component: dynamic(() => import("./UploadFiles"), {
       loading: () => <StepLoading />,
     }),
@@ -64,7 +54,6 @@ const guiBuilderSteps: readonly GuiBuilderStep[] = [
     slug: "test",
     label: "Submissions",
     icon: <FontAwesomeIcon icon={["fad", "flask"]} />,
-    lockedWhenNew: false,
     component: dynamic(() => import("./TestSubmission"), {
       loading: () => <StepLoading />,
     }),
@@ -73,7 +62,6 @@ const guiBuilderSteps: readonly GuiBuilderStep[] = [
     slug: "assign",
     label: "Assign Students",
     icon: <FontAwesomeIcon icon={["fad", "sitemap"]} />,
-    lockedWhenNew: false,
     component: dynamic(() => import("./AssignStudents"), {
       loading: () => <StepLoading />,
     }),

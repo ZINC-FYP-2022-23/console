@@ -53,8 +53,12 @@ interface ConfigModelComputed {
     {
       /** Whether any of the pipeline config, policy, or schedule is edited. */
       any: boolean;
-      /** Whether the pipeline config is edited. */
+      /** Whether the {@link Config pipeline config} is edited. */
       config: boolean;
+      /** Whether the {@link GradingPolicy grading policy} is edited. */
+      policy: boolean;
+      /** Whether the {@link Schedule schedule} is edited. */
+      schedule: boolean;
     }
   >;
   /**
@@ -146,9 +150,12 @@ interface ConfigModelThunk {
    * Making this a thunk allows us to lazily get the state. If this is a computed value,
    * it will cause unnecessary re-renders whenever the user edits the config.
    */
+  // TODO(Anson): Deprecate this
   getConfigsToSave: Thunk<ConfigModel, undefined, undefined, GuiBuilderModel, ConfigsToSave>;
   /** Lazily gets {@link ConfigModel.editingConfig}. */
   getEditingConfig: Thunk<ConfigModel, undefined, undefined, GuiBuilderModel, Config>;
+  /** Lazily gets {@link ConfigModel.editingPolicy} and {@link ConfigModel.editingSchedule}. */
+  getPolicyAndSchedule: Thunk<ConfigModel, undefined, undefined, GuiBuilderModel, GradingPolicy & Schedule>;
   /** Updates a non-readonly field of the selected stage. */
   updateSelectedStage: Thunk<
     ConfigModel,
@@ -192,6 +199,8 @@ const configModelComputed: ConfigModelComputed = {
     return {
       any: isConfigEdited || isPolicyEdited || isScheduleEdited,
       config: isConfigEdited,
+      policy: isPolicyEdited,
+      schedule: isScheduleEdited,
     };
   }),
   isPipelineLayoutValid: computed((state) => {
@@ -304,6 +313,13 @@ const configModelThunk: ConfigModelThunk = {
   }),
   getEditingConfig: thunk((_actions, _payload, { getState }) => {
     return getState().editingConfig;
+  }),
+  getPolicyAndSchedule: thunk((_actions, _payload, { getState }) => {
+    const { editingPolicy, editingSchedule } = getState();
+    return {
+      ...editingPolicy,
+      ...editingSchedule,
+    };
   }),
   updateSelectedStage: thunk((actions, { path, value }, { getStoreState }) => {
     const selectedNode = getStoreState().pipelineEditor.nodes.find((node) => node.selected);
