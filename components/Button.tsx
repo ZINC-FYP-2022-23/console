@@ -1,30 +1,33 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import React from "react";
 
-type ButtonProps = {
+type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
+  /** Additional class names to apply extra styles. */
   className?: string;
-  opaque?: boolean;
-  title: string;
-  onClick(event: React.MouseEvent<HTMLButtonElement>): void;
+  /** Leading icon, if any. */
+  icon?: React.ReactNode;
+  /** Disabled when `disabled` prop is true. */
+  onClick?: React.MouseEventHandler<HTMLButtonElement>;
+  disabled?: boolean;
 };
 
-function Button({ title, className, opaque = false, onClick }: ButtonProps) {
-  const baseStyle =
-    "inline-flex items-center border border-transparent font-medium rounded-md focus:outline-none transition ease-in-out duration-150";
-  const _className = className ? `${baseStyle} ${className}` : baseStyle;
-
-  if (opaque) {
-    return (
-      <button type="button" onClick={onClick} className={_className}>
-        {title}
-      </button>
-    );
-  }
+/**
+ * Button with base styles.
+ */
+function Button({ children, onClick, className = "", icon, disabled = false, ...props }: ButtonProps) {
   return (
-    <span className="inline-flex round-md shadow-sm">
-      <button type="button" onClick={onClick} className={_className}>
-        {title}
-      </button>
-    </span>
+    <button
+      type="button"
+      onClick={disabled ? () => {} : onClick}
+      className={
+        "px-4 py-1 flex items-center justify-center border border-transparent font-medium rounded-md transition ease-in-out duration-150 " +
+        className
+      }
+      disabled={disabled}
+      {...props}
+    >
+      {icon && <span className="mr-3">{icon}</span>}
+      <span>{children}</span>
+    </button>
   );
 }
 

@@ -1,70 +1,100 @@
+import GUIAssignmentBuilder from "@/components/GuiBuilder/GuiBuilder";
+import { LayoutProvider } from "@/contexts/layout";
+import { GET_PIPELINE_CONFIG_FOR_ASSIGNMENT } from "@/graphql/queries/user";
+import { Layout } from "@/layout";
+import { initializeApollo } from "@/lib/apollo";
+import { guiBuilderModel } from "@/store/GuiBuilder";
+import { Assignment, AssignmentConfig } from "@/types/tables";
 import { useQuery } from "@apollo/client";
-import Button from "components/Button";
-import { LayoutProvider } from "contexts/layout";
-import { GET_PIPELINE_CONFIG_FOR_ASSIGNMENT } from "graphql/queries/user";
-import { Layout } from "layout";
-import { initializeApollo } from "lib/apollo";
+import { MantineProvider, MantineThemeOverride } from "@mantine/core";
+import { createStore, StoreProvider } from "easy-peasy";
 import { GetServerSideProps } from "next";
-import { useRouter } from "next/router";
-import { Config } from "types";
+import defaultTheme from "tailwindcss/defaultTheme";
 
-function GUIAssignmentBuilder() {
-  const router = useRouter();
-  const assignmentConfigId = parseInt(router.query.assignmentConfigId as string, 10);
-  const { data, loading } = useQuery(GET_PIPELINE_CONFIG_FOR_ASSIGNMENT, {
-    variables: {
-      assignmentConfigId,
+/**
+ * Custom Mantine theme for the GUI Assignment Builder.
+ */
+const mantineTheme: MantineThemeOverride = {
+  colors: {
+    blue: ["#8FADE0", "#6F95D8", "#4F7ECF", "#3560C0", "#2C56A0", "#234580", "#1B3663", "#162B50", "#122340"],
+  },
+  fontFamily: `Inter var, ${defaultTheme.fontFamily.sans.join(", ")}`,
+  fontFamilyMonospace: `Fira Code, ${defaultTheme.fontFamily.mono.join(", ")}`,
+};
+
+interface GUIAssignmentBuilderRootProps {
+  /** The `assignmentConfigId`. If it's `-1`, it means we're creating a new assignment. */
+  configId: number;
+  /** The assignment ID. */
+  assignmentId: number;
+}
+
+const guiBuilderStore = createStore(guiBuilderModel);
+
+function GUIAssignmentBuilderRoot({ configId, assignmentId }: GUIAssignmentBuilderRootProps) {
+  const { data, error } = useQuery<{ assignmentConfig: AssignmentConfig; assignment: Assignment }>(
+    GET_PIPELINE_CONFIG_FOR_ASSIGNMENT,
+    {
+      variables: {
+        assignmentConfigId: configId,
+        assignmentId,
+      },
     },
-  });
+  );
 
-  if (data) {
-    const config = Config.fromYaml(data.assignmentConfig.config_yaml);
-    console.log(config);
+  // TODO(Anson): Better handling of error
+  if (error) {
+    console.error(error);
   }
 
   return (
     <LayoutProvider>
-      <Layout title="Assignment Configs">
-        <div className="p-4 w-full flex flex-col">
-          {/* Top bar */}
-          <div className="mb-3 flex items-center justify-between">
-            <h1 className="font-bold text-gray-900 text-xl sm:text-2xl">Assignment Config</h1>
-            <div className="flex gap-2">
-              <Button
-                title="Create"
-                className="px-3 py-1 bg-green-500 text-white hover:bg-green-600"
-                onClick={() => {
-                  // TODO
-                }}
-              />
-            </div>
-          </div>
-          <div className="flex-1 flex flex-row gap-3">
-            <div className="w-4/6 flex flex-col gap-3">
-              <div className="h-1/2 bg-white rounded-md">Pipeline editor</div>
-              <div className="h-1/2 bg-white rounded-md">Stage settings</div>
-            </div>
-            <div className="w-2/6 bg-white rounded-md">General settings</div>
-          </div>
-        </div>
+      <Layout title="Assignment Config">
+        <MantineProvider theme={mantineTheme}>
+          <StoreProvider store={guiBuilderStore}>
+            <GUIAssignmentBuilder data={data} configId={configId === -1 ? null : configId} />
+          </StoreProvider>
+        </MantineProvider>
       </Layout>
     </LayoutProvider>
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const apolloClient = initializeApollo(ctx.req.headers.cookie!);
-  await apolloClient.query({
+export const getServerSideProps: GetServerSideProps = async ({ req, query }) => {
+  const apolloClient = initializeApollo(req.headers.cookie!);
+  /**
+   * The `assignmentConfig` query param has two possible types of values:
+   *  - Numerical string (e.g. `"1"`) when loading an existing assignment config
+   *  - `"new"` when creating a new assignment config
+   */
+  let configId: string | number = query.assignmentConfigId as string;
+  let assignmentId: string | number = query.assignmentId as string;
+
+  const isNew = configId === "new";
+  configId = isNew ? -1 : parseInt(configId);
+  assignmentId = parseInt(assignmentId);
+  if (isNaN(configId) || isNaN(assignmentId)) {
+    return { notFound: true };
+  }
+
+  const { data } = await apolloClient.query({
     query: GET_PIPELINE_CONFIG_FOR_ASSIGNMENT,
     variables: {
-      assignmentConfigId: parseInt(ctx.query.assignmentConfigId as string, 10),
+      assignmentId,
+      assignmentConfigId: configId,
     },
   });
+  if (data.assignment === null || (!isNew && data.assignmentConfig === null)) {
+    return { notFound: true };
+  }
+
   return {
     props: {
       initialApolloState: apolloClient.cache.extract(),
+      configId,
+      assignmentId,
     },
   };
 };
 
-export default GUIAssignmentBuilder;
+export default GUIAssignmentBuilderRoot;

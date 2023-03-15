@@ -36,10 +36,23 @@ export function AppealTextMessage({ message }: { message: DisplayMessageType }) 
   const logDate = new Date(time);
   logDate.setTime(logDate.getTime() + 8 * 60 * 60 * 1000);
 
+  let backgroundColor: string;
+  switch (type) {
+    case "Student":
+      backgroundColor = "bg-blue-100";
+      break;
+    case "Teaching Assistant":
+      backgroundColor = "bg-red-100";
+      break;
+    default:
+      backgroundColor = "bg-gray-100";
+  }
+  const backgroundCSS = "p-3 mx-8 flex justify-between rounded-lg " + backgroundColor;
+
   return (
     <>
-      <div className="mx-12 h-12 border-l-2"></div>
-      <div className="mx-8 flex justify-between">
+      <div className="h-4 border-l-2"></div>
+      <div className={backgroundCSS}>
         <div className="flex flex-row space-x-2">
           <Icon name={name} type={type} />
           <div className="overflow-x-auto">
@@ -54,7 +67,7 @@ export function AppealTextMessage({ message }: { message: DisplayMessageType }) 
                 })} at ${logDate.toLocaleTimeString().toLowerCase()}`}
               </p>
             </div>
-            <p className="ml-2 text-sm text-gray-900">{content}</p>
+            <p className="ml-2 text-sm text-gray-900 font-bold">{content}</p>
           </div>
         </div>
       </div>

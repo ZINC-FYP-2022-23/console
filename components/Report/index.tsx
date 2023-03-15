@@ -105,7 +105,7 @@ export function ReportSlideOver() {
               Generated on{" "}
               {loading ? (
                 <span className="ml-2">
-                  <Spinner />
+                  <Spinner className="mr-3 h-5 w-5 text-white" />
                 </span>
               ) : (
                 new Date(data.report.createdAt).toLocaleDateString("en-US", {
