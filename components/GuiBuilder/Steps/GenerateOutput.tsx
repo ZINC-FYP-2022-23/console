@@ -59,8 +59,7 @@ function GenerateOutput() {
             <span>Submit Assignment Solution</span>
           </h3>
           <p className="text-sm text-gray-600">
-            Please submit the solution of this assignment. It will be used to generate the expected output of test
-            cases.
+            This assignment&apos;s solution will be used to generate the expected output of test cases.
           </p>
           <div className="self-start">
             <SubmissionUploader assignmentConfigId={configId}>
