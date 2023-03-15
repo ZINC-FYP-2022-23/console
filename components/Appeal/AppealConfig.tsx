@@ -16,8 +16,10 @@ type AppealConfigType = {
   stopCollectionAt?: Date;
   isAppealAllowed: boolean;
   appealLimits?: Number | null;
-  appealDueAt?: Date;
+  appealStartAt?: Date;
+  appealStopAt?: Date;
   isAppealStudentReplyAllowed?: boolean;
+  isAppealViewReportAllowed: boolean;
 };
 
 interface AppealConfigProps {
@@ -95,23 +97,45 @@ export function AppealConfig({ assignmentConfig, setAssignmentConfig, onChange }
                   });
                 else updateAppealConfig({ appealLimits: parseInt(e.target.value, 10) || null });
               }}
-              placeholder="Unlimited"
+              placeholder="1"
               className="mt-1 form-input block w-1/2 py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5"
             />
           </div>
-          {/* appealDueAt */}
+          {/* appealStartAt */}
           <div className="mt-4 flex flex-col space-y-2">
-            <label htmlFor="appealDueAt" className="block text-sm font-medium leading-5 text-gray-900">
+            <label htmlFor="appealStartAt" className="block text-sm font-medium leading-5 text-gray-900">
+              Start Appeal Collection
+            </label>
+            <div className="relative rounded-md shadow-sm">
+              <DateInput
+                id="appealStartAt"
+                selected={getLocalDate(assignmentConfig.appealStartAt)}
+                onChange={(date) => {
+                  if (setAssignmentConfig)
+                    setAssignmentConfig({
+                      ...assignmentConfig,
+                      appealStartAt: zonedTimeToUtc(date!, "Asia/Hong_Kong"),
+                    });
+                  else if (date) updateAppealConfig({ appealStartAt: zonedTimeToUtc(date!, "Asia/Hong_Kong") });
+                }}
+                minDate={assignmentConfig.stopCollectionAt}
+                placeholderText="Appeal Submission Closing Date"
+              />
+            </div>
+          </div>
+          {/* appealStopAt */}
+          <div className="mt-4 flex flex-col space-y-2">
+            <label htmlFor="appealStopAt" className="block text-sm font-medium leading-5 text-gray-900">
               Stop Appeal Collection
             </label>
             <div className="relative rounded-md shadow-sm">
               <DateInput
-                id="appealDueAt"
-                selected={getLocalDate(assignmentConfig.appealDueAt)}
+                id="appealStopAt"
+                selected={getLocalDate(assignmentConfig.appealStopAt)}
                 onChange={(date) => {
                   if (setAssignmentConfig)
-                    setAssignmentConfig({ ...assignmentConfig, appealDueAt: zonedTimeToUtc(date!, "Asia/Hong_Kong") });
-                  else if (date) updateAppealConfig({ appealDueAt: zonedTimeToUtc(date!, "Asia/Hong_Kong") });
+                    setAssignmentConfig({ ...assignmentConfig, appealStopAt: zonedTimeToUtc(date!, "Asia/Hong_Kong") });
+                  else if (date) updateAppealConfig({ appealStopAt: zonedTimeToUtc(date!, "Asia/Hong_Kong") });
                 }}
                 minDate={assignmentConfig.stopCollectionAt}
                 placeholderText="Appeal Submission Closing Date"
@@ -136,6 +160,26 @@ export function AppealConfig({ assignmentConfig, setAssignmentConfig, onChange }
                 Allow Student Reply
               </label>
               <p className="text-gray-500">Allow students to send reply messages after submitting an appeal.</p>
+            </div>
+          </div>
+          {/* isAppealViewReportAllowed */}
+          <div className="mt-4 flex items-start">
+            <div className="flex items-center h-5">
+              <Checkbox
+                checked={assignmentConfig.isAppealViewReportAllowed}
+                onChange={(e) => {
+                  if (setAssignmentConfig)
+                    setAssignmentConfig({ ...assignmentConfig, isAppealViewReportAllowed: e.target.checked });
+                  else updateAppealConfig({ isAppealViewReportAllowed: e.target.checked });
+                }}
+                id="isAppealViewReportAllowed"
+              />
+            </div>
+            <div className="ml-3 text-sm leading-5">
+              <label htmlFor="isAppealViewReportAllowed" className="font-medium text-gray-700">
+                Allow View Report
+              </label>
+              <p className="text-gray-500">Allow students to view appeal report.</p>
             </div>
           </div>
         </div>

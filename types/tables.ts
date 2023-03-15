@@ -42,6 +42,13 @@ export type AssignmentConfig = {
   /** Whether the current time is after `stopCollectionAt`. */
   submissionWindowPassed: boolean;
   updatedAt: string;
+  /** Appeal-related */
+  isAppealAllowed: boolean;
+  appealLimits?: Number | null;
+  appealStartAt?: Date;
+  appealStopAt?: Date;
+  isAppealStudentReplyAllowed?: boolean;
+  isAppealViewReportAllowed: boolean;
 };
 
 export type AssignmentConfigUser = {

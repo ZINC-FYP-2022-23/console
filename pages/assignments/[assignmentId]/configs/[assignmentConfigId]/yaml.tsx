@@ -282,10 +282,12 @@ function AssignmentConfigurationYAML() {
                     })
                   }
                   assignmentConfig={{
-                    isAppealAllowed: data.assignmentConfig.isAppealAllowed,
-                    appealLimits: data.assignmentConfig.appealLimits,
-                    appealDueAt: data.assignmentConfig.appealDueAt,
-                    isAppealStudentReplyAllowed: data.assignmentConfig.isAppealStudentReplyAllowed,
+                    isAppealAllowed: data!.assignmentConfig.isAppealAllowed,
+                    appealLimits: data!.assignmentConfig.appealLimits,
+                    appealStartAt: data!.assignmentConfig.appealStartAt,
+                    appealStopAt: data!.assignmentConfig.appealStopAt,
+                    isAppealStudentReplyAllowed: data!.assignmentConfig.isAppealStudentReplyAllowed,
+                    isAppealViewReportAllowed: data!.assignmentConfig.isAppealViewReportAllowed,
                   }}
                 />
               </div>

@@ -29,8 +29,10 @@ interface AssignmentConfig {
   // Appeal-related configs
   isAppealAllowed: boolean;
   appealLimits?: Number | null;
-  appealDueAt?: Date;
+  appealStartAt?: Date;
+  appealStopAt?: Date;
   isAppealStudentReplyAllowed?: boolean;
+  isAppealViewReportAllowed: boolean;
 }
 
 function AssignmentConfigCreateSuccessModalContent() {
@@ -99,8 +101,10 @@ function AssignmentConfigCreation({ assignment }) {
     // Appeal-related settings
     isAppealAllowed: true,
     appealLimits: 1,
-    appealDueAt: setHours(setMinutes(addDays(new Date(), 14), 59), 23),
+    appealStartAt: setHours(setMinutes(addDays(new Date(), 7), 59), 23),
+    appealStopAt: setHours(setMinutes(addDays(new Date(), 14), 59), 23),
     isAppealStudentReplyAllowed: true,
+    isAppealViewReportAllowed: true,
   };
   const [assignmentConfig, setAssignmentConfig] = useState(initialConfig);
 
