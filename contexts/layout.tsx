@@ -28,7 +28,8 @@ interface LayoutAction {
     | "createAssignmentConfigSuccess"
     | "updateNotification"
     | "assignmentSupportingFilesUploader"
-    | "chooseAssignmentConfigEditor";
+    | "chooseAssignmentConfigEditor"
+    | "setAssignmentConfigId";
   payload?: any;
 }
 
@@ -127,6 +128,8 @@ function layoutReducer(state: LayoutState, action: LayoutAction): LayoutState {
         assignmentId: action.payload.assignmentId,
         assignmentConfigId: action.payload.assignmentConfigId,
       };
+    case "setAssignmentConfigId":
+      return { ...state, assignmentConfigId: action.payload };
     default:
       return state;
   }

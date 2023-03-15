@@ -69,7 +69,8 @@ function File({ fileObject, folder }) {
   var path = "";
   if (!existing) path = file.path;
   else {
-    path = file.path.replace(`/mnt/zinc/helpers/${assignmentConfigId}/${folder.toLowerCase()}/`, "");
+    const uploadDir = process.env.NEXT_PUBLIC_UPLOAD_DIR || "/mnt/zinc";
+    path = file.path.replace(`${uploadDir}/helpers/${assignmentConfigId}/${folder.toLowerCase()}/`, "");
   }
   return (
     <FileWrap existing={existing} file={file}>
@@ -339,7 +340,12 @@ function FileList({ existingFiles, name }) {
 //     )
 // }
 
-function AssignmentSupportingFilesUploader() {
+interface AssignmentSupportingFilesUploaderProps {
+  /** Callback after saving successfully. */
+  onSaveSuccess?: () => void;
+}
+
+function AssignmentSupportingFilesUploader({ onSaveSuccess }: AssignmentSupportingFilesUploaderProps) {
   const [dockingFiles, setDockingFiles] = useState<CachedFile[]>([]);
   const [existedFiles, setExistedFiles] = useState<ExistedFile[]>([]);
   const { assignmentConfigId } = useLayoutState();
@@ -383,7 +389,7 @@ function AssignmentSupportingFilesUploader() {
     } catch (error) {
       console.error(error);
     }
-    dispatch({ type: "closeModal" });
+    onSaveSuccess?.();
   };
 
   return (
@@ -413,7 +419,7 @@ function AssignmentSupportingFilesUploader() {
           </div>
         </DndProvider>
       </div>
-      <div className="w-full flex justify-center ">
+      <div className="w-full mt-4 flex justify-center">
         <button
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-1/4"
           onClick={handleSubmit()}

@@ -4,5 +4,13 @@
 
 export { default as Checkbox } from "./Checkbox";
 export { default as DateInput } from "./DateInput";
-export { default as TextInput } from "./TextInput";
+export * from "./MultiSelect";
+export { default as MultiSelect } from "./MultiSelect";
+export { default as NumberInput } from "./NumberInput";
+export * from "./Select";
+export { default as Select } from "./Select";
 export { default as Switch } from "./Switch";
+export { default as SwitchGroup } from "./SwitchGroup";
+export { default as TagsInput } from "./TagsInput";
+export { default as Textarea } from "./Textarea";
+export { default as TextInput } from "./TextInput";

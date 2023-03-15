@@ -6,9 +6,9 @@ ENV PORT 3000
 WORKDIR /usr/src/app
 
 # Installing dependencies
-COPY package*.json .npmrc /usr/src/app/
+COPY package.json yarn.lock .npmrc /usr/src/app/
 RUN npm config set '//npm.fontawesome.com/:_authToken' "${NPM_TOKEN}"
-RUN yarn install
+RUN yarn install --frozen-lockfile
 
 # Copying source files
 COPY . /usr/src/app

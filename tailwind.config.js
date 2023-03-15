@@ -53,9 +53,7 @@ module.exports = {
       }
     },
   },
-  plugins: [
-    require('@tailwindcss/forms'),
-  ],
+  plugins: [],
   safelist: [
     { pattern: /section-*/ },
     { pattern: /max-w-*/ }

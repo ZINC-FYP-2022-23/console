@@ -1,11 +1,11 @@
 import Link from "next/link";
 import { useQuery } from "@apollo/client";
 import { initializeApollo } from "../../../../lib/apollo";
-import { LayoutProvider, useLayoutDispatch, useLayoutState } from "../../../../contexts/layout";
+import { LayoutProvider, useLayoutDispatch } from "../../../../contexts/layout";
 import { Layout } from "../../../../layout";
 import { GET_CONFIGS_FOR_ASSIGNMENT } from "../../../../graphql/queries/user";
 import { useRouter } from "next/router";
-import { Modal, ModalWithHeader } from "../../../../components/Modal";
+import ChooseEditorModeModal from "@/components/GuiBuilder/ChooseEditorModeModal";
 
 function AssignmentConfigs({ configs }) {
   const router = useRouter();
@@ -43,31 +43,30 @@ function AssignmentConfigs({ configs }) {
   );
 }
 
-function ChooseConfigEditorModal() {
-  const { assignmentId, assignmentConfigId } = useLayoutState();
-  const baseUrl = `/assignments/${assignmentId}/configs/${assignmentConfigId}`;
+function AddConfigButton() {
+  const router = useRouter();
+  const assignmentId = parseInt(router.query.assignmentId as string, 10);
+  const dispatch = useLayoutDispatch();
   return (
-    <ModalWithHeader title="Choose Editor Mode">
-      <div className="sm:px-6">
-        <p className="mb-5">TODO: Refine the UI</p>
-        <div className="flex gap-4">
-          <Link href={`${baseUrl}/gui`}>
-            <a className="px-4 py-2 border border-transparent text-sm leading-5 font-medium rounded-md text-cse-700 bg-blue-100 hover:bg-blue-50 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-blue-200 transition ease-in-out duration-150">
-              GUI Editor
-            </a>
-          </Link>
-          <Link href={`${baseUrl}/yaml`}>
-            <a className="px-4 py-2 border border-transparent text-sm leading-5 font-medium rounded-md text-cse-700 bg-blue-100 hover:bg-blue-50 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-blue-200 transition ease-in-out duration-150">
-              YAML Editor
-            </a>
-          </Link>
-        </div>
-      </div>
-    </ModalWithHeader>
+    <button
+      onClick={() =>
+        dispatch({
+          type: "chooseAssignmentConfigEditor",
+          payload: {
+            assignmentId,
+            assignmentConfigId: undefined,
+          },
+        })
+      }
+      className="px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-cse-600 hover:bg-cse-500 focus:outline-none focus:shadow-outline-cse focus:border-cse-700 active:bg-cse-700 transition duration-150 ease-in-out"
+    >
+      Add Config
+    </button>
   );
 }
 
 function AssignmentConfiguration() {
+  const dispatch = useLayoutDispatch();
   const router = useRouter();
   const assignmentId = parseInt(router.query.assignmentId as string, 10);
   const { data, loading } = useQuery(GET_CONFIGS_FOR_ASSIGNMENT, {
@@ -157,11 +156,7 @@ function AssignmentConfiguration() {
                     </Link>
                   </span>
                   <span className="ml-3 shadow-sm rounded-md">
-                    <Link href={`/assignments/${assignmentId}/configs/new`}>
-                      <a className="inline-flex items-center px-4 py-2 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-cse-600 hover:bg-cse-500 focus:outline-none focus:shadow-outline-cse focus:border-cse-700 active:bg-cse-700 transition duration-150 ease-in-out">
-                        Add Config
-                      </a>
-                    </Link>
+                    <AddConfigButton />
                   </span>
                 </div>
               </div>
@@ -171,7 +166,7 @@ function AssignmentConfiguration() {
             </div>
           </div>
         </div>
-        <ChooseConfigEditorModal />
+        <ChooseEditorModeModal />
       </Layout>
     </LayoutProvider>
   );
