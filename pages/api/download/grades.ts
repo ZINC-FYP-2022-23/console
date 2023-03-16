@@ -4,7 +4,7 @@ import axios from "axios";
 import { Workbook } from "exceljs";
 
 // Helper function to determine final score from appeals and manual TA changes
-const finalScore = (submission, report, assignment_appeals, changeLogs) => {
+export const finalScore = (submission, report, assignment_appeals: any[], changeLogs: any[]) => {
   const computeScoreFromReport = (r) => {
     return r.grade !== null && r.grade.hasOwnProperty("details")
       ? r.grade.details.accScore
@@ -13,14 +13,16 @@ const finalScore = (submission, report, assignment_appeals, changeLogs) => {
       : `${r.grade.score}`;
   };
 
-  let date = submission.createdAt;
-  let fScore = computeScoreFromReport(report);
+  let date: Date = submission.createdAt;
+  let fScore: string = computeScoreFromReport(report);
 
   // Check for assignment appeals
   if (assignment_appeals.length > 0) {
     const [appeal] = assignment_appeals;
-    date = appeal.updatedAt;
-    fScore = computeScoreFromReport(appeal.submission.report[0]);
+    if (appeal && appeal.submission && appeal.submission.reports && appeal.submission.reports.length > 0) {
+      date = appeal.updatedAt;
+      fScore = computeScoreFromReport(appeal.submission.reports[0]);
+    }
   }
 
   // Check for TA manual change logs
@@ -28,7 +30,7 @@ const finalScore = (submission, report, assignment_appeals, changeLogs) => {
     const [change] = changeLogs;
     if (change.createdAt.getTime() > date.getTime()) {
       date = change.createdAt;
-      fScore = change.updatedState.score;
+      fScore = `${change.updatedState.score}`;
     }
   }
 

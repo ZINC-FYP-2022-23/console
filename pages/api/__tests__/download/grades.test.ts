@@ -1,9 +1,10 @@
+import { finalScore } from "../../download/grades";
+
 describe("API - Download Gradebook", () => {
   //   const mockRequestResponse = (method: RequestMethod = 'GET') => {
-
   //   };
 
-  describe("handler()", () => {
+  describe("finalScore()", () => {
     const report = {
       grade: {
         score: 50,
@@ -21,8 +22,8 @@ describe("API - Download Gradebook", () => {
     };
 
     it("returns same final score as score if no appeal record no change log", () => {
-      // const fScore = finalScore(submission, report, [], []);
-      // expect(fScore).toEqual("50");
+      const fScore = finalScore(submission, report, [], []);
+      expect(fScore).toEqual("50");
     });
 
     it("returns updated final score as score if have appeal record no change log", () => {
@@ -42,8 +43,8 @@ describe("API - Download Gradebook", () => {
         },
       };
 
-      // const fScore = finalScore(submission, report, [appeal], []);
-      // expect(fScore).toEqual("70");
+      const fScore = finalScore(submission, report, [appeal], []);
+      expect(fScore).toEqual("70");
     });
 
     it("returns updated final score as score if no appeal record have change log", () => {
@@ -57,8 +58,8 @@ describe("API - Download Gradebook", () => {
         },
       };
 
-      // const fScore = finalScore(submission, report, [], [change]);
-      // expect(fScore).toEqual("70");
+      const fScore = finalScore(submission, report, [], [change]);
+      expect(fScore).toEqual("80");
     });
 
     it("returns change final score as score if appeal record earlier than change log", () => {
@@ -87,8 +88,8 @@ describe("API - Download Gradebook", () => {
         },
       };
 
-      // const fScore = finalScore(submission, report, [appeal], [change]);
-      // expect(fScore).toEqual("80");
+      const fScore = finalScore(submission, report, [appeal], [change]);
+      expect(fScore).toEqual("80");
     });
 
     it("returns appeal final score as score if appeal record later than change log", () => {
@@ -117,8 +118,8 @@ describe("API - Download Gradebook", () => {
         },
       };
 
-      // const fScore = finalScore(submission, report, [appeal], [change]);
-      // expect(fScore).toEqual("90");
+      const fScore = finalScore(submission, report, [appeal], [change]);
+      expect(fScore).toEqual("90");
     });
   });
 });
