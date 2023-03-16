@@ -40,7 +40,8 @@ interface TransformAppealDataType {
  * Transform Appeal Data to `TransformAppealDataType` for displaying in the appeals table
  * @returns {AppealTableType[]}
  */
-function transformAppealData({ appealData, userData, oldGrade, newGrade }: TransformAppealDataType): AppealTableType[] {
+// TODO(BRYAN): Add `oldGrade`, `newGrade`
+function transformAppealData({ appealData, userData }: TransformAppealDataType): AppealTableType[] {
   return appealData.map((data, index) => {
     const updatedDateString = data.updatedAt ?? data.createdAt;
     const updatedDateDate = new Date(updatedDateString);
