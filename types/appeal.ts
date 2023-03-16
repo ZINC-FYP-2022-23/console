@@ -12,7 +12,8 @@ export enum AppealStatus {
 export type AppealAttempt = {
   id: number;
   newFileSubmissionId?: string;
-  assignmentConfigAndUserId: number;
+  assignmentConfigId: number;
+  userId: number;
   createdAt: string;
   latestStatus: AppealStatus;
   updatedAt: string;

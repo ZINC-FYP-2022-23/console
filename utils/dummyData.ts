@@ -18,7 +18,8 @@ export const appealStatus: AppealStatus = AppealStatus.Accept;
 
 export const appeal: AppealAttempt | null = {
   id: 1,
-  assignmentConfigAndUserId: 999,
+  assignmentConfigId: 1,
+  userId: 6,
   createdAt: "2022-12-20",
   latestStatus: AppealStatus.Reject,
   updatedAt: "2022-12-21",
@@ -72,14 +73,16 @@ export const messageList: DisplayMessageType[] = [
 export const appealAttempts: AppealAttempt[] = [
   {
     id: 1001,
-    assignmentConfigAndUserId: 999,
+    assignmentConfigId: 1,
+    userId: 6,
     createdAt: "2022-11-13",
     latestStatus: AppealStatus.Reject,
     updatedAt: "2022-11-14",
   },
   {
     id: 1002,
-    assignmentConfigAndUserId: 999,
+    assignmentConfigId: 1,
+    userId: 6,
     createdAt: "2022-11-15",
     latestStatus: AppealStatus.Accept,
     updatedAt: "2022-11-16",
@@ -138,28 +141,32 @@ export const fullScore: number = 100;
 export const dummyAppealAttemptData: AppealAttempt[] = [
   {
     id: 2000,
-    assignmentConfigAndUserId: 11,
+    assignmentConfigId: 1,
+    userId: 6,
     createdAt: "2022-10-30T17:00:00",
     latestStatus: AppealStatus.Accept,
     updatedAt: "2022-10-30T17:00:00",
   },
   {
     id: 1000,
-    assignmentConfigAndUserId: 10,
+    assignmentConfigId: 1,
+    userId: 6,
     createdAt: "2022-10-30T16:00:00",
     latestStatus: AppealStatus.Pending,
     updatedAt: "2022-10-30T16:00:00",
   },
   {
     id: 3000,
-    assignmentConfigAndUserId: 13,
+    assignmentConfigId: 1,
+    userId: 6,
     createdAt: "2022-10-30T13:00:00",
     latestStatus: AppealStatus.Reject,
     updatedAt: "2022-10-30T13:00:00",
   },
   {
     id: 4000,
-    assignmentConfigAndUserId: 14,
+    assignmentConfigId: 1,
+    userId: 6,
     createdAt: "2022-10-28T15:00:00",
     latestStatus: AppealStatus.Pending,
     updatedAt: "2022-10-30T16:30:00",

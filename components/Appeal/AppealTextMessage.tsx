@@ -1,12 +1,12 @@
 import { DisplayMessageType } from "@/types/appeal";
 
-type IconProps = {
+interface IconProps {
   name: string; // User name
   type: "Student" | "Teaching Assistant"; // User type
-};
+}
 
 /**
- * Returns a circular Icon representing the user
+ *  Returns a circular Icon representing the user
  */
 function Icon({ name, type }: IconProps) {
   let backgroundColor: string;
@@ -21,8 +21,12 @@ function Icon({ name, type }: IconProps) {
       backgroundColor = "bg-gray-800";
   }
 
+  let letter: string;
+  if (name.length > 0) letter = name.charAt(0);
+  else letter = name;
+
   const css = "w-8 h-8 leading-8 rounded-full text-white font-bold text-lg text-center " + backgroundColor;
-  return <div className={css}>{name.charAt(0)}</div>;
+  return <div className={css}>{letter}</div>;
 }
 
 /**
@@ -37,17 +41,21 @@ export function AppealTextMessage({ message }: { message: DisplayMessageType }) 
   logDate.setTime(logDate.getTime() + 8 * 60 * 60 * 1000);
 
   let backgroundColor: string;
+  let borderColor: string;
   switch (type) {
     case "Student":
-      backgroundColor = "bg-blue-100";
+      backgroundColor = "bg-blue-100 ";
+      borderColor = "border-blue-800 ";
       break;
     case "Teaching Assistant":
-      backgroundColor = "bg-red-100";
+      backgroundColor = "bg-red-100 ";
+      borderColor = "border-red-800 ";
       break;
     default:
-      backgroundColor = "bg-gray-100";
+      backgroundColor = "bg-gray-100 ";
+      borderColor = "border-gray-800 ";
   }
-  const backgroundCSS = "p-3 mx-8 flex justify-between rounded-lg " + backgroundColor;
+  const backgroundCSS = "p-3 mx-8 flex justify-between rounded-lg border-2 " + backgroundColor + borderColor;
 
   return (
     <>
@@ -67,7 +75,7 @@ export function AppealTextMessage({ message }: { message: DisplayMessageType }) 
                 })} at ${logDate.toLocaleTimeString().toLowerCase()}`}
               </p>
             </div>
-            <p className="ml-2 text-sm text-gray-900 font-bold">{content}</p>
+            <div className="ml-2 text-m text-gray-900" dangerouslySetInnerHTML={{ __html: content }} />
           </div>
         </div>
       </div>

@@ -1,3 +1,4 @@
+import { AppealAttempt, AppealStatus, Grade, User } from "@/types";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   ColumnDef,
@@ -9,47 +10,62 @@ import {
   SortingState,
   useReactTable,
 } from "@tanstack/react-table";
-import { AppealStatus, Appeal } from "@/types";
+import { format } from "date-fns";
 import Link from "next/link";
 import { useState } from "react";
 import AppealStatusBadge from "./AppealStatusBadge";
+import { dummyAppealAttemptData, dummyUserData, dummyOldGradeData, dummyNewGradeData } from "@/utils/dummyData";
 
 // TODO(Bryan): Replace dummy data with real API call
-const dummyAppealData: Appeal[] = [
-  {
-    id: 1,
-    updatedAt: "2022-10-30 4:00PM",
-    status: AppealStatus.Pending,
-    name: "LOREM, Ipsum",
-    itsc: "lorem",
-    originalScore: 70,
-  },
-  {
-    id: 2,
-    updatedAt: "2022-10-30 5:00PM",
-    status: AppealStatus.Accept,
-    name: "CHAN, Tai Man Tom",
-    itsc: "ctm",
-    originalScore: 80,
-    finalScore: 100,
-  },
-  {
-    id: 3,
-    updatedAt: "2022-10-30 3:00PM",
-    status: AppealStatus.Reject,
-    name: "CHEUNG, Siu Ming",
-    itsc: "cmm",
-    originalScore: 80,
-    finalScore: 80,
-  },
-];
 
-const columnHelper = createColumnHelper<Appeal>();
+/** Type definition of each row in the Appeals Table. */
+type AppealTableType = {
+  id: number;
+  updatedAt: string;
+  status: AppealStatus;
+  name: string;
+  itsc: string;
+  originalScore: number;
+  finalScore?: number;
+};
+
+interface TransformAppealDataType {
+  appealData: AppealAttempt[]; // List of appeals submitted by students
+  userData: User[]; // List of data of the student
+  oldGrade: Grade[]; // List of grades before the appeal is submitted
+  newGrade: Grade[]; // List of grades after the appeal is processed
+}
+
+/**
+ * Transform Appeal Data to `TransformAppealDataType` for displaying in the appeals table
+ * @returns {AppealTableType[]}
+ */
+function transformAppealData({ appealData, userData, oldGrade, newGrade }: TransformAppealDataType): AppealTableType[] {
+  return appealData.map((data, index) => {
+    const updatedDateString = data.updatedAt ?? data.createdAt;
+    const updatedDateDate = new Date(updatedDateString);
+    const updatedDateFinalString = format(updatedDateDate, "MMM dd, yyyy h:mm aa");
+
+    return {
+      id: data.id,
+      updatedAt: updatedDateFinalString,
+      status: data.latestStatus,
+      name: userData[index].name,
+      itsc: userData[index].itsc,
+      originalScore: 70,
+      finalScore: 100,
+      //originalScore: oldGrade[index].score,
+      //finalScore: newGrade[index].score,
+    };
+  });
+}
+
+const columnHelper = createColumnHelper<AppealTableType>();
 
 /**
  * Columns for the TanStack Table. See https://tanstack.com/table/v8/docs/guide/column-defs
  */
-const columns: ColumnDef<Appeal, any>[] = [
+const columns: ColumnDef<AppealTableType, any>[] = [
   columnHelper.accessor("updatedAt", {
     header: "Last Updated",
     cell: (props) => props.getValue(),
@@ -57,6 +73,14 @@ const columns: ColumnDef<Appeal, any>[] = [
   columnHelper.accessor("status", {
     header: "Status",
     cell: (props) => <AppealStatusBadge status={props.getValue()} />,
+    sortingFn: (rowA, rowB, columnId) => {
+      /** Sort status according to their orders of appearence in this array */
+      const statusSortOrder = [AppealStatus.Pending, AppealStatus.Accept, AppealStatus.Reject] as const;
+
+      const rowAStatus: AppealStatus = rowA.getValue(columnId);
+      const rowBStatus: AppealStatus = rowB.getValue(columnId);
+      return statusSortOrder.indexOf(rowAStatus) - statusSortOrder.indexOf(rowBStatus);
+    },
   }),
   columnHelper.accessor("name", {
     header: "Name",
@@ -87,6 +111,10 @@ const columns: ColumnDef<Appeal, any>[] = [
   }),
 ];
 
+const defaultSorting: SortingState = [
+  { id: "status", desc: false }, // Appeal status
+];
+
 /**
  * @param sort Sort direction. `false` means restore original order.
  * @returns The sort icon to display in the header.
@@ -104,8 +132,15 @@ const getSortIcon = (sort: SortDirection | false) => {
 
 /** Table that summarizes all grade appeals. */
 function AppealsTable() {
-  const [data] = useState(() => [...dummyAppealData]);
-  const [sorting, setSorting] = useState<SortingState>([]);
+  const appealData: AppealTableType[] = transformAppealData({
+    appealData: dummyAppealAttemptData,
+    userData: dummyUserData,
+    oldGrade: dummyOldGradeData,
+    newGrade: dummyNewGradeData,
+  });
+
+  const [data] = useState(appealData);
+  const [sorting, setSorting] = useState<SortingState>(defaultSorting);
 
   const table = useReactTable({
     data,
