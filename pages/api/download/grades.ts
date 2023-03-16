@@ -28,7 +28,7 @@ export const finalScore = (submission, report, assignment_appeals: any[], change
   // Check for TA manual change logs
   if (changeLogs.length > 0) {
     const [change] = changeLogs;
-    if (change.createdAt.getTime() > date.getTime()) {
+    if (change && change.createdAt.getTime() > date.getTime()) {
       date = change.createdAt;
       fScore = `${change.updatedState.score}`;
     }
