@@ -144,14 +144,6 @@ interface ConfigModelThunk {
     undefined,
     GuiBuilderModel
   >;
-  /**
-   * Gets the editing configs to be saved to the database.
-   *
-   * Making this a thunk allows us to lazily get the state. If this is a computed value,
-   * it will cause unnecessary re-renders whenever the user edits the config.
-   */
-  // TODO(Anson): Deprecate this
-  getConfigsToSave: Thunk<ConfigModel, undefined, undefined, GuiBuilderModel, ConfigsToSave>;
   /** Lazily gets {@link ConfigModel.editingConfig}. */
   getEditingConfig: Thunk<ConfigModel, undefined, undefined, GuiBuilderModel, Config>;
   /** Lazily gets {@link ConfigModel.editingPolicy} and {@link ConfigModel.editingSchedule}. */
@@ -168,9 +160,6 @@ interface ConfigModelThunk {
     GuiBuilderModel
   >;
 }
-
-/** Return type of {@link ConfigModel.getConfigsToSave}. It should be assignable to {@link AssignmentConfig}. */
-type ConfigsToSave = GradingPolicy & Schedule & Pick<AssignmentConfig, "config_yaml">;
 
 // #endregion
 
@@ -302,14 +291,6 @@ const configModelThunk: ConfigModelThunk = {
       releaseGradeAt: config.releaseGradeAt,
     });
     getStoreActions().pipelineEditor.initializePipeline();
-  }),
-  getConfigsToSave: thunk((_actions, _payload, { getState }) => {
-    const { editingConfig, editingPolicy, editingSchedule } = getState();
-    return {
-      ...editingPolicy,
-      ...editingSchedule,
-      config_yaml: configToYaml(editingConfig),
-    };
   }),
   getEditingConfig: thunk((_actions, _payload, { getState }) => {
     return getState().editingConfig;

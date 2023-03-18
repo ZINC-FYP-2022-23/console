@@ -11,7 +11,6 @@ import { useQuery, useSubscription } from "@apollo/client";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ScrollArea, Tooltip } from "@mantine/core";
 import { ModalContent } from "pages/courses/[courseId]/assignments/[assignmentConfigId]/submissions";
-import LockedStep from "./LockedStep";
 
 function TestSubmission() {
   const { user } = useZinc();
@@ -37,8 +36,9 @@ function TestSubmission() {
     },
   });
 
+  // Config ID should not be null from 2nd step onwards
   if (configId === null) {
-    return <LockedStep />;
+    return null;
   }
 
   return (

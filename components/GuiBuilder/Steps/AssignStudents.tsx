@@ -6,7 +6,6 @@ import { AssignmentConfig } from "@/types/tables";
 import { useSubscription } from "@apollo/client";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ScrollArea } from "@mantine/core";
-import LockedStep from "./LockedStep";
 
 function AssignStudents() {
   const configId = useStoreState((state) => state.config.configId);
@@ -17,8 +16,9 @@ function AssignStudents() {
     },
   });
 
+  // Config ID should not be null from 2nd step onwards
   if (configId === null) {
-    return <LockedStep />;
+    return null;
   }
 
   return (

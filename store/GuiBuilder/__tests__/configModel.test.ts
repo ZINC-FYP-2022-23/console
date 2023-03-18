@@ -378,22 +378,6 @@ describe("GuiBuilder: Store - ConfigModel", () => {
     });
   });
 
-  describe("getConfigsToSave()", () => {
-    it("returns database-compatible fields", () => {
-      const model = getThreeStageModel();
-      const store = createStore(model);
-      const configToYamlMock = jest.spyOn(configUtils, "configToYaml");
-
-      const configsToSave = store.getActions().config.getConfigsToSave();
-
-      const policyKeys = ["attemptLimits", "gradeImmediately", "showImmediateScores"];
-      const scheduleKeys = ["showAt", "startCollectionAt", "dueAt", "stopCollectionAt", "releaseGradeAt"];
-      const expectedObjectKeys = ["config_yaml", ...policyKeys, ...scheduleKeys];
-      expect(configsToSave).toContainAllKeys(expectedObjectKeys);
-      expect(configToYamlMock).toHaveBeenCalledWith(model.config.editingConfig);
-    });
-  });
-
   describe("updateSelectedStage()", () => {
     it("updates the config of the selected stage", () => {
       const model = getThreeStageModel();
