@@ -246,7 +246,7 @@ function FileList({ existingFiles, name }) {
   const { assignmentConfigId } = useLayoutState();
 
   return (
-    <div className="rounded border bg-gray-100 p-2 shadow flex flex-col space-y-2 w-60" ref={drop}>
+    <div className="rounded border bg-gray-100 p-2 shadow flex flex-col space-y-2 w-1/3" ref={drop}>
       {/* <div className="uppercase text-gray-600 font-medium mx-1 text-xs">
                 {name}
             </div> */}

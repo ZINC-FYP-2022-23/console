@@ -18,7 +18,7 @@ function FormatPipelineButton() {
   const layoutPipeline = useStoreActions((action) => action.pipelineEditor.layoutPipeline);
 
   return (
-    <Tooltip label="Format the pipeline" position="bottom" transition="fade" transitionDuration={200}>
+    <Tooltip label="Layout the graph nicely" position="bottom" transition="fade" transitionDuration={200}>
       <button
         className="h-11 w-11 flex items-center justify-center bg-cse-600 text-white rounded-full drop-shadow active:bg-cse-300 transition"
         onClick={() => layoutPipeline()}
