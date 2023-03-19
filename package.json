@@ -10,7 +10,8 @@
     "format": "prettier --write .",
     "prepare": "husky install",
     "test": "jest",
-    "cypress": "concurrently \"tailwindcss -i ./styles/index.css -o ./dist/index.css --watch\" \"cypress open\" " 
+    "cypress": "concurrently \"tailwindcss -i ./styles/index.css -o ./dist/index.css --watch\" \"cypress open\" ",
+    "cypress:run:component": "cypress run --component"
   },
   "dependencies": {
     "@apollo/client": "^3.4.16",
