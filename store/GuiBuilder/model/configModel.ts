@@ -9,7 +9,7 @@ import {
   StageDependencyGraph,
 } from "@/types/GuiBuilder";
 import { AssignmentConfig } from "@/types/tables";
-import { configToYaml, isConfigEqual, isLinkedList, isScheduleEqual, parseConfigYaml } from "@/utils/GuiBuilder";
+import { generateStageLabels, isConfigEqual, isLinkedList, isScheduleEqual, parseConfigYaml } from "@/utils/GuiBuilder";
 import { action, Action, computed, Computed, thunk, Thunk } from "easy-peasy";
 import cloneDeep from "lodash/cloneDeep";
 import isEqual from "lodash/isEqual";
@@ -90,6 +90,8 @@ interface ConfigModelAction {
   setCourseId: Action<ConfigModel, number>;
   setPolicy: Action<ConfigModel, GradingPolicy>;
   setSchedule: Action<ConfigModel, Schedule>;
+  /** Sets the entire stage data map. */
+  setStageData: Action<ConfigModel, StageDataMap>;
   /** Sets the entire stage dependency graph. */
   setStageDeps: Action<ConfigModel, StageDependencyGraph>;
   /**
@@ -144,6 +146,11 @@ interface ConfigModelThunk {
     undefined,
     GuiBuilderModel
   >;
+  /**
+   * Generates a random label if multiple stages of the same name have empty labels.
+   * @returns The updated pipeline config.
+   */
+  generateStageLabels: Thunk<ConfigModel, undefined, undefined, GuiBuilderModel, Config>;
   /** Lazily gets {@link ConfigModel.editingConfig}. */
   getEditingConfig: Thunk<ConfigModel, undefined, undefined, GuiBuilderModel, Config>;
   /** Lazily gets {@link ConfigModel.editingPolicy} and {@link ConfigModel.editingSchedule}. */
@@ -240,6 +247,9 @@ const configModelAction: ConfigModelAction = {
   setSchedule: action((state, schedule) => {
     state.editingSchedule = schedule;
   }),
+  setStageData: action((state, stageData) => {
+    state.editingConfig.stageData = stageData;
+  }),
   setStageDeps: action((state, stageDeps) => {
     state.editingConfig.stageDeps = stageDeps;
   }),
@@ -291,6 +301,15 @@ const configModelThunk: ConfigModelThunk = {
       releaseGradeAt: config.releaseGradeAt,
     });
     getStoreActions().pipelineEditor.initializePipeline();
+  }),
+  generateStageLabels: thunk((_actions, _payload, { getState, getStoreActions }) => {
+    const editingConfig = getState().editingConfig;
+    const stageDataNew = generateStageLabels(editingConfig.stageData);
+    getStoreActions().config.setStageData(stageDataNew);
+    return {
+      ...editingConfig,
+      stageData: stageDataNew,
+    };
   }),
   getEditingConfig: thunk((_actions, _payload, { getState }) => {
     return getState().editingConfig;
