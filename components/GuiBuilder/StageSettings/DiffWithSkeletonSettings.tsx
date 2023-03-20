@@ -1,6 +1,10 @@
+import Button from "@/components/Button";
 import { SwitchGroup } from "@/components/Input";
 import { useSelectedStageConfig } from "@/hooks/GuiBuilder";
+import { useStoreActions, useStoreState } from "@/store/GuiBuilder";
+import { Settings } from "@/types/GuiBuilder";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Alert } from "../Diagnostics";
 
 const excludeFromProvidedLabel = (
   <p>
@@ -23,10 +27,13 @@ const excludeFromProvidedDesc = (
 function DiffWithSkeletonSettings() {
   const [config, setConfig] = useSelectedStageConfig("DiffWithSkeleton");
 
+  const useSkeleton = useStoreState((state) => state.config.editingConfig._settings.use_skeleton);
+
   if (!config) return null;
 
   return (
-    <div className="p-4">
+    <div className="p-4 space-y-5">
+      {!useSkeleton && <UseSkeletonOffAlert />}
       <div className="flex items-center text-blue-500 gap-4">
         <FontAwesomeIcon icon={["far", "circle-info"]} />
         <p>
@@ -34,7 +41,7 @@ function DiffWithSkeletonSettings() {
           gave to the students&quot;.
         </p>
       </div>
-      <div className="mt-6">
+      <div>
         <SwitchGroup
           label={excludeFromProvidedLabel}
           description={excludeFromProvidedDesc}
@@ -45,6 +52,28 @@ function DiffWithSkeletonSettings() {
         />
       </div>
     </div>
+  );
+}
+
+/**
+ * Alert to show when {@link Settings.use_skeleton} flag is off. This is because this flag must be on
+ * if the user wants to use the DiffWithSkeleton stage.
+ */
+function UseSkeletonOffAlert() {
+  const updateSettings = useStoreActions((actions) => actions.config.updateSettings);
+  return (
+    <Alert severity="warning">
+      <div>
+        <p>Please enable the &quot;Provide skeleton code to students&quot; option in the Pipeline Settings.</p>
+        <Button
+          onClick={() => updateSettings((_settings) => (_settings.use_skeleton = true))}
+          icon={<FontAwesomeIcon icon={["fad", "toggle-on"]} />}
+          className="mt-1 bg-cse-600 text-sm text-white hover:bg-cse-500 active:bg-cse-400"
+        >
+          Click me to enable
+        </Button>
+      </div>
+    </Alert>
   );
 }
 

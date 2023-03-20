@@ -1,16 +1,19 @@
 import Button from "@/components/Button";
 import ListInput from "@/components/Input/ListInput";
 import { useQueryParameters, useSelectedStageConfig } from "@/hooks/GuiBuilder";
-import { useStoreActions } from "@/store/GuiBuilder";
+import { useStoreActions, useStoreState } from "@/store/GuiBuilder";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
+import { Alert } from "../Diagnostics";
 import { InfoAccordion } from "./common";
+import { Settings } from "@/types/GuiBuilder";
 
 function FileStructureValidationSettings() {
   const [config, setConfig] = useSelectedStageConfig("FileStructureValidation");
   const { updateStep } = useQueryParameters();
 
+  const useTemplate = useStoreState((state) => state.config.editingConfig._settings.use_template);
   const setElementToHighlight = useStoreActions((actions) => actions.layout.setElementToHighlight);
 
   const [ignoredFiles, setIgnoredFiles] = useState<{ id: string; name: string }[]>(
@@ -26,6 +29,11 @@ function FileStructureValidationSettings() {
 
   return (
     <div className="p-3">
+      {useTemplate === undefined && (
+        <div className="mb-4">
+          <UseTemplateOffWarning />
+        </div>
+      )}
       <p className="mb-2">
         Files/directories to <span className="font-semibold">ignore</span> checking{" "}
         <span className="text-gray-500">(one file/directory per line)</span>:
@@ -153,6 +161,36 @@ function FileStructureValidationSettings() {
         </div>
       </InfoAccordion>
     </div>
+  );
+}
+
+/**
+ * Alert to show when {@link Settings.use_template} is undefined. This is because this value must
+ * not be undefined when the user wants to use the FileStructureValidation stage.
+ */
+function UseTemplateOffWarning() {
+  const { updateStep } = useQueryParameters();
+  const setElementToHighlight = useStoreActions((actions) => actions.layout.setElementToHighlight);
+
+  return (
+    <Alert severity="warning">
+      <div>
+        <p>
+          Please set &quot;Specify files that students should submit&quot; to another value other than &quot;None&quot;
+          in the Pipeline Settings.
+        </p>
+        <Button
+          icon={<FontAwesomeIcon icon={["fas", "edit"]} />}
+          onClick={() => {
+            updateStep("settings");
+            setElementToHighlight("useTemplate");
+          }}
+          className="mt-1 bg-cse-600 text-sm text-white hover:bg-cse-500 active:bg-cse-400"
+        >
+          Fix this field
+        </Button>
+      </div>
+    </Alert>
   );
 }
 
