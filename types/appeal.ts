@@ -53,6 +53,7 @@ export type AppealLog = {
   date: string;
   originalState?: string;
   updatedState?: string;
+  reason?: string;
 };
 
 export type DisplayMessageType = {

@@ -10,38 +10,83 @@ import {
 } from "@/types/appeal";
 
 /**
- * Check if an object is `AppealLog` type
- * @param {any} obj - The object to be checked
- * @returns {boolean}
+ * Transform the raw data appeal status into type `AppealStatus`
+ * @param originalStatus - The status to be transformed
+ * @returns {AppealStatus}
  */
-export function isAppealLog(obj: any): obj is AppealLog {
-  return "id" in obj && "type" in obj && "date" in obj;
+export function transformAppealStatus(originalStatus) {
+  let transformedStatus: AppealStatus;
+  switch (originalStatus) {
+    case "ACCEPTED":
+      transformedStatus = AppealStatus.Accept;
+      break;
+    case "PENDING":
+      transformedStatus = AppealStatus.Pending;
+      break;
+    case "REJECTED":
+      transformedStatus = AppealStatus.Reject;
+      break;
+    default:
+      transformedStatus = AppealStatus.Pending;
+  }
+
+  return transformedStatus;
+}
+
+interface transformToAppealAttemptProps {
+  /** Raw Data of a list of appeal attempts */
+  appealsDetailsData;
 }
 
 /**
- * Check if an object is `DisplayMessageType` type
- * @param {any} obj - The object to be checked
- * @returns {boolean}
+ * Transform raw data into a list of `AppealAttempt`
+ * @returns {AppealAttempt[]} - A list of `AppealAttempt`s
  */
-export function isDisplayMessageType(obj: any): obj is DisplayMessageType {
-  return "id" in obj && "content" in obj && "name" in obj && "type" in obj && "time" in obj;
-}
+export function transformToAppealAttempt({ appealsDetailsData }: transformToAppealAttemptProps) {
+  let appealAttempts: AppealAttempt[] = [];
 
-/**
- * Check if an object is `AppealMessage` type
- * @param {*} obj - The object to be checked
- * @returns {boolean}
- */
-export function isAppealMessage(obj: any): obj is AppealMessage {
-  return (
-    "id" in obj && "message" in obj && "createdAt" in obj && "senderId" in obj && "attemptId" in obj && "isRead" in obj
-  );
+  // Case: Only 1 appeal attempt
+  if (appealsDetailsData.appeal) {
+    let latestStatus: AppealStatus = transformAppealStatus(appealsDetailsData.appeal.status);
+
+    appealAttempts.push({
+      id: appealsDetailsData.appeal.id,
+      newFileSubmissionId: appealsDetailsData.appeal.newFileSubmissionId || null,
+      assignmentConfigId: appealsDetailsData.appeal.assignmentConfigId,
+      userId: appealsDetailsData.appeal.userId,
+      createdAt: appealsDetailsData.appeal.createdAt,
+      latestStatus: latestStatus,
+      updatedAt: appealsDetailsData.appeal.updatedAt,
+    });
+  }
+
+  // Case: >1 appeal attempts
+  if (appealsDetailsData.appeals) {
+    appealsDetailsData.appeals.forEach((appeal) => {
+      let latestStatus: AppealStatus = transformAppealStatus(appeal.status);
+
+      appealAttempts.push({
+        id: appeal.id,
+        newFileSubmissionId: appeal.newFileSubmissionId || null,
+        assignmentConfigId: appeal.assignmentConfigId,
+        userId: appeal.userId,
+        createdAt: appeal.createdAt,
+        latestStatus: latestStatus,
+        updatedAt: appeal.updatedAt,
+      });
+    });
+  }
+
+  return appealAttempts;
 }
 
 interface sortProps {
-  submissions?: SubmissionType[]; // A list of submission-related logs
-  messages?: DisplayMessageType[]; //  list of appeal messages
-  appealLog: AppealLog[]; // A list of appeal-related logs
+  /** List of submission-related logs */
+  submissions?: SubmissionType[];
+  /** List of appeal messages */
+  messages?: DisplayMessageType[];
+  /** List of appeal-related logs */
+  appealLog: AppealLog[];
 }
 
 /**
@@ -129,7 +174,7 @@ interface transformToAppealLogProps {
  * Transforms and merges a list of `AppealAttempt` and `ChangeLog` into one list of `AppealLog`
  * @returns {AppealLog[]} - List of transformed and merged appeal logs, ordered from newest to oldest
  */
-export function transformToAppealLog({ appeals, changeLog }: transformToAppealLogProps): AppealLog[] {
+function transformToAppealLog({ appeals, changeLog }: transformToAppealLogProps): AppealLog[] {
   let appealLog: AppealLog[] = [];
   let log: AppealLog;
 
@@ -165,4 +210,80 @@ export function transformToAppealLog({ appeals, changeLog }: transformToAppealLo
   });
 
   return appealLog;
+}
+
+interface mergeDataToActivityLogListProps {
+  appealAttempt: AppealAttempt[]; // Raw data of a list of appeals
+  appealChangeLogData; // Raw data of a list of change logs related to the appeals
+  appealMessagesData?; // Raw data of a list of appeal messages related to the appeals
+  submissionData?; // Raw data of the submission
+}
+
+/**
+ * Merges appeal
+ * @returns {(
+ * | (SubmissionType & { _type: "submission" }
+ * | (DisplayMessageType & { _type: "appealMessage" })
+ * | (AppealLog & { _type: "appealLog" })
+ * )[]} - List of transformed and merged appeal logs, ordered from newest to oldest
+ */
+export function mergeDataToActivityLogList({
+  appealAttempt,
+  appealChangeLogData,
+  appealMessagesData,
+  submissionData,
+}: mergeDataToActivityLogListProps) {
+  // Translate `appealChangeLogData` to `ChangeLog[]`
+  let changeLogs: ChangeLog[] = [];
+  appealChangeLogData.changeLogs.forEach((log) => {
+    // Assign a log type for each change log
+    let logType: ChangeLogTypes;
+    if (log.type == "APPEAL_STATUS") logType = ChangeLogTypes.APPEAL_STATUS;
+    else if (log.type == "SCORE") logType = ChangeLogTypes.SCORE;
+    else logType = ChangeLogTypes.SUBMISSION;
+
+    changeLogs.push({
+      id: log.id,
+      createdAt: log.createdAt,
+      type: logType,
+      originalState: log.originalState,
+      updatedState: log.updatedState,
+      initiatedBy: log.initiatedBy,
+      reason: log.reason || null,
+      appealId: log.appealId || null,
+    });
+  });
+
+  // Translate `appealMessagesData` to `DisplayMessageType[]`
+  let messages: DisplayMessageType[] = [];
+  if (appealMessagesData) {
+    appealMessagesData.appealMessages.forEach((message) => {
+      // Assign a user type for each message
+      let userType: "Student" | "Teaching Assistant";
+      if (message.user.hasTeachingRole) userType = "Teaching Assistant";
+      else userType = "Student";
+
+      messages.push({
+        id: message.id,
+        content: message.message,
+        name: message.user.name,
+        type: userType,
+        time: message.createdAt,
+      });
+    });
+  }
+
+  // Transform and sort the lists
+  let log: AppealLog[] = transformToAppealLog({ appeals: appealAttempt, changeLog: changeLogs });
+  let activityLogList: (
+    | (SubmissionType & { _type: "submission" })
+    | (DisplayMessageType & { _type: "appealMessage" })
+    | (AppealLog & { _type: "appealLog" })
+  )[] = sort({
+    messages: messages,
+    appealLog: log,
+    submissions: submissionData?.submissions,
+  });
+
+  return activityLogList;
 }

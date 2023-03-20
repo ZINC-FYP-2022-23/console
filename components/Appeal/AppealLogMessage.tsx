@@ -8,6 +8,7 @@ interface AppealLogMessageType {
   showButton: boolean; // Is the "View Appeal" button going to be shown
 }
 
+//TODO(BRYAN): Display the reason for the change log
 /**
  * Returns a component that shows a log message based on the log type
  */
@@ -86,6 +87,7 @@ export function AppealLogMessage({ log, showButton }: AppealLogMessageType) {
               {log.updatedState === AppealStatus.Pending && (
                 <p className="ml-2 text-sm text-yellow-600">Your appeal has been set to pending</p>
               )}
+              {log.reason && <p className="ml-2 text-sm text-gray-600">{log.reason}</p>}
             </p>
           </div>
           {showButton && (

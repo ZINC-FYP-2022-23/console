@@ -6,6 +6,9 @@ import { Menu, Transition } from "@headlessui/react";
 import { DotsVerticalIcon } from "@heroicons/react/solid";
 import { AssignmentConfig, Section } from "@/types";
 import { Tooltip } from "@mantine/core";
+import { useSubscription } from "@apollo/client";
+import { GET_NUMBER_OF_APPEALS_AND_STATUS } from "@/graphql/queries/appealQueries";
+import { Alert } from "@mantine/core";
 
 interface AssignmentsProps {
   assignmentConfigs: AssignmentConfig[];
@@ -85,7 +88,32 @@ export function Assignments({ assignmentConfigs, sections }: AssignmentsProps) {
   );
 }
 
-export function AssignmentRow({ config, sections }) {
+interface DisplayErrorProps {
+  errorMessage: string; // Message shown to the user when encountering an error
+}
+
+/**
+ * Returns an error page
+ */
+function DisplayError({ errorMessage }: DisplayErrorProps) {
+  return (
+    <div className="my-6 mt-8 flex flex-col items-center self-center mb-4">
+      <Alert icon={<FontAwesomeIcon icon={["far", "circle-exclamation"]} />} title="Error" color="red" variant="filled">
+        {errorMessage}
+      </Alert>
+    </div>
+  );
+}
+
+interface AssignmentRowProps {
+  config;
+  sections;
+}
+
+/**
+ * Returns a row with assignment details
+ */
+export function AssignmentRow({ config, sections }: AssignmentRowProps) {
   const dispatch = useLayoutDispatch();
   const sectionsString = sections
     .filter(
@@ -96,6 +124,36 @@ export function AssignmentRow({ config, sections }) {
     )
     .map((section) => section.name)
     .join(", ");
+
+  // Fetch data with GraphQL
+  const {
+    data: appealData,
+    loading: appealLoading,
+    error: appealError,
+  } = useSubscription(GET_NUMBER_OF_APPEALS_AND_STATUS, { variables: { assignmentConfigId: config.id } });
+
+  // Display `Loading` if data is still being fetched
+  if (appealLoading) {
+    return <div>Loading...</div>;
+  }
+
+  // Display error if it occurred
+  if (appealError) {
+    const errorMessage = "Unable to Fetch appeal numbers and statuses with `GET_NUMBER_OF_APPEALS_AND_STATUS`";
+    return <DisplayError errorMessage={errorMessage} />;
+  } else if (!appealData || !appealData.assignment_appeals_aggregate) {
+    const errorMessage = "Appeal Number and Statuses data not available.";
+    return <DisplayError errorMessage={errorMessage} />;
+  }
+
+  // Get the appeal-related numbers
+  const totalAppealNumber: number = appealData.assignment_appeals_aggregate.aggregate.count;
+  let totalPendingAppealNumber: number = 0;
+  appealData.assignment_appeals_aggregate.nodes.forEach((node) => {
+    if (node.status == "PENDING") totalPendingAppealNumber++;
+  });
+  const appealNumberLabel: string =
+    totalPendingAppealNumber.toString() + " Outstanding, " + totalPendingAppealNumber.toString() + " Total";
 
   return (
     <tr className="bg-white">
@@ -116,13 +174,7 @@ export function AssignmentRow({ config, sections }) {
         {config.submissions_aggregate.aggregate.count}/{config.affected_users_aggregate.aggregate.count}
       </td>
       <td className="px-6 py-4 text-right whitespace-no-wrap text-sm leading-5 text-cool-gray-500">
-        <Tooltip
-          // TODO(Bryan): Replace with real values
-          label={`XXX Outstanding, YYY Total`}
-          transition="fade"
-          position="bottom"
-        >
-          {/* TODO(Bryan): Replace with real values */}
+        <Tooltip label={appealNumberLabel} transition="fade" position="bottom">
           <button
             className="p-2 rounded-md hover:bg-gray-100 active:bg-gray-200 transition"
             onClick={() => {
@@ -132,7 +184,7 @@ export function AssignmentRow({ config, sections }) {
               });
             }}
           >
-            XXX/YYY
+            {totalPendingAppealNumber}/{totalAppealNumber}
           </button>
         </Tooltip>
       </td>

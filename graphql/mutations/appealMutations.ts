@@ -23,3 +23,11 @@ export const CREATE_CHANGE_LOG = gql`
     }
   }
 `;
+
+export const UPDATE_APPEAL_STATUS = gql`
+  mutation updateAppealStatus($id: bigint!, $status: String!) {
+    updateAppeal(pk_columns: { id: $id }, _set: { status: $status }) {
+      id
+    }
+  }
+`;

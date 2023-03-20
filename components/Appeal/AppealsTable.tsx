@@ -1,5 +1,13 @@
-import { AppealAttempt, AppealStatus, Grade, User } from "@/types";
+import {
+  GET_APPEALS_DETAILS_BY_ASSIGNMENT_ID,
+  GET_APPEAL_CONFIG,
+  GET_SUBMISSION_GRADE,
+} from "@/graphql/queries/appealQueries";
+import { AppealStatus, Grade } from "@/types";
+import { dummyNewGradeData, dummyOldGradeData } from "@/utils/dummyData";
+import { useQuery, useSubscription } from "@apollo/client";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Alert } from "@mantine/core";
 import {
   ColumnDef,
   createColumnHelper,
@@ -14,7 +22,7 @@ import { format } from "date-fns";
 import Link from "next/link";
 import { useState } from "react";
 import AppealStatusBadge from "./AppealStatusBadge";
-import { dummyAppealAttemptData, dummyUserData, dummyOldGradeData, dummyNewGradeData } from "@/utils/dummyData";
+import { transformAppealStatus } from "@/utils/appealUtils";
 
 // TODO(Bryan): Replace dummy data with real API call
 
@@ -28,38 +36,6 @@ type AppealTableType = {
   originalScore: number;
   finalScore?: number;
 };
-
-interface TransformAppealDataType {
-  appealData: AppealAttempt[]; // List of appeals submitted by students
-  userData: User[]; // List of data of the student
-  oldGrade: Grade[]; // List of grades before the appeal is submitted
-  newGrade: Grade[]; // List of grades after the appeal is processed
-}
-
-/**
- * Transform Appeal Data to `TransformAppealDataType` for displaying in the appeals table
- * @returns {AppealTableType[]}
- */
-// TODO(BRYAN): Add `oldGrade`, `newGrade`
-function transformAppealData({ appealData, userData }: TransformAppealDataType): AppealTableType[] {
-  return appealData.map((data, index) => {
-    const updatedDateString = data.updatedAt ?? data.createdAt;
-    const updatedDateDate = new Date(updatedDateString);
-    const updatedDateFinalString = format(updatedDateDate, "MMM dd, yyyy h:mm aa");
-
-    return {
-      id: data.id,
-      updatedAt: updatedDateFinalString,
-      status: data.latestStatus,
-      name: userData[index].name,
-      itsc: userData[index].itsc,
-      originalScore: 70,
-      finalScore: 100,
-      //originalScore: oldGrade[index].score,
-      //finalScore: newGrade[index].score,
-    };
-  });
-}
 
 const columnHelper = createColumnHelper<AppealTableType>();
 
@@ -131,20 +107,67 @@ const getSortIcon = (sort: SortDirection | false) => {
   }
 };
 
-/** Table that summarizes all grade appeals. */
-function AppealsTable() {
-  const appealData: AppealTableType[] = transformAppealData({
-    appealData: dummyAppealAttemptData,
-    userData: dummyUserData,
-    oldGrade: dummyOldGradeData,
-    newGrade: dummyNewGradeData,
-  });
+interface DisplayErrorProps {
+  /** Message shown to the user when encountering an error */
+  errorMessage: string;
+}
 
-  const [data] = useState(appealData);
+/**
+ * Returns an error page
+ */
+function DisplayError({ errorMessage }: DisplayErrorProps) {
+  return (
+    <div className="my-6 mt-8 flex flex-col items-center self-center mb-4">
+      <Alert icon={<FontAwesomeIcon icon={["far", "circle-exclamation"]} />} title="Error" color="red" variant="filled">
+        {errorMessage}
+      </Alert>
+    </div>
+  );
+}
+
+interface AppealsTableProps {
+  assignmentConfigId: number;
+}
+
+/** Table that summarizes all grade appeals. */
+function AppealsTable({ assignmentConfigId }: AppealsTableProps) {
   const [sorting, setSorting] = useState<SortingState>(defaultSorting);
 
+  // Fetch data with GraphQL
+  const {
+    data: appealsDetailsData,
+    loading: appealDetailsLoading,
+    error: appealDetailsError,
+  } = useSubscription(GET_APPEALS_DETAILS_BY_ASSIGNMENT_ID, { variables: { assignmentConfigId: assignmentConfigId } });
+  const {
+    data: appealConfigData,
+    loading: appealConfigLoading,
+    error: appealConfigError,
+  } = useQuery(GET_APPEAL_CONFIG, { variables: { assignmentConfigId: assignmentConfigId } });
+
+  // Transform data into `AppealTableType[]`
+  const appealData: AppealTableType[] = [];
+  if (appealsDetailsData) {
+    appealsDetailsData.appeals.map((appeal) => {
+      let finalScore: number | undefined = undefined;
+      if (appeal.submission) {
+        finalScore = appeal.submission.reports.grade;
+      }
+
+      appealData.push({
+        id: appeal.id,
+        updatedAt: format(new Date(appeal.updatedAt ?? appeal.createdAt), "MMM dd, yyyy h:mm aa"),
+        status: transformAppealStatus(appeal.status),
+        name: appeal.user.name,
+        itsc: appeal.user.itsc,
+        originalScore: appeal.user.submissions[0].reports[0].grade.score,
+        finalScore,
+      });
+    });
+  }
+
   const table = useReactTable({
-    data,
+    data: appealData,
     columns,
     state: {
       sorting,
@@ -153,6 +176,24 @@ function AppealsTable() {
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
   });
+
+  // Display `Loading` if data is still being fetched
+  if (appealDetailsLoading || appealConfigLoading) {
+    return <div>Loading...</div>;
+  }
+
+  // Display error if it occurred
+  if (appealDetailsError) {
+    const errorMessage = "Unable to fetch appeals details with `GET_APPEALS_DETAILS_BY_ASSIGNMENT_ID`";
+    return <DisplayError errorMessage={errorMessage} />;
+  } else if (appealConfigError) {
+    const errorMessage = "Unable to fetch appeals configs with `GET_APPEAL_CONFIG`";
+    return <DisplayError errorMessage={errorMessage} />;
+  } else if (!appealConfigData.assignmentConfig.isAppealAllowed) {
+    // Check if the appeal submission is allowed
+    const errorMessage = "`isAppealAllowed` has been set to false";
+    return <DisplayError errorMessage={errorMessage} />;
+  }
 
   return (
     <div className="shadow rounded-lg overflow-hidden">
