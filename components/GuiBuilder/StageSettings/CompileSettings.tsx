@@ -1,6 +1,8 @@
 import { TagsInput, Textarea, TextInput } from "@/components/Input";
+import { cFamilyCompileDefault } from "@/constants/GuiBuilder/supportedLanguages";
 import { useSelectedStageConfig } from "@/hooks/GuiBuilder";
 import { useStoreState } from "@/store/GuiBuilder";
+import { getCompilePreviewCommand } from "@/utils/GuiBuilder/stageConfig";
 import { FocusEventHandler, memo } from "react";
 import { DeepReadonly } from "utility-types";
 import { InfoTooltip } from "../Diagnostics";
@@ -34,8 +36,8 @@ const getConfigMetadata = (lang: string): ConfigMetadata => {
     case "cpp":
       return {
         input: { placeholder: "e.g. *.cpp" },
-        output: { defaultValue: "a.out" },
-        flags: { defaultValue: "-std=c++11 -pedantic -Wall -Wextra -g" },
+        output: { defaultValue: cFamilyCompileDefault.output },
+        flags: { defaultValue: cFamilyCompileDefault.flags },
       };
     case "java":
       return {
@@ -54,11 +56,12 @@ const getConfigMetadata = (lang: string): ConfigMetadata => {
 
 function CompileSettings() {
   const [config, setConfig] = useSelectedStageConfig("Compile");
-  const language = useStoreState((state) => state.config.editingConfig._settings.lang.language);
+  const lang = useStoreState((state) => state.config.editingConfig._settings.lang);
 
   if (!config) return null;
 
-  const metadata = getConfigMetadata(language);
+  const metadata = getConfigMetadata(lang.language);
+  const previewCommand = getCompilePreviewCommand(lang, config);
 
   /** If user has typed something in the input box of tags input, add it to the list of tags. */
   const onTagInputBlur = (target: "input" | "additional_packages"): FocusEventHandler<HTMLInputElement> => {
@@ -73,7 +76,7 @@ function CompileSettings() {
   };
 
   return (
-    <div className="p-3 space-y-4">
+    <div className="p-3 flex flex-col gap-4">
       <div className="flex gap-3">
         <label htmlFor="input" className="mt-2 flex-1">
           Input files <span className="text-red-600 text-xs">(required)</span>
@@ -132,6 +135,12 @@ function CompileSettings() {
           className="flex-[2] font-mono text-sm"
         />
       </div>
+      {previewCommand && (
+        <div className="px-3 py-2 mt-2 bg-gray-100 rounded-md space-y-2 text-sm">
+          <p className="font-medium text-gray-600">Compilation command preview:</p>
+          <div className="px-4 py-2 bg-gray-700 font-mono text-white rounded">{previewCommand}</div>
+        </div>
+      )}
     </div>
   );
 }
@@ -144,7 +153,7 @@ const FlagsTooltip = memo(() => (
         Separate each flag with a <span className="font-semibold">space</span> (e.g. <code> -verbose -nowarn</code>).
       </li>
       <li>
-        <span className="font-semibold">No need</span> to re-specify the output file here.
+        <span className="font-semibold">No need</span> to re-specify the input and output files here.
       </li>
     </ul>
   </InfoTooltip>
