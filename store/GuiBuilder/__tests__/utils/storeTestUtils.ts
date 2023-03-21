@@ -8,6 +8,7 @@ import { GuiBuilderModel, guiBuilderModel } from "../../guiBuilderModel";
  */
 export function getThreeStageModel(): GuiBuilderModel {
   const model = cloneDeep(guiBuilderModel);
+  model.config.initialized = true;
   model.config.editingConfig.stageDeps = {
     "stage-0": [],
     "stage-1": ["stage-0"],
