@@ -65,14 +65,21 @@ interface ItemProps extends React.ComponentPropsWithRef<"input"> {
    * Event handler for pressing the "Enter" key in the input box. It should update the state to insert
    * a new list item.
    */
-  onEnterKeyPressed: () => void;
+  /**
+   * Event handler to update the state to insert a new list item when "Enter", "Comma", or "Space" keys
+   * are pressed.
+   *
+   * We insert a new list item when "Comma" or "Space" is pressed since it prevents users from listing
+   * multiple items in a single input box.
+   */
+  onNewItemKeyPressed: () => void;
   /**
    * Event handler for deleting the this list item.
    */
   onDelete: () => void;
 }
 
-const Item = ({ index, onEnterKeyPressed, onDelete, ...inputProps }: ItemProps) => {
+const Item = ({ index, onNewItemKeyPressed, onDelete, ...inputProps }: ItemProps) => {
   const { inputRefs, setInputIndexToFocus } = useListInputContext();
 
   const handleInputKeyDown = (event: KeyboardEvent<HTMLInputElement>, index: number) => {
@@ -89,7 +96,10 @@ const Item = ({ index, onEnterKeyPressed, onDelete, ...inputProps }: ItemProps) 
         break;
       // Insert new input box below
       case "Enter":
-        onEnterKeyPressed();
+      case " ":
+      case ",":
+        event.preventDefault();
+        onNewItemKeyPressed();
         setInputIndexToFocus(index + 1);
         break;
       // Auto-delete an empty input box
