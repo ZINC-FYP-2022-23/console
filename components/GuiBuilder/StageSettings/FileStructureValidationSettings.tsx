@@ -35,8 +35,7 @@ function FileStructureValidationSettings() {
         </div>
       )}
       <p className="mb-2">
-        Files/directories to <span className="font-semibold">ignore</span> checking{" "}
-        <span className="text-gray-500">(one file/directory per line)</span>:
+        Files/directories to <span className="font-semibold">ignore</span> checking:
       </p>
       <ListInput>
         {ignoredFiles.map((file, index) => (
@@ -50,7 +49,7 @@ function FileStructureValidationSettings() {
               newFiles[index].name = event.target.value;
               updateIgnoredFiles(newFiles);
             }}
-            onEnterKeyPressed={() => {
+            onNewItemKeyPressed={() => {
               const newFiles = [...ignoredFiles];
               newFiles.splice(index + 1, 0, { id: uuidv4(), name: "" });
               updateIgnoredFiles(newFiles);

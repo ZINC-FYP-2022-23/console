@@ -156,7 +156,7 @@ function PipelineSettings() {
             </div>
             {_settings.use_template === SettingsUseTemplate.FILENAMES && (
               <div className="mt-4 mx-3 p-3 bg-gray-50 rounded-lg drop-shadow">
-                <p className="mb-2 font-medium text-gray-600">Files to submit (one file per line):</p>
+                <p className="mb-2 font-medium text-gray-600">Files to submit:</p>
                 <ListInput>
                   {_settings.template.map((file, index) => (
                     <ListInput.Item
@@ -169,7 +169,7 @@ function PipelineSettings() {
                         newTemplate[index].name = event.target.value;
                         updateSettings((_settings) => (_settings.template = newTemplate));
                       }}
-                      onEnterKeyPressed={() => {
+                      onNewItemKeyPressed={() => {
                         const newTemplate = [..._settings.template];
                         newTemplate.splice(index + 1, 0, { id: uuidv4(), name: "" });
                         updateSettings((_settings) => (_settings.template = newTemplate));
