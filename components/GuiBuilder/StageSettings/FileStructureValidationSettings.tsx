@@ -9,6 +9,12 @@ import { Alert } from "../Diagnostics";
 import { InfoAccordion } from "./common";
 import { Settings } from "@/types/GuiBuilder";
 
+/**
+ * List of file/directories names that are automatically excluded
+ * ({@link https://docs.zinc.ust.dev/user/pipeline/docker/FileStructureValidation.html Reference}).
+ */
+const defaultIgnoreList = ["*~", ".directory", ".DS_Store", "._*", "Thumbs.db", "Desktop.ini", "desktop.ini"];
+
 function FileStructureValidationSettings() {
   const [config, setConfig] = useSelectedStageConfig("FileStructureValidation");
   const { updateStep } = useQueryParameters();
@@ -29,37 +35,67 @@ function FileStructureValidationSettings() {
 
   return (
     <div className="p-3">
-      {useTemplate === undefined && (
+      {useTemplate === undefined ? (
         <div className="mb-4">
           <UseTemplateOffWarning />
+        </div>
+      ) : (
+        <div className="mt-1 mb-4 flex items-center text-blue-500 gap-4">
+          <FontAwesomeIcon icon={["far", "circle-info"]} />
+          <p className="leading-5">
+            This stage validates whether the submission follows the file structure as{" "}
+            <button
+              onClick={() => {
+                updateStep("settings");
+                setElementToHighlight("useTemplate");
+              }}
+              title="Show that settings in General Settings"
+              className="border-b border-blue-600 font-medium text-blue-600"
+            >
+              specified in here
+            </button>
+            .
+          </p>
         </div>
       )}
       <p className="mb-2">
         Files/directories to <span className="font-semibold">ignore</span> checking:
       </p>
       <ListInput>
-        {ignoredFiles.map((file, index) => (
-          <ListInput.Item
-            key={file.id}
-            index={index}
-            placeholder="e.g. '*.out' or './examples/*'"
-            value={file.name}
-            onChange={(event) => {
-              const newFiles = [...ignoredFiles];
-              newFiles[index].name = event.target.value;
-              updateIgnoredFiles(newFiles);
-            }}
-            onNewItemKeyPressed={() => {
-              const newFiles = [...ignoredFiles];
-              newFiles.splice(index + 1, 0, { id: uuidv4(), name: "" });
-              updateIgnoredFiles(newFiles);
-            }}
-            onDelete={() => {
-              const newFiles = ignoredFiles.filter((f) => f.id !== file.id);
-              updateIgnoredFiles(newFiles);
-            }}
-          />
-        ))}
+        {ignoredFiles.map((file, index) => {
+          const isDefaultIgnore = defaultIgnoreList.includes(file.name);
+          return (
+            <div key={file.id}>
+              <ListInput.Item
+                index={index}
+                placeholder="e.g. '*.out' or './examples/*'"
+                value={file.name}
+                onChange={(event) => {
+                  const newFiles = [...ignoredFiles];
+                  newFiles[index].name = event.target.value;
+                  updateIgnoredFiles(newFiles);
+                }}
+                onNewItemKeyPressed={() => {
+                  const newFiles = [...ignoredFiles];
+                  newFiles.splice(index + 1, 0, { id: uuidv4(), name: "" });
+                  updateIgnoredFiles(newFiles);
+                }}
+                onDelete={() => {
+                  const newFiles = ignoredFiles.filter((f) => f.id !== file.id);
+                  updateIgnoredFiles(newFiles);
+                }}
+                classNames={{
+                  input: isDefaultIgnore ? "!border-orange-500" : "",
+                }}
+              />
+              {isDefaultIgnore && (
+                <span className="ml-3 font-medium text-orange-500 text-xs">
+                  This item is <span className="font-semibold">always ignored</span> by default. No need to specify it.
+                </span>
+              )}
+            </div>
+          );
+        })}
         <ListInput.AddButton
           onClick={() => {
             const newFiles = [...ignoredFiles, { id: uuidv4(), name: "" }];
@@ -76,9 +112,6 @@ function FileStructureValidationSettings() {
               <li>
                 All files/directories matching the name,{" "}
                 <span className="font-semibold">regardless of its location</span>, will be ignored from checking.
-              </li>
-              <li>
-                Glob expressions (<code>*</code>) are accepted.
               </li>
               <li>
                 No need to add leading or trailing slash (<code>/</code>).
@@ -131,33 +164,14 @@ function FileStructureValidationSettings() {
       </InfoAccordion>
       <InfoAccordion title="Default ignore list">
         <p>
-          The Grader will <span className="font-semibold">always exclude</span> the following files/directories during
-          file structure validation (no need to re-specify them in the above):
+          The Grader will <span className="font-semibold">always ignore</span> checking the following files/directories
+          during file structure validation:
         </p>
         <ul className="ml-6 mt-1 list-disc font-mono">
-          <li>*~</li>
-          <li>.directory</li>
-          <li>.DS_Store</li>
-          <li>._*</li>
-          <li>Thumbs.db</li>
-          <li>Desktop.ini</li>
-          <li>desktop.ini</li>
+          {defaultIgnoreList.map((file) => (
+            <li key={file}>{file}</li>
+          ))}
         </ul>
-      </InfoAccordion>
-      <InfoAccordion title="How to specify what files should students submit?">
-        <div className="space-y-2">
-          <p>This can be done in the General Settings step:</p>
-          <Button
-            icon={<FontAwesomeIcon icon={["fas", "compass"]} />}
-            onClick={() => {
-              updateStep("settings");
-              setElementToHighlight("useTemplate");
-            }}
-            className="border border-cse-600 text-cse-600 hover:bg-blue-100 active:bg-blue-200"
-          >
-            Show me the location
-          </Button>
-        </div>
       </InfoAccordion>
     </div>
   );
