@@ -15,6 +15,7 @@ interface Settings {
   }[];
   use_skeleton: boolean;
   use_provided: boolean;
+  use_generated: boolean;
   stage_wait_duration_secs?: number;
   cpus?: number;
   mem_gb?: number;
@@ -34,6 +35,7 @@ export interface SettingsRaw {
   template?: string[];
   use_skeleton?: boolean;
   use_provided?: boolean;
+  use_generated?: boolean;
   stage_wait_duration_secs?: number;
   cpus?: number;
   mem_gb?: number;

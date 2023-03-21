@@ -123,6 +123,8 @@ export interface StdioTestRaw {
   diff_ignore_flags?: DiffIgnoreFlag[];
   additional_packages?: string[];
   additional_pip_packages?: string[];
+  experimentalModularize?: boolean;
+  generate_expected_output?: boolean;
 }
 
 export interface StdioTest {
@@ -130,6 +132,14 @@ export interface StdioTest {
   diff_ignore_flags: DiffIgnoreFlag[];
   additional_packages: string[];
   additional_pip_packages: string[];
+  /** Enable the experimental feature of modularizing `StdioTest` into `Run`+`Diff` stages. */
+  experimentalModularize: boolean;
+  /**
+   * Enable the experimental feature of auto-generating expected output of test cases.
+   *
+   * Requires `experimentalModularize` to be true for this to take effect.
+   */
+  generate_expected_output: boolean;
 }
 
 export interface ValgrindRaw {

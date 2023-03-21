@@ -16,6 +16,16 @@ interface Submission {
   user_id: number;
 }
 
+/** Success payload returned by the `addSubmissionEntry` GraphQL mutation. */
+interface CreateSubmission {
+  id: number;
+  assignment_config_id: number;
+  created_at: string;
+  stored_name: string;
+  upload_name: string;
+  user_id: number;
+}
+
 async function submit(cookie: string, submission: Submission) {
   try {
     const {
@@ -29,19 +39,49 @@ async function submit(cookie: string, submission: Submission) {
       data: {
         query: `
           mutation addSubmissionEntry($submission: submissions_insert_input!) {
-            createSubmission(
-              object: $submission
-            ){ id }
+            createSubmission(object: $submission) {
+              id
+              assignment_config_id
+              created_at
+              stored_name
+              upload_name
+              user_id
+            }
           }
         `,
         variables: { submission },
       },
     });
     if (!errors) {
-      return data.createSubmission;
+      return data.createSubmission as CreateSubmission;
     } else {
       throw new Error(errors[0].message);
     }
+  } catch (error) {
+    throw error;
+  }
+}
+
+/**
+ * Decompresses and pushes a grading job in Redis.
+ *
+ * @param submission Data of the new submission.
+ * @param isTest Optional explicit value for the `isTest` flag in the Redis payload of the grading task.
+ */
+async function decompress(submission: CreateSubmission, isTest?: boolean) {
+  try {
+    const { data } = await axios({
+      method: "post",
+      url: `http://${process.env.WEBHOOK_ADDR}/decompression`,
+      data: {
+        submission,
+        isTest,
+      },
+    });
+    if (data.error) {
+      throw new Error(data.error);
+    }
+    return data;
   } catch (error) {
     throw error;
   }
@@ -55,7 +95,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       keepExtensions: true,
       encoding: "utf-8",
     });
-    form.parse(req, async (err, fields, { files }) => {
+    form.parse(req, async (err, fields: Record<string, string>, { files }) => {
       if (err) {
         throw err;
       } else {
@@ -67,6 +107,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
             error: "Checksum mismatched, potential transmission corruption detected",
           });
         }
+        const isTest = "isTest" in fields ? fields.isTest === "true" : undefined;
         const destinationFilename = `submitted/${files.lastModifiedDate.getTime()}_${userId}_${files.path.replace(
           `/tmp/`,
           "",
@@ -82,7 +123,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         try {
           copy(files.path, `${process.env.NEXT_PUBLIC_UPLOAD_DIR}/${destinationFilename}`, async (err: Error) => {
             if (!err) {
-              await submit(req.headers.cookie!, submission);
+              const createSubmission = await submit(req.headers.cookie!, submission);
+              await decompress(createSubmission, isTest);
               return res.json({
                 status: "success",
               });

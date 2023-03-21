@@ -1,7 +1,7 @@
-import guiBuilderSteps, { GuiBuilderStepSlug } from "@/components/GuiBuilder/Steps/GuiBuilderSteps";
+import { GuiBuilderStepSlug } from "@/components/GuiBuilder/Steps/GuiBuilderSteps";
 import { HighlightableElementsKey } from "@/constants/GuiBuilder/highlightableElements";
 import { useQueryParameters } from "@/hooks/GuiBuilder";
-import { action, Action, Computed, computed } from "easy-peasy";
+import { action, Action } from "easy-peasy";
 import set from "lodash/set";
 
 // #region Model Definition
@@ -9,7 +9,7 @@ import set from "lodash/set";
 /**
  * Model for the layout-related states in the GUI Assignment Builder.
  */
-export type LayoutModel = LayoutModelState & LayoutModelComputed & LayoutModelAction;
+export type LayoutModel = LayoutModelState & LayoutModelAction;
 
 interface LayoutModelState {
   /** Slug of which step the user is in. */
@@ -26,11 +26,6 @@ interface LayoutModelState {
   isAddStageCollapsed: boolean;
   /** Which element on the page should be highlighted. */
   elementToHighlight?: HighlightableElementsKey;
-}
-
-interface LayoutModelComputed {
-  /** Zero-based index of which step the user is in. */
-  stepIndex: Computed<LayoutModel, number>;
 }
 
 interface LayoutModelAction {
@@ -114,12 +109,6 @@ const layoutModelState: LayoutModelState = {
   isAddStageCollapsed: false,
 };
 
-const layoutModelComputed: LayoutModelComputed = {
-  stepIndex: computed((state) => {
-    return guiBuilderSteps.findIndex((step) => step.slug === state.step);
-  }),
-};
-
 const layoutModelAction: LayoutModelAction = {
   setStep: action((state, stepSlug) => {
     state.step = stepSlug;
@@ -146,7 +135,6 @@ const layoutModelAction: LayoutModelAction = {
 
 export const layoutModel: LayoutModel = {
   ...layoutModelState,
-  ...layoutModelComputed,
   ...layoutModelAction,
 };
 

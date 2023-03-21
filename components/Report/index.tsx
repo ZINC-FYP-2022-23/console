@@ -13,6 +13,8 @@ import { MakeStageReportView } from "./MakeStageReport";
 import { GTestStageReportView } from "./GTestStageReport";
 import { JUnitStageReportView } from "./JUnitStageReport";
 import { PyTestStageReportView } from "./PyTestStageReport";
+import { RunStageReportView } from "./RunStageReport";
+import { transformModularizedStdioTestReports } from "@/utils/reportTransformation";
 
 export function Report({ report, user }) {
   const dispatch = useLayoutDispatch();
@@ -209,8 +211,26 @@ export function ReportSlideOver() {
                   </div>
                   <div className="space-y-2">
                     {data.report.sanitizedReports !== null &&
+                      "run" in data.report.sanitizedReports &&
+                      !("diff" in data.report.sanitizedReports) && (
+                        <RunStageReportView reports={data.report.sanitizedReports.run} />
+                      )}
+                  </div>
+                  <div className="space-y-2">
+                    {data.report.sanitizedReports !== null &&
                       Object.keys(data.report.sanitizedReports).includes("stdioTest") && (
                         <StdioTestStageReportView reports={data.report.sanitizedReports.stdioTest} />
+                      )}
+                    {/* Temporary fix for missing StdioTest report if `experimentalModularize` is set to true */}
+                    {data.report.sanitizedReports !== null &&
+                      "run" in data.report.sanitizedReports &&
+                      "diff" in data.report.sanitizedReports && (
+                        <StdioTestStageReportView
+                          reports={transformModularizedStdioTestReports(
+                            data.report.sanitizedReports.run,
+                            data.report.sanitizedReports.diff,
+                          )}
+                        />
                       )}
                   </div>
                   <div className="space-y-2">

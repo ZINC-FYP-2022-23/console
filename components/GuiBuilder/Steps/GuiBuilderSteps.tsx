@@ -1,13 +1,19 @@
 import { Spinner } from "@/components/Spinner";
+import { StageDataMap, StdioTest } from "@/types/GuiBuilder";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import dynamic from "next/dynamic";
 
-export type GuiBuilderStepSlug = "settings" | "pipeline" | "upload" | "test" | "assign";
+export type GuiBuilderStepSlug = "settings" | "pipeline" | "upload" | "generate-output" | "test" | "assign";
 
 export type GuiBuilderStep = Readonly<{
   slug: GuiBuilderStepSlug;
   label: string;
   icon: React.ReactNode;
+  /**
+   * Optional function to determine whether to show the step. If not provided, the step will always be shown.
+   * @param stageData Data of pipeline stages for deriving whether to show the step.
+   */
+  showStep?: (stageData: StageDataMap) => boolean;
   /**
    * The component to render in the step.
    *
@@ -47,6 +53,19 @@ const guiBuilderSteps: readonly GuiBuilderStep[] = [
     label: "Upload Files",
     icon: <FontAwesomeIcon icon={["fad", "upload"]} />,
     component: dynamic(() => import("./UploadFiles"), {
+      loading: () => <StepLoading />,
+    }),
+  },
+  {
+    slug: "generate-output",
+    label: "Generate Output",
+    icon: <FontAwesomeIcon icon={["fad", "folder-gear"]} />,
+    showStep: (stageData) => {
+      return Object.values(stageData).some(
+        (stage) => stage.name === "StdioTest" && (stage.config as StdioTest).generate_expected_output,
+      );
+    },
+    component: dynamic(() => import("./GenerateOutput"), {
       loading: () => <StepLoading />,
     }),
   },
