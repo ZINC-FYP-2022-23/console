@@ -3,6 +3,7 @@ import { useZinc } from "@/contexts/zinc";
 import { useStoreActions, useStoreState } from "@/store/GuiBuilder";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Modal, useMantineTheme } from "@mantine/core";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import Button from "../Button";
@@ -69,22 +70,30 @@ function FinishedAllStepsModal() {
       size="auto"
       withCloseButton={false}
     >
-      <div className="flex flex-col items-center gap-6">
+      <div className="flex flex-col items-center gap-8">
         <div className="px-5 flex flex-col items-center gap-3">
           <div className="h-12 w-12 mx-auto flex items-center justify-center rounded-full bg-green-100">
             <FontAwesomeIcon icon={["fas", "check"]} className="text-lg text-green-600" />
           </div>
           <p className="font-medium text-center text-lg">Assignment config saved successfully</p>
           <div className="text-sm">
-            <p className="text-center text-gray-600">You have finished all steps to configure an assignment.</p>
-            <div className="mt-5 text-gray-900">
-              <SwitchGroup
-                checked={shouldRegrade}
-                label="Trigger regrading for students assigned to this config"
-                onChange={() => setShouldRegrade(!shouldRegrade)}
-              />
-            </div>
+            <p className="text-center text-gray-500">You have finished all steps to configure an assignment.</p>
           </div>
+        </div>
+        <div className="px-5 flex flex-col items-center gap-3">
+          <div className="text-gray-900">
+            <SwitchGroup
+              checked={shouldRegrade}
+              label="Trigger regrading for students assigned to this config"
+              onChange={() => setShouldRegrade(!shouldRegrade)}
+            />
+          </div>
+          <Link href={`/api/download/configs/${configId}`}>
+            <a className="mt-1 px-4 py-1 flex items-center justify-center bg-blue-100 border border-transparent font-medium rounded-md text-blue-700 transition ease-in-out duration-150 hover:bg-blue-200">
+              <FontAwesomeIcon icon={["far", "file-export"]} className="mr-3" />
+              <span>Export Config as YAML</span>
+            </a>
+          </Link>
         </div>
         <div className="w-full mt-2 flex flex-col gap-2">
           <Button onClick={() => closeModal("/assignments")} className="bg-indigo-600 text-white hover:bg-indigo-700">
