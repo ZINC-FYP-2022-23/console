@@ -3,7 +3,7 @@
  */
 
 import { defaultSettings } from "@/constants/GuiBuilder/defaults";
-import { Settings, SettingsLang, SettingsRaw } from "@/types/GuiBuilder";
+import { Settings, SettingsLang, SettingsRaw, SettingsUseTemplate } from "@/types/GuiBuilder";
 import cloneDeep from "lodash/cloneDeep";
 import isEqual from "lodash/isEqual";
 import { v4 as uuidv4 } from "uuid";
@@ -34,12 +34,12 @@ export function settingsRawToSettings(sr: SettingsRaw): Settings {
  * Converts a {@link Settings} object to a raw settings object to be de-serialized to YAML.
  */
 export function settingsToSettingsRaw(settings: Settings): SettingsRaw {
-  const s = tidySettings(settings);
+  const { template, ...settingsRest } = tidySettings(settings);
 
   const _settings: SettingsRaw = {
-    ...s,
-    lang: settingsLangToString(s.lang),
-    template: s.template.map((t) => t.name),
+    ...settingsRest,
+    lang: settingsLangToString(settingsRest.lang),
+    ...(settingsRest.use_template === SettingsUseTemplate.FILENAMES && { template: template.map((t) => t.name) }),
   };
 
   return _settings;

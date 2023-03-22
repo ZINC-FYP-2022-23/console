@@ -107,6 +107,7 @@ function PipelineSettings() {
               <LangVersionTooltip />
             </div>
             <TextInput
+              id="lang_version"
               value={_settings.lang.version}
               onChange={(event) => {
                 const value = event.target.value;
@@ -122,6 +123,7 @@ function PipelineSettings() {
         <h3 className="mb-3 font-semibold text-base">Helper Files</h3>
         <div className="flex flex-col gap-5">
           <SwitchGroup
+            id="use_skeleton"
             label="Provide skeleton code to students"
             checked={_settings.use_skeleton}
             onChange={(value) => {
@@ -129,6 +131,7 @@ function PipelineSettings() {
             }}
           />
           <SwitchGroup
+            id="use_provided"
             label="Use additional files for grading"
             checked={_settings.use_provided}
             onChange={(value) => {
@@ -155,7 +158,7 @@ function PipelineSettings() {
               />
             </div>
             {_settings.use_template === SettingsUseTemplate.FILENAMES && (
-              <div className="mt-4 mx-3 p-3 bg-gray-50 rounded-lg drop-shadow">
+              <div id="use-template-filenames" className="mt-4 mx-3 p-3 bg-gray-50 rounded-lg drop-shadow">
                 <p className="mb-2 font-medium text-gray-600">Files to submit:</p>
                 <ListInput>
                   {_settings.template.map((file, index) => (
@@ -211,6 +214,7 @@ function PipelineSettings() {
         <h3 className="mb-3 font-semibold text-base">Stage Settings</h3>
         <div className="flex flex-col gap-5">
           <SwitchGroup
+            id="early_return_on_throw"
             label="Early return on error (Experimental)"
             description="Whether the pipeline will abort when any stage returns a non-zero exit code"
             checked={_settings.early_return_on_throw}
@@ -219,6 +223,7 @@ function PipelineSettings() {
             }}
           />
           <SwitchGroup
+            id="network"
             label="Allow Internet access for all stages"
             checked={_settings.enable_features.network}
             onChange={(value) => {
