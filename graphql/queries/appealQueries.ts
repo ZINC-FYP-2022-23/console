@@ -69,17 +69,6 @@ export const GET_APPEAL_CONFIG = gql`
   }
 `;
 
-export const GET_SUBMISSION_GRADE = gql`
-  query getSubmissionGrade($userId: bigint!, $assignmentConfigId: bigint!) {
-    submissions(where: { user_id: { _eq: $userId }, assignment_config_id: { _eq: $assignmentConfigId } }) {
-      id
-      reports(order_by: { createdAt: desc }, limit: 1) {
-        grade
-      }
-    }
-  }
-`;
-
 /* Queries used in `Appeal Details Page` */
 export const GET_APPEAL_DETAILS_BY_APPEAL_ID = gql`
   subscription getAppealDetails($appealId: bigint!) {

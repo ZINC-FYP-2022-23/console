@@ -138,14 +138,13 @@ function AppealsTable({ assignmentConfigId }: AppealsTableProps) {
     error: appealConfigError,
   } = useQuery(GET_APPEAL_CONFIG, { variables: { assignmentConfigId: assignmentConfigId } });
 
-  // TODO(BRYAN): update the score in Student UI as well
   // Transform data into `AppealTableType[]`
   const appealData: AppealTableType[] = [];
   if (appealsDetailsData) {
     appealsDetailsData.appeals.map((appeal) => {
       let status: AppealStatus = transformAppealStatus(appeal.status);
 
-      // Calculate the Original Score
+      // Get the Original Score
       let originalScore: number = -1;
       for (let i = 0; i < appeal.user.submissions.length; i++) {
         // Do not pick the submission that is related to the appeal
@@ -155,7 +154,7 @@ function AppealsTable({ assignmentConfigId }: AppealsTableProps) {
         }
       }
 
-      // Calculate the Final Score
+      // Get the Final Score
       let finalScore: number | undefined = undefined;
       for (let i = 0; i < appeal.user.change_logs.length; i++) {
         if (appeal.user.change_logs[i].appealId === appeal.id) {

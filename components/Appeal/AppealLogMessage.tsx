@@ -40,12 +40,6 @@ export function AppealLogMessage({ log, showButton }: AppealLogMessageType) {
                 })} at ${logDate.toLocaleTimeString().toLowerCase()}`}
               </span>
             </p>
-            {log.reason && (
-              <div>
-                <p>Reason: </p>
-                <div className="ml-2 text-sm text-gray-600" dangerouslySetInnerHTML={{ __html: log.reason }} />
-              </div>
-            )}
           </div>
           {showButton && (
             <span className="inline-flex rounded-md shadow-sm">
@@ -60,8 +54,6 @@ export function AppealLogMessage({ log, showButton }: AppealLogMessageType) {
       </>
     );
   }
-
-  console.log(log.reason);
 
   // Log component for `APPEAL_STATUS`-related log
   if (log.type === ChangeLogTypes.APPEAL_STATUS && log.updatedState) {
@@ -213,6 +205,12 @@ export function AppealLogMessage({ log, showButton }: AppealLogMessageType) {
                 </>
               )}
             </p>
+            {log.reason && (
+              <div className="flex-row">
+                <p className="ml-2 text-sm text-gray-600">Reason: </p>
+                <div className="ml-4 text-sm text-blue-900" dangerouslySetInnerHTML={{ __html: log.reason }} />
+              </div>
+            )}
           </div>
           {showButton && (
             <span className="inline-flex rounded-md shadow-sm">
