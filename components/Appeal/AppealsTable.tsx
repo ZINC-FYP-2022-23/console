@@ -1,10 +1,5 @@
-import {
-  GET_APPEALS_DETAILS_BY_ASSIGNMENT_ID,
-  GET_APPEAL_CONFIG,
-  GET_SUBMISSION_GRADE,
-} from "@/graphql/queries/appealQueries";
+import { GET_APPEALS_DETAILS_BY_ASSIGNMENT_ID, GET_APPEAL_CONFIG } from "@/graphql/queries/appealQueries";
 import { AppealStatus, Grade } from "@/types";
-import { dummyNewGradeData, dummyOldGradeData } from "@/utils/dummyData";
 import { useQuery, useSubscription } from "@apollo/client";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Alert } from "@mantine/core";
@@ -23,8 +18,6 @@ import Link from "next/link";
 import { useState } from "react";
 import AppealStatusBadge from "./AppealStatusBadge";
 import { transformAppealStatus } from "@/utils/appealUtils";
-
-// TODO(Bryan): Replace dummy data with real API call
 
 /** Type definition of each row in the Appeals Table. */
 type AppealTableType = {
@@ -145,22 +138,53 @@ function AppealsTable({ assignmentConfigId }: AppealsTableProps) {
     error: appealConfigError,
   } = useQuery(GET_APPEAL_CONFIG, { variables: { assignmentConfigId: assignmentConfigId } });
 
+  // TODO(BRYAN): update the score in Student UI as well
   // Transform data into `AppealTableType[]`
   const appealData: AppealTableType[] = [];
   if (appealsDetailsData) {
     appealsDetailsData.appeals.map((appeal) => {
+      let status: AppealStatus = transformAppealStatus(appeal.status);
+
+      // Calculate the Original Score
+      let originalScore: number = -1;
+      for (let i = 0; i < appeal.user.submissions.length; i++) {
+        // Do not pick the submission that is related to the appeal
+        if (appeal.user.submissions[i].id != appeal.newFileSubmissionId) {
+          originalScore = appeal.user.submissions[i].reports[0].grade.score;
+          break;
+        }
+      }
+
+      // Calculate the Final Score
       let finalScore: number | undefined = undefined;
-      if (appeal.submission) {
-        finalScore = appeal.submission.reports.grade;
+      for (let i = 0; i < appeal.user.change_logs.length; i++) {
+        if (appeal.user.change_logs[i].appealId === appeal.id) {
+          // Use the latest score change
+          if (appeal.user.change_logs[i].type === "SCORE") {
+            finalScore = appeal.user.change_logs[i].updatedState.replace(/[^0-9]/g, "");
+            break;
+          }
+          // Use the new file submission score submitted with the appeal
+          if (
+            status === AppealStatus.Accept &&
+            appeal.user.change_logs[i].type === "APPEAL_STATUS" &&
+            appeal.user.change_logs[i].updatedState === "[{'status':ACCEPTED}]" &&
+            appeal.submission &&
+            appeal.submission.reports.length > 0
+          ) {
+            finalScore = appeal.submission.reports[0].grade.score;
+            break;
+          }
+        }
       }
 
       appealData.push({
         id: appeal.id,
         updatedAt: format(new Date(appeal.updatedAt ?? appeal.createdAt), "MMM dd, yyyy h:mm aa"),
-        status: transformAppealStatus(appeal.status),
+        status,
         name: appeal.user.name,
         itsc: appeal.user.itsc,
-        originalScore: appeal.user.submissions[0].reports[0].grade.score,
+        originalScore,
         finalScore,
       });
     });

@@ -1,22 +1,23 @@
 import { AppealLogMessage } from "@/components/Appeal/AppealLogMessage";
 import { AppealResult } from "@/components/Appeal/AppealResult";
 import { AppealTextMessage } from "@/components/Appeal/AppealTextMessage";
+import { NumberInput } from "@/components/Input";
 import RichTextEditor from "@/components/RichTextEditor";
 import { LayoutProvider } from "@/contexts/layout";
 import { CREATE_APPEAL_MESSAGE, CREATE_CHANGE_LOG, UPDATE_APPEAL_STATUS } from "@/graphql/mutations/appealMutations";
 import {
   GET_APPEAL_CHANGE_LOGS_BY_APPEAL_ID,
-  GET_APPEAL_CONFIG,
   GET_APPEAL_DETAILS_BY_APPEAL_ID,
   GET_APPEAL_MESSAGES,
-  GET_ASSIGNMENT_CONFIG_ID_BY_APPEAL_ID,
+  GET_ASSIGNMENT_SUBMISSIONS,
+  GET_IDS_BY_APPEAL_ID,
 } from "@/graphql/queries/appealQueries";
 import { Layout } from "@/layout";
 import { AppealAttempt, AppealStatus } from "@/types";
-import { AppealLog, DisplayMessageType, ChangeLogTypes } from "@/types/appeal";
+import { AppealLog, ChangeLogTypes, DisplayMessageType } from "@/types/appeal";
 import { Submission as SubmissionType } from "@/types/tables";
 import { mergeDataToActivityLogList, transformToAppealAttempt } from "@/utils/appealUtils";
-import { useMutation, useSubscription } from "@apollo/client";
+import { useMutation, useQuery, useSubscription } from "@apollo/client";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Tab } from "@headlessui/react";
 import { Alert, clsx, createStyles, Modal } from "@mantine/core";
@@ -27,8 +28,6 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { ReactGhLikeDiff } from "react-gh-like-diff";
 import { initializeApollo } from "../../../lib/apollo";
-import { useQuery } from "@apollo/client";
-import { BooleanValueNode } from "graphql";
 
 /**
  * Return a state to be uploaded to database (for mutation) according to the appeal status
@@ -69,7 +68,7 @@ interface createNewChangeLogProps {
 }
 
 /**
- * Returns a new change log
+ * Returns a new change log to create a Change Log with `CREATE_CHANGE_LOG`
  * @returns {(ChangeLog & { userId: number, assignmentConfigId: number, submissionId: number })}
  */
 function createNewChangeLog({
@@ -118,6 +117,7 @@ interface CustomModalProps {
   modalOpen: boolean;
   /** Function that sets the bollean of `modalOpen` */
   setModalOpen;
+  /** Details of the appeal attempt */
   appealAttempt: AppealAttempt;
 }
 
@@ -129,23 +129,26 @@ function CustomModal({ changeLog, modalOpen, setModalOpen, appealAttempt }: Cust
   const [createChangeLog] = useMutation(CREATE_CHANGE_LOG);
   const [updateAppealStatus] = useMutation(UPDATE_APPEAL_STATUS);
 
-  // Transform type `NewChangeLog` to `AppealLog` for <AppealLogMessage> component
   let type: ChangeLogTypes;
-  /** Used to update the appeal status via GraphQL mutation with type `string` */
-  let mutationStatus: string | null = null;
+  let mutationText: string | null = null;
+  let text: string;
 
   if (changeLog.type === "APPEAL_STATUS") {
+    text = "The appeal status will be updated to ";
     type = ChangeLogTypes.APPEAL_STATUS;
     if (changeLog.updatedState === "[{'status':ACCEPTED}]") {
-      mutationStatus = "ACCEPTED";
+      mutationText = "ACCEPTED";
     } else if (changeLog.updatedState === "[{'status':REJECTED}]") {
-      mutationStatus = "REJECTED";
+      mutationText = "REJECTED";
     } else {
-      mutationStatus = "PENDING";
+      mutationText = "PENDING";
     }
   } else if (changeLog.type === "SCORE") {
+    text = "The score will be updated to ";
     type = ChangeLogTypes.SCORE;
+    mutationText = changeLog.updatedState.replace(/[^0-9]/g, "");
   } else {
+    text = "There is will be an update in submission ";
     type = ChangeLogTypes.SUBMISSION;
   }
 
@@ -161,13 +164,18 @@ function CustomModal({ changeLog, modalOpen, setModalOpen, appealAttempt }: Cust
       {/* Display change */}
       <div className="flex items-center">
         <div className="w-8 h-8 bg-yellow-300 rounded-full flex justify-center items-center">
-          <FontAwesomeIcon icon={["fad", "gavel"]} />
+          {changeLog.type === "APPEAL_STATUS" && <FontAwesomeIcon icon={["fad", "gavel"]} />}
+          {changeLog.type === "SCORE" && <FontAwesomeIcon icon={["fad", "star"]} />}
+          {changeLog.type === "SUBMISSION" && <FontAwesomeIcon icon={["fad", "inbox-in"]} />}
         </div>
         <p className="ml-2 text-sm text-gray-600">
-          The appeal status will be updated to
-          {mutationStatus === "ACCEPTED" && <p className="ml-2 text-sm text-green-600">Accepted</p>}
-          {mutationStatus === "REJECTED" && <p className="ml-2 text-sm text-red-600">Rejected</p>}
-          {mutationStatus === "PENDING" && <p className="ml-2 text-sm text-yellow-600">Pending</p>}
+          {text}
+          <p className="text-green-600 font-bold">
+            {mutationText === "ACCEPTED" && <p>Accepted</p>}
+            {mutationText === "REJECTED" && <p className="text-red-600">Rejected</p>}
+            {mutationText === "PENDING" && <p className="text-yellow-600">Pending</p>}
+            {changeLog.type === "SCORE" && <p>{mutationText}</p>}
+          </p>
         </p>
       </div>
       <div className="py-1" />
@@ -194,14 +202,16 @@ function CustomModal({ changeLog, modalOpen, setModalOpen, appealAttempt }: Cust
                 input: changeLog,
               },
             });
+
             if (type === ChangeLogTypes.APPEAL_STATUS) {
               updateAppealStatus({
                 variables: {
                   id: appealAttempt.id,
-                  status: mutationStatus,
+                  status: mutationText,
                 },
               });
             }
+
             setModalOpen(false);
           }
         }}
@@ -248,7 +258,7 @@ function ChangeAppealStatus({ userId, submissionId, appealAttempt }: ChangeAppea
   }
 
   return (
-    <div className="w-auto px-5 py-4 bg-white text-gray-700 shadow rounded-md">
+    <div className="w-auto h-full px-5 py-4 bg-white text-gray-700 shadow rounded-md">
       <CustomModal changeLog={newLog} modalOpen={modalOpen} setModalOpen={setModalOpen} appealAttempt={appealAttempt} />
       <p className="font-medium flex justify-self-center text-lg bold">Appeal Status:</p>
       <br />
@@ -339,12 +349,13 @@ interface ChangeScoreProps {
   submissionId: number;
   appealAttempt: AppealAttempt;
   oldScore: number;
+  maxScore: number;
 }
 
 /**
  * Returns a box that shows the score and allow TAs to change the score
  */
-function ChangeScore({ userId, submissionId, appealAttempt, oldScore }: ChangeScoreProps) {
+function ChangeScore({ userId, submissionId, appealAttempt, oldScore, maxScore }: ChangeScoreProps) {
   const [newScore, setNewScore] = useState(oldScore);
   const initialLog: NewChangeLog = createNewChangeLog({
     userId,
@@ -356,41 +367,66 @@ function ChangeScore({ userId, submissionId, appealAttempt, oldScore }: ChangeSc
   });
   const [newLog, setNewLog] = useState(initialLog);
   const [modalOpen, setModalOpen] = useState(false);
+  let isBlank: boolean = false; // The number input field is blank
 
-  // TODO(BRYAN): Add textbox and handle the onClick function when button is pressed
   return (
-    <div className="w-auto px-5 py-4 bg-white text-gray-700 shadow rounded-md">
+    <div className="w-auto h-full px-5 py-4 bg-white text-gray-700 shadow rounded-md">
       <CustomModal changeLog={newLog} modalOpen={modalOpen} setModalOpen={setModalOpen} appealAttempt={appealAttempt} />
-      <p className="font-medium flex justify-self-center text-lg bold">Score Update:</p>
+      <p className="font-medium flex justify-self-center text-lg bold">
+        Score: {oldScore} / {maxScore}
+      </p>
       <br />
-      <div className="col-span-2">
-        <p>XXX</p>
-      </div>
-      <a
-        className={`bg-white text-blue-700 hover:text-blue-500 focus:border-blue-300 focus:shadow-outline-blue active:text-blue-800 active:bg-gray-50 transition ease-in-out duration-150 w-full px-3 py-1.5 border text-center border-gray-300 text-sm leading-4 font-medium rounded-lg focus:outline-none`}
-        onClick={() => {
-          if (newScore !== oldScore) {
-            setNewLog(
-              createNewChangeLog({
-                userId,
-                submissionId,
-                appealAttempt,
-                type: "SCORE",
-                oldScore,
-                newScore,
-              }),
-            );
-            //setModalOpen(true);
+      <p className="font-medium flex justify-self-center text-lg bold">Score Update:</p>
+      <div className="h-1.5" />
+      <NumberInput
+        value={oldScore}
+        onChange={(score) => {
+          if (score) {
+            setNewScore(score);
+            isBlank = false;
           } else {
-            alert("Updated score cannot be the same as old score");
+            isBlank = true;
           }
         }}
-      >
-        Update
-      </a>
+      />
+      <div className="h-1.5" />
+      <div className="flex w-full justify-center">
+        <a
+          className={`bg-white text-blue-700 hover:text-blue-500 focus:border-blue-300 focus:shadow-outline-blue active:text-blue-800 active:bg-gray-50 transition ease-in-out duration-150 w-full px-3 py-1.5 border text-center border-gray-300 text-sm leading-4 font-medium rounded-lg focus:outline-none`}
+          onClick={() => {
+            if (newScore === oldScore) {
+              alert("Updated score cannot be the same as old score");
+            } else if (newScore > maxScore) {
+              alert("Updated score cannot be larger than the maximum score");
+            } else if (isBlank) {
+              alert("The input field is blank, please input a new score.");
+            } else {
+              setNewLog(
+                createNewChangeLog({
+                  userId,
+                  submissionId,
+                  appealAttempt,
+                  type: "SCORE",
+                  oldScore,
+                  newScore,
+                }),
+              );
+              setModalOpen(true);
+            }
+          }}
+        >
+          <div className="w-full flex items-center gap-1 justify-center">
+            <FontAwesomeIcon icon={["far", "pen-to-square"]} />
+            <div className="px-auto" />
+            <span>Update</span>
+          </div>
+        </a>
+      </div>
     </div>
   );
 }
+
+/* Start of Tabs-related components */
 
 interface MessageButtonProps {
   /** The text message sent to the TA when submitting the appeal */
@@ -418,7 +454,6 @@ function MessageButton({ userId, comments, setComments }: MessageButtonProps) {
         if (comments === null || comments === "") {
           alert("Please Fill All Required Field");
         } else {
-          // TODO(BRYAN): Add error checking + Notification
           createAppealMessage({
             variables: {
               input: {
@@ -560,8 +595,9 @@ function CodeComparisonTab({ diffData }: CodeComparisonTabProps) {
   );
 }
 
+/* End of Tabs-related components */
+
 interface DisplayErrorProps {
-  courseId: number;
   /** Message shown to the user when encountering an error */
   errorMessage: string;
 }
@@ -569,22 +605,13 @@ interface DisplayErrorProps {
 /**
  * Returns an error page
  */
-function DisplayError({ courseId, errorMessage }: DisplayErrorProps) {
+function DisplayError({ errorMessage }: DisplayErrorProps) {
   return (
     <LayoutProvider>
       <Layout title="Grade Appeal Details">
         <main className="flex-1 flex bg-gray-200 overflow-y-auto">
           <div className="p-5 flex flex-1 flex-col h-full w-max">
             <div className="pb-3">
-              <div className="my-1 flex items-center">
-                <Link href={`/courses/${courseId}`}>
-                  <a className="max-w-max-content w-max px-3 py-1.5 mb-3 border border-gray-300 text-sm leading-4 font-medium rounded-lg text-blue-700 bg-white hover:text-blue-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:text-blue-800 active:bg-gray-50 transition ease-in-out duration-150">
-                    <FontAwesomeIcon icon={["far", "chevron-left"]} className="mr-2" />
-                    Back
-                  </a>
-                </Link>
-                <h1 className="flex-1 font-semibold text-2xl text-center">Grade Appeal</h1>
-              </div>
               <div className="my-6 mt-8 flex flex-col items-center self-center mb-4">
                 <Alert
                   icon={<FontAwesomeIcon icon={["far", "circle-exclamation"]} />}
@@ -603,14 +630,10 @@ function DisplayError({ courseId, errorMessage }: DisplayErrorProps) {
   );
 }
 
-interface DisplayLoadingProps {
-  courseId: number;
-}
-
 /**
  * Returns a loading page to show fetching data is in progress
  */
-function DisplayLoading({ courseId }: DisplayLoadingProps) {
+function DisplayLoading() {
   return (
     <LayoutProvider>
       <Layout title="Grade Appeal Details">
@@ -618,12 +641,6 @@ function DisplayLoading({ courseId }: DisplayLoadingProps) {
           <div className="p-5 flex flex-1 flex-col h-full w-max">
             <div className="pb-3">
               <div className="my-1 flex items-center">
-                <Link href={`/courses/${courseId}`}>
-                  <a className="max-w-max-content w-max px-3 py-1.5 mb-3 border border-gray-300 text-sm leading-4 font-medium rounded-lg text-blue-700 bg-white hover:text-blue-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:text-blue-800 active:bg-gray-50 transition ease-in-out duration-150">
-                    <FontAwesomeIcon icon={["far", "chevron-left"]} className="mr-2" />
-                    Back
-                  </a>
-                </Link>
                 <h1 className="flex-1 font-semibold text-2xl text-center">Grade Appeal</h1>
               </div>
               <div>Loading Data...</div>
@@ -639,8 +656,8 @@ interface AppealDetailsProps {
   appealId: number;
   userId: number;
   courseId: number; // The course ID that the appeal is related to
-  assignmentId: number; // The assignment ID that the appeal is related to
   submissionId: number;
+  assignmentConfigId: number;
   diffSubmissionsData: DiffSubmissionsData;
 }
 
@@ -650,17 +667,11 @@ interface AppealDetailsProps {
 function AppealDetails({
   appealId,
   userId,
-  courseId,
-  assignmentId,
   submissionId,
+  assignmentConfigId,
   diffSubmissionsData,
 }: AppealDetailsProps) {
   // Fetch data with GraphQL
-  const {
-    data: appealConfigData,
-    loading: appealConfigLoading,
-    error: appealConfigError,
-  } = useQuery(GET_APPEAL_CONFIG, { variables: { assignmentConfigId: assignmentId } });
   const {
     data: appealsDetailsData,
     loading: appealDetailsLoading,
@@ -676,35 +687,38 @@ function AppealDetails({
     loading: appealMessagesLoading,
     error: appealMessagesError,
   } = useSubscription(GET_APPEAL_MESSAGES, { variables: { appealId: appealId } });
+  const {
+    data: submissionsData,
+    loading: submissionsLoading,
+    error: submissionsError,
+  } = useSubscription(GET_ASSIGNMENT_SUBMISSIONS, { variables: { assignmentConfigId } });
 
   // Display Loading if data fetching is still in-progress
-  if (appealConfigLoading || appealDetailsLoading || appealChangeLogLoading || appealMessagesLoading) {
-    return <DisplayLoading courseId={courseId} />;
+  if (appealDetailsLoading || appealChangeLogLoading || appealMessagesLoading || submissionsLoading) {
+    return <DisplayLoading />;
   }
 
   // Display error if it occurred
-  if (appealConfigError) {
-    const errorMessage = "Unable to Fetch appeal details with `GET_APPEAL_CONFIG`";
-    return <DisplayError courseId={courseId} errorMessage={errorMessage} />;
-  } else if (appealDetailsError) {
-    const errorMessage = "Unable to Fetch appeal details with `GET_APPEAL_DETAILS_BY_APPEAL_ID`";
-    return <DisplayError courseId={courseId} errorMessage={errorMessage} />;
+  if (appealDetailsError) {
+    const errorMessage = "Unable to fetch appeal details with `GET_APPEAL_DETAILS_BY_APPEAL_ID`";
+    return <DisplayError errorMessage={errorMessage} />;
   } else if (appealChangeLogError) {
-    const errorMessage = "Unable to Fetch appeal details with `GET_APPEAL_CHANGE_LOGS_BY_APPEAL_ID`";
-    return <DisplayError courseId={courseId} errorMessage={errorMessage} />;
+    const errorMessage = "Unable to fetch appeal details with `GET_APPEAL_CHANGE_LOGS_BY_APPEAL_ID`";
+    return <DisplayError errorMessage={errorMessage} />;
   } else if (appealMessagesError) {
-    const errorMessage = "Unable to Fetch appeal details with `GET_APPEAL_MESSAGES`";
-    return <DisplayError courseId={courseId} errorMessage={errorMessage} />;
+    const errorMessage = "Unable to fetch appeal details with `GET_APPEAL_MESSAGES`";
+    return <DisplayError errorMessage={errorMessage} />;
+  } else if (submissionsError) {
+    const errorMessage = "Unable to fetch appeal details with `GET_ASSIGNMENT_SUBMISSIONS`";
+    return <DisplayError errorMessage={errorMessage} />;
   } else if (!appealsDetailsData || !appealsDetailsData.appeal) {
     // Check if the appeal details is available, if not, there is no such appeal
     const errorMessage = "Invalid appeal. Please check the appeal number.";
-    return <DisplayError courseId={courseId} errorMessage={errorMessage} />;
+    return <DisplayError errorMessage={errorMessage} />;
   }
 
   // Translate `appealDetailsData` to `AppealAttempt[]`
   let appealAttempt: AppealAttempt[] = transformToAppealAttempt({ appealsDetailsData });
-
-  console.log(appealAttempt);
 
   // Merge the data and create a log list
   let activityLogList: (
@@ -714,19 +728,41 @@ function AppealDetails({
   )[] = mergeDataToActivityLogList({ appealAttempt, appealChangeLogData, appealMessagesData });
 
   // Get Grade Scores
-  const originalScore: number = appealsDetailsData.appeal.user.submissions[0].reports[0].grade.score;
-  const totalScore: number = appealsDetailsData.appeal.user.submissions[0].reports[0].grade.maxTotal;
+  let score: number = -1;
+  // First, get the score of the original submission
+  for (let i = 0; i < submissionsData.submissions.length; i++) {
+    // Do not pick the submission that is related to the appeal
+    if (submissionsData.submissions[i].id != appealsDetailsData.appeal.newFileSubmissionId) {
+      score = submissionsData.submissions[i].reports[0].grade.score;
+      break;
+    }
+  }
+  // Second, get the latest score based on change logs
+  for (let i = 0; i < appealChangeLogData.changeLogs.length; i++) {
+    // Use the latest score change
+    if (appealChangeLogData.changeLogs[0].type == "SCORE") {
+      score = appealChangeLogData.changeLogs[0].updatedState.replace(/[^0-9]/g, "");
+      break;
+    }
+    // Use the new file submission score submitted with the appeal
+    if (
+      appealAttempt[0].latestStatus === AppealStatus.Accept &&
+      appealChangeLogData.changeLogs[0].type == "APPEAL_STATUS" &&
+      appealChangeLogData.changeLogs[0].updatedState == "[{'status':ACCEPTED}]" &&
+      appealsDetailsData.appeal.submission &&
+      appealsDetailsData.appeal.submission.reports.length() > 0
+    ) {
+      score = appealsDetailsData.appeal.submission.reports[0].grade.score;
+      break;
+    }
+  }
+
+  const totalScore: number = submissionsData.submissions[0].reports[0].grade.maxTotal;
 
   return (
     <LayoutProvider>
       <Layout title="Appeal Detail">
         <div className="p-6 w-full flex flex-col overflow-y-auto">
-          <Link href={`/courses/${courseId}`}>
-            <a className="max-w-max-content w-max px-3 py-1.5 mb-3 border border-gray-300 text-sm leading-4 font-medium rounded-lg text-blue-700 bg-white hover:text-blue-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:text-blue-800 active:bg-gray-50 transition ease-in-out duration-150">
-              <FontAwesomeIcon icon={["far", "chevron-left"]} className="mr-2" />
-              Back
-            </a>
-          </Link>
           <h1 className="text-2xl text-gray-900 font-bold leading-7">Appeal Details</h1>
           <div className="flex flex-row mt-8">
             {/* Appeal Information */}
@@ -735,10 +771,6 @@ function AppealDetails({
               <p className="col-span-2">{appealsDetailsData.appeal.user.name}</p>
               <p className="font-medium">ITSC:</p>
               <p className="col-span-2">{appealsDetailsData.appeal.user.itsc}</p>
-              <p className="font-medium">Original Score:</p>
-              <p className="col-span-2">
-                {originalScore} / {totalScore}
-              </p>
             </div>
             {/* Appeal Status */}
             <div className="max-w-md mr-4 px-5">
@@ -750,7 +782,8 @@ function AppealDetails({
                 userId={userId}
                 submissionId={submissionId}
                 appealAttempt={appealAttempt[0]}
-                oldScore={originalScore}
+                oldScore={score}
+                maxScore={totalScore}
               />
             </div>
           </div>
@@ -804,24 +837,18 @@ export const getServerSideProps: GetServerSideProps = async ({ req, query }) => 
   const userId = parseInt(req.cookies.user);
   const appealId = parseInt(query.appealId as string);
 
-  // Get AssignmentID
-  let assignmentId: number = -1;
-  const { data } = await apolloClient.query({
-    query: GET_ASSIGNMENT_CONFIG_ID_BY_APPEAL_ID,
+  const { data: idData } = await apolloClient.query({
+    query: GET_IDS_BY_APPEAL_ID,
     variables: {
-      appealId,
+      appealId: appealId,
     },
   });
-  if (data.appeal.assignmentConfigId) {
-    assignmentId = data.appeal.assignmentConfigId;
-  }
 
-  // TODO(BRYAN): Get CourseID
-  let courseId: number = -1;
+  const assignmentConfigId: number = idData.appeal.assignmentConfigId;
 
   // TODO(BRYAN): Obtain the submission IDs from the backend
-  const oldSubmissionId = 1;
-  const newSubmissionId = 2;
+  const oldSubmissionId: number = 1;
+  const newSubmissionId: number = idData.appeal.newFileSubmissionId;
   let diffSubmissionsData: DiffSubmissionsData;
   try {
     const response = await fetch(
@@ -842,8 +869,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, query }) => 
       initialApolloState: apolloClient.cache.extract(),
       appealId,
       userId,
-      courseId,
-      assignmentId,
+      assignmentConfigId,
       diffSubmissionsData,
       submissionId: oldSubmissionId,
     },
