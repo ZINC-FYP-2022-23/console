@@ -176,7 +176,6 @@ interface transformToAppealLogProps {
  */
 function transformToAppealLog({ appeals, changeLog }: transformToAppealLogProps): AppealLog[] {
   let appealLog: AppealLog[] = [];
-  let log: AppealLog;
 
   appeals.forEach((appeal) => {
     appealLog.push({
@@ -196,6 +195,7 @@ function transformToAppealLog({ appeals, changeLog }: transformToAppealLogProps)
       date: log.createdAt,
       originalState: originalState,
       updatedState: updatedStatus,
+      reason: log.reason,
     });
   });
 
@@ -249,7 +249,7 @@ export function mergeDataToActivityLogList({
       originalState: log.originalState,
       updatedState: log.updatedState,
       initiatedBy: log.initiatedBy,
-      reason: log.reason || null,
+      reason: log.reason,
       appealId: log.appealId || null,
     });
   });

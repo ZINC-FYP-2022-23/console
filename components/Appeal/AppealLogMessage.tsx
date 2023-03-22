@@ -40,6 +40,12 @@ export function AppealLogMessage({ log, showButton }: AppealLogMessageType) {
                 })} at ${logDate.toLocaleTimeString().toLowerCase()}`}
               </span>
             </p>
+            {log.reason && (
+              <div>
+                <p>Reason: </p>
+                <div className="ml-2 text-sm text-gray-600" dangerouslySetInnerHTML={{ __html: log.reason }} />
+              </div>
+            )}
           </div>
           {showButton && (
             <span className="inline-flex rounded-md shadow-sm">
@@ -54,6 +60,8 @@ export function AppealLogMessage({ log, showButton }: AppealLogMessageType) {
       </>
     );
   }
+
+  console.log(log.reason);
 
   // Log component for `APPEAL_STATUS`-related log
   if (log.type === ChangeLogTypes.APPEAL_STATUS && log.updatedState) {
@@ -87,7 +95,12 @@ export function AppealLogMessage({ log, showButton }: AppealLogMessageType) {
               {log.updatedState === AppealStatus.Pending && (
                 <p className="ml-2 text-sm text-yellow-600">Your appeal has been set to pending</p>
               )}
-              {log.reason && <p className="ml-2 text-sm text-gray-600">{log.reason}</p>}
+              {log.reason && (
+                <div className="flex-row">
+                  <p className="text-sm text-gray-600">Reason: </p>
+                  <div className="ml-2 text-sm text-blue-900" dangerouslySetInnerHTML={{ __html: log.reason }} />
+                </div>
+              )}
             </p>
           </div>
           {showButton && (
@@ -118,29 +131,37 @@ export function AppealLogMessage({ log, showButton }: AppealLogMessageType) {
             >
               <FontAwesomeIcon icon={["fad", "star"]} />
             </div>
-            <p className="ml-2 text-sm text-gray-600">
-              The score has been updated
-              {log.originalState && (
-                <>
-                  {" from "}
-                  <span className="text-yellow-700">{log.originalState}</span>
-                </>
+            <div className="flex-col">
+              <p className="ml-2 text-sm text-gray-600">
+                The score has been updated
+                {log.originalState && (
+                  <>
+                    {" from "}
+                    <span className="text-yellow-700">{log.originalState}</span>
+                  </>
+                )}
+                {log.updatedState && (
+                  <>
+                    {" to "}
+                    <span className="text-yellow-700">{log.updatedState}</span>
+                  </>
+                )}
+                {" on"}
+                <span className="ml-1">
+                  {`${logDate.toLocaleDateString("en-HK", {
+                    month: "short",
+                    day: "numeric",
+                    ...(logDate.getFullYear() !== now.getFullYear() && { year: "numeric" }),
+                  })} at ${logDate.toLocaleTimeString().toLowerCase()}`}
+                </span>
+              </p>
+              {log.reason && (
+                <div className="flex-row">
+                  <p className="ml-2 text-sm text-gray-600">Reason: </p>
+                  <div className="ml-4 text-sm text-blue-900" dangerouslySetInnerHTML={{ __html: log.reason }} />
+                </div>
               )}
-              {log.updatedState && (
-                <>
-                  {" to "}
-                  <span className="text-yellow-700">{log.updatedState}</span>
-                </>
-              )}
-              {" on"}
-              <span className="ml-1">
-                {`${logDate.toLocaleDateString("en-HK", {
-                  month: "short",
-                  day: "numeric",
-                  ...(logDate.getFullYear() !== now.getFullYear() && { year: "numeric" }),
-                })} at ${logDate.toLocaleTimeString().toLowerCase()}`}
-              </span>
-            </p>
+            </div>
           </div>
           {showButton && (
             <span className="inline-flex rounded-md shadow-sm">
