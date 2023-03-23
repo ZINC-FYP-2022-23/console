@@ -9,6 +9,11 @@ declare global {
   namespace Cypress {
     interface Chainable {
       /**
+       * Clicks outside the current element by clicking at the top-left corner of the body.
+       */
+      clickOutside: () => Chainable<any>;
+
+      /**
        * Mounts a React component into the DOM. See {@link mount} from `"cypress/react"`.
        */
       mount: typeof mount;

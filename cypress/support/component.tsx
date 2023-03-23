@@ -5,6 +5,7 @@ import { far } from "@fortawesome/pro-regular-svg-icons";
 import { mount, MountOptions } from "cypress/react";
 import { Store, StoreProvider } from "easy-peasy";
 import "../../dist/index.css";
+import "./commands";
 
 Cypress.Commands.add("mount", (jsx: React.ReactNode, options?: MountOptions, rerenderKey?: string) => {
   // Register Font Awesome icons
