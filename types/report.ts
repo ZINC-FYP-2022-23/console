@@ -14,6 +14,7 @@ export type GraderReport = {
   scoreReports?: ScoreReports;
 };
 
+// TODO(Anson): Deprecate the old error format
 export type ConfigError = {
   configFormatError?: {
     errorField: string;

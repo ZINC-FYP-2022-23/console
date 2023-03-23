@@ -1,5 +1,6 @@
 export * from "./Config";
 export type { default as Config } from "./Config";
+export * from "./Diagnostics";
 export * from "./GradingPolicy";
 export type { default as GradingPolicy } from "./GradingPolicy";
 export * from "./Graph";

@@ -4,7 +4,7 @@ import { useQuery } from "@apollo/client";
 import * as Sentry from "@sentry/nextjs";
 import JSZip from "jszip";
 import { SIDEBAR } from "../graphql/queries/user";
-import { ConfigError } from "@/types/report";
+import { Diagnostic } from "../types";
 
 interface ZincContextState {
   user: number;
@@ -19,7 +19,7 @@ interface ZincContextState {
     assignmentConfigId: string,
   ) => Promise<{
     id: string;
-    /** Stringified object of type {@link ConfigError}. */
+    /** Stringified array of objects with type {@link Diagnostic}. */
     configError?: string;
   }>;
   triggerManualGrading: (configId: string, usersBeingGraded?: Array<number>) => Promise<any>;

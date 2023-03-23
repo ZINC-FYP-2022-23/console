@@ -1,6 +1,8 @@
 import { defaultConfig, defaultPolicy, defaultSchedule } from "@/constants/GuiBuilder/defaults";
 import {
   Config,
+  ConfigDiagnostics,
+  DiagnosticRaw,
   GradingPolicy,
   Schedule,
   Settings,
@@ -47,6 +49,9 @@ interface ConfigModelState {
   initSchedule: Schedule;
   /** The scheduling with proposed changes. */
   editingSchedule: Schedule;
+
+  /** Diagnostics found in the {@link Config} after validation by the Grader. */
+  diagnostics: ConfigDiagnostics;
 }
 
 interface ConfigModelComputed {
@@ -192,6 +197,12 @@ const configModelState: ConfigModelState = {
   editingPolicy: defaultPolicy,
   initSchedule: defaultSchedule,
   editingSchedule: defaultSchedule,
+
+  diagnostics: {
+    _settings: [],
+    stages: {},
+    others: [],
+  },
 };
 
 const configModelComputed: ConfigModelComputed = {

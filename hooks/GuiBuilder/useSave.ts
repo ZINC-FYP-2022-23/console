@@ -2,8 +2,10 @@ import { useLayoutDispatch } from "@/contexts/layout";
 import { useZinc } from "@/contexts/zinc";
 import { CREATE_ASSIGNMENT_CONFIG, UPDATE_ASSIGNMENT_CONFIG } from "@/graphql/mutations/user";
 import { useStoreActions, useStoreState } from "@/store/GuiBuilder";
+import { DiagnosticRaw } from "@/types/GuiBuilder";
 import { AssignmentConfig } from "@/types/tables";
 import { configToYaml } from "@/utils/GuiBuilder";
+import { nullToUndefined } from "@/utils/object";
 import { useMutation } from "@apollo/client";
 import { useRouter } from "next/router";
 import { useState } from "react";
@@ -52,12 +54,16 @@ function useSave() {
     // Validate `_settings` part of YAML first
     const editingConfig = getEditingConfig();
     const settingsYaml = configToYaml(editingConfig, true);
-    const { configError } = await validateAssignmentConfig(settingsYaml, configId?.toString() ?? "draft");
-    if (configError) {
-      const configErrorJson = JSON.parse(configError);
-      console.error("Error while validating config", configErrorJson);
+    const { configError: configDiagnosticsRaw } = await validateAssignmentConfig(
+      settingsYaml,
+      configId?.toString() ?? "draft",
+    );
+    if (configDiagnosticsRaw && configDiagnosticsRaw !== "[]") {
+      const configDiagnosticsRawJson = JSON.parse(configDiagnosticsRaw);
+      console.error("Error while validating config", configDiagnosticsRawJson);
 
-      // TODO(Anson): Parse the config error and display it in UI
+      const configDiagnostics = nullToUndefined(configDiagnosticsRawJson) as DiagnosticRaw[];
+      // TODO(Anson): Use a store action to parse the diagnostics
 
       dispatch({
         type: "showNotification",
@@ -65,7 +71,7 @@ function useSave() {
           success: false,
           title: "Error in General Settings",
           // TODO(Anson): Show proper error message instead of the raw JSON
-          message: configError,
+          message: configDiagnosticsRaw,
         },
       });
       return false;
@@ -142,12 +148,14 @@ function useSave() {
     // Validate config YAML first
     const editingConfig = generateStageLabels();
     const configYaml = configToYaml(editingConfig);
-    const { configError } = await validateAssignmentConfig(configYaml, configId.toString());
-    if (configError) {
-      const configErrorJson = JSON.parse(configError);
-      console.error("Error while validating config", configErrorJson);
+    const { configError: configDiagnosticsRaw } = await validateAssignmentConfig(configYaml, configId.toString());
+    if (configDiagnosticsRaw && configDiagnosticsRaw !== "[]") {
+      const configDiagnosticsRawJson = JSON.parse(configDiagnosticsRaw);
+      console.error("Error while validating config", configDiagnosticsRawJson);
 
-      // TODO(Anson): Parse the config error and display it in UI
+      const configDiagnostics = nullToUndefined(configDiagnosticsRawJson) as DiagnosticRaw[];
+
+      // TODO(Anson): Use a store action to parse the diagnostics
 
       dispatch({
         type: "showNotification",
@@ -155,7 +163,7 @@ function useSave() {
           success: false,
           title: "Error in Pipeline Settings",
           // TODO(Anson): Show proper error message instead of the raw JSON
-          message: configError,
+          message: configDiagnosticsRaw,
         },
       });
       return false;
