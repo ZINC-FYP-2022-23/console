@@ -31,7 +31,7 @@ function MakeSettings() {
           </div>
           <div className="flex-[3] flex">
             <TagsInput
-              name="targets"
+              id="targets"
               value={config.targets}
               onChange={(tags) => setConfig({ ...config, targets: tags })}
               onBlur={onTagInputBlur("targets")}
@@ -67,7 +67,7 @@ function MakeSettings() {
           </div>
           <div className="flex-[3] flex">
             <TagsInput
-              name="additional_packages"
+              id="additional_packages"
               value={config.additional_packages}
               onChange={(tags) => setConfig({ ...config, additional_packages: tags })}
               onBlur={onTagInputBlur("additional_packages")}

@@ -1,12 +1,10 @@
 import CompileSettings from "@/components/GuiBuilder/StageSettings/CompileSettings";
+import supportedStages from "@/constants/GuiBuilder/supportedStages";
 import { Compile } from "@/types/GuiBuilder";
 import { createStore } from "easy-peasy";
 import { getModelWithSingleStage } from "../utils";
 
-const compileEmpty: Compile = {
-  input: [],
-  additional_packages: [],
-};
+const getModelWithConfigStage = () => getModelWithSingleStage("Compile", supportedStages.Compile.defaultConfig);
 
 describe("GuiBuilder: Stage Settings - Compile", () => {
   beforeEach(() => {
@@ -14,7 +12,7 @@ describe("GuiBuilder: Stage Settings - Compile", () => {
   });
 
   it("sets the Compile stage config", () => {
-    const model = getModelWithSingleStage("Compile", compileEmpty);
+    const model = getModelWithConfigStage();
     const store = createStore(model);
     cy.mountWithStore(store, <CompileSettings />);
 
@@ -24,19 +22,19 @@ describe("GuiBuilder: Stage Settings - Compile", () => {
     cy.get("#additional_packages").type("curl").clickOutside();
 
     cy.then(() => {
-      const compileActual = store.getState().config.editingConfig.stageData["stage-0"].config;
-      const compileExpected: Compile = {
+      const configActual = store.getState().config.editingConfig.stageData["stage-0"].config;
+      const configExpected: Compile = {
         input: ["a.cpp", "b.cpp"],
         output: "a.out",
         flags: "-std=c+11 -pedantic",
         additional_packages: ["curl"],
       };
-      expect(compileActual).to.deep.equal(compileExpected);
+      expect(configActual).to.deep.equal(configExpected);
     });
   });
 
   it("disables the `output` field if Java is used", () => {
-    const model = getModelWithSingleStage("Compile", compileEmpty);
+    const model = getModelWithConfigStage();
     model.config.editingConfig._settings.lang = {
       language: "java",
       compiler: null,
