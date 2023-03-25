@@ -4,6 +4,8 @@
  * See `cypress/cypress.d.ts` for the commands' documentation.
  */
 
+import "@4tw/cypress-drag-drop";
+
 Cypress.Commands.add("clickMultiSelectInput", (selector: string, content: string[]) => {
   cy.get(selector).click();
   content.forEach((c) => {
