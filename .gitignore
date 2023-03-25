@@ -43,4 +43,5 @@ docker-compose.yml
 .sentryclirc
 
 # Cypress
+cypress/screenshots
 cypress/videos

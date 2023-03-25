@@ -5,8 +5,6 @@ import { PyTest, PyTestRaw } from "@/types/GuiBuilder";
 import { createStore, Store } from "easy-peasy";
 import { getModelWithSingleStage } from "../utils";
 
-const getModelWithConfigStage = () => getModelWithSingleStage("PyTest", supportedStages.PyTest.defaultConfig);
-
 /**
  * Obtain the current `PyTest` config from the store and converts it to a raw config.
  */
@@ -36,7 +34,7 @@ describe("GuiBuilder: Stage Settings - PyTest", () => {
 
   describe("setting the PyTest stage config", () => {
     it("sets the non-scoring policy fields", () => {
-      const model = getModelWithConfigStage();
+      const model = getModelWithSingleStage("PyTest");
       const store = createStore(model);
       cy.mountWithStore(store, <PyTestSettings />);
 
@@ -53,15 +51,14 @@ describe("GuiBuilder: Stage Settings - PyTest", () => {
     });
 
     it("handles Score-out-of-Total scoring policy", () => {
-      const model = getModelWithConfigStage();
+      const model = getModelWithSingleStage("PyTest");
       const store = createStore(model);
       cy.mountWithStore(store, <PyTestSettings />);
 
       cy.get("button").contains("Edit Stage Configuration").click();
       cy.get("[role=radio]").contains("Score-out-of-Total").click();
       cy.get("#score").clear().type("100");
-      cy.get("#treatDenormalScore").click();
-      cy.get("div.mantine-Select-item").contains("This stage will get a score of 0").click();
+      cy.clickSelectInput("#treatDenormalScore", "This stage will get a score of 0");
 
       cy.then(() => {
         const configActualRaw = getConfigRawFromStore(store);
@@ -76,7 +73,7 @@ describe("GuiBuilder: Stage Settings - PyTest", () => {
     });
 
     it("handles Weighted scoring policy", () => {
-      const model = getModelWithConfigStage();
+      const model = getModelWithSingleStage("PyTest");
       const store = createStore(model);
       cy.mountWithStore(store, <PyTestSettings />);
 
@@ -89,8 +86,7 @@ describe("GuiBuilder: Stage Settings - PyTest", () => {
       // Score Overrides
       cy.get("button").contains("Add Override").click();
       cy.get('[data-cy="predicate-score"]').clear().type("2");
-      cy.get('[data-cy="predicate-joinPolicy"]').click();
-      cy.get("div.mantine-Select-item").contains("any").click();
+      cy.clickSelectInput('[data-cy="predicate-joinPolicy"]', "any");
       setPredicateRow(0, { key: "Class name", op: "equals", value: "TestHard" });
       cy.get("button").contains("Add condition").click();
       setPredicateRow(1, { key: "Test case name", op: "matches regex", value: "test_hard" });
@@ -117,7 +113,7 @@ describe("GuiBuilder: Stage Settings - PyTest", () => {
     });
 
     it("handles Disable scoring policy", () => {
-      const model = getModelWithConfigStage();
+      const model = getModelWithSingleStage("PyTest");
       const store = createStore(model);
       cy.mountWithStore(store, <PyTestSettings />);
 

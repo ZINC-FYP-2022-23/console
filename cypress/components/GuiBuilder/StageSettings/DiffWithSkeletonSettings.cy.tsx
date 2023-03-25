@@ -1,11 +1,7 @@
 import DiffWithSkeletonSettings from "@/components/GuiBuilder/StageSettings/DiffWithSkeletonSettings";
-import supportedStages from "@/constants/GuiBuilder/supportedStages";
 import { DiffWithSkeleton } from "@/types/GuiBuilder";
 import { createStore } from "easy-peasy";
 import { getModelWithSingleStage } from "../utils";
-
-const getModelWithConfigStage = () =>
-  getModelWithSingleStage("DiffWithSkeleton", supportedStages.DiffWithSkeleton.defaultConfig);
 
 describe("GuiBuilder: Stage Settings - DiffWithSkeleton", () => {
   beforeEach(() => {
@@ -13,7 +9,7 @@ describe("GuiBuilder: Stage Settings - DiffWithSkeleton", () => {
   });
 
   it("sets the DiffWithSkeleton stage config", () => {
-    const model = getModelWithConfigStage();
+    const model = getModelWithSingleStage("DiffWithSkeleton");
     model.config.editingConfig._settings.use_skeleton = true;
     const store = createStore(model);
     cy.mountWithStore(store, <DiffWithSkeletonSettings />);
@@ -30,7 +26,7 @@ describe("GuiBuilder: Stage Settings - DiffWithSkeleton", () => {
   });
 
   it("shows a warning when `_settings.use_skeleton` is not true", () => {
-    const model = getModelWithConfigStage();
+    const model = getModelWithSingleStage("DiffWithSkeleton");
     model.config.editingConfig._settings.use_skeleton = false;
     const store = createStore(model);
     cy.mountWithStore(store, <DiffWithSkeletonSettings />);

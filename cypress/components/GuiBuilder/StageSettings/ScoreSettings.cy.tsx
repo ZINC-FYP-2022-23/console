@@ -1,10 +1,7 @@
 import ScoreSettings from "@/components/GuiBuilder/StageSettings/ScoreSettings";
-import supportedStages from "@/constants/GuiBuilder/supportedStages";
 import { Score } from "@/types/GuiBuilder";
 import { createStore } from "easy-peasy";
 import { getModelWithSingleStage } from "../utils";
-
-const getModelWithConfigStage = () => getModelWithSingleStage("Score", supportedStages.Score.defaultConfig);
 
 describe("GuiBuilder: Stage Settings - Score", () => {
   beforeEach(() => {
@@ -12,7 +9,7 @@ describe("GuiBuilder: Stage Settings - Score", () => {
   });
 
   it("sets the Score stage config", () => {
-    const model = getModelWithConfigStage();
+    const model = getModelWithSingleStage("Score");
     const store = createStore(model);
     cy.mountWithStore(store, <ScoreSettings />);
 
@@ -32,7 +29,7 @@ describe("GuiBuilder: Stage Settings - Score", () => {
   });
 
   it("shows an error if minScore > maxScore", () => {
-    const model = getModelWithConfigStage();
+    const model = getModelWithSingleStage("Score");
     const store = createStore(model);
     cy.mountWithStore(store, <ScoreSettings />);
 

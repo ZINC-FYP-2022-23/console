@@ -1,10 +1,7 @@
 import { StdioTestStageSettings } from "@/components/GuiBuilder/StageSettings/StdioTestSettings";
-import supportedStages from "@/constants/GuiBuilder/supportedStages";
 import { StdioTest } from "@/types/GuiBuilder";
 import { createStore } from "easy-peasy";
 import { getModelWithSingleStage } from "../../utils";
-
-const getModelWithConfigStage = () => getModelWithSingleStage("StdioTest", supportedStages.StdioTest.defaultConfig);
 
 describe("GuiBuilder: <StdioTestStageSettings />", () => {
   beforeEach(() => {
@@ -12,13 +9,11 @@ describe("GuiBuilder: <StdioTestStageSettings />", () => {
   });
 
   it("sets the overall settings of the StdioTest stage", () => {
-    const model = getModelWithConfigStage();
+    const model = getModelWithSingleStage("StdioTest");
     const store = createStore(model);
     cy.mountWithStore(store, <StdioTestStageSettings />);
 
-    cy.get("#diff_ignore_flags").click();
-    cy.get("li").contains("Trailing whitespace").click();
-    cy.get("li").contains("Space change").click().clickOutside();
+    cy.clickMultiSelectInput("#diff_ignore_flags", ["Trailing whitespace", "Space change"]);
     cy.get("#additional_packages").type("curl,");
 
     cy.then(() => {
@@ -35,7 +30,7 @@ describe("GuiBuilder: <StdioTestStageSettings />", () => {
 
   describe("Additional pip packages", () => {
     it("is disabled when the config does not use Python", () => {
-      const model = getModelWithConfigStage();
+      const model = getModelWithSingleStage("StdioTest");
       const store = createStore(model);
       cy.mountWithStore(store, <StdioTestStageSettings />);
 
@@ -51,7 +46,7 @@ describe("GuiBuilder: <StdioTestStageSettings />", () => {
     });
 
     it("is enabled when the config uses Python", () => {
-      const model = getModelWithConfigStage();
+      const model = getModelWithSingleStage("StdioTest");
       model.config.editingConfig._settings.lang = {
         language: "python",
         compiler: null,

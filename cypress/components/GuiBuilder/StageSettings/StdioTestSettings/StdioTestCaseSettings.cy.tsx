@@ -39,29 +39,22 @@ describe("GuiBuilder: <StdioTestCaseSettings />", () => {
 
     // Report
     cy.get("#score").type("1");
-    cy.get("#visibility").click();
-    cy.get("div.mantine-Select-item").contains("Visible after grading").click();
-    cy.get("#hide_from_report").click();
-    cy.get("li").contains("Standard input").click().clickOutside();
+    cy.clickSelectInput("#visibility", "Visible after grading");
+    cy.clickMultiSelectInput("#hide_from_report", ["Standard input"]);
 
     // Input/Output
     cy.get("#file").type("a.out");
     cy.get("#flags").type("1");
-    cy.get("#_stdinInputMode").click();
-    cy.get("div.mantine-Select-item").contains("From helper file").click();
+    cy.clickSelectInput("#_stdinInputMode", "From helper file");
     cy.get("#file_stdin").type("1.txt");
-    cy.get("#_expectedInputMode").click();
-    cy.get("div.mantine-Select-item").contains("By text input").click();
+    cy.clickSelectInput("#_expectedInputMode", "By text input");
     cy.get(".monaco-editor").first().type("hi");
 
     // Valgrind
     cy.get("#_valgrindOverride").click();
     cy.get("#valgrind-score").type("5");
-    cy.get("#valgrind-visibility").click();
-    cy.get("div.mantine-Select-item").contains("Always visible").click();
-    cy.get("#valgrind-checksFilter").click();
-    cy.get("li").contains("All Valgrind errors").click();
-    cy.get("li").contains("Memory leaks").click().clickOutside();
+    cy.clickSelectInput("#valgrind-visibility", "Always visible");
+    cy.clickMultiSelectInput("#valgrind-checksFilter", ["All Valgrind errors", "Memory leaks"]);
     cy.get("#valgrind-args").type("-v");
 
     cy.then(() => {

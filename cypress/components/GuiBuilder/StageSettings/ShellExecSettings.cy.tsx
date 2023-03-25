@@ -1,10 +1,7 @@
 import ShellExecSettings from "@/components/GuiBuilder/StageSettings/ShellExecSettings";
-import supportedStages from "@/constants/GuiBuilder/supportedStages";
 import { ShellExec } from "@/types/GuiBuilder";
 import { createStore } from "easy-peasy";
 import { getModelWithSingleStage } from "../utils";
-
-const getModelWithConfigStage = () => getModelWithSingleStage("ShellExec", supportedStages.ShellExec.defaultConfig);
 
 describe("GuiBuilder: Stage Settings - ShellExec", () => {
   beforeEach(() => {
@@ -12,7 +9,7 @@ describe("GuiBuilder: Stage Settings - ShellExec", () => {
   });
 
   it("sets the ShellExec stage config", () => {
-    const model = getModelWithConfigStage();
+    const model = getModelWithSingleStage("ShellExec");
     const store = createStore(model);
     cy.mountWithStore(store, <ShellExecSettings />);
 

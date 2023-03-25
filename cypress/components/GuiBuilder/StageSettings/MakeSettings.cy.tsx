@@ -1,10 +1,7 @@
 import MakeSettings from "@/components/GuiBuilder/StageSettings/MakeSettings";
-import supportedStages from "@/constants/GuiBuilder/supportedStages";
 import { Make } from "@/types/GuiBuilder";
 import { createStore } from "easy-peasy";
 import { getModelWithSingleStage } from "../utils";
-
-const getModelWithConfigStage = () => getModelWithSingleStage("Make", supportedStages.Make.defaultConfig);
 
 describe("GuiBuilder: Stage Settings - Make", () => {
   beforeEach(() => {
@@ -12,7 +9,7 @@ describe("GuiBuilder: Stage Settings - Make", () => {
   });
 
   it("sets the Make stage config", () => {
-    const model = getModelWithConfigStage();
+    const model = getModelWithSingleStage("Make");
     const store = createStore(model);
     cy.mountWithStore(store, <MakeSettings />);
 

@@ -2,18 +2,20 @@
  * @file Utilities for testing GUI Assignment Builder components.
  */
 
+import supportedStages from "@/constants/GuiBuilder/supportedStages";
 import { guiBuilderModel, GuiBuilderModel } from "@/store/GuiBuilder";
-import { StageKind } from "@/types/GuiBuilder";
+import { StageConfig, StageKind } from "@/types/GuiBuilder";
 import cloneDeep from "lodash/cloneDeep";
 
 /**
- * Returns a model that contains a single pipeline stage. This stage has a stage ID of `"stage-0"`,
- * and its node is selected in the pipeline editor.
+ * Returns a model that contains a single pipeline stage.
  *
- * @param name Name of that pipeline stage (e.g. `"DiffWithSkeleton"`).
- * @param config Configuration of that pipeline stage.
+ * The config of this stage is the default config as defined in {@link supportedStages}. It has a stage ID of
+ * `"stage-0"`, and its node is selected in the pipeline editor.
+ *
+ * @param name Name of a supported pipeline stage (e.g. `"DiffWithSkeleton"`).
  */
-export function getModelWithSingleStage<TConfig = any>(name: string, config: TConfig): GuiBuilderModel {
+export function getModelWithSingleStage<TName extends keyof StageConfig>(name: TName): GuiBuilderModel {
   const stageId = "stage-0";
 
   const model = cloneDeep(guiBuilderModel);
@@ -26,7 +28,7 @@ export function getModelWithSingleStage<TConfig = any>(name: string, config: TCo
       name: name,
       label: "",
       kind: StageKind.GRADING, // Doesn't matter so we chose the default value of StageKind
-      config: config,
+      config: supportedStages[name].defaultConfig,
     },
   };
   model.pipelineEditor.nodes = [

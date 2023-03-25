@@ -1,10 +1,7 @@
 import CompileSettings from "@/components/GuiBuilder/StageSettings/CompileSettings";
-import supportedStages from "@/constants/GuiBuilder/supportedStages";
 import { Compile } from "@/types/GuiBuilder";
 import { createStore } from "easy-peasy";
 import { getModelWithSingleStage } from "../utils";
-
-const getModelWithConfigStage = () => getModelWithSingleStage("Compile", supportedStages.Compile.defaultConfig);
 
 describe("GuiBuilder: Stage Settings - Compile", () => {
   beforeEach(() => {
@@ -12,7 +9,7 @@ describe("GuiBuilder: Stage Settings - Compile", () => {
   });
 
   it("sets the Compile stage config", () => {
-    const model = getModelWithConfigStage();
+    const model = getModelWithSingleStage("Compile");
     const store = createStore(model);
     cy.mountWithStore(store, <CompileSettings />);
 
@@ -34,7 +31,7 @@ describe("GuiBuilder: Stage Settings - Compile", () => {
   });
 
   it("disables the `output` field if Java is used", () => {
-    const model = getModelWithConfigStage();
+    const model = getModelWithSingleStage("Compile");
     model.config.editingConfig._settings.lang = {
       language: "java",
       compiler: null,

@@ -16,14 +16,12 @@ describe("GuiBuilder - <PipelineSettings />", () => {
     cy.mountWithStore(store, <PipelineSettings />);
 
     // Language
-    cy.get("#lang").click();
-    cy.get("div.mantine-Select-item").contains("C++ (g++)").click();
+    cy.clickSelectInput("#lang", "C++ (g++)");
     cy.get("#lang_version").type("8");
 
     // Helper Files
     cy.get("#use_skeleton").click();
-    cy.get("#use_template").click();
-    cy.get("div.mantine-Select-item").contains("None").click();
+    cy.clickSelectInput("#use_template", "None");
 
     // Stage Settings
     cy.get("#network").click();
@@ -58,8 +56,7 @@ describe("GuiBuilder - <PipelineSettings />", () => {
     cy.mountWithStore(store, <PipelineSettings />);
 
     // Text input
-    cy.get("#use_template").click();
-    cy.get("div.mantine-Select-item").contains("Text input").click();
+    cy.clickSelectInput("#use_template", "Text input");
     cy.get("#use-template-filenames input").type("a.cpp{Enter}b.cpp");
     cy.then(() => {
       const _settings = store.getState().config.editingConfig._settings;
@@ -69,8 +66,7 @@ describe("GuiBuilder - <PipelineSettings />", () => {
     });
 
     // File upload
-    cy.get("#use_template").click();
-    cy.get("div.mantine-Select-item").contains("File upload").click();
+    cy.clickSelectInput("#use_template", "File upload");
     cy.then(() => {
       const _settings = store.getState().config.editingConfig._settings;
       const settingsRaw = settingsToSettingsRaw(_settings);
@@ -85,8 +81,7 @@ describe("GuiBuilder - <PipelineSettings />", () => {
     cy.mountWithStore(store, <PipelineSettings />);
 
     // Any GPU
-    cy.get("#gpus").click();
-    cy.get("div.mantine-Select-item").contains("Any GPU").click();
+    cy.clickSelectInput("#gpus", "Any GPU");
     cy.then(() => {
       const _settings = store.getState().config.editingConfig._settings;
       const settingsRaw = settingsToSettingsRaw(_settings);
@@ -94,8 +89,7 @@ describe("GuiBuilder - <PipelineSettings />", () => {
     });
 
     // Choose vendors
-    cy.get("#gpus").click();
-    cy.get("div.mantine-Select-item").contains("Choose vendors").click();
+    cy.clickSelectInput("#gpus", "Choose vendors");
     cy.get("#NVIDIA").click();
     cy.get("#INTEL").click();
     cy.then(() => {

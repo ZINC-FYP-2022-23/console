@@ -1,3 +1,9 @@
+/**
+ * @file Custom Cypress commands for component tests.
+ *
+ * See `cypress/cypress.d.ts` for the commands' documentation.
+ */
+
 import { IconPack, library } from "@fortawesome/fontawesome-svg-core";
 import { fas } from "@fortawesome/free-solid-svg-icons";
 import { fad } from "@fortawesome/pro-duotone-svg-icons";

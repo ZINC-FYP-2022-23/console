@@ -1,11 +1,7 @@
 import FileStructureValidationSettings from "@/components/GuiBuilder/StageSettings/FileStructureValidationSettings";
-import supportedStages from "@/constants/GuiBuilder/supportedStages";
 import { FileStructureValidation, SettingsUseTemplate } from "@/types/GuiBuilder";
 import { createStore } from "easy-peasy";
 import { getModelWithSingleStage } from "../utils";
-
-const getModelWithConfigStage = () =>
-  getModelWithSingleStage("FileStructureValidation", supportedStages.FileStructureValidation.defaultConfig);
 
 describe("GuiBuilder: Stage Settings - FileStructureValidation", () => {
   beforeEach(() => {
@@ -13,7 +9,7 @@ describe("GuiBuilder: Stage Settings - FileStructureValidation", () => {
   });
 
   it("sets the FileStructureValidation stage config", () => {
-    const model = getModelWithConfigStage();
+    const model = getModelWithSingleStage("FileStructureValidation");
     model.config.editingConfig._settings.use_template = SettingsUseTemplate.PATH;
     const store = createStore(model);
     cy.mountWithStore(store, <FileStructureValidationSettings />);
@@ -31,7 +27,7 @@ describe("GuiBuilder: Stage Settings - FileStructureValidation", () => {
   });
 
   it("shows a warning if `_settings.use_template` is undefined", () => {
-    const model = getModelWithConfigStage();
+    const model = getModelWithSingleStage("FileStructureValidation");
     model.config.editingConfig._settings.use_template = undefined;
     const store = createStore(model);
     cy.mountWithStore(store, <FileStructureValidationSettings />);
@@ -43,7 +39,7 @@ describe("GuiBuilder: Stage Settings - FileStructureValidation", () => {
   });
 
   it("shows a warning if the file/directory is ignored by default", () => {
-    const model = getModelWithConfigStage();
+    const model = getModelWithSingleStage("FileStructureValidation");
     model.config.editingConfig._settings.use_template = SettingsUseTemplate.PATH;
     const store = createStore(model);
     cy.mountWithStore(store, <FileStructureValidationSettings />);

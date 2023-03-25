@@ -18,11 +18,8 @@ describe("GuiBuilder: Stage Settings - Make", () => {
     cy.mountWithStore(store, <ValgrindSettings />);
 
     cy.get("#score").type("5");
-    cy.get("#visibility").click();
-    cy.get("div.mantine-Select-item").contains("Always visible").click();
-    cy.get("#checksFilter").click();
-    cy.get("li").contains("All Valgrind errors").click();
-    cy.get("li").contains("Memory leaks").click().clickOutside();
+    cy.clickSelectInput("#visibility", "Always visible");
+    cy.clickMultiSelectInput("#checksFilter", ["All Valgrind errors", "Memory leaks"]);
     cy.get("#args").type("-v");
 
     cy.then(() => {
@@ -39,7 +36,7 @@ describe("GuiBuilder: Stage Settings - Make", () => {
   });
 
   it("shows a warning if the pipeline has no StdioTest stage", () => {
-    const model = getModelWithSingleStage("Valgrind", supportedStages.Valgrind.defaultConfig);
+    const model = getModelWithSingleStage("Valgrind");
     const store = createStore(model);
     cy.mountWithStore(store, <ValgrindSettings />);
 
