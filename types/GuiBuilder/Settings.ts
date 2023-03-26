@@ -19,7 +19,10 @@ interface Settings {
   cpus?: number;
   mem_gb?: number;
   early_return_on_throw: boolean;
-  enable_features: SettingsFeatures;
+  enable_features: {
+    network: boolean;
+    gpu_device?: SettingsGpuDevice[] | "ANY";
+  };
 }
 
 /**
@@ -57,36 +60,16 @@ export interface SettingsLang {
 
 /**
  * Enum for `_settings.use_template`.
+ * - `FILENAMES` - Take list of files from the `_settings.template` field.
+ * - `PATH` - Take from the list of files uploaded by the TA on what files the student should submit.
  */
-export enum SettingsUseTemplate {
-  /**
-   * Take from the list of files uploaded by the TA on what files the student should submit.
-   */
-  PATH = "PATH",
-
-  /**
-   * Take list of files from the `_settings.template` field.
-   */
-  FILENAMES = "FILENAMES",
-}
+export type SettingsUseTemplate = "FILENAMES" | "PATH";
 
 /**
- * The `_settings.enable_features` field.
- */
-export interface SettingsFeatures {
-  network: boolean;
-  gpu_device?: SettingsGpuDevice[] | "ANY";
-}
-
-/**
- * The `_settings.enable_features.gpu` field.
+ * Accepted vendors for the `_settings.enable_features.gpu_device` field.
  *
  * {@link https://docs.zinc.ust.dev/user/model/Config.html#settings-enable-features-gpu}
  */
-export enum SettingsGpuDevice {
-  NVIDIA = "NVIDIA",
-  AMD = "AMD",
-  INTEL = "INTEL",
-}
+export type SettingsGpuDevice = "NVIDIA" | "AMD" | "INTEL";
 
 export default Settings;

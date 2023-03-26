@@ -1,5 +1,5 @@
 import FileStructureValidationSettings from "@/components/GuiBuilder/StageSettings/FileStructureValidationSettings";
-import { FileStructureValidation, SettingsUseTemplate } from "@/types/GuiBuilder";
+import { FileStructureValidation } from "@/types/GuiBuilder";
 import { createStore } from "easy-peasy";
 import { getModelWithSingleStage } from "../utils";
 
@@ -10,7 +10,7 @@ describe("GuiBuilder: Stage Settings - FileStructureValidation", () => {
 
   it("sets the FileStructureValidation stage config", () => {
     const model = getModelWithSingleStage("FileStructureValidation");
-    model.config.editingConfig._settings.use_template = SettingsUseTemplate.PATH;
+    model.config.editingConfig._settings.use_template = "PATH";
     const store = createStore(model);
     cy.mountWithStore(store, <FileStructureValidationSettings />);
 
@@ -40,7 +40,7 @@ describe("GuiBuilder: Stage Settings - FileStructureValidation", () => {
 
   it("shows a warning if the file/directory is ignored by default", () => {
     const model = getModelWithSingleStage("FileStructureValidation");
-    model.config.editingConfig._settings.use_template = SettingsUseTemplate.PATH;
+    model.config.editingConfig._settings.use_template = "PATH";
     const store = createStore(model);
     cy.mountWithStore(store, <FileStructureValidationSettings />);
 

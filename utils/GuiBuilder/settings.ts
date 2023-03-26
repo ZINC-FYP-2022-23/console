@@ -3,7 +3,7 @@
  */
 
 import { defaultSettings } from "@/constants/GuiBuilder/defaults";
-import { Settings, SettingsLang, SettingsRaw, SettingsUseTemplate } from "@/types/GuiBuilder";
+import { Settings, SettingsLang, SettingsRaw } from "@/types/GuiBuilder";
 import cloneDeep from "lodash/cloneDeep";
 import isEqual from "lodash/isEqual";
 import { v4 as uuidv4 } from "uuid";
@@ -39,7 +39,7 @@ export function settingsToSettingsRaw(settings: Settings): SettingsRaw {
   const _settings: SettingsRaw = {
     ...settingsRest,
     lang: settingsLangToString(settingsRest.lang),
-    ...(settingsRest.use_template === SettingsUseTemplate.FILENAMES && { template: template.map((t) => t.name) }),
+    ...(settingsRest.use_template === "FILENAMES" && { template: template.map((t) => t.name) }),
   };
 
   return _settings;

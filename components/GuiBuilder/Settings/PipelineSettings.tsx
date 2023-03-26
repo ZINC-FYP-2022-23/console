@@ -3,7 +3,7 @@ import ListInput from "@/components/Input/ListInput";
 import { highlightableElementIds } from "@/constants/GuiBuilder/highlightableElements";
 import supportedLanguages from "@/constants/GuiBuilder/supportedLanguages";
 import { useStoreActions, useStoreState } from "@/store/GuiBuilder";
-import { SettingsFeatures, SettingsGpuDevice, SettingsUseTemplate } from "@/types/GuiBuilder";
+import { Settings, SettingsGpuDevice, SettingsUseTemplate } from "@/types/GuiBuilder";
 import { settingsLangToString } from "@/utils/GuiBuilder";
 import { memo } from "react";
 import { v4 as uuidv4 } from "uuid";
@@ -22,12 +22,12 @@ const useTemplateSelectOptions: SelectItem<"undefined" | SettingsUseTemplate>[] 
   },
   {
     label: "Text input",
-    value: SettingsUseTemplate.FILENAMES,
+    value: "FILENAMES",
     description: "Input the names of the files to submit",
   },
   {
     label: "File upload",
-    value: SettingsUseTemplate.PATH,
+    value: "PATH",
     description: "Specify files to submit by uploading files",
   },
 ];
@@ -40,7 +40,7 @@ const gpuSelectOptions: SelectItem<GpuSelectValue>[] = [
   { label: "Choose vendors", value: "choose" },
 ];
 
-const getGpuSelectValue = (gpu: SettingsFeatures["gpu_device"]): GpuSelectValue => {
+const getGpuSelectValue = (gpu: Settings["enable_features"]["gpu_device"]): GpuSelectValue => {
   if (gpu === undefined) {
     return "undefined";
   } else if (gpu === "ANY") {
@@ -50,7 +50,7 @@ const getGpuSelectValue = (gpu: SettingsFeatures["gpu_device"]): GpuSelectValue 
   }
 };
 
-const gpuSelectValueToGpuDevice = (value: GpuSelectValue): SettingsFeatures["gpu_device"] => {
+const gpuSelectValueToGpuDevice = (value: GpuSelectValue): Settings["enable_features"]["gpu_device"] => {
   switch (value) {
     case "undefined":
       return undefined;
@@ -61,10 +61,10 @@ const gpuSelectValueToGpuDevice = (value: GpuSelectValue): SettingsFeatures["gpu
   }
 };
 
-const gpuVendorSelectOptions = [
-  { label: "NVIDIA", value: SettingsGpuDevice.NVIDIA },
-  { label: "AMD", value: SettingsGpuDevice.AMD },
-  { label: "Intel", value: SettingsGpuDevice.INTEL },
+const gpuVendorSelectOptions: { label: string; value: SettingsGpuDevice }[] = [
+  { label: "NVIDIA", value: "NVIDIA" },
+  { label: "AMD", value: "AMD" },
+  { label: "Intel", value: "INTEL" },
 ];
 
 function PipelineSettings() {
@@ -157,7 +157,7 @@ function PipelineSettings() {
                 styles={{ root: { flex: 1 } }}
               />
             </div>
-            {_settings.use_template === SettingsUseTemplate.FILENAMES && (
+            {_settings.use_template === "FILENAMES" && (
               <div id="use-template-filenames" className="mt-4 mx-3 p-3 bg-gray-50 rounded-lg drop-shadow">
                 <p className="mb-2 font-medium text-gray-600">Files to submit:</p>
                 <ListInput>
@@ -192,7 +192,7 @@ function PipelineSettings() {
                 </ListInput>
               </div>
             )}
-            {_settings.use_template === SettingsUseTemplate.PATH && (
+            {_settings.use_template === "PATH" && (
               <div className="mt-4 mx-3 p-3 bg-gray-50 drop-shadow rounded-lg space-y-2 text-gray-700">
                 <p>To upload your files:</p>
                 <ol className="ml-6 list-decimal">
