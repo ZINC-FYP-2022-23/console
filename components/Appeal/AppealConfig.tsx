@@ -88,6 +88,7 @@ export function AppealConfig({ assignmentConfig, setAssignmentConfig, onChange }
             </label>
             <input
               id="appealLimits"
+              value={assignmentConfig.appealLimits}
               type="number"
               onChange={(e) => {
                 if (setAssignmentConfig)
@@ -97,7 +98,6 @@ export function AppealConfig({ assignmentConfig, setAssignmentConfig, onChange }
                   });
                 else updateAppealConfig({ appealLimits: parseInt(e.target.value, 10) || null });
               }}
-              placeholder="1"
               className="mt-1 form-input block w-1/2 py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5"
             />
           </div>
