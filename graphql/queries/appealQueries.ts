@@ -15,7 +15,7 @@ export const GET_NUMBER_OF_APPEALS_AND_STATUS = gql`
 
 export const GET_APPEALS_DETAILS_BY_ASSIGNMENT_ID = gql`
   subscription getAppealDetailsList($assignmentConfigId: bigint!) {
-    appeals(where: { assignmentConfigId: { _eq: $assignmentConfigId } }) {
+    appeals(where: { assignmentConfigId: { _eq: $assignmentConfigId } }, order_by: { createdAt: desc }) {
       createdAt
       id
       newFileSubmissionId
@@ -65,6 +65,23 @@ export const GET_APPEAL_CONFIG = gql`
       appealStartAt
       appealStopAt
       isAppealViewReportAllowed
+    }
+  }
+`;
+
+export const GET_SUBMISSIONS_BY_ASSIGNMENT_ID = gql`
+  subscription getAssignmentSubmissions($assignmentConfigId: bigint!) {
+    submissions(where: { assignment_config_id: { _eq: $assignmentConfigId } }, order_by: { created_at: desc }) {
+      id
+      assignment_config_id
+      reports(order_by: { createdAt: desc }, limit: 1) {
+        id
+        grade
+      }
+      created_at
+      isLate
+      remarks
+      user_id
     }
   }
 `;
@@ -138,9 +155,12 @@ export const GET_APPEAL_MESSAGES = gql`
   }
 `;
 
-export const GET_ASSIGNMENT_SUBMISSIONS = gql`
-  subscription getAssignmentSubmissions($assignmentConfigId: bigint!) {
-    submissions(where: { assignment_config_id: { _eq: $assignmentConfigId } }, order_by: { created_at: desc }) {
+export const GET_SUBMISSIONS_BY_ASSIGNMENT_AND_USER_ID = gql`
+  subscription getAssignmentSubmissions($assignmentConfigId: bigint!, $userId: bigint!) {
+    submissions(
+      where: { assignment_config_id: { _eq: $assignmentConfigId }, user_id: { _eq: $userId } }
+      order_by: { created_at: desc }
+    ) {
       id
       assignment_config_id
       reports(order_by: { createdAt: desc }, limit: 1) {

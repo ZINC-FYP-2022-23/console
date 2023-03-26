@@ -1,5 +1,10 @@
-import { GET_APPEALS_DETAILS_BY_ASSIGNMENT_ID, GET_APPEAL_CONFIG } from "@/graphql/queries/appealQueries";
-import { AppealStatus, Grade } from "@/types";
+import {
+  GET_APPEALS_DETAILS_BY_ASSIGNMENT_ID,
+  GET_APPEAL_CONFIG,
+  GET_SUBMISSIONS_BY_ASSIGNMENT_ID,
+} from "@/graphql/queries/appealQueries";
+import { AppealStatus, AssignmentConfig, Appeal, Submission as SubmissionType } from "@/types";
+import { ChangeLog } from "@/types/tables";
 import { useQuery, useSubscription } from "@apollo/client";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Alert } from "@mantine/core";
@@ -119,6 +124,76 @@ function DisplayError({ errorMessage }: DisplayErrorProps) {
   );
 }
 
+interface getScoreProps {
+  appeals: Appeal[];
+  changeLogs: ChangeLog[];
+  submissions: SubmissionType[];
+}
+
+/**
+ * Gets the latest score based on the following logic:
+ * @returns {number}
+ */
+function getScore({ appeals, changeLogs, submissions }: getScoreProps) {
+  /* *** Logic of how to get the score: ***
+   * If the `updatedAt` of the latest `ACCEPTED` appeal later than the date of any `SCORE` change:
+   *    If `newFileSubmission` is available, >>>  use the score of the `newFileSubmission`.
+   *    If `newFileSubmission` is NOT available:
+   *        If there is a `SCORE` change log >>> use the score of latest `SCORE` change.
+   *        If there is NO `SCORE` change log >>> use the score of the original submission.
+   * If there is the date of the latest `SCORE` change than is later than the `updatedAt` of the latest `ACCEPTED` appeal >>> use the score of latest `SCORE` change
+   * If there are NO `SCORE` change log AND `ACCEPTED` appeal >>> use the score of the original submission
+   */
+
+  const acceptedAppeals: Appeal[] = appeals.filter((e) => e.status === "ACCEPTED");
+  let acceptedAppealDate: Date | null = null;
+  let acceptedAppealScore: number | null = null;
+
+  // Get the latest `ACCEPTED` appeal with a new score generated
+  for (let i = 0; i < acceptedAppeals.length; i++) {
+    if (
+      acceptedAppeals[i].updatedAt &&
+      acceptedAppeals[i].submission &&
+      acceptedAppeals[i].submission.reports.length > 0 &&
+      acceptedAppeals[i].submission.reports[0].grade.score
+    ) {
+      acceptedAppealDate = new Date(acceptedAppeals[i].updatedAt!);
+      acceptedAppealScore = acceptedAppeals[i].submission.reports[0].grade.score;
+      break;
+    }
+  }
+
+  // Get the latest `SCORE` change log
+  for (let i = 0; i < changeLogs.length; i++) {
+    const changeLogDate: Date = new Date(changeLogs[i].createdAt);
+
+    if (acceptedAppealDate && acceptedAppealDate > changeLogDate) {
+      return acceptedAppealScore;
+    }
+
+    if (changeLogs[i].type === "SCORE") {
+      return parseInt(changeLogs[i].updatedState.replace(/[^0-9]/g, ""));
+    }
+  }
+
+  // If above fails, get the original submission score
+  for (let i = 0; i < submissions.length; i++) {
+    let isNewFileSubmission: boolean = false;
+
+    // Do not pick the submission that is related to the appeal
+    for (let j = 0; j < appeals.length; j++) {
+      if (submissions[i].id === appeals[j].newFileSubmissionId) {
+        isNewFileSubmission = true;
+        break;
+      }
+    }
+
+    if (!isNewFileSubmission && submissions[i].reports.length > 0 && submissions[i].reports[0].grade.score) {
+      return submissions[i].reports[0].grade.score;
+    }
+  }
+}
+
 interface AppealsTableProps {
   assignmentConfigId: number;
 }
@@ -132,17 +207,28 @@ function AppealsTable({ assignmentConfigId }: AppealsTableProps) {
     data: appealsDetailsData,
     loading: appealDetailsLoading,
     error: appealDetailsError,
-  } = useSubscription(GET_APPEALS_DETAILS_BY_ASSIGNMENT_ID, { variables: { assignmentConfigId: assignmentConfigId } });
+  } = useSubscription<{ appeals: Appeal[] }>(GET_APPEALS_DETAILS_BY_ASSIGNMENT_ID, {
+    variables: { assignmentConfigId: assignmentConfigId },
+  });
   const {
     data: appealConfigData,
     loading: appealConfigLoading,
     error: appealConfigError,
-  } = useQuery(GET_APPEAL_CONFIG, { variables: { assignmentConfigId: assignmentConfigId } });
+  } = useQuery<{ assignmentConfig: AssignmentConfig }>(GET_APPEAL_CONFIG, {
+    variables: { assignmentConfigId: assignmentConfigId },
+  });
+  const {
+    data: submissionsData,
+    loading: submissionsLoading,
+    error: submissionsError,
+  } = useSubscription<{ submissions: SubmissionType[] }>(GET_SUBMISSIONS_BY_ASSIGNMENT_ID, {
+    variables: { assignmentConfigId: assignmentConfigId },
+  });
 
   // Transform data into `AppealTableType[]`
   const appealData: AppealTableType[] = [];
-  if (appealsDetailsData) {
-    appealsDetailsData.appeals.map((appeal) => {
+  if (appealsDetailsData && submissionsData) {
+    appealsDetailsData.appeals.map((appeal, appealIndex) => {
       let status: AppealStatus = transformAppealStatus(appeal.status);
 
       // Get the Original Score
@@ -156,27 +242,16 @@ function AppealsTable({ assignmentConfigId }: AppealsTableProps) {
       }
 
       // Get the Final Score
-      let finalScore: number | undefined = undefined;
-      for (let i = 0; i < appeal.user.change_logs.length; i++) {
-        if (appeal.user.change_logs[i].appealId === appeal.id) {
-          // Use the latest score change
-          if (appeal.user.change_logs[i].type === "SCORE") {
-            finalScore = appeal.user.change_logs[i].updatedState.replace(/[^0-9]/g, "");
-            break;
-          }
-          // Use the new file submission score submitted with the appeal
-          if (
-            status === AppealStatus.Accept &&
-            appeal.user.change_logs[i].type === "APPEAL_STATUS" &&
-            appeal.user.change_logs[i].updatedState === "[{'status':ACCEPTED}]" &&
-            appeal.submission &&
-            appeal.submission.reports.length > 0
-          ) {
-            finalScore = appeal.submission.reports[0].grade.score;
-            break;
-          }
-        }
-      }
+      const userAppeals: Appeal[] = appealsDetailsData.appeals
+        .filter((a) => a.userId === appeal.userId)
+        .slice(appealIndex);
+      const userChangeLogs: ChangeLog[] = appeal.user.change_logs.filter((c) => c.appealId === appeal.id);
+      const userSubmissions: SubmissionType[] = submissionsData.submissions.filter((s) => s.user_id === appeal.userId);
+      const finalScore: number = getScore({
+        appeals: userAppeals,
+        changeLogs: userChangeLogs,
+        submissions: userSubmissions,
+      })!;
 
       appealData.push({
         id: appeal.id,
@@ -205,7 +280,7 @@ function AppealsTable({ assignmentConfigId }: AppealsTableProps) {
   });
 
   // Display `Loading` if data is still being fetched
-  if (appealDetailsLoading || appealConfigLoading) {
+  if (appealDetailsLoading || appealConfigLoading || submissionsLoading) {
     return <div>Loading...</div>;
   }
 
@@ -216,7 +291,7 @@ function AppealsTable({ assignmentConfigId }: AppealsTableProps) {
   } else if (appealConfigError) {
     const errorMessage = "Unable to fetch appeals configs with `GET_APPEAL_CONFIG`";
     return <DisplayError errorMessage={errorMessage} />;
-  } else if (!appealConfigData.assignmentConfig.isAppealAllowed) {
+  } else if (!appealConfigData!.assignmentConfig.isAppealAllowed) {
     // Check if the appeal submission is allowed
     const errorMessage = "`isAppealAllowed` has been set to false";
     return <DisplayError errorMessage={errorMessage} />;

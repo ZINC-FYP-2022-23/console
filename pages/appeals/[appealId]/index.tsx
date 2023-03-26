@@ -10,7 +10,7 @@ import {
   GET_APPEAL_CHANGE_LOGS_BY_APPEAL_ID,
   GET_APPEAL_DETAILS_BY_APPEAL_ID,
   GET_APPEAL_MESSAGES,
-  GET_ASSIGNMENT_SUBMISSIONS,
+  GET_SUBMISSIONS_BY_ASSIGNMENT_AND_USER_ID,
   GET_IDS_BY_APPEAL_ID,
 } from "@/graphql/queries/appealQueries";
 import { Layout } from "@/layout";
@@ -708,14 +708,14 @@ function getScore({ appeals, changeLogs, submissions }: getScoreProps) {
 
   // Get the latest `SCORE` change log
   for (let i = 0; i < changeLogs.length; i++) {
-    if (changeLogs[i].type === "SCORE") {
-      const changeLogDate: Date = new Date(changeLogs[i].createdAt);
+    const changeLogDate: Date = new Date(changeLogs[i].createdAt);
 
-      if (acceptedAppealDate && acceptedAppealDate > changeLogDate) {
-        return acceptedAppealScore;
-      } else {
-        return parseInt(changeLogs[i].updatedState.replace(/[^0-9]/g, ""));
-      }
+    if (acceptedAppealDate && acceptedAppealDate > changeLogDate) {
+      return acceptedAppealScore;
+    }
+
+    if (changeLogs[i].type === "SCORE") {
+      return parseInt(changeLogs[i].updatedState.replace(/[^0-9]/g, ""));
     }
   }
 
@@ -780,8 +780,8 @@ function AppealDetails({
     data: submissionsData,
     loading: submissionsLoading,
     error: submissionsError,
-  } = useSubscription<{ submissions: SubmissionType[] }>(GET_ASSIGNMENT_SUBMISSIONS, {
-    variables: { assignmentConfigId },
+  } = useSubscription<{ submissions: SubmissionType[] }>(GET_SUBMISSIONS_BY_ASSIGNMENT_AND_USER_ID, {
+    variables: { assignmentConfigId, userId },
   });
   const {
     data: appealsData,

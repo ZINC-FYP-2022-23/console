@@ -234,4 +234,5 @@ export type User = {
   sections: SectionUser[];
   submissions: Submission[];
   updatedAt: string;
+  change_logs: ChangeLog[];
 };
