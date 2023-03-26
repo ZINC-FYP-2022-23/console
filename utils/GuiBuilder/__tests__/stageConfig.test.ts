@@ -1,5 +1,10 @@
-import { Compile, SettingsLang, TestCase } from "@/types/GuiBuilder";
-import { getCompilePreviewCommand, getTestCaseNeighborIds, getTestCasesLargestId } from "../stageConfig";
+import { Compile, Make, SettingsLang, TestCase } from "@/types/GuiBuilder";
+import {
+  getCompilePreviewCommand,
+  getMakePreviewCommand,
+  getTestCaseNeighborIds,
+  getTestCasesLargestId,
+} from "../stageConfig";
 
 /**
  * @returns A dummy {@link TestCase} with the given `id`.
@@ -87,6 +92,22 @@ describe("GuiBuilder: Utils - Stage Config", () => {
 
       expect(getCompilePreviewCommand(java, compile)).toBeNull();
     });
+  });
+
+  test("getMakePreviewCommand()", () => {
+    const makeEmpty: Make = {
+      targets: [],
+      args: "",
+      additional_packages: [],
+    };
+    expect(getMakePreviewCommand(makeEmpty)).toBe("make");
+
+    const make: Make = {
+      targets: ["all", "clean"],
+      args: "-f Makefile",
+      additional_packages: [],
+    };
+    expect(getMakePreviewCommand(make)).toBe("make -f Makefile all clean");
   });
 
   test("getTestCasesLargestId()", () => {

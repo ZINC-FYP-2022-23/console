@@ -3,7 +3,7 @@
  */
 
 import { cFamilyCompileDefault } from "@/constants/GuiBuilder/supportedLanguages";
-import { Compile, SettingsLang, TestCase } from "@/types/GuiBuilder";
+import { Compile, Make, SettingsLang, TestCase } from "@/types/GuiBuilder";
 
 /**
  * Previews what the compilation command will the {@link Compile} stage run. It returns `null` if
@@ -34,6 +34,15 @@ export const getCompilePreviewCommand = (lang: SettingsLang, compile: Compile): 
     default:
       return null;
   }
+};
+
+/**
+ * Previews what the GNU Make command will the {@link Make} stage run.
+ *
+ * @param make The `Make` stage config.
+ */
+export const getMakePreviewCommand = (make: Make): string => {
+  return `make ${make.args} ${make.targets.join(" ")}`.trimRight();
 };
 
 /**
