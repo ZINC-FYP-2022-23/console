@@ -35,12 +35,12 @@ export function settingsRawToSettings(sr: SettingsRaw): Settings {
  * Converts a {@link Settings} object to a raw settings object to be de-serialized to YAML.
  */
 export function settingsToSettingsRaw(settings: Settings): SettingsRaw {
-  const s = tidySettings(settings);
+  const { template, ...settingsRest } = tidySettings(settings);
 
   const _settings: SettingsRaw = {
-    ...s,
-    lang: settingsLangToString(s.lang),
-    template: s.template.map((t) => t.name),
+    ...settingsRest,
+    lang: settingsLangToString(settingsRest.lang),
+    ...(settingsRest.use_template === "FILENAMES" && { template: template.map((t) => t.name) }),
   };
 
   return _settings;

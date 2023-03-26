@@ -53,7 +53,7 @@ function PredicateRow<TPredicates extends Predicates>({
   const numOfPredicatesSet = predicateKeys.reduce((acc, curr) => (override[curr] ? acc + 1 : acc), 0);
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-2" data-cy="predicate-row">
       <span
         className={clsx(
           "font-medium text-cse-500",
@@ -84,6 +84,7 @@ function PredicateRow<TPredicates extends Predicates>({
             }
           });
         }}
+        data-cy="predicate-row-key"
       />
       <Select
         data={predicateOpOptions[predicateData.type]}
@@ -94,6 +95,7 @@ function PredicateRow<TPredicates extends Predicates>({
           updateOverride((override) => (override[predicateKey] = { ...predicateValue, op }));
         }}
         maxDropdownHeight={250}
+        data-cy="predicate-row-op"
       />
       {predicateData.type === "string" && (
         <TextInput
@@ -105,6 +107,7 @@ function PredicateRow<TPredicates extends Predicates>({
             });
           }}
           classNames={{ root: "flex-1", input: "font-mono" }}
+          data-cy="predicate-row-value-string"
         />
       )}
       {predicateData.type === "number" && (
@@ -118,6 +121,7 @@ function PredicateRow<TPredicates extends Predicates>({
             });
           }}
           className="flex-1"
+          data-cy="predicate-row-value-number"
         />
       )}
       {predicateData.type === "boolean" && (
@@ -132,6 +136,7 @@ function PredicateRow<TPredicates extends Predicates>({
             });
           }}
           styles={{ root: { flex: 1 } }}
+          data-cy="predicate-row-value-boolean"
         />
       )}
       {/** User should not be able to delete all predicates because the grader will output error

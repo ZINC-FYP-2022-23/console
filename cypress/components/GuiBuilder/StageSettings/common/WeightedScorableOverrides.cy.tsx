@@ -1,9 +1,6 @@
+import { PredicateData, WeightedScorableOverrides } from "@/components/GuiBuilder/StageSettings/common";
 import { defaultJoinPolicy, defaultPredicate } from "@/constants/GuiBuilder/defaults";
 import { Override, PredicateBoolean, PredicateNumber, Predicates, PredicateString } from "@/types/GuiBuilder";
-import "@testing-library/jest-dom";
-import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import WeightedScorableOverrides, { PredicateData } from "./WeightedScorableOverrides";
 
 /** An example implementation of {@link Predicates} that contains all types of predicates. */
 type TestPredicates = {
@@ -32,7 +29,11 @@ const testPredicatesData: PredicateData<TestPredicates>[] = [
 ];
 
 describe("GuiBuilder: <WeightedScorableOverrides />", () => {
-  it("deletes the override when the delete score override button is clicked", async () => {
+  beforeEach(() => {
+    cy.viewport(800, 500);
+  });
+
+  it("deletes the override when the delete score override button is clicked", () => {
     const initialOverrides: Override<TestPredicates>[] = [
       {
         _uuid: "mock-uuid-1",
@@ -45,42 +46,40 @@ describe("GuiBuilder: <WeightedScorableOverrides />", () => {
         bool: { op: "EQ", value: true },
       },
     ];
-    const setOverridesMock = jest.fn();
+    const setOverridesSpy = cy.spy().as("setOverridesSpy");
 
-    const { queryAllByRole } = render(
+    cy.mount(
       <WeightedScorableOverrides
         data={testPredicatesData}
         overrides={initialOverrides}
-        setOverrides={setOverridesMock}
+        setOverrides={setOverridesSpy}
       />,
     );
-    const deleteOverrideButtons = queryAllByRole("button", { name: /delete score override/i });
-    await userEvent.click(deleteOverrideButtons[0]);
-
-    expect(setOverridesMock).toHaveBeenCalledWith([initialOverrides[1]]);
+    cy.get('button[title="Delete score override" i]').first().click();
+    cy.get("@setOverridesSpy").should("be.calledWith", [initialOverrides[1]]);
   });
 
   describe("Add condition button", () => {
-    it("adds a new predicate row when clicked", async () => {
+    it("adds a new predicate row when clicked", () => {
       const initialOverride: Override<TestPredicates> = {
         _uuid: "mock-uuid-1",
         score: 2,
         num: { op: "EQ", value: 1 },
       };
-      const setOverridesMock = jest.fn();
+      const setOverridesSpy = cy.spy().as("setOverridesSpy");
 
-      const { getByRole } = render(
+      cy.mount(
         <WeightedScorableOverrides
           data={testPredicatesData}
           overrides={[initialOverride]}
-          setOverrides={setOverridesMock}
+          setOverrides={setOverridesSpy}
         />,
       );
-      const addConditionButton = getByRole("button", { name: /add condition/i });
-      expect(addConditionButton).toBeInTheDocument();
-
-      await userEvent.click(addConditionButton);
-      expect(setOverridesMock).toHaveBeenCalledWith([
+      cy.get("button")
+        .contains(/add condition/i)
+        .should("be.visible")
+        .click();
+      cy.get("@setOverridesSpy").should("be.calledWith", [
         {
           ...initialOverride,
           joinPolicy: defaultJoinPolicy,
@@ -89,7 +88,7 @@ describe("GuiBuilder: <WeightedScorableOverrides />", () => {
       ]);
     });
 
-    it("is hidden if all predicate fields are already added", async () => {
+    it("is hidden if all predicate fields are already added", () => {
       const initialOverrides: Override<TestPredicates>[] = [
         {
           _uuid: "mock-uuid-1",
@@ -99,12 +98,11 @@ describe("GuiBuilder: <WeightedScorableOverrides />", () => {
           str: { op: "EQ", value: "foo" },
         },
       ];
-      const { queryByRole } = render(
-        <WeightedScorableOverrides data={testPredicatesData} overrides={initialOverrides} />,
-      );
-      const addConditionButton = queryByRole("button", { name: /add condition/i });
 
-      expect(addConditionButton).toBeNull();
+      cy.mount(<WeightedScorableOverrides data={testPredicatesData} overrides={initialOverrides} />);
+      cy.get("button")
+        .contains(/add condition/i)
+        .should("not.exist");
     });
   });
 
@@ -114,23 +112,23 @@ describe("GuiBuilder: <WeightedScorableOverrides />", () => {
         _uuid: "mock-uuid-1",
         score: 2,
       };
-      const getDeleteConditionButtons = () => screen.queryAllByRole("button", { name: /delete condition/i });
+      // const getDeleteConditionButtons = () => screen.queryAllByRole("button", { name: /delete condition/i });
 
       // 0 predicate
-      render(<WeightedScorableOverrides data={testPredicatesData} overrides={[testPredicateOverride]} />);
-      expect(getDeleteConditionButtons()).toEqual([]);
+      cy.mount(<WeightedScorableOverrides data={testPredicatesData} overrides={[testPredicateOverride]} />);
+      cy.get("button[title='Delete condition' i]").should("not.exist");
 
       // 1 predicate
-      render(
+      cy.mount(
         <WeightedScorableOverrides
           data={testPredicatesData}
           overrides={[{ ...testPredicateOverride, bool: { op: "EQ", value: true } }]}
         />,
       );
-      expect(getDeleteConditionButtons()).toEqual([]);
+      cy.get("button[title='Delete condition' i]").should("not.exist");
 
       // 2 predicates
-      render(
+      cy.mount(
         <WeightedScorableOverrides
           data={testPredicatesData}
           overrides={[
@@ -142,10 +140,10 @@ describe("GuiBuilder: <WeightedScorableOverrides />", () => {
           ]}
         />,
       );
-      expect(getDeleteConditionButtons()).toHaveLength(2);
+      cy.get("button[title='Delete condition' i]").should("have.length", 2);
     });
 
-    it("deletes the predicate row when clicked", async () => {
+    it("deletes the predicate row when clicked", () => {
       const expectedOverride: Override<TestPredicates> = {
         _uuid: "mock-uuid-1",
         score: 2,
@@ -155,19 +153,17 @@ describe("GuiBuilder: <WeightedScorableOverrides />", () => {
         ...expectedOverride,
         bool: { op: "EQ", value: true },
       };
-      const setOverridesMock = jest.fn();
+      const setOverridesSpy = cy.spy().as("setOverridesSpy");
 
-      const { queryAllByRole } = render(
+      cy.mount(
         <WeightedScorableOverrides
           data={testPredicatesData}
           overrides={[initialOverride]}
-          setOverrides={setOverridesMock}
+          setOverrides={setOverridesSpy}
         />,
       );
-      const deleteConditionButtons = queryAllByRole("button", { name: /delete condition/i });
-      await userEvent.click(deleteConditionButtons[0]); // Delete the `bool` predicate
-
-      expect(setOverridesMock).toHaveBeenCalledWith([expectedOverride]);
+      cy.get("button[title='Delete condition' i]").first().click();
+      cy.get("@setOverridesSpy").should("be.calledWith", [expectedOverride]);
     });
   });
 });

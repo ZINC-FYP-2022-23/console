@@ -310,6 +310,7 @@ describe("GuiBuilder: Store - ConfigModel", () => {
       initAssignmentStart: "@thunk.config.initializeAssignment(start)",
       initAssignmentSuccess: "@thunk.config.initializeAssignment(success)",
       setCourseId: "@action.config.setCourseId",
+      setInitialized: "@action.config.setInitialized",
       initConfig: "@action.config.initializeConfig",
       initPolicy: "@action.config.initializePolicy",
       initSchedule: "@action.config.initializeSchedule",
@@ -339,6 +340,7 @@ describe("GuiBuilder: Store - ConfigModel", () => {
         type.initPipelineStart,
         // ... ignore other actions invoked by `initializePipeline()`
         type.initPipelineSuccess,
+        type.setInitialized,
         type.initAssignmentSuccess,
       ]);
 
@@ -360,14 +362,30 @@ describe("GuiBuilder: Store - ConfigModel", () => {
       expect(store.getMockedActions()).toEqual([
         { type: type.initAssignmentStart, payload },
         { type: type.setCourseId, payload: courseId },
+        { type: type.setInitialized, payload: true },
         { type: type.initAssignmentSuccess, payload },
       ]);
     });
 
-    it("does nothing if every payload field is null", () => {
+    it("only sets `initialized` to true if every payload field is null", () => {
       const model = cloneDeep(guiBuilderModel);
       const store = createStore(model, { mockActions: true });
       const payload = { configId: null, courseId: null, config: null };
+
+      store.getActions().config.initializeAssignment(payload);
+
+      expect(store.getMockedActions()).toEqual([
+        { type: type.initAssignmentStart, payload },
+        { type: type.setInitialized, payload: true },
+        { type: type.initAssignmentSuccess, payload },
+      ]);
+    });
+
+    it("does nothing if the store is already initialized", () => {
+      const model = getThreeStageModel();
+      model.config.initialized = true; // Assume it's initialized
+      const store = createStore(model, { mockActions: true });
+      const payload = { configId: null, courseId: 1, config: null };
 
       store.getActions().config.initializeAssignment(payload);
 

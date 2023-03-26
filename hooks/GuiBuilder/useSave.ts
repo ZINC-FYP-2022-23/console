@@ -25,6 +25,7 @@ function useSave() {
   const isEdited = useStoreState((state) => state.config.isEdited);
   const isPipelineLayoutValid = useStoreState((state) => state.config.isPipelineLayoutValid);
 
+  const generateStageLabels = useStoreActions((actions) => actions.config.generateStageLabels);
   const getEditingConfig = useStoreActions((actions) => actions.config.getEditingConfig);
   const getPolicyAndSchedule = useStoreActions((actions) => actions.config.getPolicyAndSchedule);
   const setConfigId = useStoreActions((actions) => actions.config.setConfigId);
@@ -139,7 +140,7 @@ function useSave() {
     }
 
     // Validate config YAML first
-    const editingConfig = getEditingConfig();
+    const editingConfig = generateStageLabels();
     const configYaml = configToYaml(editingConfig);
     const { configError } = await validateAssignmentConfig(configYaml, configId.toString());
     if (configError) {

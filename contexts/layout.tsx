@@ -46,7 +46,7 @@ interface LayoutState {
   stdioTestCase?: any;
   reportId?: string;
   valgrindTestCase?: any;
-  modalType?: "stdiotest" | "valgrind" | "regrading" | "yaml" | "files";
+  modalType?: "stdiotest" | "valgrind" | "regrading" | "yaml" | "files" | "editorMode";
   gradingPayload?: any;
   coursePageSlideOver?: "submissions";
   userId?: string;
@@ -122,6 +122,7 @@ function layoutReducer(state: LayoutState, action: LayoutAction): LayoutState {
         showModal: true,
         assignmentId: action.payload.assignmentId,
         assignmentConfigId: action.payload.assignmentConfigId,
+        modalType: "editorMode",
       };
     case "setAssignmentConfigId":
       return { ...state, assignmentConfigId: action.payload };

@@ -9,7 +9,7 @@ import {
   StageDependencyGraph,
 } from "@/types/GuiBuilder";
 import { AssignmentConfig } from "@/types/tables";
-import { configToYaml, isConfigEqual, isLinkedList, isScheduleEqual, parseConfigYaml } from "@/utils/GuiBuilder";
+import { generateStageLabels, isConfigEqual, isLinkedList, isScheduleEqual, parseConfigYaml } from "@/utils/GuiBuilder";
 import { action, Action, computed, Computed, thunk, Thunk } from "easy-peasy";
 import cloneDeep from "lodash/cloneDeep";
 import isEqual from "lodash/isEqual";
@@ -29,6 +29,11 @@ interface ConfigModelState {
   configId: number | null;
   /** The ID of the course that this config belongs to. */
   courseId: number;
+  /**
+   * Whether the store is initialized from the data loaded from database, i.e. whether
+   * {@link ConfigModel.initializeAssignment} is called.
+   */
+  initialized: boolean;
 
   /** Initial pipeline configuration (e.g. when loaded from database). It should be immutable after initialization. */
   initConfig: Config;
@@ -88,8 +93,11 @@ interface ConfigModelAction {
 
   setConfigId: Action<ConfigModel, number>;
   setCourseId: Action<ConfigModel, number>;
+  setInitialized: Action<ConfigModel, boolean>;
   setPolicy: Action<ConfigModel, GradingPolicy>;
   setSchedule: Action<ConfigModel, Schedule>;
+  /** Sets the entire stage data map. */
+  setStageData: Action<ConfigModel, StageDataMap>;
   /** Sets the entire stage dependency graph. */
   setStageDeps: Action<ConfigModel, StageDependencyGraph>;
   /**
@@ -132,7 +140,10 @@ interface ConfigModelAction {
 }
 
 interface ConfigModelThunk {
-  /** Initializes the store states according to the data queried from the database. */
+  /**
+   * If the store is not {@link ConfigModel.initialized initialized}, it initializes the store states
+   * according to the data queried from the database.
+   */
   initializeAssignment: Thunk<
     ConfigModel,
     {
@@ -144,6 +155,11 @@ interface ConfigModelThunk {
     undefined,
     GuiBuilderModel
   >;
+  /**
+   * Generates a random label if multiple stages of the same name have empty labels.
+   * @returns The updated pipeline config.
+   */
+  generateStageLabels: Thunk<ConfigModel, undefined, undefined, GuiBuilderModel, Config>;
   /** Lazily gets {@link ConfigModel.editingConfig}. */
   getEditingConfig: Thunk<ConfigModel, undefined, undefined, GuiBuilderModel, Config>;
   /** Lazily gets {@link ConfigModel.editingPolicy} and {@link ConfigModel.editingSchedule}. */
@@ -168,6 +184,8 @@ interface ConfigModelThunk {
 const configModelState: ConfigModelState = {
   configId: null,
   courseId: 0,
+  initialized: false,
+
   initConfig: defaultConfig,
   editingConfig: defaultConfig,
   initPolicy: defaultPolicy,
@@ -234,11 +252,17 @@ const configModelAction: ConfigModelAction = {
   setCourseId: action((state, courseId) => {
     state.courseId = courseId;
   }),
+  setInitialized: action((state, initialized) => {
+    state.initialized = initialized;
+  }),
   setPolicy: action((state, gradingPolicy) => {
     state.editingPolicy = gradingPolicy;
   }),
   setSchedule: action((state, schedule) => {
     state.editingSchedule = schedule;
+  }),
+  setStageData: action((state, stageData) => {
+    state.editingConfig.stageData = stageData;
   }),
   setStageDeps: action((state, stageDeps) => {
     state.editingConfig.stageDeps = stageDeps;
@@ -273,24 +297,37 @@ const configModelAction: ConfigModelAction = {
 };
 
 const configModelThunk: ConfigModelThunk = {
-  initializeAssignment: thunk((actions, { configId, courseId, config }, { getStoreActions }) => {
-    if (courseId !== null) actions.setCourseId(courseId);
-    if (config === null) return;
+  initializeAssignment: thunk((actions, { configId, courseId, config }, { getState, getStoreActions }) => {
+    if (getState().initialized) return;
 
-    actions.initializeConfig({ id: configId, configYaml: config.config_yaml });
-    actions.initializePolicy({
-      attemptLimits: config.attemptLimits,
-      gradeImmediately: config.gradeImmediately,
-      showImmediateScores: config.showImmediateScores,
-    });
-    actions.initializeSchedule({
-      showAt: config.showAt,
-      startCollectionAt: config.startCollectionAt,
-      dueAt: config.dueAt,
-      stopCollectionAt: config.stopCollectionAt,
-      releaseGradeAt: config.releaseGradeAt,
-    });
-    getStoreActions().pipelineEditor.initializePipeline();
+    if (courseId !== null) actions.setCourseId(courseId);
+    if (config) {
+      actions.initializeConfig({ id: configId, configYaml: config.config_yaml });
+      actions.initializePolicy({
+        attemptLimits: config.attemptLimits,
+        gradeImmediately: config.gradeImmediately,
+        showImmediateScores: config.showImmediateScores,
+      });
+      actions.initializeSchedule({
+        showAt: config.showAt,
+        startCollectionAt: config.startCollectionAt,
+        dueAt: config.dueAt,
+        stopCollectionAt: config.stopCollectionAt,
+        releaseGradeAt: config.releaseGradeAt,
+      });
+      getStoreActions().pipelineEditor.initializePipeline();
+    }
+
+    actions.setInitialized(true);
+  }),
+  generateStageLabels: thunk((_actions, _payload, { getState, getStoreActions }) => {
+    const editingConfig = getState().editingConfig;
+    const stageDataNew = generateStageLabels(editingConfig.stageData);
+    getStoreActions().config.setStageData(stageDataNew);
+    return {
+      ...editingConfig,
+      stageData: stageDataNew,
+    };
   }),
   getEditingConfig: thunk((_actions, _payload, { getState }) => {
     return getState().editingConfig;

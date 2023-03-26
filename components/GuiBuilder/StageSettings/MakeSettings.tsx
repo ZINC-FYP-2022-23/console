@@ -1,13 +1,16 @@
 import { TagsInput, Textarea } from "@/components/Input";
 import { useSelectedStageConfig } from "@/hooks/GuiBuilder";
+import { getMakePreviewCommand } from "@/utils/GuiBuilder/stageConfig";
 import { FocusEventHandler, memo } from "react";
 import { InfoTooltip } from "../Diagnostics";
-import { AdditionalPackagesTooltip, InfoAccordion } from "./common";
+import { AdditionalPackagesTooltip } from "./common";
 
 function MakeSettings() {
   const [config, setConfig] = useSelectedStageConfig("Make");
 
   if (!config) return null;
+
+  const previewCommand = getMakePreviewCommand(config);
 
   /** If user has typed something in the input box of tags input, add it to the list of tags. */
   const onTagInputBlur = (target: "targets" | "additional_packages"): FocusEventHandler<HTMLInputElement> => {
@@ -23,7 +26,7 @@ function MakeSettings() {
 
   return (
     <div className="p-3">
-      <div className="pb-12 border-b border-gray-300 space-y-4">
+      <div className="flex flex-col gap-4">
         <div className="flex gap-2">
           <div className="flex-[2]">
             <label htmlFor="targets">Target files to run</label>
@@ -31,7 +34,7 @@ function MakeSettings() {
           </div>
           <div className="flex-[3] flex">
             <TagsInput
-              name="targets"
+              id="targets"
               value={config.targets}
               onChange={(tags) => setConfig({ ...config, targets: tags })}
               onBlur={onTagInputBlur("targets")}
@@ -67,7 +70,7 @@ function MakeSettings() {
           </div>
           <div className="flex-[3] flex">
             <TagsInput
-              name="additional_packages"
+              id="additional_packages"
               value={config.additional_packages}
               onChange={(tags) => setConfig({ ...config, additional_packages: tags })}
               onBlur={onTagInputBlur("additional_packages")}
@@ -76,20 +79,11 @@ function MakeSettings() {
             />
           </div>
         </div>
+        <div className="px-3 py-2 mt-2 bg-gray-100 rounded-md space-y-2 text-sm">
+          <p className="font-medium text-gray-600">Command that will be run:</p>
+          <div className="px-4 py-2 bg-gray-700 font-mono text-white rounded">{previewCommand}</div>
+        </div>
       </div>
-      <InfoAccordion title="Example">
-        <ul className="ml-5 mb-2 list-disc">
-          <li>
-            Target files to run: <code>all</code>
-          </li>
-          <li>
-            Arguments to the <code>make</code> command: <code>-f Makefile2</code>
-          </li>
-        </ul>
-        <p>
-          This will run &quot;<code>make -f Makefile2 all</code>&quot;
-        </p>
-      </InfoAccordion>
     </div>
   );
 }

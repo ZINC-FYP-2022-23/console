@@ -7,16 +7,18 @@ interface SwitchGroupProps {
   onChange: (value: boolean) => void;
   description?: string | React.ReactNode;
   disabled?: boolean;
+  id?: string;
 }
 
 /**
  * A switch group that contains a switch, label, and description (optional).
  */
-function SwitchGroup({ label, checked, onChange, description, disabled = false }: SwitchGroupProps) {
+function SwitchGroup({ label, checked, onChange, description, disabled = false, id }: SwitchGroupProps) {
   return (
     <div className="flex gap-5 items-center">
       <Switch.Group>
         <Switch
+          id={id}
           checked={checked}
           onChange={onChange}
           className={clsx(
@@ -35,7 +37,9 @@ function SwitchGroup({ label, checked, onChange, description, disabled = false }
           />
         </Switch>
         <div className="flex flex-col">
-          <Switch.Label className={clsx(disabled && "text-gray-400")}>{label}</Switch.Label>
+          <Switch.Label passive className={clsx(disabled && "text-gray-400")}>
+            {label}
+          </Switch.Label>
           {description && typeof description === "string" ? (
             <p className={clsx("mt-1 text-xs leading-3", disabled ? "text-gray-300" : "text-gray-500")}>
               {description}

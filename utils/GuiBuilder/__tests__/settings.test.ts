@@ -1,4 +1,4 @@
-import { Settings, SettingsGpuDevice, SettingsLang, SettingsRaw, SettingsUseTemplate } from "@/types/GuiBuilder";
+import { Settings, SettingsLang, SettingsRaw } from "@/types/GuiBuilder";
 import * as uuid from "uuid";
 import {
   isSettingsEqual,
@@ -18,7 +18,7 @@ function getMockSettings(): Settings {
       compiler: "g++",
       version: "8",
     },
-    use_template: SettingsUseTemplate.FILENAMES,
+    use_template: "FILENAMES",
     template: [
       { id: "mock-uuid-1", name: "foo.cpp" },
       { id: "mock-uuid-2", name: "bar.cpp" },
@@ -32,7 +32,7 @@ function getMockSettings(): Settings {
     early_return_on_throw: false,
     enable_features: {
       network: true,
-      gpu_device: [SettingsGpuDevice.AMD, SettingsGpuDevice.INTEL],
+      gpu_device: ["AMD", "INTEL"],
     },
   };
 }
@@ -42,7 +42,7 @@ describe("GuiBuilder: Utils - Settings", () => {
     it("converts a SettingsRaw object to Settings", () => {
       const settingsRaw: SettingsRaw = {
         lang: "cpp/g++:8",
-        use_template: SettingsUseTemplate.FILENAMES,
+        use_template: "FILENAMES",
         template: ["foo.cpp", "bar.cpp"],
         cpus: 2.5,
       };
@@ -52,7 +52,7 @@ describe("GuiBuilder: Utils - Settings", () => {
           compiler: "g++",
           version: "8",
         },
-        use_template: SettingsUseTemplate.FILENAMES,
+        use_template: "FILENAMES",
         template: [
           { id: "mock-uuid-1", name: "foo.cpp" },
           { id: "mock-uuid-2", name: "bar.cpp" },
@@ -76,15 +76,19 @@ describe("GuiBuilder: Utils - Settings", () => {
       expect(settingsRaw.lang).toBe("cpp/g++:8");
     });
 
-    it("converts `template` to a string array", () => {
+    it("keeps the `template` string array only if `use_template` is `FILENAMES`", () => {
       const settings = getMockSettings();
       settings.template = [
         { id: "mock-uuid-1", name: "foo.txt" },
         { id: "mock-uuid-2", name: " bar.txt " },
       ];
+      expect(settingsToSettingsRaw(settings).template).toEqual(["foo.txt", "bar.txt"]);
 
-      const settingsRaw = settingsToSettingsRaw(settings);
-      expect(settingsRaw.template).toEqual(["foo.txt", "bar.txt"]);
+      settings.use_template = "PATH";
+      expect(settingsToSettingsRaw(settings)).not.toHaveProperty("template");
+
+      settings.use_template = undefined;
+      expect(settingsToSettingsRaw(settings)).not.toHaveProperty("template");
     });
   });
 
@@ -114,10 +118,10 @@ describe("GuiBuilder: Utils - Settings", () => {
 
     it("sorts the GPU devices array", () => {
       const settings = getMockSettings();
-      settings.enable_features.gpu_device = [SettingsGpuDevice.INTEL, SettingsGpuDevice.AMD];
+      settings.enable_features.gpu_device = ["INTEL", "AMD"];
 
       const settingsTidied = tidySettings(settings);
-      expect(settingsTidied.enable_features.gpu_device).toEqual([SettingsGpuDevice.AMD, SettingsGpuDevice.INTEL]);
+      expect(settingsTidied.enable_features.gpu_device).toEqual(["AMD", "INTEL"]);
     });
 
     it("does not modify the original settings object", () => {
