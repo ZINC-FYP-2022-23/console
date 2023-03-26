@@ -8,15 +8,17 @@ interface TagsInputProps extends Omit<ReactTagInputProps, "value"> {
   disabled?: boolean;
   /** Extra classes to style the wrapper. */
   className?: string;
+  /** HTML id attribute to put at the wrapper. */
+  id?: string;
 }
 
 /**
  * A component for tag(s) input.
  */
-function TagsInput({ value, disabled = false, className = "", ...props }: TagsInputProps) {
+function TagsInput({ value, disabled = false, className = "", id, ...props }: TagsInputProps) {
   return (
     // Custom styles are put in `index.css`
-    <div className={clsx("tag-input", disabled && "disabled", className)}>
+    <div id={id} className={clsx("tag-input", disabled && "disabled", className)}>
       <ReactTagInput value={value} disabled={disabled} separators={[" ", ","]} isEditOnRemove {...props} />
     </div>
   );

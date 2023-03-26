@@ -74,15 +74,19 @@ describe("GuiBuilder: Utils - Settings", () => {
       expect(settingsRaw.lang).toBe("cpp/g++:8");
     });
 
-    it("converts `template` to a string array", () => {
+    it("keeps the `template` string array only if `use_template` is `FILENAMES`", () => {
       const settings = getMockSettings();
       settings.template = [
         { id: "mock-uuid-1", name: "foo.txt" },
         { id: "mock-uuid-2", name: " bar.txt " },
       ];
+      expect(settingsToSettingsRaw(settings).template).toEqual(["foo.txt", "bar.txt"]);
 
-      const settingsRaw = settingsToSettingsRaw(settings);
-      expect(settingsRaw.template).toEqual(["foo.txt", "bar.txt"]);
+      settings.use_template = SettingsUseTemplate.PATH;
+      expect(settingsToSettingsRaw(settings)).not.toHaveProperty("template");
+
+      settings.use_template = undefined;
+      expect(settingsToSettingsRaw(settings)).not.toHaveProperty("template");
     });
   });
 

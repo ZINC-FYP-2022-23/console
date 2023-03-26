@@ -43,6 +43,7 @@ function DiffWithSkeletonSettings() {
       </div>
       <div>
         <SwitchGroup
+          id="exclude_from_provided"
           label={excludeFromProvidedLabel}
           description={excludeFromProvidedDesc}
           checked={config.exclude_from_provided}

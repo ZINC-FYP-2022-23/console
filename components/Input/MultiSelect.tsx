@@ -20,6 +20,7 @@ interface MultiSelectProps<TValue extends string> {
   placeholder?: string;
   /** Whether to show the pop-up menu above the button. */
   showAbove?: boolean;
+  id?: string;
 }
 
 /**
@@ -32,11 +33,13 @@ function MultiSelect<TValue extends string>({
   disabled = false,
   placeholder,
   showAbove = false,
+  id,
 }: MultiSelectProps<TValue>) {
   return (
     <Listbox value={value} onChange={onChange} multiple disabled={disabled}>
       <div className="relative">
         <Listbox.Button
+          id={id}
           className={clsx(
             "w-full py-2 pl-3 pr-8 border border-gray-300 text-left cursor-default text-sm rounded-md shadow-sm",
             disabled ? "cursor-not-allowed opacity-70 bg-gray-100 text-gray-400" : "bg-white",

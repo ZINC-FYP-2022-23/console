@@ -82,7 +82,7 @@ function CompileSettings() {
           Input files <span className="text-red-600 text-xs">(required)</span>
         </label>
         <TagsInput
-          name="input"
+          id="input"
           value={config.input}
           onChange={(tags) => setConfig({ ...config, input: tags })}
           onBlur={onTagInputBlur("input")}
@@ -127,7 +127,7 @@ function CompileSettings() {
           </div>
         </div>
         <TagsInput
-          name="additional_packages"
+          id="additional_packages"
           value={config.additional_packages}
           onChange={(tags) => setConfig({ ...config, additional_packages: tags })}
           onBlur={onTagInputBlur("additional_packages")}

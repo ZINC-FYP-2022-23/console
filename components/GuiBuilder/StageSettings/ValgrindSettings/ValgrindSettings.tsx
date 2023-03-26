@@ -17,7 +17,7 @@ function ValgrindSettings() {
   return (
     <div className="p-3 flex flex-col gap-4">
       {!hasStdioTestStage && (
-        <Alert severity="warning">
+        <Alert severity="warning" data-cy="missing-stdiotest-alert">
           <p>
             Your grading pipeline is missing a{" "}
             <button
@@ -31,6 +31,7 @@ function ValgrindSettings() {
         </Alert>
       )}
       <SwitchGroup
+        id="enabled"
         label='Run Valgrind on all test cases in "Standard I/O Test" stage'
         checked={config.enabled}
         onChange={(value) => setConfig({ ...config, enabled: value })}
@@ -73,6 +74,7 @@ function ValgrindSettings() {
         </label>
         <div className="flex-[2]">
           <MultiSelect
+            id="checksFilter"
             data={checksFilterOptions}
             value={config.checksFilter ?? defaultValgrindConfig.checksFilter}
             onChange={(value) => setConfig({ ...config, checksFilter: value })}

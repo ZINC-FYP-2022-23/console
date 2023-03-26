@@ -9,7 +9,9 @@
     "lint": "next lint",
     "format": "prettier --write .",
     "prepare": "husky install",
-    "test": "jest"
+    "test": "jest",
+    "cypress": "concurrently \"tailwindcss -i ./styles/index.css -o ./dist/index.css --watch\" \"cypress open\" ",
+    "cypress:run:component": "cypress run --component"
   },
   "dependencies": {
     "@apollo/client": "^3.4.16",
@@ -79,6 +81,7 @@
     "uuid": "^8.3.2"
   },
   "devDependencies": {
+    "@4tw/cypress-drag-drop": "^2.2.3",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "12.1.5",
     "@testing-library/react-hooks": "^8.0.1",
@@ -100,6 +103,8 @@
     "@types/uuid": "^8.3.4",
     "autoprefixer": "^10.4.12",
     "babel-jest": "^29.2.2",
+    "concurrently": "^7.6.0",
+    "cypress": "^12.8.1",
     "eslint": "7.32.0",
     "eslint-config-next": "11.1.2",
     "file-selector": "^0.2.2",

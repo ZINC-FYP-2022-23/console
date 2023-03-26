@@ -33,9 +33,10 @@ function useListInputContext() {
 
 interface ListInputRootProps {
   children: React.ReactNode;
+  id?: string;
 }
 
-const ListInputRoot = ({ children }: ListInputRootProps) => {
+const ListInputRoot = ({ children, id }: ListInputRootProps) => {
   const inputRefs = useRef<ListInputContextType["inputRefs"]["current"]>([]);
   const [inputIndexToFocus, setInputIndexToFocus] = useState<number | null>(null);
 
@@ -48,7 +49,7 @@ const ListInputRoot = ({ children }: ListInputRootProps) => {
   }, [inputIndexToFocus]);
 
   return (
-    <div className="flex flex-col gap-2">
+    <div id={id} className="flex flex-col gap-2">
       <ListInputContext.Provider value={{ inputRefs, inputIndexToFocus, setInputIndexToFocus }}>
         {children}
       </ListInputContext.Provider>

@@ -25,6 +25,7 @@ function Policy() {
         />
       </div>
       <SwitchGroup
+        id="gradeImmediately"
         label="Grade immediately after submission"
         checked={policy.gradeImmediately}
         onChange={(value) => {
@@ -32,6 +33,7 @@ function Policy() {
         }}
       />
       <SwitchGroup
+        id="showImmediateScores"
         label="Reveal grading details"
         description="Show all available grading information right after the submission is graded"
         checked={policy.showImmediateScores}

@@ -14,6 +14,7 @@
 
 # production
 /build
+dist/*.css
 
 # misc
 .DS_Store
@@ -40,3 +41,7 @@ docker-compose.yml
 
 # Sentry
 .sentryclirc
+
+# Cypress
+cypress/screenshots
+cypress/videos

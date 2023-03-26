@@ -42,6 +42,7 @@ function StdioTestStageSettings() {
           </div>
           <div className="flex-[3]">
             <MultiSelect
+              id="diff_ignore_flags"
               data={diffIgnoreFlagOptions}
               value={config.diff_ignore_flags}
               onChange={(value) => setConfig({ ...config, diff_ignore_flags: value })}
@@ -56,7 +57,7 @@ function StdioTestStageSettings() {
             </div>
           </div>
           <TagsInput
-            name="additional_packages"
+            id="additional_packages"
             value={config.additional_packages}
             onChange={(tags) => setConfig({ ...config, additional_packages: tags })}
             onBlur={onTagInputBlur("additional_packages")}
@@ -73,7 +74,7 @@ function StdioTestStageSettings() {
           </div>
           <div className="flex-[3]">
             <TagsInput
-              name="additional_pip_packages"
+              id="additional_pip_packages"
               value={config.additional_pip_packages}
               onChange={(tags) => setConfig({ ...config, additional_pip_packages: tags })}
               onBlur={onTagInputBlur("additional_pip_packages")}

@@ -89,6 +89,7 @@ function StageNode({ id, data, selected }: NodeProps<StageNodeData>) {
             }
           })(selected, isDragOver),
         )}
+        data-label={data.label}
       >
         <Handle
           type="source"

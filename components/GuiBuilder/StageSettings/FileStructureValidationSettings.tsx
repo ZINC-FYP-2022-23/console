@@ -61,7 +61,7 @@ function FileStructureValidationSettings() {
       <p className="mb-2">
         Files/directories to <span className="font-semibold">ignore</span> checking:
       </p>
-      <ListInput>
+      <ListInput id="ignore_in_submission">
         {ignoredFiles.map((file, index) => {
           const isDefaultIgnore = defaultIgnoreList.includes(file.name);
           return (
