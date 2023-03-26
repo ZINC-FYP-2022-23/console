@@ -26,7 +26,7 @@ import {
 } from "@/types";
 import { ChangeLog } from "@/types/tables";
 import { mergeDataToActivityLogList, transformToAppealAttempt } from "@/utils/appealUtils";
-import { useMutation, useSubscription } from "@apollo/client";
+import { useMutation, useQuery, useSubscription } from "@apollo/client";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Tab } from "@headlessui/react";
 import { Alert, clsx, createStyles, Modal } from "@mantine/core";
@@ -787,7 +787,7 @@ function AppealDetails({
     data: appealsData,
     loading: appealsLoading,
     error: appealsError,
-  } = useSubscription<{ appeals: Appeal[] }>(GET_APPEALS_BY_USER_ID_AND_ASSIGNMENT_ID, {
+  } = useQuery<{ appeals: Appeal[] }>(GET_APPEALS_BY_USER_ID_AND_ASSIGNMENT_ID, {
     variables: { userId: studentId, assignmentConfigId },
   });
 
@@ -928,19 +928,30 @@ export const getServerSideProps: GetServerSideProps = async ({ req, query }) => 
   const userId = parseInt(req.cookies.user);
   const appealId = parseInt(query.appealId as string);
 
-  const { data: idData } = await apolloClient.query({
+  // Fetch data via GraphQL
+  const { data: idData } = await apolloClient.query<{ appeal: Appeal }>({
     query: GET_IDS_BY_APPEAL_ID,
     variables: {
       appealId: appealId,
     },
   });
+  const { data: submissionsData } = await apolloClient.query<{ submissions: SubmissionType[] }>({
+    query: GET_SUBMISSIONS_BY_ASSIGNMENT_AND_USER_ID,
+    variables: { assignmentConfigId: idData.appeal.assignmentConfigId, userId },
+  });
 
+  // Get Ids
   const assignmentConfigId: number = idData.appeal.assignmentConfigId;
   const studentId: number = idData.appeal.userId;
+  const newSubmissionId: number = idData.appeal.newFileSubmissionId || -1;
+  let oldSubmissionId: number = -1;
+  for (let i = 0; i < submissionsData.submissions.length; i++) {
+    if (submissionsData.submissions[i].id != newSubmissionId) {
+      oldSubmissionId = submissionsData.submissions[i].id;
+      break;
+    }
+  }
 
-  // TODO(BRYAN): Obtain the submission IDs from the backend
-  const oldSubmissionId: number = 1;
-  const newSubmissionId: number = idData.appeal.newFileSubmissionId;
   let diffSubmissionsData: DiffSubmissionsData;
   try {
     const response = await fetch(

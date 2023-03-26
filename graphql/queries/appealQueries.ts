@@ -156,7 +156,7 @@ export const GET_APPEAL_MESSAGES = gql`
 `;
 
 export const GET_SUBMISSIONS_BY_ASSIGNMENT_AND_USER_ID = gql`
-  subscription getAssignmentSubmissions($assignmentConfigId: bigint!, $userId: bigint!) {
+  query getAssignmentSubmissions($assignmentConfigId: bigint!, $userId: bigint!) {
     submissions(
       where: { assignment_config_id: { _eq: $assignmentConfigId }, user_id: { _eq: $userId } }
       order_by: { created_at: desc }
