@@ -36,7 +36,6 @@ export type ChangeLog = {
   updatedState: string;
   initiatedBy: number; // User ID
   reason?: string;
-
   appealId?: number;
 };
 

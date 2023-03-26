@@ -8,7 +8,6 @@ interface AppealLogMessageType {
   showButton: boolean; // Is the "View Appeal" button going to be shown
 }
 
-//TODO(BRYAN): Display the reason for the change log
 /**
  * Returns a component that shows a log message based on the log type
  */

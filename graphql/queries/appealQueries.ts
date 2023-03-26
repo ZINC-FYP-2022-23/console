@@ -174,4 +174,21 @@ export const GET_IDS_BY_APPEAL_ID = gql`
     }
   }
 `;
+
+export const GET_APPEALS_BY_USER_ID_AND_ASSIGNMENT_ID = gql`
+  subscription getAllUserAppeals($userId: bigint!, $assignmentConfigId: bigint!) {
+    appeals(
+      order_by: { createdAt: desc }
+      where: { userId: { _eq: $userId }, assignmentConfigId: { _eq: $assignmentConfigId } }
+    ) {
+      id
+      newFileSubmissionId
+      assignmentConfigId
+      createdAt
+      status
+      updatedAt
+      userId
+    }
+  }
+`;
 /* End of Queries used in `Appeal Details Page` */

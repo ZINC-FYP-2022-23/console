@@ -18,6 +18,7 @@ import Link from "next/link";
 import { useState } from "react";
 import AppealStatusBadge from "./AppealStatusBadge";
 import { transformAppealStatus } from "@/utils/appealUtils";
+import { utcToZonedTime } from "date-fns-tz";
 
 /** Type definition of each row in the Appeals Table. */
 type AppealTableType = {
@@ -179,7 +180,10 @@ function AppealsTable({ assignmentConfigId }: AppealsTableProps) {
 
       appealData.push({
         id: appeal.id,
-        updatedAt: format(new Date(appeal.updatedAt ?? appeal.createdAt), "MMM dd, yyyy h:mm aa"),
+        updatedAt: format(
+          utcToZonedTime(`${appeal.updatedAt ?? appeal.createdAt}Z`, "Asia/Hong_Kong"),
+          "MMM dd, yyyy h:mm aa",
+        ),
         status,
         name: appeal.user.name,
         itsc: appeal.user.itsc,

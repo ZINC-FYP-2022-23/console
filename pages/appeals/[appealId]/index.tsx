@@ -6,6 +6,7 @@ import RichTextEditor from "@/components/RichTextEditor";
 import { LayoutProvider } from "@/contexts/layout";
 import { CREATE_APPEAL_MESSAGE, CREATE_CHANGE_LOG, UPDATE_APPEAL_STATUS } from "@/graphql/mutations/appealMutations";
 import {
+  GET_APPEALS_BY_USER_ID_AND_ASSIGNMENT_ID,
   GET_APPEAL_CHANGE_LOGS_BY_APPEAL_ID,
   GET_APPEAL_DETAILS_BY_APPEAL_ID,
   GET_APPEAL_MESSAGES,
@@ -13,17 +14,24 @@ import {
   GET_IDS_BY_APPEAL_ID,
 } from "@/graphql/queries/appealQueries";
 import { Layout } from "@/layout";
-import { AppealAttempt, AppealStatus } from "@/types";
-import { AppealLog, ChangeLogTypes, DisplayMessageType } from "@/types/appeal";
-import { Submission as SubmissionType } from "@/types/tables";
+import {
+  Appeal,
+  AppealAttempt,
+  AppealLog,
+  AppealMessage,
+  AppealStatus,
+  ChangeLogTypes,
+  DisplayMessageType,
+  Submission as SubmissionType,
+} from "@/types";
+import { ChangeLog } from "@/types/tables";
 import { mergeDataToActivityLogList, transformToAppealAttempt } from "@/utils/appealUtils";
-import { useMutation, useQuery, useSubscription } from "@apollo/client";
+import { useMutation, useSubscription } from "@apollo/client";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Tab } from "@headlessui/react";
 import { Alert, clsx, createStyles, Modal } from "@mantine/core";
 import { zonedTimeToUtc } from "date-fns-tz";
 import { GetServerSideProps } from "next";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { ReactGhLikeDiff } from "react-gh-like-diff";
@@ -63,8 +71,8 @@ interface createNewChangeLogProps {
   appealAttempt: AppealAttempt;
   type: string;
   newStatus?: AppealStatus;
-  oldScore?: number | string;
-  newScore?: number | string;
+  oldScore?: number;
+  newScore?: number;
 }
 
 /**
@@ -208,6 +216,7 @@ function CustomModal({ changeLog, modalOpen, setModalOpen, appealAttempt }: Cust
                 variables: {
                   id: appealAttempt.id,
                   status: mutationText,
+                  updatedAt: zonedTimeToUtc(new Date(), "Asia/Hong_Kong"),
                 },
               });
             }
@@ -400,6 +409,8 @@ function ChangeScore({ userId, submissionId, appealAttempt, oldScore, maxScore }
               alert("Updated score cannot be larger than the maximum score");
             } else if (isBlank) {
               alert("The input field is blank, please input a new score.");
+            } else if (newScore < 0) {
+              alert("Updated score cannot be negative");
             } else {
               setNewLog(
                 createNewChangeLog({
@@ -481,12 +492,14 @@ type ActivityLogTabProps = {
     | (DisplayMessageType & { _type: "appealMessage" })
     | (AppealLog & { _type: "appealLog" })
   )[];
+  /** Allow message to be sent or not */
+  allowChange: boolean;
 };
 
 /**
  * Return a component that shows the Activity Log under the Activity Log Tab to show all appeal messages and appeal logs
  */
-function ActivityLogTab({ userId, activityLogList }: ActivityLogTabProps) {
+function ActivityLogTab({ userId, activityLogList, allowChange }: ActivityLogTabProps) {
   const [comments, setComments] = useState("");
 
   return (
@@ -511,25 +524,27 @@ function ActivityLogTab({ userId, activityLogList }: ActivityLogTabProps) {
           },
         )}
       </div>
-      <div className="mb-6 sticky bottom-0 object-bottom">
-        {/* @ts-ignore */}
-        <RichTextEditor
-          id="rte"
-          value={comments}
-          onChange={setComments}
-          controls={[
-            ["bold", "italic", "underline"],
-            ["h1", "h2", "h3", "unorderedList", "orderedList"],
-          ]}
-        />
-        <div className="py-1" />
-        {/* Hide the Send Message Button if the text editor is empty */}
-        {comments && comments !== "<p><br></p>" && (
-          <div className="flex justify-center">
-            <MessageButton userId={userId} comments={comments} setComments={setComments} />
-          </div>
-        )}
-      </div>
+      {allowChange && (
+        <div className="mb-6 sticky bottom-0 object-bottom">
+          {/* @ts-ignore */}
+          <RichTextEditor
+            id="rte"
+            value={comments}
+            onChange={setComments}
+            controls={[
+              ["bold", "italic", "underline"],
+              ["h1", "h2", "h3", "unorderedList", "orderedList"],
+            ]}
+          />
+          <div className="py-1" />
+          {/* Hide the Send Message Button if the text editor is empty */}
+          {comments && comments !== "<p><br></p>" && (
+            <div className="flex justify-center">
+              <MessageButton userId={userId} comments={comments} setComments={setComments} />
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
@@ -652,9 +667,80 @@ function DisplayLoading() {
   );
 }
 
+interface getScoreProps {
+  appeals: Appeal[];
+  changeLogs: ChangeLog[];
+  submissions: SubmissionType[];
+}
+
+/**
+ * Gets the latest score based on the following logic:
+ * @returns {number}
+ */
+function getScore({ appeals, changeLogs, submissions }: getScoreProps) {
+  /* *** Logic of how to get the score: ***
+   * If the `updatedAt` of the latest `ACCEPTED` appeal later than the date of any `SCORE` change:
+   *    If `newFileSubmission` is available, >>>  use the score of the `newFileSubmission`.
+   *    If `newFileSubmission` is NOT available:
+   *        If there is a `SCORE` change log >>> use the score of latest `SCORE` change.
+   *        If there is NO `SCORE` change log >>> use the score of the original submission.
+   * If there is the date of the latest `SCORE` change than is later than the `updatedAt` of the latest `ACCEPTED` appeal >>> use the score of latest `SCORE` change
+   * If there are NO `SCORE` change log AND `ACCEPTED` appeal >>> use the score of the original submission
+   */
+
+  const acceptedAppeals: Appeal[] = appeals.filter((e) => e.status === "ACCEPTED");
+  let acceptedAppealDate: Date | null = null;
+  let acceptedAppealScore: number | null = null;
+
+  // Get the latest `ACCEPTED` appeal with a new score generated
+  for (let i = 0; i < acceptedAppeals.length; i++) {
+    if (
+      acceptedAppeals[i].updatedAt &&
+      acceptedAppeals[i].submission &&
+      acceptedAppeals[i].submission.reports.length > 0 &&
+      acceptedAppeals[i].submission.reports[0].grade.score
+    ) {
+      acceptedAppealDate = new Date(acceptedAppeals[i].updatedAt!);
+      acceptedAppealScore = acceptedAppeals[i].submission.reports[0].grade.score;
+      break;
+    }
+  }
+
+  // Get the latest `SCORE` change log
+  for (let i = 0; i < changeLogs.length; i++) {
+    if (changeLogs[i].type === "SCORE") {
+      const changeLogDate: Date = new Date(changeLogs[i].createdAt);
+
+      if (acceptedAppealDate && acceptedAppealDate > changeLogDate) {
+        return acceptedAppealScore;
+      } else {
+        return parseInt(changeLogs[i].updatedState.replace(/[^0-9]/g, ""));
+      }
+    }
+  }
+
+  // If above fails, get the original submission score
+  for (let i = 0; i < submissions.length; i++) {
+    let isNewFileSubmission: boolean = false;
+
+    // Do not pick the submission that is related to the appeal
+    for (let j = 0; j < appeals.length; j++) {
+      if (submissions[i].id === appeals[j].newFileSubmissionId) {
+        isNewFileSubmission = true;
+        break;
+      }
+    }
+
+    if (!isNewFileSubmission && submissions[i].reports.length > 0 && submissions[i].reports[0].grade.score) {
+      return submissions[i].reports[0].grade.score;
+    }
+  }
+}
+
 interface AppealDetailsProps {
   appealId: number;
   userId: number;
+  studentId: number;
   courseId: number; // The course ID that the appeal is related to
   submissionId: number;
   assignmentConfigId: number;
@@ -667,6 +753,7 @@ interface AppealDetailsProps {
 function AppealDetails({
   appealId,
   userId,
+  studentId,
   submissionId,
   assignmentConfigId,
   diffSubmissionsData,
@@ -676,25 +763,36 @@ function AppealDetails({
     data: appealsDetailsData,
     loading: appealDetailsLoading,
     error: appealDetailsError,
-  } = useSubscription(GET_APPEAL_DETAILS_BY_APPEAL_ID, { variables: { appealId: appealId } });
+  } = useSubscription<{ appeal: Appeal }>(GET_APPEAL_DETAILS_BY_APPEAL_ID, { variables: { appealId: appealId } });
   const {
     data: appealChangeLogData,
     loading: appealChangeLogLoading,
     error: appealChangeLogError,
-  } = useSubscription(GET_APPEAL_CHANGE_LOGS_BY_APPEAL_ID, { variables: { appealId: appealId } });
+  } = useSubscription<{ changeLogs: ChangeLog[] }>(GET_APPEAL_CHANGE_LOGS_BY_APPEAL_ID, {
+    variables: { appealId: appealId },
+  });
   const {
     data: appealMessagesData,
     loading: appealMessagesLoading,
     error: appealMessagesError,
-  } = useSubscription(GET_APPEAL_MESSAGES, { variables: { appealId: appealId } });
+  } = useSubscription<{ appealMessages: AppealMessage[] }>(GET_APPEAL_MESSAGES, { variables: { appealId: appealId } });
   const {
     data: submissionsData,
     loading: submissionsLoading,
     error: submissionsError,
-  } = useSubscription(GET_ASSIGNMENT_SUBMISSIONS, { variables: { assignmentConfigId } });
+  } = useSubscription<{ submissions: SubmissionType[] }>(GET_ASSIGNMENT_SUBMISSIONS, {
+    variables: { assignmentConfigId },
+  });
+  const {
+    data: appealsData,
+    loading: appealsLoading,
+    error: appealsError,
+  } = useSubscription<{ appeals: Appeal[] }>(GET_APPEALS_BY_USER_ID_AND_ASSIGNMENT_ID, {
+    variables: { userId: studentId, assignmentConfigId },
+  });
 
   // Display Loading if data fetching is still in-progress
-  if (appealDetailsLoading || appealChangeLogLoading || appealMessagesLoading || submissionsLoading) {
+  if (appealDetailsLoading || appealChangeLogLoading || appealMessagesLoading || submissionsLoading || appealsLoading) {
     return <DisplayLoading />;
   }
 
@@ -727,37 +825,18 @@ function AppealDetails({
     | (AppealLog & { _type: "appealLog" })
   )[] = mergeDataToActivityLogList({ appealAttempt, appealChangeLogData, appealMessagesData });
 
-  // Get Grade Scores
-  let score: number = -1;
-  // First, get the score of the original submission
-  for (let i = 0; i < submissionsData.submissions.length; i++) {
-    // Do not pick the submission that is related to the appeal
-    if (submissionsData.submissions[i].id != appealsDetailsData.appeal.newFileSubmissionId) {
-      score = submissionsData.submissions[i].reports[0].grade.score;
-      break;
-    }
-  }
-  // Second, get the latest score based on change logs
-  for (let i = 0; i < appealChangeLogData.changeLogs.length; i++) {
-    // Use the latest score change
-    if (appealChangeLogData.changeLogs[0].type == "SCORE") {
-      score = appealChangeLogData.changeLogs[0].updatedState.replace(/[^0-9]/g, "");
-      break;
-    }
-    // Use the new file submission score submitted with the appeal
-    if (
-      appealAttempt[0].latestStatus === AppealStatus.Accept &&
-      appealChangeLogData.changeLogs[0].type == "APPEAL_STATUS" &&
-      appealChangeLogData.changeLogs[0].updatedState == "[{'status':ACCEPTED}]" &&
-      appealsDetailsData.appeal.submission &&
-      appealsDetailsData.appeal.submission.reports.length() > 0
-    ) {
-      score = appealsDetailsData.appeal.submission.reports[0].grade.score;
-      break;
-    }
-  }
+  // Get the original score
+  const score: number = getScore({
+    appeals: appealsData!.appeals,
+    changeLogs: appealChangeLogData!.changeLogs,
+    submissions: submissionsData!.submissions,
+  })!;
 
-  const totalScore: number = submissionsData.submissions[0].reports[0].grade.maxTotal;
+  const totalScore: number = submissionsData!.submissions[0].reports[0].grade.maxTotal;
+
+  // Determine if new changes and messages can be submitted
+  let allowChange: boolean = true;
+  if (appealsData!.appeals[0].id != appealAttempt[0].id) allowChange = false;
 
   return (
     <LayoutProvider>
@@ -771,21 +850,33 @@ function AppealDetails({
               <p className="col-span-2">{appealsDetailsData.appeal.user.name}</p>
               <p className="font-medium">ITSC:</p>
               <p className="col-span-2">{appealsDetailsData.appeal.user.itsc}</p>
+              {!allowChange && (
+                <>
+                  <p className="font-medium">Score:</p>
+                  <p className="col-span-2">
+                    {score} / {totalScore}
+                  </p>
+                </>
+              )}
             </div>
-            {/* Appeal Status */}
-            <div className="max-w-md mr-4 px-5">
-              <ChangeAppealStatus userId={userId} submissionId={submissionId} appealAttempt={appealAttempt[0]} />
-            </div>
-            {/* Score */}
-            <div className="max-w-md mr-4 px-5 y-full">
-              <ChangeScore
-                userId={userId}
-                submissionId={submissionId}
-                appealAttempt={appealAttempt[0]}
-                oldScore={score}
-                maxScore={totalScore}
-              />
-            </div>
+            {allowChange && (
+              <>
+                {/* Appeal Status */}
+                <div className="max-w-md mr-4 px-5">
+                  <ChangeAppealStatus userId={userId} submissionId={submissionId} appealAttempt={appealAttempt[0]} />
+                </div>
+                {/* Score */}
+                <div className="max-w-md mr-4 px-5 y-full">
+                  <ChangeScore
+                    userId={userId}
+                    submissionId={submissionId}
+                    appealAttempt={appealAttempt[0]}
+                    oldScore={score}
+                    maxScore={totalScore}
+                  />
+                </div>
+              </>
+            )}
           </div>
           {/* Tabs */}
           <div className="py-2 flex-1 space-y-2">
@@ -817,7 +908,7 @@ function AppealDetails({
               <Tab.Panels>
                 {/* "Activity Log" tab panel */}
                 <Tab.Panel>
-                  <ActivityLogTab userId={userId} activityLogList={activityLogList} />
+                  <ActivityLogTab userId={userId} activityLogList={activityLogList} allowChange={allowChange} />
                 </Tab.Panel>
                 {/* "Code Comparison" tab panel */}
                 <Tab.Panel>
@@ -845,6 +936,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, query }) => 
   });
 
   const assignmentConfigId: number = idData.appeal.assignmentConfigId;
+  const studentId: number = idData.appeal.userId;
 
   // TODO(BRYAN): Obtain the submission IDs from the backend
   const oldSubmissionId: number = 1;
@@ -869,6 +961,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, query }) => 
       initialApolloState: apolloClient.cache.extract(),
       appealId,
       userId,
+      studentId,
       assignmentConfigId,
       diffSubmissionsData,
       submissionId: oldSubmissionId,

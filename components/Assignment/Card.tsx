@@ -153,7 +153,7 @@ export function AssignmentRow({ config, sections }: AssignmentRowProps) {
     if (node.status == "PENDING") totalPendingAppealNumber++;
   });
   const appealNumberLabel: string =
-    totalPendingAppealNumber.toString() + " Outstanding, " + totalPendingAppealNumber.toString() + " Total";
+    totalPendingAppealNumber.toString() + " Outstanding, " + totalAppealNumber.toString() + " Total";
 
   return (
     <tr className="bg-white">
