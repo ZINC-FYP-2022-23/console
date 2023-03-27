@@ -9,26 +9,15 @@ export enum AppealStatus {
   Pending = "Pending",
 }
 
-// Any updates on `AppealAttempt` have to update function `isAppealAttempt()`
 export type AppealAttempt = {
   id: number;
   newFileSubmissionId?: string;
-  assignmentConfigAndUserId: number;
+  assignmentConfigId: number;
+  userId: number;
   createdAt: string;
   latestStatus: AppealStatus;
   updatedAt: string;
 };
-
-export function isAppealAttempt(obj: any): obj is AppealAttempt {
-  return (
-    "id" in obj &&
-    "filePath" in obj &&
-    "submissionId" in obj &&
-    "createdAt" in obj &&
-    "status" in obj &&
-    "decisionTimestamp" in obj
-  );
-}
 
 export type AppealMessage = {
   id: number;
@@ -47,7 +36,6 @@ export type ChangeLog = {
   updatedState: string;
   initiatedBy: number; // User ID
   reason?: string;
-
   appealId?: number;
 };
 
@@ -64,6 +52,7 @@ export type AppealLog = {
   date: string;
   originalState?: string;
   updatedState?: string;
+  reason?: string;
 };
 
 export type DisplayMessageType = {

@@ -17,6 +17,7 @@ import { SlideOver } from "../../../../../components/SlideOver";
 import { useState } from "react";
 import AssignmentSupportingFilesUploader from "../../../../../components/AssignmentSupportingFilesUploader";
 import { FilesProvider } from "../../../../../contexts/assignmentSupportingFiles";
+import { AppealConfig } from "@/components/Appeal/AppealConfig";
 import { Assignment, AssignmentConfig } from "@/types/tables";
 
 function SlideOverContent() {
@@ -274,7 +275,21 @@ function AssignmentConfigurationYAML() {
                   }}
                 />
                 <AssignedUsers />
-                Notificaion
+                <AppealConfig
+                  onChange={() =>
+                    refetch({
+                      assignmentConfigId,
+                    })
+                  }
+                  assignmentConfig={{
+                    isAppealAllowed: data!.assignmentConfig.isAppealAllowed,
+                    appealLimits: data!.assignmentConfig.appealLimits,
+                    appealStartAt: data!.assignmentConfig.appealStartAt,
+                    appealStopAt: data!.assignmentConfig.appealStopAt,
+                    isAppealStudentReplyAllowed: data!.assignmentConfig.isAppealStudentReplyAllowed,
+                    isAppealViewReportAllowed: data!.assignmentConfig.isAppealViewReportAllowed,
+                  }}
+                />
               </div>
             </div>
           </div>

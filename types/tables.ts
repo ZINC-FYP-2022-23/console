@@ -2,7 +2,33 @@
  * @file Types for the database tables.
  */
 
+import { NumberInputStylesNames } from "@mantine/core";
 import { GraderReport, ScoreReports } from "./report";
+
+export type AppealMessage = {
+  id: number;
+  message: string;
+  senderId: number;
+  appealId: number;
+  createdAt: string;
+  isRead: boolean;
+  assignment_appeal: Appeal;
+  user: User;
+};
+
+export type Appeal = {
+  id: number;
+  createdAt: string;
+  status: string;
+  newFileSubmissionId: number | null;
+  updatedAt: string | null;
+  userId: number;
+  assignmentConfigId: number;
+  assignment_appeal_messages: AppealMessage[];
+  assignment_config: AssignmentConfig;
+  submission: Submission;
+  user: User;
+};
 
 export type Assignment = {
   configs: AssignmentConfig[];
@@ -42,6 +68,14 @@ export type AssignmentConfig = {
   /** Whether the current time is after `stopCollectionAt`. */
   submissionWindowPassed: boolean;
   updatedAt: string;
+  /** Appeal-related */
+  isAppealAllowed: boolean;
+  appealLimits: number | null;
+  appealStartAt: Date | null;
+  appealStopAt: Date | null;
+  isAppealStudentReplyAllowed: boolean;
+  isAppealViewReportAllowed: boolean;
+  assignment_appeals: Appeal[];
 };
 
 export type AssignmentConfigUser = {
@@ -60,6 +94,22 @@ export type AssignmentType = {
   id: number;
   name: string;
   updated_at: string;
+};
+
+export type ChangeLog = {
+  id: number;
+  createdAt: string;
+  type: string;
+  originalState: string;
+  updatedState: string;
+  initiated_by: number;
+  reason: string;
+  appealId: number;
+  userId: number;
+  assignmentConfigId: number;
+  reportId: number;
+  submissionId: number;
+  user: User;
 };
 
 export type Course = {
@@ -184,4 +234,5 @@ export type User = {
   sections: SectionUser[];
   submissions: Submission[];
   updatedAt: string;
+  change_logs: ChangeLog[];
 };

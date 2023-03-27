@@ -146,7 +146,7 @@ export function AssignmentSlideOverContent() {
               {/* "Appeal Cases" tab panel */}
               <Tab.Panel>
                 <div className="px-6 py-5">
-                  <AppealsTable />
+                  <AppealsTable assignmentConfigId={assignmentConfigId || -1} />
                 </div>
               </Tab.Panel>
             </Tab.Panels>

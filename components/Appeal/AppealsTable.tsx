@@ -1,4 +1,13 @@
+import {
+  GET_APPEALS_DETAILS_BY_ASSIGNMENT_ID,
+  GET_APPEAL_CONFIG,
+  GET_SUBMISSIONS_BY_ASSIGNMENT_ID,
+} from "@/graphql/queries/appealQueries";
+import { AppealStatus, AssignmentConfig, Appeal, Submission as SubmissionType } from "@/types";
+import { ChangeLog } from "@/types/tables";
+import { useQuery, useSubscription } from "@apollo/client";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Alert } from "@mantine/core";
 import {
   ColumnDef,
   createColumnHelper,
@@ -9,47 +18,30 @@ import {
   SortingState,
   useReactTable,
 } from "@tanstack/react-table";
-import { AppealStatus, Appeal } from "@/types";
+import { format } from "date-fns";
 import Link from "next/link";
 import { useState } from "react";
 import AppealStatusBadge from "./AppealStatusBadge";
+import { transformAppealStatus } from "@/utils/appealUtils";
+import { utcToZonedTime } from "date-fns-tz";
 
-// TODO(Bryan): Replace dummy data with real API call
-const dummyAppealData: Appeal[] = [
-  {
-    id: 1,
-    updatedAt: "2022-10-30 4:00PM",
-    status: AppealStatus.Pending,
-    name: "LOREM, Ipsum",
-    itsc: "lorem",
-    originalScore: 70,
-  },
-  {
-    id: 2,
-    updatedAt: "2022-10-30 5:00PM",
-    status: AppealStatus.Accept,
-    name: "CHAN, Tai Man Tom",
-    itsc: "ctm",
-    originalScore: 80,
-    finalScore: 100,
-  },
-  {
-    id: 3,
-    updatedAt: "2022-10-30 3:00PM",
-    status: AppealStatus.Reject,
-    name: "CHEUNG, Siu Ming",
-    itsc: "cmm",
-    originalScore: 80,
-    finalScore: 80,
-  },
-];
+/** Type definition of each row in the Appeals Table. */
+type AppealTableType = {
+  id: number;
+  updatedAt: string;
+  status: AppealStatus;
+  name: string;
+  itsc: string;
+  originalScore: number;
+  finalScore?: number;
+};
 
-const columnHelper = createColumnHelper<Appeal>();
+const columnHelper = createColumnHelper<AppealTableType>();
 
 /**
  * Columns for the TanStack Table. See https://tanstack.com/table/v8/docs/guide/column-defs
  */
-const columns: ColumnDef<Appeal, any>[] = [
+const columns: ColumnDef<AppealTableType, any>[] = [
   columnHelper.accessor("updatedAt", {
     header: "Last Updated",
     cell: (props) => props.getValue(),
@@ -57,6 +49,14 @@ const columns: ColumnDef<Appeal, any>[] = [
   columnHelper.accessor("status", {
     header: "Status",
     cell: (props) => <AppealStatusBadge status={props.getValue()} />,
+    sortingFn: (rowA, rowB, columnId) => {
+      /** Sort status according to their orders of appearence in this array */
+      const statusSortOrder = [AppealStatus.Pending, AppealStatus.Accept, AppealStatus.Reject] as const;
+
+      const rowAStatus: AppealStatus = rowA.getValue(columnId);
+      const rowBStatus: AppealStatus = rowB.getValue(columnId);
+      return statusSortOrder.indexOf(rowAStatus) - statusSortOrder.indexOf(rowBStatus);
+    },
   }),
   columnHelper.accessor("name", {
     header: "Name",
@@ -87,6 +87,10 @@ const columns: ColumnDef<Appeal, any>[] = [
   }),
 ];
 
+const defaultSorting: SortingState = [
+  { id: "status", desc: false }, // Appeal status
+];
+
 /**
  * @param sort Sort direction. `false` means restore original order.
  * @returns The sort icon to display in the header.
@@ -102,13 +106,170 @@ const getSortIcon = (sort: SortDirection | false) => {
   }
 };
 
+interface DisplayErrorProps {
+  /** Message shown to the user when encountering an error */
+  errorMessage: string;
+}
+
+/**
+ * Returns an error page
+ */
+function DisplayError({ errorMessage }: DisplayErrorProps) {
+  return (
+    <div className="my-6 mt-8 flex flex-col items-center self-center mb-4">
+      <Alert icon={<FontAwesomeIcon icon={["far", "circle-exclamation"]} />} title="Error" color="red" variant="filled">
+        {errorMessage}
+      </Alert>
+    </div>
+  );
+}
+
+interface getScoreProps {
+  appeals: Appeal[];
+  changeLogs: ChangeLog[];
+  submissions: SubmissionType[];
+}
+
+/**
+ * Gets the latest score based on the following logic:
+ * @returns {number}
+ */
+function getScore({ appeals, changeLogs, submissions }: getScoreProps) {
+  /* *** Logic of how to get the score: ***
+   * If the `updatedAt` of the latest `ACCEPTED` appeal later than the date of any `SCORE` change:
+   *    If `newFileSubmission` is available, >>>  use the score of the `newFileSubmission`.
+   *    If `newFileSubmission` is NOT available:
+   *        If there is a `SCORE` change log >>> use the score of latest `SCORE` change.
+   *        If there is NO `SCORE` change log >>> use the score of the original submission.
+   * If there is the date of the latest `SCORE` change than is later than the `updatedAt` of the latest `ACCEPTED` appeal >>> use the score of latest `SCORE` change
+   * If there are NO `SCORE` change log AND `ACCEPTED` appeal >>> use the score of the original submission
+   */
+
+  const acceptedAppeals: Appeal[] = appeals.filter((e) => e.status === "ACCEPTED");
+  let acceptedAppealDate: Date | null = null;
+  let acceptedAppealScore: number | null = null;
+
+  // Get the latest `ACCEPTED` appeal with a new score generated
+  for (let i = 0; i < acceptedAppeals.length; i++) {
+    if (
+      acceptedAppeals[i].updatedAt &&
+      acceptedAppeals[i].submission &&
+      acceptedAppeals[i].submission.reports.length > 0 &&
+      acceptedAppeals[i].submission.reports[0].grade.score
+    ) {
+      acceptedAppealDate = new Date(acceptedAppeals[i].updatedAt!);
+      acceptedAppealScore = acceptedAppeals[i].submission.reports[0].grade.score;
+      break;
+    }
+  }
+
+  // Get the latest `SCORE` change log
+  for (let i = 0; i < changeLogs.length; i++) {
+    const changeLogDate: Date = new Date(changeLogs[i].createdAt);
+
+    if (acceptedAppealDate && acceptedAppealDate > changeLogDate) {
+      return acceptedAppealScore;
+    }
+
+    if (changeLogs[i].type === "SCORE") {
+      return parseInt(changeLogs[i].updatedState.replace(/[^0-9]/g, ""));
+    }
+  }
+
+  // If above fails, get the original submission score
+  for (let i = 0; i < submissions.length; i++) {
+    let isNewFileSubmission: boolean = false;
+
+    // Do not pick the submission that is related to the appeal
+    for (let j = 0; j < appeals.length; j++) {
+      if (submissions[i].id === appeals[j].newFileSubmissionId) {
+        isNewFileSubmission = true;
+        break;
+      }
+    }
+
+    if (!isNewFileSubmission && submissions[i].reports.length > 0 && submissions[i].reports[0].grade.score) {
+      return submissions[i].reports[0].grade.score;
+    }
+  }
+}
+
+interface AppealsTableProps {
+  assignmentConfigId: number;
+}
+
 /** Table that summarizes all grade appeals. */
-function AppealsTable() {
-  const [data] = useState(() => [...dummyAppealData]);
-  const [sorting, setSorting] = useState<SortingState>([]);
+function AppealsTable({ assignmentConfigId }: AppealsTableProps) {
+  const [sorting, setSorting] = useState<SortingState>(defaultSorting);
+
+  // Fetch data with GraphQL
+  const {
+    data: appealsDetailsData,
+    loading: appealDetailsLoading,
+    error: appealDetailsError,
+  } = useSubscription<{ appeals: Appeal[] }>(GET_APPEALS_DETAILS_BY_ASSIGNMENT_ID, {
+    variables: { assignmentConfigId: assignmentConfigId },
+  });
+  const {
+    data: appealConfigData,
+    loading: appealConfigLoading,
+    error: appealConfigError,
+  } = useQuery<{ assignmentConfig: AssignmentConfig }>(GET_APPEAL_CONFIG, {
+    variables: { assignmentConfigId: assignmentConfigId },
+  });
+  const {
+    data: submissionsData,
+    loading: submissionsLoading,
+    error: submissionsError,
+  } = useSubscription<{ submissions: SubmissionType[] }>(GET_SUBMISSIONS_BY_ASSIGNMENT_ID, {
+    variables: { assignmentConfigId: assignmentConfigId },
+  });
+
+  // Transform data into `AppealTableType[]`
+  const appealData: AppealTableType[] = [];
+  if (appealsDetailsData && submissionsData) {
+    appealsDetailsData.appeals.map((appeal, appealIndex) => {
+      let status: AppealStatus = transformAppealStatus(appeal.status);
+
+      // Get the Original Score
+      let originalScore: number = -1;
+      for (let i = 0; i < appeal.user.submissions.length; i++) {
+        // Do not pick the submission that is related to the appeal
+        if (appeal.user.submissions[i].id != appeal.newFileSubmissionId) {
+          originalScore = appeal.user.submissions[i].reports[0].grade.score;
+          break;
+        }
+      }
+
+      // Get the Final Score
+      const userAppeals: Appeal[] = appealsDetailsData.appeals
+        .filter((a) => a.userId === appeal.userId)
+        .slice(appealIndex);
+      const userChangeLogs: ChangeLog[] = appeal.user.change_logs.filter((c) => c.appealId === appeal.id);
+      const userSubmissions: SubmissionType[] = submissionsData.submissions.filter((s) => s.user_id === appeal.userId);
+      const finalScore: number = getScore({
+        appeals: userAppeals,
+        changeLogs: userChangeLogs,
+        submissions: userSubmissions,
+      })!;
+
+      appealData.push({
+        id: appeal.id,
+        updatedAt: format(
+          utcToZonedTime(`${appeal.updatedAt ?? appeal.createdAt}Z`, "Asia/Hong_Kong"),
+          "MMM dd, yyyy h:mm aa",
+        ),
+        status,
+        name: appeal.user.name,
+        itsc: appeal.user.itsc,
+        originalScore,
+        finalScore,
+      });
+    });
+  }
 
   const table = useReactTable({
-    data,
+    data: appealData,
     columns,
     state: {
       sorting,
@@ -117,6 +278,24 @@ function AppealsTable() {
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
   });
+
+  // Display `Loading` if data is still being fetched
+  if (appealDetailsLoading || appealConfigLoading || submissionsLoading) {
+    return <div>Loading...</div>;
+  }
+
+  // Display error if it occurred
+  if (appealDetailsError) {
+    const errorMessage = "Unable to fetch appeals details with `GET_APPEALS_DETAILS_BY_ASSIGNMENT_ID`";
+    return <DisplayError errorMessage={errorMessage} />;
+  } else if (appealConfigError) {
+    const errorMessage = "Unable to fetch appeals configs with `GET_APPEAL_CONFIG`";
+    return <DisplayError errorMessage={errorMessage} />;
+  } else if (!appealConfigData!.assignmentConfig.isAppealAllowed) {
+    // Check if the appeal submission is allowed
+    const errorMessage = "`isAppealAllowed` has been set to false";
+    return <DisplayError errorMessage={errorMessage} />;
+  }
 
   return (
     <div className="shadow rounded-lg overflow-hidden">
