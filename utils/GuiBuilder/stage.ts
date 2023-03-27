@@ -12,13 +12,24 @@ import { v4 as uuidv4 } from "uuid";
 import { transposeGraph } from "./graph";
 
 /**
- * @param id The stage id (e.g. `"stdioTest:hidden"`)
+ * @param stageName The stage name (e.g. `"StdioTest"`).
+ * @example
+ * getStageKey("StdioTest"); // "stdioTest"
+ * getStageKey("StdioTest", "hidden"); // "stdioTest:hidden"
+ */
+export function getStageKey(stageName: string, stageLabel = "") {
+  const name = stageName.charAt(0).toLowerCase() + stageName.slice(1);
+  return stageLabel === "" ? name : `${name}:${stageLabel}`;
+}
+
+/**
+ * @param stageKey The stage key (e.g. `"stdioTest:hidden"`)
  * @example
  * const output = getStageNameAndLabel("stdioTest:hidden");
  * console.log(output); // ["StdioTest", "hidden"]
  */
-export function getStageNameAndLabel(id: string) {
-  const splitOutput = id.split(":");
+export function getStageNameAndLabel(stageKey: string) {
+  const splitOutput = stageKey.split(":");
   const name = splitOutput[0].charAt(0).toUpperCase() + splitOutput[0].slice(1);
   const label = splitOutput.length > 1 ? splitOutput[1] : "";
   return [name, label] as const;

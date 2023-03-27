@@ -63,10 +63,12 @@ function StageNode({ id, data, selected }: NodeProps<StageNodeData>) {
 
   const stageData = useStoreState((state) => state.config.editingConfig.stageData);
   const stageDeps = useStoreState((state) => state.config.editingConfig.stageDeps);
+  const stagesDiagnostics = useStoreState((state) => state.config.diagnostics.stages);
   const draggingNewStage = useStoreState((state) => state.pipelineEditor.draggingNewStage);
   const setShouldFocusLabelInput = useStoreActions((actions) => actions.pipelineEditor.setShouldFocusLabelInput);
 
   const stageLabel = stageData[id]?.label ?? "";
+  const hasDiagnostics = stagesDiagnostics[id]?.length > 0;
 
   return (
     <div className="relative">
@@ -88,6 +90,7 @@ function StageNode({ id, data, selected }: NodeProps<StageNodeData>) {
               return "bg-white border-gray-400";
             }
           })(selected, isDragOver),
+          hasDiagnostics && "!border-red-500 border-2",
         )}
         data-label={data.label}
       >
@@ -119,6 +122,11 @@ function StageNode({ id, data, selected }: NodeProps<StageNodeData>) {
         </div>
       </div>
       {selected && <StageNodeActionButtons id={id} />}
+      {hasDiagnostics && (
+        <div className="absolute -top-3 -right-3 flex items-center justify-center bg-white text-2xl text-red-500 rounded-full">
+          <FontAwesomeIcon icon={["fas", "circle-exclamation"]} />
+        </div>
+      )}
     </div>
   );
 }

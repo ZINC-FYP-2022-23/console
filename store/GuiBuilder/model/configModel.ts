@@ -12,6 +12,7 @@ import {
 } from "@/types/GuiBuilder";
 import { AssignmentConfig } from "@/types/tables";
 import { generateStageLabels, isConfigEqual, isLinkedList, isScheduleEqual, parseConfigYaml } from "@/utils/GuiBuilder";
+import { configDiagnosticsFromRaw } from "@/utils/GuiBuilder/diagnostics";
 import { action, Action, computed, Computed, thunk, Thunk } from "easy-peasy";
 import cloneDeep from "lodash/cloneDeep";
 import isEqual from "lodash/isEqual";
@@ -142,6 +143,12 @@ interface ConfigModelAction {
       value: any;
     }
   >;
+
+  /**
+   * Parses the diagnostics from the Grader after validating the config. It will overwrite the previous
+   * {@link ConfigModel.diagnostics} state.
+   */
+  parseDiagnostics: Action<ConfigModel, DiagnosticRaw[]>;
 }
 
 interface ConfigModelThunk {
@@ -304,6 +311,10 @@ const configModelAction: ConfigModelAction = {
       return;
     }
     stage[path] = value;
+  }),
+
+  parseDiagnostics: action((state, diagnosticsRaw) => {
+    state.diagnostics = configDiagnosticsFromRaw(diagnosticsRaw, state.editingConfig.stageData);
   }),
 };
 

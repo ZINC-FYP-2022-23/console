@@ -4,6 +4,7 @@ import * as uuid from "uuid";
 import {
   configsToConfigsRaw,
   generateStageLabels,
+  getStageKey,
   getStageNameAndLabel,
   isStageDependencyEqual,
   parseStages,
@@ -63,11 +64,14 @@ const stageData: StageDataMap = {
 };
 
 describe("GuiBuilder: Utils - Stage", () => {
-  describe("getStageNameAndLabel()", () => {
-    it("gets the stage name and label", () => {
-      expect(getStageNameAndLabel("compile")).toEqual(["Compile", ""]);
-      expect(getStageNameAndLabel("stdioTest:hidden")).toEqual(["StdioTest", "hidden"]);
-    });
+  test("getStageKey()", () => {
+    expect(getStageKey("StdioTest")).toEqual("stdioTest");
+    expect(getStageKey("StdioTest", "hidden")).toEqual("stdioTest:hidden");
+  });
+
+  test("getStageNameAndLabel()", () => {
+    expect(getStageNameAndLabel("compile")).toEqual(["Compile", ""]);
+    expect(getStageNameAndLabel("stdioTest:hidden")).toEqual(["StdioTest", "hidden"]);
   });
 
   describe("parseStages()", () => {

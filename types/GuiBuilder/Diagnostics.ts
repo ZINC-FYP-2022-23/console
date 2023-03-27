@@ -44,6 +44,8 @@ export interface Diagnostic {
   severity: "WARNING" | "ERROR";
   /** Location of the diagnostic if any. */
   location?: {
+    /** Key of the stage (e.g. `"compile:main"`, `"diffWithSkeleton"`). */
+    stage?: string;
     /** Test case ID. */
     testCaseId?: number;
   };

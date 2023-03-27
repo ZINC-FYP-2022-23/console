@@ -4,7 +4,10 @@ import cloneDeep from "lodash/cloneDeep";
 import { GuiBuilderModel, guiBuilderModel } from "../../guiBuilderModel";
 
 /**
- * Gets an example store model with 3 stages (`DiffWithSkeleton`, `FileStructureValidation`, and `Compile`).
+ * Gets an example store model with 3 stages:
+ * 1. `"diffWithSkeleton"` with UUID `"stage-0"`
+ * 2. `"fileStructureValidation"` with UUID `"stage-1"`
+ * 3. `"compile:all"` with UUID `"stage-2"`
  */
 export function getThreeStageModel(): GuiBuilderModel {
   const model = cloneDeep(guiBuilderModel);
