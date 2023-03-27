@@ -13,7 +13,7 @@ describe("API - Download Gradebook", () => {
     const submission = {
       id: 0,
       isLate: false,
-      createdAt: new Date(),
+      created_at: new Date(),
       reports: [report],
       user: {
         itsc: "testITSC",

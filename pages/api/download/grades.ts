@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { withSentry } from "@sentry/nextjs";
 import axios from "axios";
 import { Workbook } from "exceljs";
+import { utcToZonedTime } from "date-fns-tz";
 
 // Helper function to determine final score from appeals and manual TA changes
 export const finalScore = (submission, report, assignment_appeals: any[], changeLogs: any[]) => {
@@ -13,14 +14,15 @@ export const finalScore = (submission, report, assignment_appeals: any[], change
       : `${r.grade.score}`;
   };
 
-  let date: Date = submission.createdAt;
+  let date: Date = utcToZonedTime(submission.created_at, "Asia/Hong_Kong");
   let fScore: string = computeScoreFromReport(report);
 
   // Check for assignment appeals
   if (assignment_appeals.length > 0) {
     const [appeal] = assignment_appeals;
     if (appeal && appeal.submission && appeal.submission.reports && appeal.submission.reports.length > 0) {
-      date = appeal.updatedAt;
+      // TODO(Owen): appeal.updatedAt type `string | null` not allowed
+      date = utcToZonedTime(appeal.updatedAt, "Asia/Hong_Kong");
       fScore = computeScoreFromReport(appeal.submission.reports[0]);
     }
   }
@@ -28,8 +30,8 @@ export const finalScore = (submission, report, assignment_appeals: any[], change
   // Check for TA manual change logs
   if (changeLogs.length > 0) {
     const [change] = changeLogs;
-    if (change && change.createdAt.getTime() > date.getTime()) {
-      date = change.createdAt;
+    if (change && utcToZonedTime(change.createdAt, "Asia/Hong_Kong").getTime() > date.getTime()) {
+      date = utcToZonedTime(change.createdAt, "Asia/Hong_Kong");
       fScore = `${change.updatedState.score}`;
     }
   }
