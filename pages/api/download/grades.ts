@@ -97,10 +97,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
                 limit: 1
                 where: {
                   status: { _eq: "ACCEPTED" }
+                  newFileSubmissionId: {_is_null: false}
                 }
                 order_by: {
                   userId: asc
-                  createdAt: desc
+                  updatedAt: desc
                 }
               ) {
                 submission {
