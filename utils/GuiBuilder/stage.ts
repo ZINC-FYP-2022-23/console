@@ -60,7 +60,7 @@ export function parseStages(stages: { [key: string]: any }): [StageDependencyGra
  * @param stageDeps Assume that the stage dependency graph has the shape of a **linked list**.
  */
 export function stagesToYamlObj(stageDeps: StageDependencyGraph, stageData: StageDataMap): { [key: string]: any } {
-  const stageDataTidied = configsToConfigsRaw(generateStageLabels(stageData));
+  const stageDataTidied = configsToConfigsRaw(stageData);
 
   // Currently the grader executes each stage sequentially. Hence, `stageDeps` is a linked list.
   // By transposing the graph, we are "reversing" the linked list to get the order of execution.

@@ -44,7 +44,10 @@ function ChooseEditorModeModal() {
             </a>
           </Link>
         </div>
-        <Alert severity="warning">GUI Mode will discard all comments in the configuration YAML file.</Alert>
+        <Alert severity="warning">
+          If you open an existing configuration in GUI Mode, all the comments in the configuration YAML file will be
+          discarded on save.
+        </Alert>
       </div>
     </ModalWithHeader>
   );

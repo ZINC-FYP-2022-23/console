@@ -72,7 +72,7 @@ function WeightedScorableOverrides<TPredicates extends Predicates>({
         const numOfPredicatesSet = predicateKeys.reduce((acc, curr) => (override[curr] ? acc + 1 : acc), 0);
 
         return (
-          <div key={override._uuid} className="px-4 py-3 bg-gray-100 rounded-md text-sm">
+          <div key={override._uuid} className="px-4 py-3 bg-gray-100 rounded-md text-sm" data-cy="predicate">
             <div className="flex items-center gap-3 text-gray-700">
               <span>Set score to</span>
               <NumberInput
@@ -82,6 +82,7 @@ function WeightedScorableOverrides<TPredicates extends Predicates>({
                   updateOverride(index, (override) => (override.score = value));
                 }}
                 styles={{ input: { width: "6rem" } }}
+                data-cy="predicate-score"
               />
               <span>for test cases matching</span>
               <Select
@@ -92,6 +93,7 @@ function WeightedScorableOverrides<TPredicates extends Predicates>({
                   updateOverride(index, (override) => (override.joinPolicy = value));
                 }}
                 styles={{ input: { width: "5rem" } }}
+                data-cy="predicate-joinPolicy"
               />
               <span>conditions of:</span>
               <button

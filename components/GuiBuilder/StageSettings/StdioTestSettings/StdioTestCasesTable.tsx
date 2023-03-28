@@ -84,6 +84,7 @@ const columns = [
         <FontAwesomeIcon
           icon={["far", value ? "circle-check" : "circle-xmark"]}
           className={clsx("text-xl", value ? "text-green-700" : "text-red-700")}
+          aria-label={value ? "Yes" : "No"}
         />
       );
     },
@@ -104,10 +105,7 @@ const defaultSorting: SortingState = [{ id: "id", desc: false }];
  * @param testCases Test cases to map. This array is not mutated.
  * @param valgrind Data of the Valgrind stage if this stage exists in the pipeline.
  */
-export const mapTestCasesToTableData = (
-  testCases: TestCase[],
-  valgrind: Valgrind | null,
-): StdioTestCasesTableType[] => {
+const mapTestCasesToTableData = (testCases: TestCase[], valgrind: Valgrind | null): StdioTestCasesTableType[] => {
   return testCases.map(
     (testCase): StdioTestCasesTableType => ({
       id: testCase.id,
@@ -198,7 +196,7 @@ function StdioTestCasesTable({ testCases, onDuplicate, onDelete, onVisit }: Stdi
                   {cells.map((cell, index) => {
                     const isLast = cells.length - 1 === index;
                     return (
-                      <td key={cell.id} className={clsx("py-1", isLast ? "pr-3" : "px-5")}>
+                      <td key={cell.id} className={clsx("py-1", isLast ? "pr-3" : "px-5")} data-cy={cell.id}>
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
                       </td>
                     );

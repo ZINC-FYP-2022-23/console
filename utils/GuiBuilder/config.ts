@@ -29,13 +29,16 @@ export function parseConfigYaml(yaml: string): Config {
 
 /**
  * De-serializes a {@link Config} object to a YAML string.
+ * @param settingsOnly Whether to only serialize settings such that the output YAML only has a `_settings` key.
  */
-export function configToYaml(config: Config): string {
-  const _settings = settingsToSettingsRaw(config._settings);
-  const stages = stagesToYamlObj(config.stageDeps, config.stageData);
+export function configToYaml(config: Config, settingsOnly = false): string {
+  const input = {
+    _settings: settingsToSettingsRaw(config._settings),
+    ...(settingsOnly ? {} : stagesToYamlObj(config.stageDeps, config.stageData)),
+  };
 
   // Recursively convert fields with value `undefined` to `null` as js-yaml cannot parse `undefined` fields
-  const outputObjString = JSON.stringify({ _settings, ...stages }, (_, v) => (v === undefined ? null : v));
+  const outputObjString = JSON.stringify(input, (_, v) => (v === undefined ? null : v));
   return dump(JSON.parse(outputObjString));
 }
 

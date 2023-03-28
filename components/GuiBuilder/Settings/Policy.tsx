@@ -9,7 +9,7 @@ function Policy() {
   const setPolicy = useStoreActions((actions) => actions.config.setPolicy);
 
   return (
-    <div className="px-1 flex flex-col gap-5 text-sm">
+    <div className="px-1 pt-1 flex flex-col gap-5 text-sm">
       <div className="flex items-center gap-2">
         <div className="flex-1 flex items-center gap-1">
           <label htmlFor="attemptLimits">Attempt Limits</label>
@@ -25,6 +25,7 @@ function Policy() {
         />
       </div>
       <SwitchGroup
+        id="gradeImmediately"
         label="Grade immediately after submission"
         checked={policy.gradeImmediately}
         onChange={(value) => {
@@ -32,6 +33,7 @@ function Policy() {
         }}
       />
       <SwitchGroup
+        id="showImmediateScores"
         label="Reveal grading details"
         description="Show all available grading information right after the submission is graded"
         checked={policy.showImmediateScores}

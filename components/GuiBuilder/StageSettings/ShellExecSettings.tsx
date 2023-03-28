@@ -41,7 +41,7 @@ function ShellExecSettings() {
           </div>
         </div>
         <TagsInput
-          name="additional_packages"
+          id="additional_packages"
           value={config.additional_packages}
           onChange={(tags) => setConfig({ ...config, additional_packages: tags })}
           onBlur={onTagInputBlur}

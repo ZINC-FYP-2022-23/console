@@ -102,6 +102,7 @@ function StdioTestCaseSettings({ caseId, closeModal, setView }: StdioTestCaseSet
             <p className="font-semibold text-xl">Test Case #</p>
             <div className="flex items-center relative">
               <NumberInput
+                id="id"
                 value={newId ?? undefined}
                 onChange={(value) => setNewId(value ?? null)}
                 alertLevel={isNewIdInvalid ? "error" : undefined}
@@ -142,7 +143,11 @@ function StdioTestCaseSettings({ caseId, closeModal, setView }: StdioTestCaseSet
               </div>
               {isNewIdInvalid && (
                 <p className="ml-2 absolute bottom-[-1.25rem] font-medium text-xs text-red-500">
-                  {newId === null || newId < 1 ? "ID should be greater than 1" : "This ID is already taken"}
+                  {newId === null || newId < 1 ? (
+                    <span data-cy="id-error-gt-1">ID should be greater than 1</span>
+                  ) : (
+                    <span data-cy="id-error-taken">This ID is already taken</span>
+                  )}
                 </p>
               )}
             </div>
@@ -157,6 +162,7 @@ function StdioTestCaseSettings({ caseId, closeModal, setView }: StdioTestCaseSet
                   setIsEditingId(true);
                 }}
                 className="w-8 h-8 flex items-center justify-center bg-amber-200 text-amber-700 rounded-full transition hover:bg-amber-300 active:bg-amber-400"
+                data-cy="edit-id"
               >
                 <FontAwesomeIcon icon={["far", "pen-field"]} />
               </button>
@@ -204,6 +210,7 @@ function StdioTestCaseSettings({ caseId, closeModal, setView }: StdioTestCaseSet
                 Visibility to students
               </label>
               <Select
+                id="visibility"
                 data={visibilityOptions}
                 value={caseConfig.visibility}
                 onChange={(value) => value && updateTestCase((testCase) => (testCase.visibility = value))}
@@ -217,6 +224,7 @@ function StdioTestCaseSettings({ caseId, closeModal, setView }: StdioTestCaseSet
               </label>
               <div className="flex-[3]">
                 <MultiSelect
+                  id="hide_from_report"
                   data={hiddenItemOptions}
                   value={caseConfig.hide_from_report ?? []}
                   onChange={(value) => updateTestCase((testCase) => (testCase.hide_from_report = value))}
@@ -321,6 +329,7 @@ function StdioTestCaseSettings({ caseId, closeModal, setView }: StdioTestCaseSet
           <div className="space-y-5">
             <div>
               <SwitchGroup
+                id="_valgrindOverride"
                 label="Override config from Valgrind stage"
                 checked={caseConfig._valgrindOverride}
                 onChange={(value) =>
@@ -333,7 +342,10 @@ function StdioTestCaseSettings({ caseId, closeModal, setView }: StdioTestCaseSet
                 }
               />
               {caseConfig._valgrindOverride && !hasValgrindStage && (
-                <div className="px-4 py-3 mt-3 flex items-center gap-4 bg-yellow-100 text-yellow-800 rounded-md">
+                <div
+                  className="px-4 py-3 mt-3 flex items-center gap-4 bg-yellow-100 text-yellow-800 rounded-md"
+                  data-cy="missing-valgrind-warning"
+                >
                   <FontAwesomeIcon icon={["far", "triangle-exclamation"]} className="text-xl text-yellow-600" />
                   <p>
                     Your grading pipeline is missing a{" "}
@@ -352,6 +364,7 @@ function StdioTestCaseSettings({ caseId, closeModal, setView }: StdioTestCaseSet
               )}
             </div>
             <SwitchGroup
+              id="valgrind-enabled"
               label="Run Valgrind on this test case"
               checked={caseConfig.valgrind?.enabled ?? defaultValgrindConfig.enabled}
               onChange={(value) =>
@@ -366,13 +379,13 @@ function StdioTestCaseSettings({ caseId, closeModal, setView }: StdioTestCaseSet
           <div className="mt-5 space-y-3">
             <div className="flex gap-2">
               <div className="flex-[2] flex items-center gap-1">
-                <label htmlFor="valgrind.score" className={!caseConfig._valgrindOverride ? "text-gray-400" : ""}>
+                <label htmlFor="valgrind-score" className={!caseConfig._valgrindOverride ? "text-gray-400" : ""}>
                   Valgrind score
                 </label>
                 <ValgrindScoreTooltip />
               </div>
               <NumberInput
-                id="valgrind.score"
+                id="valgrind-score"
                 value={caseConfig.valgrind?.score}
                 onChange={(value) =>
                   updateTestCase((testCase) => {
@@ -390,13 +403,13 @@ function StdioTestCaseSettings({ caseId, closeModal, setView }: StdioTestCaseSet
             </div>
             <div className="flex gap-2">
               <label
-                htmlFor="valgrind.visibility"
+                htmlFor="valgrind-visibility"
                 className={clsx("mt-2 flex-[2]", !caseConfig._valgrindOverride && "text-gray-400")}
               >
                 Visibility to students
               </label>
               <Select
-                id="valgrind.visibility"
+                id="valgrind-visibility"
                 data={valgrindVisibilityOptions}
                 value={caseConfig.valgrind?.visibility ?? defaultValgrindConfig.visibility}
                 onChange={(value) => {
@@ -413,13 +426,14 @@ function StdioTestCaseSettings({ caseId, closeModal, setView }: StdioTestCaseSet
             </div>
             <div className="flex gap-2">
               <label
-                htmlFor="valgrind.checksFilter"
+                htmlFor="valgrind-checksFilter"
                 className={clsx("mt-2 flex-[2]", !caseConfig._valgrindOverride && "text-gray-400")}
               >
                 Errors to check
               </label>
               <div className="flex-[3]">
                 <MultiSelect
+                  id="valgrind-checksFilter"
                   data={valgrindChecksFilterOptions}
                   value={caseConfig.valgrind?.checksFilter ?? defaultValgrindConfig.checksFilter}
                   onChange={(value) => {
@@ -436,13 +450,13 @@ function StdioTestCaseSettings({ caseId, closeModal, setView }: StdioTestCaseSet
             </div>
             <div className="flex gap-2">
               <label
-                htmlFor="valgrind.args"
+                htmlFor="valgrind-args"
                 className={clsx("mt-2 flex-[2]", !caseConfig._valgrindOverride && "text-gray-400")}
               >
                 Valgrind command-line options
               </label>
               <Textarea
-                id="valgrind.args"
+                id="valgrind-args"
                 value={caseConfig.valgrind?.args ?? ""}
                 onChange={(e) => {
                   updateTestCase((testCase) => {
@@ -473,25 +487,23 @@ interface HelperFileInputCardProps {
  * A card for users to input the helper file name in "Standard input" and "Expected output".
  */
 function HelperFileInputCard({ value, onChange, placeholder }: HelperFileInputCardProps) {
-  const setStep = useStoreActions((actions) => actions.layout.setStep);
   return (
-    <div className="mb-3 mx-2 p-3 bg-gray-50 rounded-lg drop-shadow">
-      <ol className="pl-4 mb-2 text-gray-600 text-sm list-decimal">
-        <li>
-          Upload the helper file to{" "}
-          <button onClick={() => setStep("upload")} className="underline text-blue-700">
-            Additional files used for grading
-          </button>
-        </li>
-        <li>Input the helper file name below:</li>
-      </ol>
+    <div className="mb-3 mx-2 p-3 bg-gray-50 rounded-lg text-gray-600 text-sm drop-shadow">
+      <label htmlFor="file_stdin">Helper file name:</label>
       <TextInput
         id="file_stdin"
         value={value}
         onChange={onChange}
         placeholder={placeholder}
-        classNames={{ root: "ml-4", input: "font-mono" }}
+        classNames={{ root: "mt-2", input: "font-mono" }}
       />
+      <div className="mt-3 text-blue-500 flex items-center gap-2">
+        <FontAwesomeIcon icon={["far", "circle-info"]} />
+        <p>
+          Helper files should be uploaded later in the <span className="font-semibold">Upload Files</span> step &gt;
+          &quot;Additional files used for grading&quot;
+        </p>
+      </div>
     </div>
   );
 }

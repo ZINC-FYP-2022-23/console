@@ -1,8 +1,49 @@
 /**
- * @file Utilities for manipulating stage configs.
+ * @file Utilities related to stage configs.
  */
 
-import { TestCase } from "@/types/GuiBuilder";
+import { cFamilyCompileDefault } from "@/constants/GuiBuilder/supportedLanguages";
+import { Compile, Make, SettingsLang, TestCase } from "@/types/GuiBuilder";
+
+/**
+ * Previews what the compilation command will the {@link Compile} stage run. It returns `null` if
+ * preview is not available.
+ *
+ * The previewed command is derived from how the Grader would build the command in the implementation
+ * of the `Compile` stage.
+ *
+ * @param lang Language of the config.
+ * @param compile The `Compile` stage config.
+ */
+export const getCompilePreviewCommand = (lang: SettingsLang, compile: Compile): string | null => {
+  const input = compile.input.join(" ");
+
+  switch (lang.language) {
+    case "c":
+    case "cpp": {
+      let compiler = lang.compiler;
+      if (compiler === "clang") {
+        if (lang.language === "cpp") compiler += "++";
+        compiler += `-${lang.version}`;
+      }
+      const flags = compile.flags || cFamilyCompileDefault.flags;
+      const output = compile.output || cFamilyCompileDefault.output;
+
+      return `${compiler} ${flags} -o ${output} ${input}`;
+    }
+    default:
+      return null;
+  }
+};
+
+/**
+ * Previews what the GNU Make command will the {@link Make} stage run.
+ *
+ * @param make The `Make` stage config.
+ */
+export const getMakePreviewCommand = (make: Make): string => {
+  return `make ${make.args} ${make.targets.join(" ")}`.trimRight();
+};
 
 /**
  * @returns The largest test case ID in the given test cases.

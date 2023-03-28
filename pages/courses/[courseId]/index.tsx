@@ -23,6 +23,22 @@ function CourseSlideOver() {
   }
 }
 
+function CourseModalContent() {
+  const { modalType } = useLayoutState();
+  switch (modalType) {
+    case "regrading":
+      return (
+        <Modal size="regular">
+          <RegradingConfirmationDialog />
+        </Modal>
+      );
+    case "editorMode":
+      return <ChooseEditorModeModal />;
+    default:
+      return <div className="hidden"></div>;
+  }
+}
+
 function Course() {
   const router = useRouter();
   const courseId = router.query.courseId as string;
@@ -55,10 +71,7 @@ function Course() {
       <SlideOver>
         <CourseSlideOver />
       </SlideOver>
-      <Modal size="regular">
-        <RegradingConfirmationDialog />
-      </Modal>
-      <ChooseEditorModeModal />
+      <CourseModalContent />
     </LayoutProvider>
   );
 }

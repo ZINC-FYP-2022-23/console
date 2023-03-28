@@ -1,5 +1,14 @@
 import { SettingsLang } from "@/types/GuiBuilder";
 
+/**
+ * Default `Compile` stage configs for C and C++ assignments
+ * ({@link https://docs.zinc.ust.dev/user/pipeline/docker/Compile.html Reference}).
+ */
+export const cFamilyCompileDefault = {
+  flags: "-std=c++11 -pedantic -Wall -Wextra -g",
+  output: "a.out",
+} as const;
+
 type SupportedLanguage = Pick<SettingsLang, "compiler" | "language"> & {
   /** Label to display in the UI. */
   readonly label: string;
@@ -23,8 +32,8 @@ const supportedLanguages: readonly SupportedLanguage[] = [
   },
   {
     language: "cpp",
-    compiler: "clang++",
-    label: "C++ (clang++)",
+    compiler: "clang",
+    label: "C++ (clang)",
   },
   {
     language: "cpp",

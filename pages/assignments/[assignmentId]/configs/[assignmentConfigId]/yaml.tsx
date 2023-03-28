@@ -149,13 +149,13 @@ function YAMLConfigEditor({ yamlString }) {
 
   async function updateYaml() {
     try {
-      // const yaml = jsyaml.load(configYaml);
-      const { configError } = await validateAssignmentConfig(configYaml, assignmentConfigId as string);
+      const configYamlTrimmed = configYaml.trim();
+      const { configError } = await validateAssignmentConfig(configYamlTrimmed, assignmentConfigId as string);
       if (!configError) {
         await updatePipelineConfig({
           variables: {
             id: parseInt(assignmentConfigId as string, 10),
-            yaml: configYaml,
+            yaml: configYamlTrimmed,
           },
         });
         dispatch({

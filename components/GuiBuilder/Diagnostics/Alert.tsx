@@ -4,9 +4,8 @@ import { clsx } from "@mantine/core";
 
 type AlertSeverity = "info" | "warning" | "error";
 
-interface AlertProps {
+interface AlertProps extends React.ComponentPropsWithoutRef<"div"> {
   severity: AlertSeverity;
-  children: React.ReactNode;
   /**
    * Callback when the close button is pressed. No close button will be rendered if this is not provided.
    */
@@ -22,7 +21,7 @@ const severityToIconName: Record<AlertSeverity, IconName> = {
 /**
  * An alert to attract the user's attention with important static message.
  */
-function Alert({ severity, children, onClose }: AlertProps) {
+function Alert({ severity, children, onClose, ...props }: AlertProps) {
   return (
     <div
       className={clsx(
@@ -31,6 +30,7 @@ function Alert({ severity, children, onClose }: AlertProps) {
         severity === "warning" && "bg-yellow-100 text-yellow-800",
         severity === "error" && "bg-red-100 text-red-800",
       )}
+      {...props}
     >
       <FontAwesomeIcon
         icon={["far", severityToIconName[severity]]}

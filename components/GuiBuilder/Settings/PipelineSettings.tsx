@@ -2,9 +2,8 @@ import { Checkbox, NumberInput, Select, SelectItem, SwitchGroup, TextInput } fro
 import ListInput from "@/components/Input/ListInput";
 import { highlightableElementIds } from "@/constants/GuiBuilder/highlightableElements";
 import supportedLanguages from "@/constants/GuiBuilder/supportedLanguages";
-import supportedStages from "@/constants/GuiBuilder/supportedStages";
 import { useStoreActions, useStoreState } from "@/store/GuiBuilder";
-import { SettingsFeatures, SettingsGpuDevice, SettingsUseTemplate } from "@/types/GuiBuilder";
+import { Settings, SettingsGpuDevice, SettingsUseTemplate } from "@/types/GuiBuilder";
 import { settingsLangToString } from "@/utils/GuiBuilder";
 import { memo } from "react";
 import { v4 as uuidv4 } from "uuid";
@@ -23,12 +22,12 @@ const useTemplateSelectOptions: SelectItem<"undefined" | SettingsUseTemplate>[] 
   },
   {
     label: "Text input",
-    value: SettingsUseTemplate.FILENAMES,
+    value: "FILENAMES",
     description: "Input the names of the files to submit",
   },
   {
     label: "File upload",
-    value: SettingsUseTemplate.PATH,
+    value: "PATH",
     description: "Specify files to submit by uploading files",
   },
 ];
@@ -41,7 +40,7 @@ const gpuSelectOptions: SelectItem<GpuSelectValue>[] = [
   { label: "Choose vendors", value: "choose" },
 ];
 
-const getGpuSelectValue = (gpu: SettingsFeatures["gpu_device"]): GpuSelectValue => {
+const getGpuSelectValue = (gpu: Settings["enable_features"]["gpu_device"]): GpuSelectValue => {
   if (gpu === undefined) {
     return "undefined";
   } else if (gpu === "ANY") {
@@ -51,7 +50,7 @@ const getGpuSelectValue = (gpu: SettingsFeatures["gpu_device"]): GpuSelectValue 
   }
 };
 
-const gpuSelectValueToGpuDevice = (value: GpuSelectValue): SettingsFeatures["gpu_device"] => {
+const gpuSelectValueToGpuDevice = (value: GpuSelectValue): Settings["enable_features"]["gpu_device"] => {
   switch (value) {
     case "undefined":
       return undefined;
@@ -62,15 +61,14 @@ const gpuSelectValueToGpuDevice = (value: GpuSelectValue): SettingsFeatures["gpu
   }
 };
 
-const gpuVendorSelectOptions = [
-  { label: "NVIDIA", value: SettingsGpuDevice.NVIDIA },
-  { label: "AMD", value: SettingsGpuDevice.AMD },
-  { label: "Intel", value: SettingsGpuDevice.INTEL },
+const gpuVendorSelectOptions: { label: string; value: SettingsGpuDevice }[] = [
+  { label: "NVIDIA", value: "NVIDIA" },
+  { label: "AMD", value: "AMD" },
+  { label: "Intel", value: "INTEL" },
 ];
 
 function PipelineSettings() {
   const _settings = useStoreState((state) => state.config.editingConfig._settings);
-  const setStep = useStoreActions((actions) => actions.layout.setStep);
   const updateSettings = useStoreActions((actions) => actions.config.updateSettings);
 
   return (
@@ -109,6 +107,7 @@ function PipelineSettings() {
               <LangVersionTooltip />
             </div>
             <TextInput
+              id="lang_version"
               value={_settings.lang.version}
               onChange={(event) => {
                 const value = event.target.value;
@@ -124,6 +123,7 @@ function PipelineSettings() {
         <h3 className="mb-3 font-semibold text-base">Helper Files</h3>
         <div className="flex flex-col gap-5">
           <SwitchGroup
+            id="use_skeleton"
             label="Provide skeleton code to students"
             checked={_settings.use_skeleton}
             onChange={(value) => {
@@ -131,6 +131,7 @@ function PipelineSettings() {
             }}
           />
           <SwitchGroup
+            id="use_provided"
             label="Use additional files for grading"
             checked={_settings.use_provided}
             onChange={(value) => {
@@ -156,9 +157,9 @@ function PipelineSettings() {
                 styles={{ root: { flex: 1 } }}
               />
             </div>
-            {_settings.use_template === SettingsUseTemplate.FILENAMES && (
-              <div className="mt-4 mx-3 p-3 bg-gray-50 rounded-lg drop-shadow">
-                <p className="mb-2 font-medium text-gray-600">Files to submit (one file per line):</p>
+            {_settings.use_template === "FILENAMES" && (
+              <div id="use-template-filenames" className="mt-4 mx-3 p-3 bg-gray-50 rounded-lg drop-shadow">
+                <p className="mb-2 font-medium text-gray-600">Files to submit:</p>
                 <ListInput>
                   {_settings.template.map((file, index) => (
                     <ListInput.Item
@@ -171,7 +172,7 @@ function PipelineSettings() {
                         newTemplate[index].name = event.target.value;
                         updateSettings((_settings) => (_settings.template = newTemplate));
                       }}
-                      onEnterKeyPressed={() => {
+                      onNewItemKeyPressed={() => {
                         const newTemplate = [..._settings.template];
                         newTemplate.splice(index + 1, 0, { id: uuidv4(), name: "" });
                         updateSettings((_settings) => (_settings.template = newTemplate));
@@ -191,16 +192,12 @@ function PipelineSettings() {
                 </ListInput>
               </div>
             )}
-            {_settings.use_template === SettingsUseTemplate.PATH && (
+            {_settings.use_template === "PATH" && (
               <div className="mt-4 mx-3 p-3 bg-gray-50 drop-shadow rounded-lg space-y-2 text-gray-700">
                 <p>To upload your files:</p>
                 <ol className="ml-6 list-decimal">
                   <li>
-                    Visit the{" "}
-                    <button onClick={() => setStep("upload")} className="text-blue-600 underline">
-                      Upload Files
-                    </button>{" "}
-                    step
+                    Visit the <span className="font-semibold">Upload Files</span> step
                   </li>
                   <li>
                     Upload your files under{" "}
@@ -217,6 +214,7 @@ function PipelineSettings() {
         <h3 className="mb-3 font-semibold text-base">Stage Settings</h3>
         <div className="flex flex-col gap-5">
           <SwitchGroup
+            id="early_return_on_throw"
             label="Early return on error (Experimental)"
             description="Whether the pipeline will abort when any stage returns a non-zero exit code"
             checked={_settings.early_return_on_throw}
@@ -225,6 +223,7 @@ function PipelineSettings() {
             }}
           />
           <SwitchGroup
+            id="network"
             label="Allow Internet access for all stages"
             checked={_settings.enable_features.network}
             onChange={(value) => {
@@ -361,26 +360,12 @@ const LangVersionTooltip = memo(() => (
 LangVersionTooltip.displayName = "LangVersionTooltip";
 
 const UseTemplateTooltip = memo(() => {
-  const setStep = useStoreActions((actions) => actions.layout.setStep);
-  const setAccordion = useStoreActions((actions) => actions.layout.setAccordion);
-  const setAddStageSearchString = useStoreActions((actions) => actions.layout.setAddStageSearchString);
-
   return (
     <InfoTooltip width={520}>
       <p>
         To perform the actual checking, add the &quot;
-        <span className="font-semibold">File Structure Validation</span>&quot; stage in your{" "}
-        <button
-          onClick={() => {
-            setStep("pipeline");
-            setAccordion({ path: "addNewStage", value: ["preCompile"] });
-            setAddStageSearchString(supportedStages.FileStructureValidation.nameInUI);
-          }}
-          className="underline text-blue-700"
-        >
-          grading pipeline
-        </button>
-        .
+        <span className="font-semibold">File Structure Validation</span>&quot; stage to your grading pipeline in the{" "}
+        <span className="font-semibold">Pipeline Stages</span> step later.
       </p>
     </InfoTooltip>
   );

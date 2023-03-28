@@ -81,7 +81,7 @@ function PyTestSettings() {
                 <p className="text-gray-500 text-xs">Required by the submission and your test suite</p>
               </div>
               <TagsInput
-                name="additional_pip_packages"
+                id="additional_pip_packages"
                 value={config.additional_pip_packages}
                 onChange={(tags) => setConfig({ ...config, additional_pip_packages: tags })}
                 onBlur={onTagInputBlur}
@@ -114,11 +114,11 @@ function PyTestSettings() {
               <>
                 <div className="space-y-4">
                   <div className="flex gap-3 items-center">
-                    <label htmlFor="scoreWeighting.default" className="flex-1">
+                    <label htmlFor="scoreWeighting-default" className="flex-1">
                       Default score of each test case <span className="text-red-600 text-xs">(required)</span>
                     </label>
                     <NumberInput
-                      id="scoreWeighting.default"
+                      id="scoreWeighting-default"
                       value={config.scoreWeighting?.default}
                       onChange={(value) => {
                         if (value === undefined) return;
@@ -131,11 +131,11 @@ function PyTestSettings() {
                   </div>
                   <div className="flex gap-3">
                     <div className="mt-2 flex-1">
-                      <label htmlFor="scoreWeighting.limit">Upper limit of this stage&apos;s score</label>
+                      <label htmlFor="scoreWeighting-limit">Upper limit of this stage&apos;s score</label>
                       <p className="text-gray-500 text-xs">Leave blank to disable upper limit</p>
                     </div>
                     <NumberInput
-                      id="scoreWeighting.limit"
+                      id="scoreWeighting-limit"
                       value={config.scoreWeighting?.limit}
                       onChange={(value) => {
                         setConfig({ ...config, scoreWeighting: { ...config.scoreWeighting, limit: value } });

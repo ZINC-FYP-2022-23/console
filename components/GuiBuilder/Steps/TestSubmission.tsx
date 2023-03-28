@@ -11,15 +11,12 @@ import { useQuery, useSubscription } from "@apollo/client";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ScrollArea } from "@mantine/core";
 import { ModalContent } from "pages/courses/[courseId]/assignments/[assignmentConfigId]/submissions";
-import { Alert } from "../Diagnostics";
-import LockedStep from "./LockedStep";
 
 function TestSubmission() {
   const { user } = useZinc();
 
   const configId = useStoreState((state) => state.config.configId);
   const courseId = useStoreState((state) => state.config.courseId);
-  const isAnyEdited = useStoreState((state) => state.config.isEdited.any);
 
   const { data: submissionDetail } = useQuery<{
     user: User;
@@ -39,8 +36,9 @@ function TestSubmission() {
     },
   });
 
+  // Config ID should not be null from 2nd step onwards
   if (configId === null) {
-    return <LockedStep />;
+    return null;
   }
 
   return (
@@ -55,13 +53,6 @@ function TestSubmission() {
             </button>
           </SubmissionUploader>
         </div>
-        {isAnyEdited && (
-          <div className="w-max mt-4 drop-shadow-sm">
-            <Alert severity="warning">
-              You have unsaved changes. Please save them before testing your submissions.
-            </Alert>
-          </div>
-        )}
       </div>
       <ScrollArea type="auto">
         <ul className="w-full flex-1">

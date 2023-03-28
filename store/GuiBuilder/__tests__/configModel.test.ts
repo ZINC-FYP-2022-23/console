@@ -310,6 +310,7 @@ describe("GuiBuilder: Store - ConfigModel", () => {
       initAssignmentStart: "@thunk.config.initializeAssignment(start)",
       initAssignmentSuccess: "@thunk.config.initializeAssignment(success)",
       setCourseId: "@action.config.setCourseId",
+      setInitialized: "@action.config.setInitialized",
       initConfig: "@action.config.initializeConfig",
       initPolicy: "@action.config.initializePolicy",
       initSchedule: "@action.config.initializeSchedule",
@@ -339,6 +340,7 @@ describe("GuiBuilder: Store - ConfigModel", () => {
         type.initPipelineStart,
         // ... ignore other actions invoked by `initializePipeline()`
         type.initPipelineSuccess,
+        type.setInitialized,
         type.initAssignmentSuccess,
       ]);
 
@@ -360,11 +362,12 @@ describe("GuiBuilder: Store - ConfigModel", () => {
       expect(store.getMockedActions()).toEqual([
         { type: type.initAssignmentStart, payload },
         { type: type.setCourseId, payload: courseId },
+        { type: type.setInitialized, payload: true },
         { type: type.initAssignmentSuccess, payload },
       ]);
     });
 
-    it("does nothing if every payload field is null", () => {
+    it("only sets `initialized` to true if every payload field is null", () => {
       const model = cloneDeep(guiBuilderModel);
       const store = createStore(model, { mockActions: true });
       const payload = { configId: null, courseId: null, config: null };
@@ -373,24 +376,23 @@ describe("GuiBuilder: Store - ConfigModel", () => {
 
       expect(store.getMockedActions()).toEqual([
         { type: type.initAssignmentStart, payload },
+        { type: type.setInitialized, payload: true },
         { type: type.initAssignmentSuccess, payload },
       ]);
     });
-  });
 
-  describe("getConfigsToSave()", () => {
-    it("returns database-compatible fields", () => {
+    it("does nothing if the store is already initialized", () => {
       const model = getThreeStageModel();
-      const store = createStore(model);
-      const configToYamlMock = jest.spyOn(configUtils, "configToYaml");
+      model.config.initialized = true; // Assume it's initialized
+      const store = createStore(model, { mockActions: true });
+      const payload = { configId: null, courseId: 1, config: null };
 
-      const configsToSave = store.getActions().config.getConfigsToSave();
+      store.getActions().config.initializeAssignment(payload);
 
-      const policyKeys = ["attemptLimits", "gradeImmediately", "showImmediateScores"];
-      const scheduleKeys = ["showAt", "startCollectionAt", "dueAt", "stopCollectionAt", "releaseGradeAt"];
-      const expectedObjectKeys = ["config_yaml", ...policyKeys, ...scheduleKeys];
-      expect(configsToSave).toContainAllKeys(expectedObjectKeys);
-      expect(configToYamlMock).toHaveBeenCalledWith(model.config.editingConfig);
+      expect(store.getMockedActions()).toEqual([
+        { type: type.initAssignmentStart, payload },
+        { type: type.initAssignmentSuccess, payload },
+      ]);
     });
   });
 

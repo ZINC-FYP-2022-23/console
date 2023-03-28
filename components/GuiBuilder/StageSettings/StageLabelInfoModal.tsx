@@ -28,7 +28,7 @@ function StageLabelInfoModal() {
       opened={isModalOpened}
       onClose={closeModal}
       centered
-      size="lg"
+      size={640}
       classNames={classes}
     >
       <div className="flex flex-col gap-2">
@@ -41,6 +41,7 @@ function StageLabelInfoModal() {
             This helps you <span className="font-semibold">quickly differentiate</span> multiple stages having the{" "}
             <span className="font-semibold">same name</span> (e.g. multiple &quot;Standard I/O Test&quot; stages).
           </li>
+          <li>We may generate a random label for you when needed. You can rename it to something more meaningful.</li>
         </ul>
         <Image src="/assets/gui_editor_stage_label.svg" alt="stage label" width={650} height={172} />
         <Button onClick={closeModal} className="mx-auto bg-cse-700 text-white hover:bg-cse-500">

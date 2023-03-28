@@ -1,4 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { clsx } from "@mantine/core";
 import { createContext, useContext, useRef, KeyboardEvent, useState, useEffect } from "react";
 
 //////////////////// Context ////////////////////
@@ -32,9 +33,10 @@ function useListInputContext() {
 
 interface ListInputRootProps {
   children: React.ReactNode;
+  id?: string;
 }
 
-const ListInputRoot = ({ children }: ListInputRootProps) => {
+const ListInputRoot = ({ children, id }: ListInputRootProps) => {
   const inputRefs = useRef<ListInputContextType["inputRefs"]["current"]>([]);
   const [inputIndexToFocus, setInputIndexToFocus] = useState<number | null>(null);
 
@@ -47,7 +49,7 @@ const ListInputRoot = ({ children }: ListInputRootProps) => {
   }, [inputIndexToFocus]);
 
   return (
-    <div className="flex flex-col gap-2">
+    <div id={id} className="flex flex-col gap-2">
       <ListInputContext.Provider value={{ inputRefs, inputIndexToFocus, setInputIndexToFocus }}>
         {children}
       </ListInputContext.Provider>
@@ -65,14 +67,28 @@ interface ItemProps extends React.ComponentPropsWithRef<"input"> {
    * Event handler for pressing the "Enter" key in the input box. It should update the state to insert
    * a new list item.
    */
-  onEnterKeyPressed: () => void;
+  /**
+   * Event handler to update the state to insert a new list item when "Enter", "Comma", or "Space" keys
+   * are pressed.
+   *
+   * We insert a new list item when "Comma" or "Space" is pressed since it prevents users from listing
+   * multiple items in a single input box.
+   */
+  onNewItemKeyPressed: () => void;
   /**
    * Event handler for deleting the this list item.
    */
   onDelete: () => void;
+  /**
+   * Additional class names to apply extra styling.
+   */
+  classNames?: {
+    /** The input box. */
+    input?: string;
+  };
 }
 
-const Item = ({ index, onEnterKeyPressed, onDelete, ...inputProps }: ItemProps) => {
+const Item = ({ index, onNewItemKeyPressed, onDelete, classNames, ...inputProps }: ItemProps) => {
   const { inputRefs, setInputIndexToFocus } = useListInputContext();
 
   const handleInputKeyDown = (event: KeyboardEvent<HTMLInputElement>, index: number) => {
@@ -89,7 +105,10 @@ const Item = ({ index, onEnterKeyPressed, onDelete, ...inputProps }: ItemProps) 
         break;
       // Insert new input box below
       case "Enter":
-        onEnterKeyPressed();
+      case " ":
+      case ",":
+        event.preventDefault();
+        onNewItemKeyPressed();
         setInputIndexToFocus(index + 1);
         break;
       // Auto-delete an empty input box
@@ -110,7 +129,10 @@ const Item = ({ index, onEnterKeyPressed, onDelete, ...inputProps }: ItemProps) 
         ref={(ref) => (inputRefs.current[index] = ref)}
         type="text"
         onKeyDown={(event) => handleInputKeyDown(event, index)}
-        className="flex-1 px-3 py-1 border-0 border-b-2 border-gray-200 font-mono text-sm leading-6 placeholder:text-gray-400 focus:outline-none focus:ring-0 focus:border-blue-400 transition"
+        className={clsx(
+          "flex-1 px-3 py-1 border-0 border-b-2 border-gray-200 font-mono text-sm leading-6 placeholder:text-gray-400 focus:outline-none focus:ring-0 focus:border-blue-400 transition",
+          classNames?.input,
+        )}
         {...inputProps}
       />
       <button

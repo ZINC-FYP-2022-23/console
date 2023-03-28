@@ -1,9 +1,9 @@
 import { defaultSettings } from "@/constants/GuiBuilder/defaults";
 import { Config, StageDataMap, StageDependencyGraph, StageKind } from "@/types/GuiBuilder";
 import cloneDeep from "lodash/cloneDeep";
-import { configToYaml, parseConfigYaml } from "../config";
-import * as settingsUtils from "../settings";
-import * as stageUtils from "../stage";
+import { configToYaml, parseConfigYaml } from "../../GuiBuilder/config";
+import * as settingsUtils from "../../GuiBuilder/settings";
+import * as stageUtils from "../../GuiBuilder/stage";
 
 describe("GuiBuilder: Utils - Config", () => {
   test("parseConfigYaml()", () => {
@@ -67,10 +67,18 @@ describe("GuiBuilder: Utils - Config", () => {
 
       const settingsToRawMock = jest.spyOn(settingsUtils, "settingsToSettingsRaw");
       const stagesToYamlMock = jest.spyOn(stageUtils, "stagesToYamlObj");
-      configToYaml(config);
 
+      // Full de-serialization
+      configToYaml(config);
       expect(settingsToRawMock).toBeCalledWith(defaultSettings);
       expect(stagesToYamlMock).toBeCalledWith(stageDeps, stageData);
+      settingsToRawMock.mockClear();
+      stagesToYamlMock.mockClear();
+
+      // Only de-serialize `_settings`
+      configToYaml(config, true);
+      expect(settingsToRawMock).toBeCalledWith(defaultSettings);
+      expect(stagesToYamlMock).not.toHaveBeenCalled();
     });
 
     it("converts undefined fields to null", () => {

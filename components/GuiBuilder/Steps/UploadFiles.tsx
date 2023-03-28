@@ -4,7 +4,6 @@ import { useLayoutDispatch, useLayoutState } from "@/contexts/layout";
 import { useStoreState } from "@/store/GuiBuilder";
 import { ScrollArea } from "@mantine/core";
 import { useEffect } from "react";
-import LockedStep from "./LockedStep";
 
 function UploadFiles() {
   const { assignmentConfigId } = useLayoutState();
@@ -22,8 +21,9 @@ function UploadFiles() {
     }
   }, [assignmentConfigId, configId, dispatch]);
 
+  // Config ID should not be null from 2nd step onwards
   if (configId === null) {
-    return <LockedStep />;
+    return null;
   }
 
   return (

@@ -46,7 +46,7 @@ export interface LayoutState {
   stdioTestCase?: any;
   reportId?: string;
   valgrindTestCase?: any;
-  modalType?: "stdiotest" | "valgrind" | "regrading" | "yaml" | "files";
+  modalType?: "stdiotest" | "valgrind" | "regrading" | "yaml" | "files" | "editorMode";
   /** Tailwind class name to specify max width of slide over (e.g. `"max-w-lg"`) */
   slideOverMaxWidth?: string;
   gradingPayload?: any;
@@ -127,6 +127,7 @@ function layoutReducer(state: LayoutState, action: LayoutAction): LayoutState {
         showModal: true,
         assignmentId: action.payload.assignmentId,
         assignmentConfigId: action.payload.assignmentConfigId,
+        modalType: "editorMode",
       };
     case "setAssignmentConfigId":
       return { ...state, assignmentConfigId: action.payload };
