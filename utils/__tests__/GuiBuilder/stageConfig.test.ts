@@ -4,7 +4,7 @@ import {
   getMakePreviewCommand,
   getTestCaseNeighborIds,
   getTestCasesLargestId,
-} from "../stageConfig";
+} from "../../GuiBuilder/stageConfig";
 
 /**
  * @returns A dummy {@link TestCase} with the given `id`.

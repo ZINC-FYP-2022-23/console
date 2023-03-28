@@ -1,4 +1,4 @@
-import { getNextStepSlug } from "../layout";
+import { getNextStepSlug } from "../../GuiBuilder/layout";
 
 describe("GuiBuilder: Utils - Layout", () => {
   test("getNextStepSlug()", () => {

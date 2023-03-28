@@ -1,5 +1,5 @@
 import { DirectedGraph } from "@/types/GuiBuilder";
-import { deleteNodeFromGraph, isLinkedList, transposeGraph } from "../graph";
+import { deleteNodeFromGraph, isLinkedList, transposeGraph } from "../../GuiBuilder/graph";
 
 /** A graph that consists of a single node `A`. */
 const singleNodeGraph: DirectedGraph = { A: [] };
