@@ -1,13 +1,5 @@
 import { Submission as SubmissionType } from "types";
-import {
-  AppealAttempt,
-  AppealLog,
-  AppealMessage,
-  DisplayMessageType,
-  ChangeLog,
-  ChangeLogTypes,
-  AppealStatus,
-} from "@/types/appeal";
+import { AppealAttempt, AppealLog, DisplayMessageType, ChangeLog, ChangeLogTypes, AppealStatus } from "@/types/appeal";
 
 /**
  * Transform the raw data appeal status into type `AppealStatus`
@@ -93,7 +85,7 @@ interface sortProps {
  * This combines 2~3 lists and sort them from newest to oldest
  * @returns A list that also specifies each item's type
  */
-export function sort({ submissions, messages, appealLog }: sortProps) {
+function sort({ submissions, messages, appealLog }: sortProps) {
   let allLog: (
     | (SubmissionType & { _type: "submission" })
     | (DisplayMessageType & { _type: "appealMessage" })
