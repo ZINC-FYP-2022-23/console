@@ -22,5 +22,6 @@ export function nullToUndefined(plainObj: any): unknown {
  * `Map` or `Set`). This object will not be modified.
  */
 export function undefinedToNull(plainObj: any): unknown {
-  return JSON.parse(JSON.stringify(plainObj), (_, v) => (v === undefined ? null : v)) as unknown;
+  const outputObjString = JSON.stringify(plainObj, (_, v) => (v === undefined ? null : v));
+  return JSON.parse(outputObjString) as unknown;
 }
