@@ -32,8 +32,8 @@ import {
 } from "@/types/GuiBuilder";
 import "jest-extended";
 import * as uuid from "uuid";
-import { configsToConfigsRaw, parseStages } from "../stage";
-import * as stageRawConfig from "../stageRawConfig";
+import { configsToConfigsRaw, parseStages } from "../../GuiBuilder/stage";
+import * as stageRawConfig from "../../GuiBuilder/stageRawConfig";
 
 const UUID = "mock-uuid-0";
 

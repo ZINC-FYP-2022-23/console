@@ -8,7 +8,7 @@ import {
   isStageDependencyEqual,
   parseStages,
   stagesToYamlObj,
-} from "../stage";
+} from "../../GuiBuilder/stage";
 
 jest.mock("js-yaml");
 jest.mock("uuid");

@@ -1,5 +1,5 @@
 import { Schedule } from "@/types/GuiBuilder";
-import { appendZToIsoString, isScheduleEqual } from "../schedule";
+import { appendZToIsoString, isScheduleEqual } from "../../GuiBuilder/schedule";
 
 describe("GuiBuilder: Utils - Schedule", () => {
   describe("isScheduleEqual()", () => {

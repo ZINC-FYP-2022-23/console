@@ -7,7 +7,7 @@ import {
   settingsRawToSettings,
   settingsToSettingsRaw,
   tidySettings,
-} from "../settings";
+} from "../../GuiBuilder/settings";
 
 jest.mock("uuid");
 

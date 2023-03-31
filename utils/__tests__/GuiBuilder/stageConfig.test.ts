@@ -5,8 +5,8 @@ import {
   getTestCaseExpectedOutputHash,
   getTestCaseNeighborIds,
   getTestCasesLargestId,
-} from "../stageConfig";
-import { testCaseFromRaw } from "../stageRawConfig";
+} from "../../GuiBuilder/stageConfig";
+import { testCaseFromRaw } from "../../GuiBuilder/stageRawConfig";
 
 /**
  * @returns A dummy {@link TestCase} with the given `id`.
