@@ -37,7 +37,7 @@ interface ListInputRootProps {
 }
 
 const ListInputRoot = ({ children, id }: ListInputRootProps) => {
-  const inputRefs = useRef<ListInputContextType["inputRefs"]["current"]>([]);
+  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const [inputIndexToFocus, setInputIndexToFocus] = useState<number | null>(null);
 
   // Auto-focus the (`inputIndexToFocus`)th input box
@@ -64,10 +64,6 @@ interface ItemProps extends React.ComponentPropsWithRef<"input"> {
    */
   index: number;
   /**
-   * Event handler for pressing the "Enter" key in the input box. It should update the state to insert
-   * a new list item.
-   */
-  /**
    * Event handler to update the state to insert a new list item when "Enter", "Comma", or "Space" keys
    * are pressed.
    *
@@ -91,7 +87,7 @@ interface ItemProps extends React.ComponentPropsWithRef<"input"> {
 const Item = ({ index, onNewItemKeyPressed, onDelete, classNames, ...inputProps }: ItemProps) => {
   const { inputRefs, setInputIndexToFocus } = useListInputContext();
 
-  const handleInputKeyDown = (event: KeyboardEvent<HTMLInputElement>, index: number) => {
+  const handleInputKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     switch (event.key) {
       // Move focus to previous input box
       case "ArrowUp":
@@ -128,7 +124,7 @@ const Item = ({ index, onNewItemKeyPressed, onDelete, classNames, ...inputProps 
       <input
         ref={(ref) => (inputRefs.current[index] = ref)}
         type="text"
-        onKeyDown={(event) => handleInputKeyDown(event, index)}
+        onKeyDown={handleInputKeyDown}
         className={clsx(
           "flex-1 px-3 py-1 border-0 border-b-2 border-gray-200 font-mono text-sm leading-6 placeholder:text-gray-400 focus:outline-none focus:ring-0 focus:border-blue-400 transition",
           classNames?.input,
