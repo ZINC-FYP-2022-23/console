@@ -186,7 +186,7 @@ function UseTemplateOffWarning() {
   const setElementToHighlight = useStoreActions((actions) => actions.layout.setElementToHighlight);
 
   return (
-    <Alert severity="warning">
+    <Alert severity="warning" data-cy="use-template-off-alert">
       <div>
         <p>
           &quot;Specify files that students should submit&quot; should <span className="font-semibold">NOT</span> be set

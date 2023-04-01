@@ -31,9 +31,7 @@ describe("GuiBuilder: Stage Settings - DiffWithSkeleton", () => {
     const store = createStore(model);
     cy.mountWithStore(store, <DiffWithSkeletonSettings />);
 
-    cy.get("p")
-      .contains('Please enable the "Provide skeleton code to students" option in the Pipeline Settings.')
-      .should("be.visible");
+    cy.get('[data-cy="use-skeleton-off-alert"]').should("be.visible");
 
     // Click the button to enable `use_skeleton`
     cy.get("button").contains("Click me to enable").click();
@@ -43,6 +41,26 @@ describe("GuiBuilder: Stage Settings - DiffWithSkeleton", () => {
     });
 
     // The warning should be gone
-    cy.get("p").contains("Please enable").should("not.exist");
+    cy.get('[data-cy="use-skeleton-off-alert"]').should("not.exist");
+  });
+
+  it("shows a warning when `exclude_from_provided` is true but `_settings.use_provided` is false", () => {
+    const model = getModelWithSingleStage("DiffWithSkeleton");
+    model.config.editingConfig._settings.use_skeleton = true;
+    model.config.editingConfig._settings.use_provided = false;
+    const store = createStore(model);
+    cy.mountWithStore(store, <DiffWithSkeletonSettings />);
+
+    cy.get('[data-cy="use-provided-off-alert"]').should("be.visible");
+
+    // Click the button to enable `use_provided`
+    cy.get("button").contains("Click me to enable").click();
+    cy.then(() => {
+      const useProvided = store.getState().config.editingConfig._settings.use_provided;
+      expect(useProvided).to.equal(true);
+    });
+
+    // The warning should be gone
+    cy.get('[data-cy="use-provided-off-alert"]').should("not.exist");
   });
 });

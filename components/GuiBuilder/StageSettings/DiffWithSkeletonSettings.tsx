@@ -58,7 +58,7 @@ function DiffWithSkeletonSettings() {
 function UseSkeletonOffAlert() {
   const updateSettings = useStoreActions((actions) => actions.config.updateSettings);
   return (
-    <Alert severity="warning">
+    <Alert severity="warning" data-cy="use-skeleton-off-alert">
       <div>
         <p>You must enable &quot;Allow pipeline stages to access skeleton code&quot; in the Pipeline Settings.</p>
         <Button
@@ -80,7 +80,7 @@ function UseSkeletonOffAlert() {
 function UseProvidedOffAlert() {
   const updateSettings = useStoreActions((actions) => actions.config.updateSettings);
   return (
-    <Alert severity="warning">
+    <Alert severity="warning" data-cy="use-provided-off-alert">
       <div>
         <p>You must enable &quot;Use additional files for grading&quot; in the Pipeline Settings.</p>
         <Button
