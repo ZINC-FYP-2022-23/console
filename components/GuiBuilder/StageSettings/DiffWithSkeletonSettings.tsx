@@ -1,8 +1,8 @@
 import Button from "@/components/Button";
 import { SwitchGroup } from "@/components/Input";
-import { useSelectedStageConfig } from "@/hooks/GuiBuilder";
+import { useSelectedStageConfig, useSelectedStageDiagnostics } from "@/hooks/GuiBuilder";
 import { useStoreActions, useStoreState } from "@/store/GuiBuilder";
-import { Settings } from "@/types/GuiBuilder";
+import { Diagnostic, Settings } from "@/types/GuiBuilder";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Alert } from "../Diagnostics";
 
@@ -56,13 +56,22 @@ function DiffWithSkeletonSettings() {
  * if the user wants to use the DiffWithSkeleton stage.
  */
 function UseSkeletonOffAlert() {
+  const [diagnostics, resolveDiagnostics] = useSelectedStageDiagnostics();
   const updateSettings = useStoreActions((actions) => actions.config.updateSettings);
+
+  const isUseSkeletonOffError = (d: Diagnostic) =>
+    d.type === "MISSING_FIELD_ERROR" && !!d.message.match(/use_skeleton/);
+  const hasUseSkeletonOffError = diagnostics.some(isUseSkeletonOffError);
+
   return (
-    <Alert severity="warning" data-cy="use-skeleton-off-alert">
+    <Alert severity={hasUseSkeletonOffError ? "error" : "warning"} data-cy="use-skeleton-off-alert">
       <div>
         <p>You must enable &quot;Allow pipeline stages to access skeleton code&quot; in the Pipeline Settings.</p>
         <Button
-          onClick={() => updateSettings((_settings) => (_settings.use_skeleton = true))}
+          onClick={() => {
+            updateSettings((_settings) => (_settings.use_skeleton = true));
+            resolveDiagnostics(isUseSkeletonOffError);
+          }}
           icon={<FontAwesomeIcon icon={["fad", "toggle-on"]} />}
           className="mt-1 bg-cse-600 text-sm text-white hover:bg-cse-500 active:bg-cse-400"
         >
@@ -78,13 +87,22 @@ function UseSkeletonOffAlert() {
  * be on).
  */
 function UseProvidedOffAlert() {
+  const [diagnostics, resolveDiagnostics] = useSelectedStageDiagnostics();
   const updateSettings = useStoreActions((actions) => actions.config.updateSettings);
+
+  const isUseProvidedOffError = (d: Diagnostic) =>
+    d.type === "MISSING_FIELD_ERROR" && !!d.message.match(/use_provided/);
+  const hasUseProvidedOffError = diagnostics.some(isUseProvidedOffError);
+
   return (
-    <Alert severity="warning" data-cy="use-provided-off-alert">
+    <Alert severity={hasUseProvidedOffError ? "error" : "warning"} data-cy="use-provided-off-alert">
       <div>
         <p>You must enable &quot;Use additional files for grading&quot; in the Pipeline Settings.</p>
         <Button
-          onClick={() => updateSettings((_settings) => (_settings.use_provided = true))}
+          onClick={() => {
+            updateSettings((_settings) => (_settings.use_provided = true));
+            resolveDiagnostics(isUseProvidedOffError);
+          }}
           icon={<FontAwesomeIcon icon={["fad", "toggle-on"]} />}
           className="mt-1 bg-cse-600 text-sm text-white hover:bg-cse-500 active:bg-cse-400"
         >

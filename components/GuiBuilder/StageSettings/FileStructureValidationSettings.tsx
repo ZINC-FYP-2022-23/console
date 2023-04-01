@@ -1,13 +1,13 @@
 import Button from "@/components/Button";
 import ListInput from "@/components/Input/ListInput";
-import { useQueryParameters, useSelectedStageConfig } from "@/hooks/GuiBuilder";
+import { useQueryParameters, useSelectedStageConfig, useSelectedStageDiagnostics } from "@/hooks/GuiBuilder";
 import { useStoreActions, useStoreState } from "@/store/GuiBuilder";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { Alert } from "../Diagnostics";
 import { InfoAccordion } from "./common";
-import { Settings } from "@/types/GuiBuilder";
+import { Diagnostic, Settings } from "@/types/GuiBuilder";
 
 /**
  * List of file/directories names that are automatically excluded
@@ -37,7 +37,7 @@ function FileStructureValidationSettings() {
     <div className="p-3">
       {useTemplate === undefined ? (
         <div className="mb-4">
-          <UseTemplateOffWarning />
+          <UseTemplateOffAlert />
         </div>
       ) : (
         <div className="mt-1 mb-4 flex items-center gap-3 text-blue-500">
@@ -181,12 +181,16 @@ function FileStructureValidationSettings() {
  * Alert to show when {@link Settings.use_template} is undefined. This is because this value must
  * not be undefined when the user wants to use the FileStructureValidation stage.
  */
-function UseTemplateOffWarning() {
+function UseTemplateOffAlert() {
   const { updateStep } = useQueryParameters();
+  const [diagnostics] = useSelectedStageDiagnostics();
   const setElementToHighlight = useStoreActions((actions) => actions.layout.setElementToHighlight);
 
+  const isUseTemplateOffError = (d: Diagnostic) => d.type === "MISSING_FIELD_ERROR" && d.message.match(/use_template/);
+  const hasUseTemplateOffError = diagnostics.some(isUseTemplateOffError);
+
   return (
-    <Alert severity="warning" data-cy="use-template-off-alert">
+    <Alert severity={hasUseTemplateOffError ? "error" : "warning"} data-cy="use-template-off-alert">
       <div>
         <p>
           &quot;Specify files that students should submit&quot; should <span className="font-semibold">NOT</span> be set
