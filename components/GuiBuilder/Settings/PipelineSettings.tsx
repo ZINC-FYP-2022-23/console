@@ -124,20 +124,24 @@ function PipelineSettings() {
         <div className="flex flex-col gap-5">
           <SwitchGroup
             id="use_skeleton"
-            label="Provide skeleton code to students"
+            label="Allow pipeline stages to access skeleton code"
+            description="Enable if you'll provide skeleton files to students"
             checked={_settings.use_skeleton}
             onChange={(value) => {
               updateSettings((_settings) => (_settings.use_skeleton = value));
             }}
           />
-          <SwitchGroup
-            id="use_provided"
-            label="Use additional files for grading"
-            checked={_settings.use_provided}
-            onChange={(value) => {
-              updateSettings((_settings) => (_settings.use_provided = value));
-            }}
-          />
+          <div className="flex items-center gap-2">
+            <SwitchGroup
+              id="use_provided"
+              label="Use additional files for grading"
+              checked={_settings.use_provided}
+              onChange={(value) => {
+                updateSettings((_settings) => (_settings.use_provided = value));
+              }}
+            />
+            <UseProvidedTooltip />
+          </div>
           <div id={highlightableElementIds.useTemplateWrapper}>
             <div className="mt-4 flex items-center gap-2">
               <div className="pr-2 flex-1 flex items-center gap-1">
@@ -358,6 +362,18 @@ const LangVersionTooltip = memo(() => (
   </InfoTooltip>
 ));
 LangVersionTooltip.displayName = "LangVersionTooltip";
+
+const UseProvidedTooltip = memo(() => (
+  <InfoTooltip width={550}>
+    <ul className="px-3 list-disc">
+      <li>They are files used only in the grading process that are not provided to students.</li>
+      <li>
+        e.g. A <code>main.cpp</code> file in a C++ assignment that contains driver code to grade student submissions.
+      </li>
+    </ul>
+  </InfoTooltip>
+));
+UseProvidedTooltip.displayName = "UseProvidedTooltip";
 
 const UseTemplateTooltip = memo(() => {
   return (

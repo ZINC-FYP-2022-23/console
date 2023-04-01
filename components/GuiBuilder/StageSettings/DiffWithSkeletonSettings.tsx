@@ -6,21 +6,10 @@ import { Settings } from "@/types/GuiBuilder";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Alert } from "../Diagnostics";
 
-const excludeFromProvidedLabel = (
-  <p>
-    Exclude <code>provided</code> files from diff operation
-  </p>
-);
-
 const excludeFromProvidedDesc = (
   <ul className="pl-5 text-sm text-gray-500 list-disc">
-    <li>
-      <code>provided</code> files are helper files used for grading
-    </li>
-    <li>
-      Usually we turn this on. If turned off, submitted files containing <code>provided</code> files will still be
-      checked
-    </li>
+    <li>&quot;Additional files for grading&quot; are driver programs that are only used in the grading process</li>
+    <li>Usually we turn enable this option</li>
   </ul>
 );
 
@@ -28,13 +17,14 @@ function DiffWithSkeletonSettings() {
   const [config, setConfig] = useSelectedStageConfig("DiffWithSkeleton");
 
   const useSkeleton = useStoreState((state) => state.config.editingConfig._settings.use_skeleton);
+  const useProvided = useStoreState((state) => state.config.editingConfig._settings.use_provided);
 
   if (!config) return null;
 
   return (
     <div className="p-4 space-y-5">
       {!useSkeleton && <UseSkeletonOffAlert />}
-      <div className="flex items-center text-blue-500 gap-4">
+      <div className="flex items-center gap-3 text-blue-500">
         <FontAwesomeIcon icon={["far", "circle-info"]} />
         <p>
           Skeleton files are specified in the <span className="font-semibold">Upload Files</span> step &gt; &quot;Files
@@ -44,13 +34,18 @@ function DiffWithSkeletonSettings() {
       <div>
         <SwitchGroup
           id="exclude_from_provided"
-          label={excludeFromProvidedLabel}
+          label='Exclude "additional files for grading" from diff operation'
           description={excludeFromProvidedDesc}
           checked={config.exclude_from_provided}
           onChange={(value) => {
             setConfig({ ...config, exclude_from_provided: value });
           }}
         />
+        {config.exclude_from_provided && !useProvided && (
+          <div className="mt-2 ml-16">
+            <UseProvidedOffAlert />
+          </div>
+        )}
       </div>
     </div>
   );
@@ -65,9 +60,31 @@ function UseSkeletonOffAlert() {
   return (
     <Alert severity="warning">
       <div>
-        <p>Please enable the &quot;Provide skeleton code to students&quot; option in the Pipeline Settings.</p>
+        <p>You must enable &quot;Allow pipeline stages to access skeleton code&quot; in the Pipeline Settings.</p>
         <Button
           onClick={() => updateSettings((_settings) => (_settings.use_skeleton = true))}
+          icon={<FontAwesomeIcon icon={["fad", "toggle-on"]} />}
+          className="mt-1 bg-cse-600 text-sm text-white hover:bg-cse-500 active:bg-cse-400"
+        >
+          Click me to enable
+        </Button>
+      </div>
+    </Alert>
+  );
+}
+
+/**
+ * Alert to show when `exclude_from_provided` is on while {@link Settings.use_provided} flag is off (which should
+ * be on).
+ */
+function UseProvidedOffAlert() {
+  const updateSettings = useStoreActions((actions) => actions.config.updateSettings);
+  return (
+    <Alert severity="warning">
+      <div>
+        <p>You must enable &quot;Use additional files for grading&quot; in the Pipeline Settings.</p>
+        <Button
+          onClick={() => updateSettings((_settings) => (_settings.use_provided = true))}
           icon={<FontAwesomeIcon icon={["fad", "toggle-on"]} />}
           className="mt-1 bg-cse-600 text-sm text-white hover:bg-cse-500 active:bg-cse-400"
         >

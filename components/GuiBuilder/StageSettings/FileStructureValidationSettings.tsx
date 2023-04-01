@@ -40,7 +40,7 @@ function FileStructureValidationSettings() {
           <UseTemplateOffWarning />
         </div>
       ) : (
-        <div className="mt-1 mb-4 flex items-center text-blue-500 gap-4">
+        <div className="mt-1 mb-4 flex items-center gap-3 text-blue-500">
           <FontAwesomeIcon icon={["far", "circle-info"]} />
           <p className="leading-5">
             This stage validates whether the submission follows the file structure as{" "}
@@ -189,8 +189,8 @@ function UseTemplateOffWarning() {
     <Alert severity="warning">
       <div>
         <p>
-          Please set &quot;Specify files that students should submit&quot; to another value other than &quot;None&quot;
-          in the Pipeline Settings.
+          &quot;Specify files that students should submit&quot; should <span className="font-semibold">NOT</span> be set
+          to &quot;None&quot; in the Pipeline Settings.
         </p>
         <Button
           icon={<FontAwesomeIcon icon={["fas", "edit"]} />}
