@@ -36,9 +36,20 @@ export interface ConfigDiagnostics {
  * A diagnostic that describes a problem in the config YAML.
  */
 export interface Diagnostic {
-  /** An ID to identify the type of the diagnostic. */
+  /**
+   * A helper field to indicate whether this diagnostic is resolved.
+   *
+   * A diagnostic can be resolved if the user has fixed the problem or has chosen to ignore it. The
+   * diagnostic will be hidden from the UI if it's resolved.
+   */
+  resolved: boolean;
+
+  /** An ID to identify the type of the diagnostic (e.g. `"MISSING_FIELD_ERROR"`). */
   type: string;
-  /** Human readable message. */
+  /**
+   * Human readable message. It may not be suitable to directly display this message in the UI since it
+   * may contain the key name of the erroneous YAML field.
+   */
   message: string;
   /** Diagnostic severity. */
   severity: "WARNING" | "ERROR";
@@ -46,7 +57,7 @@ export interface Diagnostic {
   location?: {
     /** Key of the stage (e.g. `"compile:main"`, `"diffWithSkeleton"`). */
     stage?: string;
-    /** Test case ID. */
+    /** Test case ID. Relevant to certain stages such as `StdioTest`. */
     testCaseId?: number;
   };
 }

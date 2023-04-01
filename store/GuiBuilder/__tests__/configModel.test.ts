@@ -1,4 +1,4 @@
-import { Config, GradingPolicy, Schedule, Stage, StageKind } from "@/types/GuiBuilder";
+import { Config, Diagnostic, GradingPolicy, Schedule, Stage, StageKind } from "@/types/GuiBuilder";
 import { AssignmentConfig } from "@/types/tables";
 import * as configUtils from "@/utils/GuiBuilder/config";
 import { createStore } from "easy-peasy";
@@ -256,6 +256,31 @@ describe("GuiBuilder: Store - ConfigModel", () => {
       expect(config.initConfig).not.toBe(config.editingConfig);
       expect(config.initPolicy).not.toBe(config.editingPolicy);
       expect(config.initSchedule).not.toBe(config.editingSchedule);
+    });
+  });
+
+  describe("updateDiagnostics()", () => {
+    it("updates the `diagnostics` field", () => {
+      const model = cloneDeep(configModel);
+      const store = createStore(model);
+
+      const dummyDiagnostic: Diagnostic = {
+        resolved: false,
+        type: "MISSING_FIELD_ERROR",
+        message: "Missing field",
+        severity: "ERROR",
+      };
+
+      store.getActions().updateDiagnostics((diagnostics) => {
+        diagnostics.stages["stage-0"] = [dummyDiagnostic];
+      });
+
+      const state = store.getState();
+      expect(state.diagnostics).toEqual({
+        _settings: [],
+        stages: { "stage-0": [dummyDiagnostic] },
+        others: [],
+      });
     });
   });
 

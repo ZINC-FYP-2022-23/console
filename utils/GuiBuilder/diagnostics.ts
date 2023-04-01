@@ -19,8 +19,7 @@ export function configDiagnosticsFromRaw(diagnosticsRaw: DiagnosticRaw[], stageD
   };
 
   for (const diagnosticRaw of diagnosticsRaw) {
-    // `DiagnosticRaw` and `Diagnostic` are the same for now
-    const diagnostic: Diagnostic = { ...diagnosticRaw };
+    const diagnostic: Diagnostic = { ...diagnosticRaw, resolved: false };
 
     const diagnosticStage = diagnosticRaw.location?.stage;
     if (diagnosticStage === undefined) {

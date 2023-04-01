@@ -127,6 +127,11 @@ interface ConfigModelAction {
   setInitConfigsToEditing: Action<ConfigModel>;
 
   /**
+   * Updates the {@link ConfigModel.diagnostics} state. To specify how the field shall be updated,
+   * directly mutate the `diagnostics` parameter in the callback function of the payload.
+   */
+  updateDiagnostics: Action<ConfigModel, (diagnostics: ConfigDiagnostics) => void>;
+  /**
    * Updates the `_settings` field in {@link ConfigModel.editingConfig}.
    *
    * To specify how the field shall be updated, directly mutate the `_settings` parameter in the
@@ -301,6 +306,9 @@ const configModelAction: ConfigModelAction = {
     state.initSchedule = cloneDeep(state.editingSchedule);
   }),
 
+  updateDiagnostics: action((state, callback) => {
+    callback(state.diagnostics);
+  }),
   updateSettings: action((state, callback) => {
     callback(state.editingConfig._settings);
   }),

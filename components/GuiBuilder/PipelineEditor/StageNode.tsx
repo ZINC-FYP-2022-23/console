@@ -68,7 +68,7 @@ function StageNode({ id, data, selected }: NodeProps<StageNodeData>) {
   const setShouldFocusLabelInput = useStoreActions((actions) => actions.pipelineEditor.setShouldFocusLabelInput);
 
   const stageLabel = stageData[id]?.label ?? "";
-  const hasDiagnostics = stagesDiagnostics[id]?.length > 0;
+  const hasUnresolvedDiagnostics = stagesDiagnostics[id]?.some((d) => !d.resolved);
 
   return (
     <div className="relative">
@@ -90,7 +90,7 @@ function StageNode({ id, data, selected }: NodeProps<StageNodeData>) {
               return "bg-white border-gray-400";
             }
           })(selected, isDragOver),
-          hasDiagnostics && "!border-red-500 border-2",
+          hasUnresolvedDiagnostics && "!border-red-500 border-2",
         )}
         data-label={data.label}
       >
@@ -122,7 +122,7 @@ function StageNode({ id, data, selected }: NodeProps<StageNodeData>) {
         </div>
       </div>
       {selected && <StageNodeActionButtons id={id} />}
-      {hasDiagnostics && (
+      {hasUnresolvedDiagnostics && (
         <div className="absolute -top-3 -right-3 flex items-center justify-center bg-white text-2xl text-red-500 rounded-full">
           <FontAwesomeIcon icon={["fas", "circle-exclamation"]} />
         </div>
