@@ -10,7 +10,8 @@ import {
 } from "@/types/GuiBuilder";
 import { AssignmentConfig } from "@/types/tables";
 import { generateStageLabels, isConfigEqual, isLinkedList, isScheduleEqual, parseConfigYaml } from "@/utils/GuiBuilder";
-import { action, Action, computed, Computed, thunk, Thunk } from "easy-peasy";
+import { Action, Computed, Thunk, action, computed, thunk } from "easy-peasy";
+import { YAMLException } from "js-yaml";
 import cloneDeep from "lodash/cloneDeep";
 import isEqual from "lodash/isEqual";
 import { MutableKeys } from "utility-types";
@@ -84,6 +85,9 @@ interface ConfigModelComputed {
 }
 
 interface ConfigModelAction {
+  /**
+   * @throws A {@link YAMLException} if there is error while parsing the config YAML.
+   */
   initializeConfig: Action<ConfigModel, { id: number | null; configYaml: string }>;
   initializePolicy: Action<ConfigModel, GradingPolicy>;
   initializeSchedule: Action<ConfigModel, Schedule>;
@@ -143,6 +147,8 @@ interface ConfigModelThunk {
   /**
    * If the store is not {@link ConfigModel.initialized initialized}, it initializes the store states
    * according to the data queried from the database.
+   *
+   * @throws A {@link YAMLException} if there is error while parsing the config YAML.
    */
   initializeAssignment: Thunk<
     ConfigModel,
