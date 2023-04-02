@@ -77,7 +77,7 @@ function PipelineSettings() {
       <div>
         <h3 className="mb-3 font-semibold text-base">Language</h3>
         <div className="space-y-3">
-          <div className="flex items-center gap-4">
+          <div id={highlightableElementIds.langWrapper} className="flex items-center gap-4">
             <label htmlFor="lang" className="flex-1">
               Language (and Compiler)
             </label>

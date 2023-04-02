@@ -1,23 +1,27 @@
 import Button from "@/components/Button";
 import { NumberInput, TagsInput, Textarea } from "@/components/Input";
 import { defaultXUnitOverride } from "@/constants/GuiBuilder/defaults";
-import { useSelectedStageConfig } from "@/hooks/GuiBuilder";
+import { useQueryParameters, useSelectedStageConfig } from "@/hooks/GuiBuilder";
+import { useStoreActions, useStoreState } from "@/store/GuiBuilder";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ScrollArea, Tooltip } from "@mantine/core";
 import cloneDeep from "lodash/cloneDeep";
 import { FocusEventHandler, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
+import { Alert } from "../Diagnostics";
 import {
   ScorablePolicyRadioGroup,
   StageConfigModal,
-  testCaseScorablePolicyOptions,
   TotalScorableSettings,
   WeightedScorableOverrides,
+  testCaseScorablePolicyOptions,
   xUnitOverridePredicatesData,
 } from "./common";
 
 function PyTestSettings() {
   const [config, setConfig] = useSelectedStageConfig("PyTest");
+
+  const language = useStoreState((state) => state.config.editingConfig._settings.lang.language);
 
   const [modalOpened, setModalOpened] = useState(false);
 
@@ -35,15 +39,18 @@ function PyTestSettings() {
 
   return (
     <>
-      <div className="h-full py-20 flex flex-col items-center gap-5">
-        <p className="text-lg text-gray-500">To edit the stage settings, press the button below.</p>
-        <Button
-          className="bg-cse-700 text-white text-lg hover:bg-cse-500"
-          icon={<FontAwesomeIcon icon={["far", "arrow-up-right-from-square"]} />}
-          onClick={() => setModalOpened(true)}
-        >
-          Edit Stage Configuration
-        </Button>
+      <div className="h-full p-4 flex flex-col">
+        {language !== "python" && <LangNotPythonAlert />}
+        <div className="mb-16 flex-1 flex flex-col items-center justify-center">
+          <p className="mb-5 text-lg text-gray-500">To edit the stage settings, press the button below.</p>
+          <Button
+            className="bg-cse-700 text-white text-lg hover:bg-cse-500"
+            icon={<FontAwesomeIcon icon={["far", "arrow-up-right-from-square"]} />}
+            onClick={() => setModalOpened(true)}
+          >
+            Edit Stage Configuration
+          </Button>
+        </div>
       </div>
       <StageConfigModal opened={modalOpened} onClose={() => setModalOpened(false)} title="PyTest Stage Configuration">
         <ScrollArea type="auto" offsetScrollbars className="pr-1 h-full">
@@ -173,6 +180,34 @@ function PyTestSettings() {
         </ScrollArea>
       </StageConfigModal>
     </>
+  );
+}
+
+/**
+ * Alert to show when the language is not Python, since PyTest can only be used in Python assignments.
+ */
+function LangNotPythonAlert() {
+  const { updateStep } = useQueryParameters();
+  const setElementToHighlight = useStoreActions((actions) => actions.layout.setElementToHighlight);
+
+  return (
+    <Alert severity="warning" data-cy="lang-not-python-alert">
+      <div>
+        <p>
+          You must set the language to <span className="font-semibold">Python</span> in order to use PyTest.
+        </p>
+        <Button
+          icon={<FontAwesomeIcon icon={["fas", "edit"]} />}
+          onClick={() => {
+            updateStep("settings");
+            setElementToHighlight("lang");
+          }}
+          className="mt-1 bg-cse-600 text-sm text-white hover:bg-cse-500 active:bg-cse-400"
+        >
+          Fix this field
+        </Button>
+      </div>
+    </Alert>
   );
 }
 

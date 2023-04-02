@@ -6,6 +6,19 @@ import { createStore, Store } from "easy-peasy";
 import { getModelWithSingleStage } from "../utils";
 
 /**
+ * Gets a model where its language is Python and its pipeline has a single `PyTest` stage.
+ */
+const getModelWithSinglePyTestStage = () => {
+  const model = getModelWithSingleStage("PyTest");
+  model.config.editingConfig._settings.lang = {
+    language: "python",
+    compiler: null,
+    version: "3.8",
+  };
+  return model;
+};
+
+/**
  * Obtain the current `PyTest` config from the store and converts it to a raw config.
  */
 const getConfigRawFromStore = (store: Store<GuiBuilderModel>): PyTestRaw => {
@@ -34,7 +47,7 @@ describe("GuiBuilder: Stage Settings - PyTest", () => {
 
   describe("setting the PyTest stage config", () => {
     it("sets the non-scoring policy fields", () => {
-      const model = getModelWithSingleStage("PyTest");
+      const model = getModelWithSinglePyTestStage();
       const store = createStore(model);
       cy.mountWithStore(store, <PyTestSettings />);
 
@@ -51,7 +64,7 @@ describe("GuiBuilder: Stage Settings - PyTest", () => {
     });
 
     it("handles Score-out-of-Total scoring policy", () => {
-      const model = getModelWithSingleStage("PyTest");
+      const model = getModelWithSinglePyTestStage();
       const store = createStore(model);
       cy.mountWithStore(store, <PyTestSettings />);
 
@@ -73,7 +86,7 @@ describe("GuiBuilder: Stage Settings - PyTest", () => {
     });
 
     it("handles Weighted scoring policy", () => {
-      const model = getModelWithSingleStage("PyTest");
+      const model = getModelWithSinglePyTestStage();
       const store = createStore(model);
       cy.mountWithStore(store, <PyTestSettings />);
 
@@ -113,7 +126,7 @@ describe("GuiBuilder: Stage Settings - PyTest", () => {
     });
 
     it("handles Disable scoring policy", () => {
-      const model = getModelWithSingleStage("PyTest");
+      const model = getModelWithSinglePyTestStage();
       const store = createStore(model);
       cy.mountWithStore(store, <PyTestSettings />);
 
@@ -129,5 +142,18 @@ describe("GuiBuilder: Stage Settings - PyTest", () => {
         expect(configActualRaw).to.deep.equal(configExpectedRaw);
       });
     });
+  });
+
+  it("shows an alert if language is not Python", () => {
+    const model = getModelWithSingleStage("PyTest");
+    model.config.editingConfig._settings.lang = {
+      language: "cpp",
+      compiler: "g++",
+      version: "8",
+    };
+    const store = createStore(model);
+    cy.mountWithStore(store, <PyTestSettings />);
+
+    cy.get('[data-cy="lang-not-python-alert"]').should("be.visible");
   });
 });
