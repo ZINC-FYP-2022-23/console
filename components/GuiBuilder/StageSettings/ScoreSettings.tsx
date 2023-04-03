@@ -1,8 +1,14 @@
 import { NumberInput } from "@/components/Input";
 import { useSelectedStageConfig } from "@/hooks/GuiBuilder";
+import { useStoreState } from "@/store/GuiBuilder";
+import { StageKind } from "@/types/GuiBuilder";
+import { Alert } from "../Diagnostics";
 
 function ScoreSettings() {
   const [config, setConfig] = useSelectedStageConfig("Score");
+  const stageData = useStoreState((state) => state.config.editingConfig.stageData);
+
+  const hasGradingStage = Object.values(stageData).some((stage) => stage.kind === StageKind.GRADING);
 
   if (!config) return null;
 
@@ -10,7 +16,8 @@ function ScoreSettings() {
     config.minScore !== undefined && config.maxScore !== undefined && config.minScore > config.maxScore;
 
   return (
-    <div className="p-3">
+    <div className="p-3 space-y-6">
+      {!hasGradingStage && <NoGradingStageAlert />}
       <div className="flex gap-3">
         <div className="flex-1">
           <label htmlFor="normalizedTo">Normalize maximum score to</label>
@@ -28,7 +35,7 @@ function ScoreSettings() {
           className="flex-1"
         />
       </div>
-      <div className="mt-6 flex gap-3">
+      <div className="flex gap-3">
         <div className="flex-1">
           <p>Limit the final score within a range</p>
           <ul className="mx-5 list-disc text-xs text-gray-500">
@@ -70,6 +77,21 @@ function ScoreSettings() {
         </div>
       </div>
     </div>
+  );
+}
+
+/**
+ * Alert to show when the pipeline is missing a grading stage, since the Score stage depends on
+ * a grading stage.
+ */
+function NoGradingStageAlert() {
+  return (
+    <Alert severity="warning" data-cy="no-grading-stage-alert">
+      <p>
+        This stage depends on a <span className="font-semibold">Grading</span> stage in the pipeline. Please add a stage
+        from the &quot;Grading&quot; category in the Add New Stage panel.
+      </p>
+    </Alert>
   );
 }
 
