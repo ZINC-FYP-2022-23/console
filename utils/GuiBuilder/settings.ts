@@ -3,6 +3,7 @@
  */
 
 import { defaultSettings } from "@/constants/GuiBuilder/defaults";
+import supportedLanguages from "@/constants/GuiBuilder/supportedLanguages";
 import { Settings, SettingsLang, SettingsRaw } from "@/types/GuiBuilder";
 import cloneDeep from "lodash/cloneDeep";
 import isEqual from "lodash/isEqual";
@@ -60,6 +61,16 @@ export function tidySettings(settings: Settings): Settings {
   }
 
   return s;
+}
+
+/**
+ * @returns The label of {@link SettingsLang} to display in the UI (e.g. "C++ (g++)"). It returns `null`
+ * if the language cannot be found in {@link supportedLanguages}.
+ */
+export function getSettingsLangLabel(settingsLang: SettingsLang): string | null {
+  const { language, compiler } = settingsLang;
+  const supportedLang = supportedLanguages.find((l) => l.language === language && l.compiler === compiler);
+  return supportedLang?.label ?? null;
 }
 
 /**
