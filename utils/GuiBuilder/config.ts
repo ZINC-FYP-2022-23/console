@@ -3,7 +3,7 @@
  */
 
 import { Config, ConfigRaw } from "@/types/GuiBuilder";
-import { dump, load } from "js-yaml";
+import { dump, load, YAMLException } from "js-yaml";
 import isEqual from "lodash/isEqual";
 import { nullToUndefined, undefinedToNull } from "../object";
 import { isSettingsEqual, settingsRawToSettings, settingsToSettingsRaw } from "./settings";
@@ -12,9 +12,10 @@ import { isStageDependencyEqual, parseStages, stagesToYamlObj } from "./stage";
 /**
  * Creates a {@link Config} object from parsing the configuration YAML.
  * @param yaml It's assumed that the YAML has already been validated by the grader.
+ * @throws A {@link YAMLException} if there's an error while parsing the YAML.
  */
 export function parseConfigYaml(yaml: string): Config {
-  const parsedYaml = load(yaml);
+  const parsedYaml = load(yaml); // `load()` throws YAMLException if YAML is invalid
   const configRaw = nullToUndefined(parsedYaml) as ConfigRaw;
 
   const { _settings: settingsRaw, ...stagesRaw } = configRaw;

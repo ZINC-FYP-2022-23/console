@@ -4,7 +4,7 @@
 
 import supportedStages from "@/constants/GuiBuilder/supportedStages";
 import { guiBuilderModel, GuiBuilderModel } from "@/store/GuiBuilder";
-import { StageConfig, StageKind } from "@/types/GuiBuilder";
+import { StageConfig } from "@/types/GuiBuilder";
 import cloneDeep from "lodash/cloneDeep";
 
 /**
@@ -25,9 +25,9 @@ export function getModelWithSingleStage<TName extends keyof StageConfig>(name: T
   };
   model.config.editingConfig.stageData = {
     [stageId]: {
-      name: name,
+      name,
       label: "",
-      kind: StageKind.GRADING, // Doesn't matter so we chose the default value of StageKind
+      kind: supportedStages[name].kind,
       config: supportedStages[name].defaultConfig,
     },
   };
@@ -36,8 +36,8 @@ export function getModelWithSingleStage<TName extends keyof StageConfig>(name: T
       id: stageId,
       position: { x: 117.5, y: -60 },
       data: {
-        name: name,
-        label: "", // Doesn't matter
+        name,
+        label: supportedStages[name].nameInUI,
       },
       type: "stage",
       selected: true,
