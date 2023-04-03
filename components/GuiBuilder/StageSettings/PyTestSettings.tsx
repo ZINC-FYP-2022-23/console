@@ -1,8 +1,9 @@
 import Button from "@/components/Button";
 import { NumberInput, TagsInput, Textarea } from "@/components/Input";
 import { defaultXUnitOverride } from "@/constants/GuiBuilder/defaults";
-import { useQueryParameters, useSelectedStageConfig } from "@/hooks/GuiBuilder";
+import { useQueryParameters, useSelectedStageConfig, useSelectedStageDiagnostics } from "@/hooks/GuiBuilder";
 import { useStoreActions, useStoreState } from "@/store/GuiBuilder";
+import { Diagnostic } from "@/types/GuiBuilder";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ScrollArea, Tooltip } from "@mantine/core";
 import cloneDeep from "lodash/cloneDeep";
@@ -188,10 +189,14 @@ function PyTestSettings() {
  */
 function LangNotPythonAlert() {
   const { updateStep } = useQueryParameters();
+  const [diagnostics] = useSelectedStageDiagnostics();
   const setElementToHighlight = useStoreActions((actions) => actions.layout.setElementToHighlight);
 
+  const isLangNotPythonError = (d: Diagnostic) => d.type === "INVALID_FIELD_ERROR" && !!d.message.match(/python/i);
+  const hasLangNotPythonError = diagnostics.some(isLangNotPythonError);
+
   return (
-    <Alert severity="warning" data-cy="lang-not-python-alert">
+    <Alert severity={hasLangNotPythonError ? "error" : "warning"} data-cy="lang-not-python-alert">
       <div>
         <p>
           You must set the language to <span className="font-semibold">Python</span> in order to use PyTest.

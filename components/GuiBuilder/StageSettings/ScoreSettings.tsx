@@ -1,14 +1,29 @@
 import { NumberInput } from "@/components/Input";
-import { useSelectedStageConfig } from "@/hooks/GuiBuilder";
+import { useSelectedStageConfig, useSelectedStageDiagnostics } from "@/hooks/GuiBuilder";
 import { useStoreState } from "@/store/GuiBuilder";
-import { StageKind } from "@/types/GuiBuilder";
+import { Diagnostic, StageKind } from "@/types/GuiBuilder";
 import { Alert } from "../Diagnostics";
+import { useEffect } from "react";
+
+/**
+ * Predicate for filtering diagnostics that are caused by missing grading stage.
+ */
+const isNoGradingStageError = (d: Diagnostic) =>
+  !d.resolved && d.type === "MISSING_FIELD_ERROR" && !!d.message.match(/grading/i);
 
 function ScoreSettings() {
   const [config, setConfig] = useSelectedStageConfig("Score");
+  const [diagnostics, resolveDiagnostics] = useSelectedStageDiagnostics();
   const stageData = useStoreState((state) => state.config.editingConfig.stageData);
 
   const hasGradingStage = Object.values(stageData).some((stage) => stage.kind === StageKind.GRADING);
+
+  // Auto-resolve the "missing grading stage" diagnostic when a grading stage is added.
+  useEffect(() => {
+    if (hasGradingStage && diagnostics.some(isNoGradingStageError)) {
+      resolveDiagnostics(isNoGradingStageError);
+    }
+  }, [diagnostics, hasGradingStage, resolveDiagnostics]);
 
   if (!config) return null;
 
@@ -85,8 +100,11 @@ function ScoreSettings() {
  * a grading stage.
  */
 function NoGradingStageAlert() {
+  const [diagnostics] = useSelectedStageDiagnostics();
+  const hasNoGradingStageError = diagnostics.some(isNoGradingStageError);
+
   return (
-    <Alert severity="warning" data-cy="no-grading-stage-alert">
+    <Alert severity={hasNoGradingStageError ? "error" : "warning"} data-cy="no-grading-stage-alert">
       <p>
         This stage depends on a <span className="font-semibold">Grading</span> stage in the pipeline. Please add a stage
         from the &quot;Grading&quot; category in the Add New Stage panel.
