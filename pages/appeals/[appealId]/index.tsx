@@ -780,7 +780,7 @@ function AppealDetails({
     data: submissionsData,
     loading: submissionsLoading,
     error: submissionsError,
-  } = useSubscription<{ submissions: SubmissionType[] }>(GET_SUBMISSIONS_BY_ASSIGNMENT_AND_USER_ID, {
+  } = useQuery<{ submissions: SubmissionType[] }>(GET_SUBMISSIONS_BY_ASSIGNMENT_AND_USER_ID, {
     variables: { assignmentConfigId, userId },
   });
   const {
