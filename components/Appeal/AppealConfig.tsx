@@ -26,9 +26,10 @@ interface AppealConfigProps {
   assignmentConfig;
   setAssignmentConfig?; // Used when creating new config
   onChange?; // Used when updating config
+  isNew: boolean;
 }
 
-export function AppealConfig({ assignmentConfig, setAssignmentConfig, onChange }: AppealConfigProps) {
+export function AppealConfig({ assignmentConfig, setAssignmentConfig, onChange, isNew }: AppealConfigProps) {
   const router = useRouter();
   const { assignmentConfigId } = router.query;
   const dispatch = useLayoutDispatch();
@@ -109,7 +110,7 @@ export function AppealConfig({ assignmentConfig, setAssignmentConfig, onChange }
             <div className="relative rounded-md shadow-sm">
               <DateInput
                 id="appealStartAt"
-                selected={getLocalDate(assignmentConfig.appealStartAt)}
+                selected={isNew ? assignmentConfig.appealStartAt : getLocalDate(assignmentConfig.appealStartAt)}
                 onChange={(date) => {
                   if (setAssignmentConfig)
                     setAssignmentConfig({
@@ -131,7 +132,7 @@ export function AppealConfig({ assignmentConfig, setAssignmentConfig, onChange }
             <div className="relative rounded-md shadow-sm">
               <DateInput
                 id="appealStopAt"
-                selected={getLocalDate(assignmentConfig.appealStopAt)}
+                selected={isNew ? assignmentConfig.appealStopAt : getLocalDate(assignmentConfig.appealStopAt)}
                 onChange={(date) => {
                   if (setAssignmentConfig)
                     setAssignmentConfig({ ...assignmentConfig, appealStopAt: zonedTimeToUtc(date!, "Asia/Hong_Kong") });

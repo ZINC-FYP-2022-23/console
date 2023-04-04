@@ -425,7 +425,11 @@ function AssignmentConfigCreation({ assignment }) {
                     )}
                   </div>
                 </fieldset>
-                <AppealConfig assignmentConfig={assignmentConfig} setAssignmentConfig={setAssignmentConfig} />
+                <AppealConfig
+                  assignmentConfig={assignmentConfig}
+                  setAssignmentConfig={setAssignmentConfig}
+                  isNew={true}
+                />
               </div>
             </div>
           </div>

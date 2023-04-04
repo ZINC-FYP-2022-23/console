@@ -289,6 +289,7 @@ function AssignmentConfigurationYAML() {
                     isAppealStudentReplyAllowed: data!.assignmentConfig.isAppealStudentReplyAllowed,
                     isAppealViewReportAllowed: data!.assignmentConfig.isAppealViewReportAllowed,
                   }}
+                  isNew={false}
                 />
               </div>
             </div>
