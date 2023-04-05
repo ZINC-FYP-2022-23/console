@@ -63,7 +63,7 @@ function useSave() {
       payload: {
         success: false,
         title: `Error in ${step === "general" ? "General Settings" : "Pipeline Stages"}`,
-        message: `Please fix the errors in the ${
+        message: `Please fix the errors in ${
           step === "general" ? "General Settings" : "your pipeline stages settings"
         }.`,
       },
