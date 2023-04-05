@@ -1,6 +1,9 @@
-import { graphql } from "msw";
+import { RequestHandler, graphql } from "msw";
 
-export const handlers = [
+/**
+ * Global handlers that are used in all tests.
+ */
+export const handlers: RequestHandler[] = [
   graphql.query("getUserRole", (_, res, ctx) =>
     res(
       ctx.data({

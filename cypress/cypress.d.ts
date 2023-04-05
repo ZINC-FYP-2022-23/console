@@ -3,8 +3,9 @@
  */
 
 import { MultiSelect, Select } from "@/components/Input";
-import { mount, MountOptions } from "cypress/react";
+import { MountOptions, mount } from "cypress/react";
 import { Store } from "easy-peasy";
+import * as allMockedHandlers from "mocks/handlers";
 
 declare global {
   namespace Cypress {
@@ -25,7 +26,6 @@ declare global {
       clickOutside: () => Chainable<any>;
       /**
        * Clicks a {@link Select} input and selects an item from the dropdown menu.
-       *
        * @param selector A selector to get the {@link Select} input.
        * @param content The text content of the item to select.
        * @example
@@ -60,6 +60,22 @@ declare global {
        * Logs in the user with ID 1, ITSC `~ta`, and semester `2210`.
        */
       login: () => void;
+
+      /**
+       * Add mock request handlers to the [Mock Service Worker](https://mswjs.io/). This can mock
+       * GraphQL requests made by both the browser and the Next.js server.
+       * @param fileName The file name that contains the handlers. All handlers are stored in the
+       * `mocked/handlers` folder.
+       * @example
+       * // Add handlers from `mocks/handlers/global.ts`
+       * cy.addMockHandlers("global");
+       */
+      addMockHandlers: (fileName: keyof typeof allMockedHandlers) => void;
+
+      /**
+       * Resets all mock request handlers in the [Mock Service Worker](https://mswjs.io/).
+       */
+      resetMockHandlers: () => void;
 
       // #endregion
     }
