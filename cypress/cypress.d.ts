@@ -53,6 +53,15 @@ declare global {
       ) => ReturnType<typeof mount>;
 
       // #endregion
+
+      // #region e2e.ts
+
+      /**
+       * Logs in the user with ID 1, ITSC `~ta`, and semester `2210`.
+       */
+      login: () => void;
+
+      // #endregion
     }
   }
 }
