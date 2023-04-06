@@ -697,8 +697,7 @@ function getScore({ appeals, changeLogs, submissions }: getScoreProps) {
     if (
       acceptedAppeals[i].updatedAt &&
       acceptedAppeals[i].submission &&
-      acceptedAppeals[i].submission.reports.length > 0 &&
-      acceptedAppeals[i].submission.reports[0].grade.score
+      acceptedAppeals[i].submission.reports.length > 0
     ) {
       acceptedAppealDate = new Date(acceptedAppeals[i].updatedAt!);
       acceptedAppealScore = acceptedAppeals[i].submission.reports[0].grade.score;
@@ -826,11 +825,11 @@ function AppealDetails({
   )[] = mergeDataToActivityLogList({ appealAttempt, appealChangeLogData, appealMessagesData });
 
   // Get the original score
-  const score: number = getScore({
+  const score = getScore({
     appeals: appealsData!.appeals,
     changeLogs: appealChangeLogData!.changeLogs,
     submissions: submissionsData!.submissions,
-  })!;
+  });
 
   const totalScore: number = submissionsData!.submissions[0].reports[0].grade.maxTotal;
 

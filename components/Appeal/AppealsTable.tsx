@@ -154,8 +154,7 @@ function getScore({ appeals, changeLogs, submissions }: getScoreProps) {
     if (
       acceptedAppeals[i].updatedAt &&
       acceptedAppeals[i].submission &&
-      acceptedAppeals[i].submission.reports.length > 0 &&
-      acceptedAppeals[i].submission.reports[0].grade.score
+      acceptedAppeals[i].submission.reports.length > 0
     ) {
       acceptedAppealDate = new Date(acceptedAppeals[i].updatedAt!);
       acceptedAppealScore = acceptedAppeals[i].submission.reports[0].grade.score;
@@ -247,11 +246,11 @@ function AppealsTable({ assignmentConfigId }: AppealsTableProps) {
         .slice(appealIndex);
       const userChangeLogs: ChangeLog[] = appeal.user.change_logs.filter((c) => c.appealId === appeal.id);
       const userSubmissions: SubmissionType[] = submissionsData.submissions.filter((s) => s.user_id === appeal.userId);
-      const finalScore: number = getScore({
+      const finalScore = getScore({
         appeals: userAppeals,
         changeLogs: userChangeLogs,
         submissions: userSubmissions,
-      })!;
+      });
 
       appealData.push({
         id: appeal.id,
