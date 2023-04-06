@@ -7,13 +7,16 @@
 import "./commands";
 
 beforeEach(() => {
+  cy.viewport("macbook-11");
   cy.login();
-
-  cy.resetMockHandlers();
   // We still add the global handlers here even though we passed them to Mock Server Worker's
   // `setupServer()` or `setupWorker()` because those handlers are not registered successfully for
   // some odd reasons.
   cy.addMockHandlers("global");
+});
+
+afterEach(() => {
+  cy.resetMockHandlers();
 });
 
 Cypress.Commands.add("login", () => {
