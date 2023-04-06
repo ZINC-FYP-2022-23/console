@@ -3,4 +3,5 @@
  */
 
 export * as cppAssignment from "./configs/cppAssignment";
+export * as erroneousAssignment from "./configs/erroneousAssignment";
 export * as global from "./global";

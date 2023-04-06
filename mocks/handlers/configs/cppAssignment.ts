@@ -58,11 +58,26 @@ score:
 `;
 
 /**
- * Mocks a typical C++ assignment.
+ * Mocks that `assignmentConfig` table only has one C++ assignment config of ID 1.
  */
 export const handlers: RequestHandler[] = [
-  graphql.query("getPipelineConfigForAssignment", (_, res, ctx) =>
-    res(
+  graphql.query("getPipelineConfigForAssignment", (req, res, ctx) => {
+    const { assignmentConfigId } = req.variables;
+
+    if (assignmentConfigId !== 1) {
+      return res(
+        ctx.data({
+          assignmentConfig: null,
+          assignment: {
+            course: {
+              id: 1,
+            },
+          },
+        }),
+      );
+    }
+
+    return res(
       ctx.data({
         assignmentConfig: {
           attemptLimits: null,
@@ -81,6 +96,6 @@ export const handlers: RequestHandler[] = [
           },
         },
       }),
-    ),
-  ),
+    );
+  }),
 ];
