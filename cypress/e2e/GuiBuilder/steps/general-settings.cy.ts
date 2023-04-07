@@ -1,6 +1,6 @@
 describe("GuiBuilder: General Settings step", () => {
   it("populates input fields from an existing C++ config", () => {
-    cy.addMockHandlers("cppAssignment");
+    cy.addMockHandlers("cppConfig");
     cy.visit("/assignments/1/configs/1/gui?step=settings");
 
     // Pipeline Settings

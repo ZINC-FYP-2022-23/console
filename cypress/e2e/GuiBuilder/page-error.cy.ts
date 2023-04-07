@@ -1,6 +1,6 @@
 describe("GuiBuilder: Page-wide error handling", () => {
   it("shows an error message if fails to parse the config YAML", () => {
-    cy.addMockHandlers("erroneousAssignment");
+    cy.addMockHandlers("erroneousConfig");
     cy.visit("/assignments/1/configs/1/gui");
 
     cy.get("h1").contains("Something went wrong").should("be.visible");
@@ -9,7 +9,7 @@ describe("GuiBuilder: Page-wide error handling", () => {
   });
 
   it("shows 404 page if the config does not exist", () => {
-    cy.addMockHandlers("cppAssignment");
+    cy.addMockHandlers("cppConfig");
 
     // The mock handler only returns a config if the ID is 1.
     cy.request({ url: "/assignments/1/configs/2/gui", failOnStatusCode: false }).its("status").should("eq", 404);

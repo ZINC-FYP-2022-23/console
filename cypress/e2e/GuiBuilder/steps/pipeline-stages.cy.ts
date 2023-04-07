@@ -1,6 +1,6 @@
 describe("GuiBuilder: Pipeline Stages step", () => {
   it("constructs the pipeline from an existing C++ config", () => {
-    cy.addMockHandlers("cppAssignment");
+    cy.addMockHandlers("cppConfig");
     cy.visit("/assignments/1/configs/1/gui?step=pipeline");
 
     cy.get(".stage-node").as("stageNodes").should("have.length", 5);
