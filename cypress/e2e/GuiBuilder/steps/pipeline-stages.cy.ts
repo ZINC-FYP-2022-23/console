@@ -1,3 +1,5 @@
+import { aliasGqlOperation } from "cypress/e2e/utils/graphql";
+
 describe("GuiBuilder: Pipeline Stages step", () => {
   it("constructs the pipeline from an existing C++ config", () => {
     cy.addMockHandlers("cppConfig");
@@ -54,5 +56,45 @@ describe("GuiBuilder: Pipeline Stages step", () => {
     cy.get("#normalizedTo").should("have.value", "100");
     cy.get("#minScore").should("have.value", "");
     cy.get("#maxScore").should("have.value", "");
+  });
+
+  describe("Next step", () => {
+    it("shows an error notification if pipeline is invalid", () => {
+      cy.addMockHandlers("cppConfig");
+      cy.visit("/assignments/1/configs/1/gui?step=pipeline");
+
+      // Test when config YAML fails validation
+      cy.intercept("/api/configs/1/validate", { id: "1", configError: JSON.stringify({ error: "dummy error" }) });
+      cy.get('button[data-cy="next-step"]').click();
+
+      cy.get("p").contains("Error in Pipeline Settings").should("be.visible");
+      cy.url().should("include", "step=pipeline");
+
+      // Test invalid pipeline layout (disconnected nodes)
+      cy.get('button[data-cy="delete-stage-edge"]').first().click();
+      cy.get('button[data-cy="next-step"]').click();
+
+      cy.get("p").contains("Invalid Pipeline Layout").should("be.visible");
+      cy.url().should("include", "step=pipeline");
+    });
+
+    it("saves the config YAML if it passes validation", () => {
+      cy.addMockHandlers("cppConfig");
+      cy.visit("/assignments/1/configs/1/gui?step=pipeline");
+
+      cy.intercept("/api/configs/1/validate", { id: "1", configError: null });
+      cy.intercept("POST", "/v1/graphql", (req) => {
+        aliasGqlOperation(req, "updateAssignmentConfig", () => {
+          req.reply({
+            data: { updateAssignmentConfig: { id: 1 } },
+          });
+        });
+      });
+
+      cy.get('button[data-cy="next-step"]').click();
+
+      cy.wait("@gql_updateAssignmentConfig").its("response.body.data.updateAssignmentConfig.id").should("eq", 1);
+      cy.url().should("include", "step=upload"); // Visit next step
+    });
   });
 });

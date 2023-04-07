@@ -57,6 +57,18 @@ score:
   normalizedTo: 100
 `;
 
+export const assignmentConfig = {
+  attemptLimits: null,
+  gradeImmediately: true,
+  showImmediateScores: true,
+  config_yaml: configYamlCpp,
+  showAt: "2023-04-01T04:00:00", // April 1, 2023 12:00 PM
+  startCollectionAt: "2023-04-01T04:00:00",
+  dueAt: "2023-05-01T04:00:00",
+  stopCollectionAt: "2023-05-02T04:00:00",
+  releaseGradeAt: "2023-05-03T04:00:00",
+};
+
 /**
  * Mocks that `assignmentConfig` table only has one C++ assignment config of ID 1.
  */
@@ -79,17 +91,7 @@ export const handlers: RequestHandler[] = [
 
     return res(
       ctx.data({
-        assignmentConfig: {
-          attemptLimits: null,
-          gradeImmediately: true,
-          showImmediateScores: true,
-          config_yaml: configYamlCpp,
-          showAt: "2023-04-01T04:00:00", // April 1, 2023 12:00 PM
-          startCollectionAt: "2023-04-01T04:00:00",
-          dueAt: "2023-05-01T04:00:00",
-          stopCollectionAt: "2023-05-02T04:00:00",
-          releaseGradeAt: "2023-05-03T04:00:00",
-        },
+        assignmentConfig,
         assignment: {
           course: {
             id: 1,

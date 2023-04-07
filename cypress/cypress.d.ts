@@ -62,10 +62,13 @@ declare global {
       login: () => void;
 
       /**
-       * Add mock request handlers to the [Mock Service Worker](https://mswjs.io/). This can mock
+       * Add mock request handlers to the [Mock Service Worker](https://mswjs.io/) (MSW). This can mock
        * GraphQL requests made by both the browser and the Next.js server.
-       * @param fileName The file name that contains the handlers. All handlers are stored in the
-       * `mocked/handlers` folder.
+       *
+       * Generally, we use MSW handlers to mock GraphQL requests made during server-side rendering and
+       * [`cy.intercept()`](https://docs.cypress.io/api/commands/intercept) for client-side requests.
+       *
+       * @param fileName The handler name to use in `mocks/handlers/index.ts`.
        * @example
        * // Add handlers from `mocks/handlers/global.ts`
        * cy.addMockHandlers("global");
