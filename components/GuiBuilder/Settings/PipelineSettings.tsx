@@ -68,25 +68,18 @@ const gpuVendorSelectOptions: { label: string; value: SettingsGpuDevice }[] = [
   { label: "Intel", value: "INTEL" },
 ];
 
-/**
- * Predicate to check whether the diagnostic is a language format error. This occurs when the
- * "Version" field is left blank.
- */
-const isLangFormatError = (d: Diagnostic) => d.type === "LANG_FORMAT_ERROR";
-
-/**
- * Predicate to check whether the diagnostic is caused by an unsupported language. This occurs when
- * the version is invalid (e.g. Python version 8).
- */
-const isLangUnsupportedError = (d: Diagnostic) => d.type === "LANG_UNSUPPORTED_ERROR";
-
 function PipelineSettings() {
   const _settings = useStoreState((state) => state.config.editingConfig._settings);
-  const diagnostics = useStoreState((state) => state.config.diagnostics);
+  const settingsDiagnostics = useStoreState((state) => state.config.diagnostics._settings);
   const updateSettings = useStoreActions((actions) => actions.config.updateSettings);
 
-  const hasLangFormatError = diagnostics._settings.some(isLangFormatError);
-  const hasLangUnsupportedError = diagnostics.others.some(isLangUnsupportedError);
+  /** Whether there is a language format error. This occurs when the "Version" field is left blank. */
+  const hasLangFormatError = settingsDiagnostics.some((d) => d.type === "LANG_FORMAT_ERROR");
+  /**
+   * Whether there is a language unsupported error. This occurs when the version is invalid (e.g.
+   * Python version 8).
+   */
+  const hasLangUnsupportedError = settingsDiagnostics.some((d) => d.type === "LANG_UNSUPPORTED_ERROR");
 
   return (
     <div className="px-1 flex flex-col gap-8 text-sm">

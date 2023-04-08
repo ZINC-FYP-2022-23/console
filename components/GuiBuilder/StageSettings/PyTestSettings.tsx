@@ -191,6 +191,7 @@ function LangNotPythonAlert() {
   const { updateStep } = useQueryParameters();
   const [diagnostics] = useSelectedStageDiagnostics();
   const setElementToHighlight = useStoreActions((actions) => actions.layout.setElementToHighlight);
+  const setModal = useStoreActions((actions) => actions.layout.setModal);
 
   const isLangNotPythonError = (d: Diagnostic) => d.type === "INVALID_FIELD_ERROR" && !!d.message.match(/python/i);
   const hasLangNotPythonError = diagnostics.some(isLangNotPythonError);
@@ -201,16 +202,25 @@ function LangNotPythonAlert() {
         <p>
           You must set the language to <span className="font-semibold">Python</span> in order to use PyTest.
         </p>
-        <Button
-          icon={<FontAwesomeIcon icon={["fas", "edit"]} />}
-          onClick={() => {
-            updateStep("settings");
-            setElementToHighlight("lang");
-          }}
-          className="mt-1 bg-cse-600 text-sm text-white hover:bg-cse-500 active:bg-cse-400"
-        >
-          Fix this field
-        </Button>
+        <div className="mt-2 flex items-center gap-3">
+          <Button
+            icon={<FontAwesomeIcon icon={["fas", "edit"]} />}
+            onClick={() => {
+              updateStep("settings");
+              setElementToHighlight("lang");
+            }}
+            className="bg-cse-600 text-sm text-white hover:bg-cse-500 active:bg-cse-400"
+          >
+            Change language
+          </Button>
+          <Button
+            icon={<FontAwesomeIcon icon={["far", "trash-can"]} />}
+            onClick={() => setModal({ path: "deleteStage", value: true })}
+            className="bg-red-500 text-sm text-white hover:bg-red-600"
+          >
+            Delete this stage
+          </Button>
+        </div>
       </div>
     </Alert>
   );
