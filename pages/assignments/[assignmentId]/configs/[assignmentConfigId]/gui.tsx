@@ -1,4 +1,5 @@
 import GUIAssignmentBuilder from "@/components/GuiBuilder/GuiBuilder";
+import InitializationError from "@/components/GuiBuilder/InitializationError";
 import { LayoutProvider } from "@/contexts/layout";
 import { GET_PIPELINE_CONFIG_FOR_ASSIGNMENT } from "@/graphql/queries/user";
 import { Layout } from "@/layout";
@@ -30,16 +31,15 @@ function GUIAssignmentBuilderRoot({ configId, assignmentId }: GUIAssignmentBuild
     },
   );
 
-  // TODO(Anson): Better handling of error
-  if (error) {
-    console.error(error);
-  }
-
   return (
     <LayoutProvider>
       <Layout title="Assignment Config">
         <StoreProvider store={guiBuilderStore}>
-          <GUIAssignmentBuilder data={data} configId={configId === -1 ? null : configId} />
+          {error ? (
+            <InitializationError error={error} />
+          ) : (
+            <GUIAssignmentBuilder data={data} configId={configId === -1 ? null : configId} />
+          )}
         </StoreProvider>
       </Layout>
     </LayoutProvider>
@@ -60,7 +60,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, query }) => 
   configId = isNew ? -1 : parseInt(configId);
   assignmentId = parseInt(assignmentId);
   if (isNaN(configId) || isNaN(assignmentId)) {
-    return { notFound: true };
+    return { notFound: true }; // redirect to 404
   }
 
   const { data } = await apolloClient.query({
@@ -70,7 +70,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, query }) => 
       assignmentConfigId: configId,
     },
   });
-  if (data.assignment === null || (!isNew && data.assignmentConfig === null)) {
+  if (data?.assignment === null || (!isNew && data?.assignmentConfig === null)) {
     return { notFound: true };
   }
 
