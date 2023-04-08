@@ -15,9 +15,26 @@ import Unauthorized from "../pages/401";
 import toast from "react-hot-toast";
 import { Notification, NotificationBody } from "../components/Notification";
 import "@fortawesome/fontawesome-svg-core/styles.css";
+import { MantineProvider, MantineThemeOverride } from "@mantine/core";
+import { Tuple } from "@mantine/styles";
+import resolveConfig from "tailwindcss/resolveConfig";
+import tailwindConfig from "../tailwind.config";
 
 faConfig.autoAddCss = false;
 library.add(fad, far, fas as IconPack);
+
+const fullTailwindConfig = resolveConfig(tailwindConfig);
+
+/**
+ * Custom [Mantine theme](https://mantine.dev/theming/theme-object/) that is based on our Tailwind theme.
+ */
+const mantineTheme: MantineThemeOverride = {
+  colors: {
+    blue: Object.values(fullTailwindConfig.theme?.colors?.["cse"]) as Tuple<string, 10>,
+  },
+  fontFamily: fullTailwindConfig.theme?.fontFamily?.["sans"],
+  fontFamilyMonospace: fullTailwindConfig.theme?.fontFamily?.["mono"],
+};
 
 function ZincApp({ Component, pageProps, cookie, hasTeachingRole, isAdmin, user, itsc, semester }) {
   let initialApolloState = {};
@@ -32,7 +49,9 @@ function ZincApp({ Component, pageProps, cookie, hasTeachingRole, isAdmin, user,
     return (
       <ApolloProvider client={client}>
         <ZincProvider isAdmin={isAdmin} user={user} itsc={itsc} semester={semester}>
-          <Component {...pageProps} />
+          <MantineProvider theme={mantineTheme}>
+            <Component {...pageProps} />
+          </MantineProvider>
         </ZincProvider>
       </ApolloProvider>
     );
