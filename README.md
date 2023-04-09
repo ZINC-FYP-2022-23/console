@@ -41,7 +41,7 @@ Run `yarn build` to build the project for production, followed by `yarn start` t
 
 ## Testing
 
-There are two types of tests: unit tests and component tests.
+There are three types of tests: unit tests, component tests, and end-to-end (E2E) tests.
 
 ### Unit Tests
 
@@ -51,8 +51,19 @@ Unit tests written in [Jest](https://jestjs.io/) are located in the `**/__tests_
 
 Component tests written in [Cypress](https://www.cypress.io/) are located in the `cypress/components` directory. There are two ways to run the tests:
 
-- Run `yarn cypress` to open the Cypress Test Runner for running tests interactively in a browser.
+- Run `yarn cypress` to open the Cypress Test Runner and run tests interactively in a browser.
 - Run `yarn cypress:run:component` to run component tests in headless mode.
+
+### E2E Tests
+
+E2E tests written in [Cypress](https://www.cypress.io/) are located in the `cypress/e2e` directory. To run the tests:
+
+1. Run `yarn dev:mocked` to start the development server with [Mock Service Worker](https://mswjs.io/) (MSW) enabled.
+   - MSW is used for mocking both server-side and client-side API requests.
+   - The mocked [handlers](https://mswjs.io/docs/basics/request-handler) are located in the `mocks/handlers` directory.
+2. In a **new** Terminal, either run:
+   - `yarn cypress` to open the Cypress Test Runner and run tests interactively in a browser.
+   - `yarn cypress:run` to run E2E tests in headless mode.
 
 ## Recommended Editor Tools
 
