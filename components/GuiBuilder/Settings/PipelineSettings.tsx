@@ -143,7 +143,7 @@ function PipelineSettings() {
             <UseProvidedTooltip />
           </div>
           <div id={highlightableElementIds.useTemplateWrapper}>
-            <div className="mt-4 flex items-center gap-2">
+            <div className="flex items-center gap-2">
               <div className="pr-2 flex-1 flex items-center gap-1">
                 <label htmlFor="use_template">Specify files that students should submit</label>
                 <UseTemplateTooltip />

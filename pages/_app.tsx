@@ -33,8 +33,8 @@ const mantineTheme: MantineThemeOverride = {
   colors: {
     blue: Object.values(fullTailwindConfig.theme?.colors?.["cse"]) as Tuple<string, 10>,
   },
-  fontFamily: fullTailwindConfig.theme?.fontFamily?.["sans"],
-  fontFamilyMonospace: fullTailwindConfig.theme?.fontFamily?.["mono"],
+  fontFamily: (fullTailwindConfig.theme?.fontFamily?.["sans"] as string[]).join(", "),
+  fontFamilyMonospace: (fullTailwindConfig.theme?.fontFamily?.["mono"] as string[]).join(", "),
 };
 
 function ZincApp({ Component, pageProps, cookie, hasTeachingRole, isAdmin, user, itsc, semester }) {
