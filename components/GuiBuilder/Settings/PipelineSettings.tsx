@@ -127,13 +127,13 @@ function PipelineSettings() {
                 alertLevel={hasLangFormatError || hasLangUnsupportedError ? "error" : undefined}
               />
               {hasLangFormatError && (
-                <div className="font-medium text-red-500 text-sm">
+                <div className="font-medium text-red-500 text-sm" data-cy="lang-format-error">
                   <FontAwesomeIcon icon={["far", "circle-exclamation"]} className="mr-2" />
                   Please fill out this field
                 </div>
               )}
               {hasLangUnsupportedError && !hasLangFormatError && (
-                <div className="font-medium text-red-500 text-sm">
+                <div className="font-medium text-red-500 text-sm" data-cy="lang-unsupported-error">
                   <FontAwesomeIcon icon={["far", "circle-exclamation"]} className="mr-2" />
                   This language version is not supported
                 </div>

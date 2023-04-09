@@ -21,6 +21,10 @@ export interface DiagnosticRaw {
   message: string;
   /** Diagnostic severity. */
   severity: "WARNING" | "ERROR";
+  /** Additional details. */
+  details?: string;
+  /** List of YAML fields that causes the diagnostic. */
+  fields?: string[];
   /** Location of the diagnostic if any. */
   location?: {
     /** Key of the stage (e.g. `"compile:main"`, `"diffWithSkeleton"`). */
