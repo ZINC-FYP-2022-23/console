@@ -19,7 +19,7 @@ export default async function handler(_: NextApiRequest, res: NextApiResponse) {
 
     if ("serverMsw" in global) {
       console.log("[MSW] Reset handlers");
-      const serverMsw = global.serverMsw as { server: SetupServer };
+      const serverMsw = global["serverMsw"] as { server: SetupServer };
       serverMsw.server.resetHandlers();
       res.setHeader(
         "Set-Cookie",

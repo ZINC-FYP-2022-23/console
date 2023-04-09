@@ -40,7 +40,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     if ("serverMsw" in global) {
       console.log(`[MSW] Add server handlers for '${fileName}'`);
-      const serverMsw = global.serverMsw as { server: SetupServer };
+      const serverMsw = global["serverMsw"] as { server: SetupServer };
       serverMsw.server.listen({ onUnhandledRequest: "warn" });
       serverMsw.server.use(...handlers);
       res.setHeader(
