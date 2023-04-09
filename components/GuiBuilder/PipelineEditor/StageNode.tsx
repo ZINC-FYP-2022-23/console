@@ -123,7 +123,10 @@ function StageNode({ id, data, selected }: NodeProps<StageNodeData>) {
       </div>
       {selected && <StageNodeActionButtons id={id} />}
       {hasUnresolvedDiagnostics && (
-        <div className="absolute -top-3 -right-3 flex items-center justify-center bg-white text-2xl text-red-500 rounded-full">
+        <div
+          className="absolute -top-3 -right-3 flex items-center justify-center bg-white text-2xl text-red-500 rounded-full"
+          data-cy="error-icon"
+        >
           <FontAwesomeIcon icon={["fas", "circle-exclamation"]} />
         </div>
       )}
