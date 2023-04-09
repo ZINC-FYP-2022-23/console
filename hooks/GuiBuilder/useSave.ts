@@ -23,6 +23,7 @@ function useSave() {
   const currentStep = useStoreState((state) => state.layout.step);
   const configId = useStoreState((state) => state.config.configId);
   const isEdited = useStoreState((state) => state.config.isEdited);
+  const duplicatedStageLabel = useStoreState((state) => state.config.duplicatedStageLabel);
   const isPipelineLayoutValid = useStoreState((state) => state.config.isPipelineLayoutValid);
 
   const generateStageLabels = useStoreActions((actions) => actions.config.generateStageLabels);
@@ -129,6 +130,18 @@ function useSave() {
           success: false,
           title: "Invalid Pipeline Layout",
           message: "Please fix the grading pipeline layout.",
+        },
+      });
+      return false;
+    }
+    // Validate duplicated non-empty stage labels for the same stage name
+    if (duplicatedStageLabel) {
+      dispatch({
+        type: "showNotification",
+        payload: {
+          success: false,
+          title: "Duplicated Stage Labels",
+          message: `You cannot use the same stage label ("${duplicatedStageLabel.label}") in two ${duplicatedStageLabel.name} stages.`,
         },
       });
       return false;
