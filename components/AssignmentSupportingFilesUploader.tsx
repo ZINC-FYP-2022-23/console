@@ -74,7 +74,7 @@ function File({ fileObject, folder }) {
   }
   return (
     <FileWrap existing={existing} file={file}>
-      <div className="flex flex-row items-center space-x-2 truncate">
+      <div className="flex flex-row items-center space-x-2 truncate" data-cy="file">
         <div className="w-3 text-gray-600 mx-1">
           <FontAwesomeIcon icon={["fad", "file"]} />
         </div>
@@ -246,7 +246,7 @@ function FileList({ existingFiles, name }) {
   const { assignmentConfigId } = useLayoutState();
 
   return (
-    <div className="rounded border bg-gray-100 p-2 shadow flex flex-col space-y-2 w-1/3" ref={drop}>
+    <div className="rounded border bg-gray-100 p-2 shadow flex flex-col space-y-2 w-1/3" ref={drop} data-cy={name}>
       {/* <div className="uppercase text-gray-600 font-medium mx-1 text-xs">
                 {name}
             </div> */}

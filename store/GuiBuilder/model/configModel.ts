@@ -57,6 +57,12 @@ interface ConfigModelState {
 }
 
 interface ConfigModelComputed {
+  /**
+   * Whether there exist two stages of the same name (e.g. "Compile") that shares the same
+   * **non-empty** {@link Stage.label label}.
+   * @returns The stage name and the value of the duplicated label, if any.
+   */
+  duplicatedStageLabel: Computed<ConfigModel, { name: string; label: string } | null>;
   /** Whether the pipeline has a stage given its name. */
   hasStage: Computed<ConfigModel, (stageName: string) => boolean>;
   /** Whether the assignment config has been edited. */
@@ -224,6 +230,22 @@ const configModelState: ConfigModelState = {
 };
 
 const configModelComputed: ConfigModelComputed = {
+  duplicatedStageLabel: computed((state) => {
+    const stageNamesToLabels: Record<string, string[]> = {};
+    for (const stage of Object.values(state.editingConfig.stageData)) {
+      if (stage.label === "") continue;
+      if (!(stage.name in stageNamesToLabels)) {
+        stageNamesToLabels[stage.name] = [stage.label];
+        continue;
+      }
+
+      if (stageNamesToLabels[stage.name].includes(stage.label)) {
+        return { name: stage.name, label: stage.label };
+      }
+      stageNamesToLabels[stage.name].push(stage.label);
+    }
+    return null;
+  }),
   hasStage: computed((state) => {
     return (stageName: string) =>
       Object.values(state.editingConfig.stageData).some((stage) => stage.name === stageName);

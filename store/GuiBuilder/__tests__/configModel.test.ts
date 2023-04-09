@@ -9,6 +9,71 @@ import { configModel } from "../model/configModel";
 import { getThreeStageModel } from "./utils/storeTestUtils";
 
 describe("GuiBuilder: Store - ConfigModel", () => {
+  describe("duplicatedStageLabel", () => {
+    it("returns the stage name and label if there are duplicated non-empty labels", () => {
+      const model = cloneDeep(configModel);
+      model.editingConfig.stageData = {
+        "stage-0": {
+          name: "DiffWithSkeleton",
+          label: "",
+          kind: StageKind.PRE_GLOBAL,
+          config: {},
+        },
+        "stage-1": {
+          name: "Compile",
+          label: "main",
+          kind: StageKind.PRE_LOCAL,
+          config: {},
+        },
+        "stage-2": {
+          name: "Compile",
+          label: "main",
+          kind: StageKind.PRE_LOCAL,
+          config: {},
+        },
+      };
+      const store = createStore(model);
+      expect(store.getState().duplicatedStageLabel).toEqual({ name: "Compile", label: "main" });
+    });
+
+    it("returns null if there are no duplicated non-empty labels", () => {
+      const model = cloneDeep(configModel);
+      model.editingConfig.stageData = {
+        "stage-0": {
+          name: "Compile",
+          label: "",
+          kind: StageKind.PRE_LOCAL,
+          config: {},
+        },
+        "stage-1": {
+          name: "Compile",
+          label: "",
+          kind: StageKind.PRE_LOCAL,
+          config: {},
+        },
+      };
+      const store = createStore(model);
+      expect(store.getState().duplicatedStageLabel).toBeNull();
+
+      store.getActions().setStageData({
+        "stage-0": {
+          name: "Diff With Skeleton",
+          label: "test",
+          kind: StageKind.PRE_GLOBAL,
+          config: {},
+        },
+        "stage-1": {
+          name: "Compile",
+          label: "test",
+          kind: StageKind.PRE_LOCAL,
+          config: {},
+        },
+      });
+      // OK to have same label as stage-0 because their stage names are different
+      expect(store.getState().duplicatedStageLabel).toBeNull();
+    });
+  });
+
   describe("hasStage", () => {
     it("returns true if the pipeline has a stage with the given name", () => {
       const model = cloneDeep(configModel);

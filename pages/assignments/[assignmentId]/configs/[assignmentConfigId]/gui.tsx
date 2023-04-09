@@ -1,4 +1,5 @@
 import GUIAssignmentBuilder from "@/components/GuiBuilder/GuiBuilder";
+import InitializationError from "@/components/GuiBuilder/InitializationError";
 import { LayoutProvider } from "@/contexts/layout";
 import { GET_PIPELINE_CONFIG_FOR_ASSIGNMENT } from "@/graphql/queries/user";
 import { Layout } from "@/layout";
@@ -6,22 +7,9 @@ import { initializeApollo } from "@/lib/apollo";
 import { guiBuilderModel } from "@/store/GuiBuilder";
 import { Assignment, AssignmentConfig } from "@/types/tables";
 import { useQuery } from "@apollo/client";
-import { MantineProvider, MantineThemeOverride } from "@mantine/core";
-import { createStore, StoreProvider } from "easy-peasy";
+import { StoreProvider, createStore } from "easy-peasy";
 import { GetServerSideProps } from "next";
 import { useMemo } from "react";
-import defaultTheme from "tailwindcss/defaultTheme";
-
-/**
- * Custom Mantine theme for the GUI Assignment Builder.
- */
-const mantineTheme: MantineThemeOverride = {
-  colors: {
-    blue: ["#8FADE0", "#6F95D8", "#4F7ECF", "#3560C0", "#2C56A0", "#234580", "#1B3663", "#162B50", "#122340"],
-  },
-  fontFamily: `Inter var, ${defaultTheme.fontFamily.sans.join(", ")}`,
-  fontFamilyMonospace: `Fira Code, ${defaultTheme.fontFamily.mono.join(", ")}`,
-};
 
 interface GUIAssignmentBuilderRootProps {
   /** The `assignmentConfigId`. If it's `-1`, it means we're creating a new assignment. */
@@ -43,19 +31,16 @@ function GUIAssignmentBuilderRoot({ configId, assignmentId }: GUIAssignmentBuild
     },
   );
 
-  // TODO(Anson): Better handling of error
-  if (error) {
-    console.error(error);
-  }
-
   return (
     <LayoutProvider>
       <Layout title="Assignment Config">
-        <MantineProvider theme={mantineTheme}>
-          <StoreProvider store={guiBuilderStore}>
+        <StoreProvider store={guiBuilderStore}>
+          {error ? (
+            <InitializationError error={error} />
+          ) : (
             <GUIAssignmentBuilder data={data} configId={configId === -1 ? null : configId} />
-          </StoreProvider>
-        </MantineProvider>
+          )}
+        </StoreProvider>
       </Layout>
     </LayoutProvider>
   );
@@ -75,7 +60,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, query }) => 
   configId = isNew ? -1 : parseInt(configId);
   assignmentId = parseInt(assignmentId);
   if (isNaN(configId) || isNaN(assignmentId)) {
-    return { notFound: true };
+    return { notFound: true }; // redirect to 404
   }
 
   const { data } = await apolloClient.query({
@@ -85,7 +70,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, query }) => 
       assignmentConfigId: configId,
     },
   });
-  if (data.assignment === null || (!isNew && data.assignmentConfig === null)) {
+  if (data?.assignment === null || (!isNew && data?.assignmentConfig === null)) {
     return { notFound: true };
   }
 

@@ -101,6 +101,10 @@ function AddStagePanel() {
    * the user performs a new search.
    */
   const [accordionWithSearch, setAccordionWithSearch] = useState<AccordionKeys[]>(allAccordionKeys);
+  /**
+   * Mode of quick action button ("Expand all" or "Collapse all").
+   */
+  const [accordionQuickAction, setAccordionQuickAction] = useState<"expand" | "collapse">("collapse");
 
   const isSearching = searchString.trim() !== "";
   const stagesByCategory = getStagesByCategory(searchString);
@@ -134,7 +138,7 @@ function AddStagePanel() {
         <div className="flex items-center justify-end gap-2">
           {process.env.NODE_ENV === "development" && (
             <Button
-              className="text-violet-600 border border-violet-600 hover:bg-violet-100 active:bg-violet-200"
+              className="text-sm text-violet-600 border border-violet-600 hover:bg-violet-100"
               onClick={() => console.log(configToYaml(getEditingConfig()))}
             >
               Debug: Log YAML
@@ -146,28 +150,34 @@ function AddStagePanel() {
         <div className="flex justify-between items-center">
           <h2 className="font-semibold text-xl">Add New Stage</h2>
           <div className="flex items-center gap-3">
-            <Tooltip label="Expand all">
-              <button
-                onClick={() => {
-                  isSearching
-                    ? setAccordionWithSearch(allAccordionKeys)
-                    : setAccordion({ path: "addNewStage", value: allAccordionKeys });
-                }}
-                className="p-2 text-xl leading-[0] text-cse-600 rounded-full transition hover:bg-blue-200 active:bg-blue-300"
-              >
-                <FontAwesomeIcon icon={["far", "up-right-and-down-left-from-center"]} />
-              </button>
-            </Tooltip>
-            <Tooltip label="Collapse all">
-              <button
-                onClick={() => {
-                  isSearching ? setAccordionWithSearch([]) : setAccordion({ path: "addNewStage", value: [] });
-                }}
-                className="p-2 text-xl leading-[0] text-cse-600 rounded-full transition hover:bg-blue-200 active:bg-blue-300"
-              >
-                <FontAwesomeIcon icon={["far", "down-left-and-up-right-to-center"]} />
-              </button>
-            </Tooltip>
+            {accordionQuickAction === "expand" && (
+              <Tooltip label="Expand all">
+                <button
+                  onClick={() => {
+                    setAccordionQuickAction("collapse");
+                    isSearching
+                      ? setAccordionWithSearch(allAccordionKeys)
+                      : setAccordion({ path: "addNewStage", value: allAccordionKeys });
+                  }}
+                  className="p-2 text-xl leading-[0] text-cse-600 rounded-full transition hover:bg-blue-200 active:bg-blue-300"
+                >
+                  <FontAwesomeIcon icon={["far", "up-right-and-down-left-from-center"]} />
+                </button>
+              </Tooltip>
+            )}
+            {accordionQuickAction === "collapse" && (
+              <Tooltip label="Collapse all">
+                <button
+                  onClick={() => {
+                    setAccordionQuickAction("expand");
+                    isSearching ? setAccordionWithSearch([]) : setAccordion({ path: "addNewStage", value: [] });
+                  }}
+                  className="p-2 text-xl leading-[0] text-cse-600 rounded-full transition hover:bg-blue-200 active:bg-blue-300"
+                >
+                  <FontAwesomeIcon icon={["far", "down-left-and-up-right-to-center"]} />
+                </button>
+              </Tooltip>
+            )}
           </div>
         </div>
         <div className="mt-2 flex items-center text-sm text-justify text-blue-500 leading-4">
