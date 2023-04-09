@@ -97,6 +97,7 @@ function StageSettings() {
             <p className="text-gray-500 text-sm font-medium">Label:</p>
             <TextInput
               ref={labelInputRef}
+              id="stage-label"
               value={selectedStage.label}
               onChange={(event) => {
                 const value = event.target.value;
