@@ -93,8 +93,7 @@ function MissingStdioTestAlert() {
   const [diagnostics, resolveDiagnostics] = useSelectedStageDiagnostics();
   const setAddStageSearchString = useStoreActions((actions) => actions.layout.setAddStageSearchString);
 
-  const isMissingStdioTestError = (d: Diagnostic) =>
-    d.type === "MISSING_FIELD_ERROR" && !!d.message.match(/StdioTest/i);
+  const isMissingStdioTestError = (d: Diagnostic) => d.type === "MISSING_FIELD_ERROR" && d.field === "stdioTest";
   const hasMissingStdioTestError = diagnostics.some(isMissingStdioTestError);
 
   return (

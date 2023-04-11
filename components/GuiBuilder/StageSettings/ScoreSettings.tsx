@@ -9,7 +9,7 @@ import { useEffect } from "react";
  * Predicate for filtering diagnostics that are caused by missing grading stage.
  */
 const isNoGradingStageError = (d: Diagnostic) =>
-  !d.resolved && d.type === "MISSING_FIELD_ERROR" && !!d.message.match(/grading/i);
+  !d.resolved && d.type === "MISSING_FIELD_ERROR" && d.field === "<Grading Stage>";
 
 function ScoreSettings() {
   const [config, setConfig] = useSelectedStageConfig("Score");

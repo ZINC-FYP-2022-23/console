@@ -60,7 +60,7 @@ function UseSkeletonOffAlert() {
   const updateSettings = useStoreActions((actions) => actions.config.updateSettings);
 
   const isUseSkeletonOffError = (d: Diagnostic) =>
-    d.type === "MISSING_FIELD_ERROR" && !!d.message.match(/use_skeleton/);
+    d.type === "MISSING_FIELD_ERROR" && d.field === "_settings.use_skeleton";
   const hasUseSkeletonOffError = diagnostics.some(isUseSkeletonOffError);
 
   return (
@@ -91,7 +91,7 @@ function UseProvidedOffAlert() {
   const updateSettings = useStoreActions((actions) => actions.config.updateSettings);
 
   const isUseProvidedOffError = (d: Diagnostic) =>
-    d.type === "MISSING_FIELD_ERROR" && !!d.message.match(/use_provided/);
+    d.type === "MISSING_FIELD_ERROR" && d.field === "_settings.use_provided";
   const hasUseProvidedOffError = diagnostics.some(isUseProvidedOffError);
 
   return (

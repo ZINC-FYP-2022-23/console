@@ -193,7 +193,8 @@ function LangNotPythonAlert() {
   const setElementToHighlight = useStoreActions((actions) => actions.layout.setElementToHighlight);
   const setModal = useStoreActions((actions) => actions.layout.setModal);
 
-  const isLangNotPythonError = (d: Diagnostic) => d.type === "INVALID_FIELD_ERROR" && !!d.message.match(/python/i);
+  const isLangNotPythonError = (d: Diagnostic) =>
+    d.type === "INVALID_FIELD_ERROR" && d.fields?.includes("_settings.lang");
   const hasLangNotPythonError = diagnostics.some(isLangNotPythonError);
 
   return (

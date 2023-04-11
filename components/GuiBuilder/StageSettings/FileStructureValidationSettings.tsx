@@ -186,7 +186,8 @@ function UseTemplateOffAlert() {
   const [diagnostics] = useSelectedStageDiagnostics();
   const setElementToHighlight = useStoreActions((actions) => actions.layout.setElementToHighlight);
 
-  const isUseTemplateOffError = (d: Diagnostic) => d.type === "MISSING_FIELD_ERROR" && d.message.match(/use_template/);
+  const isUseTemplateOffError = (d: Diagnostic) =>
+    d.type === "MISSING_FIELD_ERROR" && d.field === "_settings.use_template";
   const hasUseTemplateOffError = diagnostics.some(isUseTemplateOffError);
 
   return (

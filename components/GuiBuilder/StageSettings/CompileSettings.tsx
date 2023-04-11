@@ -164,7 +164,7 @@ function UnsupportedLangAlert() {
   const langLabel = getSettingsLangLabel(lang);
 
   const isUnsupportedLangError = (d: Diagnostic) =>
-    !d.resolved && d.type === "INVALID_FIELD_ERROR" && !!d.message.match(/_settings\.lang/);
+    !d.resolved && d.type === "INVALID_FIELD_ERROR" && d.fields?.includes("_settings.lang");
 
   return diagnostics.some(isUnsupportedLangError) ? (
     <Alert severity="error">
