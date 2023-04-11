@@ -46,6 +46,7 @@ function StageEdge({ id, sourceX, sourceY, targetX, targetY, sourcePosition, tar
             "pointer-events-auto w-5 h-5 absolute flex items-center justify-center bg-red-500 text-white text-sm cursor-pointer rounded-full hover:bg-red-700 transition-[background-color,opacity]",
             showDeleteBtn ? "opacity-100" : "opacity-0",
           )}
+          data-cy="delete-stage-edge"
         >
           <FontAwesomeIcon className="w-3 !h-3" icon={["fas", "xmark"]} />
         </button>

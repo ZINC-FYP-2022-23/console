@@ -10,7 +10,8 @@ import {
 } from "@/types/GuiBuilder";
 import { AssignmentConfig } from "@/types/tables";
 import { generateStageLabels, isConfigEqual, isLinkedList, isScheduleEqual, parseConfigYaml } from "@/utils/GuiBuilder";
-import { action, Action, computed, Computed, thunk, Thunk } from "easy-peasy";
+import { Action, Computed, Thunk, action, computed, thunk } from "easy-peasy";
+import { YAMLException } from "js-yaml";
 import cloneDeep from "lodash/cloneDeep";
 import isEqual from "lodash/isEqual";
 import { MutableKeys } from "utility-types";
@@ -50,6 +51,12 @@ interface ConfigModelState {
 }
 
 interface ConfigModelComputed {
+  /**
+   * Whether there exist two stages of the same name (e.g. "Compile") that shares the same
+   * **non-empty** {@link Stage.label label}.
+   * @returns The stage name and the value of the duplicated label, if any.
+   */
+  duplicatedStageLabel: Computed<ConfigModel, { name: string; label: string } | null>;
   /** Whether the pipeline has a stage given its name. */
   hasStage: Computed<ConfigModel, (stageName: string) => boolean>;
   /** Whether the assignment config has been edited. */
@@ -84,6 +91,9 @@ interface ConfigModelComputed {
 }
 
 interface ConfigModelAction {
+  /**
+   * @throws A {@link YAMLException} if there is error while parsing the config YAML.
+   */
   initializeConfig: Action<ConfigModel, { id: number | null; configYaml: string }>;
   initializePolicy: Action<ConfigModel, GradingPolicy>;
   initializeSchedule: Action<ConfigModel, Schedule>;
@@ -143,6 +153,8 @@ interface ConfigModelThunk {
   /**
    * If the store is not {@link ConfigModel.initialized initialized}, it initializes the store states
    * according to the data queried from the database.
+   *
+   * @throws A {@link YAMLException} if there is error while parsing the config YAML.
    */
   initializeAssignment: Thunk<
     ConfigModel,
@@ -195,6 +207,22 @@ const configModelState: ConfigModelState = {
 };
 
 const configModelComputed: ConfigModelComputed = {
+  duplicatedStageLabel: computed((state) => {
+    const stageNamesToLabels: Record<string, string[]> = {};
+    for (const stage of Object.values(state.editingConfig.stageData)) {
+      if (stage.label === "") continue;
+      if (!(stage.name in stageNamesToLabels)) {
+        stageNamesToLabels[stage.name] = [stage.label];
+        continue;
+      }
+
+      if (stageNamesToLabels[stage.name].includes(stage.label)) {
+        return { name: stage.name, label: stage.label };
+      }
+      stageNamesToLabels[stage.name].push(stage.label);
+    }
+    return null;
+  }),
   hasStage: computed((state) => {
     return (stageName: string) =>
       Object.values(state.editingConfig.stageData).some((stage) => stage.name === stageName);

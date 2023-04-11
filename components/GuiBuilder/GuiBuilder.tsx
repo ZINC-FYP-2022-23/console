@@ -3,8 +3,9 @@ import { useStoreActions, useStoreState } from "@/store/GuiBuilder";
 import { Assignment, AssignmentConfig } from "@/types/tables";
 import "boarding.js/styles/main.css";
 import "boarding.js/styles/themes/basic.css";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import FinishedAllStepsModal from "./FinishedAllStepsModal";
+import InitializationError from "./InitializationError";
 import guiBuilderSteps from "./Steps/GuiBuilderSteps";
 import NextStepButton from "./Steps/NextStepButton";
 import Stepper from "./Steps/Stepper";
@@ -24,20 +25,28 @@ function GUIAssignmentBuilder({ data, configId: configIdProp }: GUIAssignmentBui
   const stepIndex = useStoreState((state) => state.layout.stepIndex);
   const initializeAssignment = useStoreActions((actions) => actions.config.initializeAssignment);
 
+  const [initializeError, setInitializeError] = useState<Error | null>(null);
+
   useHighlightElement();
   useWarnUnsavedChanges();
 
   // Initialize store
   useEffect(() => {
-    initializeAssignment({
-      configId: configIdProp,
-      courseId: data?.assignment.course.id ?? null,
-      config: data?.assignmentConfig ?? null,
-    });
+    try {
+      initializeAssignment({
+        configId: configIdProp,
+        courseId: data?.assignment.course.id ?? null,
+        config: data?.assignmentConfig ?? null,
+      });
+    } catch (err) {
+      setInitializeError(err as Error);
+    }
   }, [data, configIdProp, initializeAssignment]);
 
   const { initializeStateFromQueryParams } = useQueryParameters();
   initializeStateFromQueryParams();
+
+  if (initializeError) return <InitializationError error={initializeError} />;
 
   const StepComponent = guiBuilderSteps[stepIndex].component;
 

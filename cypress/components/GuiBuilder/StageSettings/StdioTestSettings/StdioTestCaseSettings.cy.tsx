@@ -44,11 +44,11 @@ describe("GuiBuilder: <StdioTestCaseSettings />", () => {
 
     // Input/Output
     cy.get("#file").type("a.out");
-    cy.get("#flags").type("1");
+    cy.get("#args").type("1");
     cy.clickSelectInput("#_stdinInputMode", "From helper file");
     cy.get("#file_stdin").type("1.txt");
     cy.clickSelectInput("#_expectedInputMode", "By text input");
-    cy.get(".monaco-editor").first().type("hi");
+    cy.get(".monaco-editor", { timeout: 8000 }).first().type("hi");
 
     // Valgrind
     cy.get("#_valgrindOverride").click();

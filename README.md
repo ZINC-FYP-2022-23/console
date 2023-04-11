@@ -1,30 +1,72 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# ZINC - Console UI
 
-## Getting Started
+ZINC UI for teaching assistants, powered by [Next.js](https://nextjs.org/) and [Tailwind CSS](https://tailwindcss.com/).
 
-First, run the development server:
+## Setting Up
 
-```bash
-npm run dev
-# or
-yarn dev
-```
+### Repo Setup
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+1. Make sure you have installed the [Yarn](https://yarnpkg.com/getting-started/install) package manager.
+2. This project uses the [Font Awesome](https://fontawesome.com/) Pro Plan icon library. Please obtain its secret NPM token and register it by running:
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
+   ```bash
+   yarn config set "//npm.fontawesome.com/:_authToken" <FONT-AWESOME-PACKAGE-TOKEN>
+   ```
 
-## Learn More
+3. Run `yarn` at the root of the project to install dependencies.
+4. If you're developing locally, copy the example environment variables file.
 
-To learn more about Next.js, take a look at the following resources:
+   ```bash
+   cp .env.local.example .env.local
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Development Server
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+The UI depends on the following backend services. They should be running **before** starting the Console UI development server.
 
-## Deploy on Vercel
+- [Webhook](https://github.com/zinc-sig/webhook)
+- PostgreSQL database
+- Redis - IPC communication
+- [Hasura](https://hasura.io/) - GraphQL engine for PostgreSQL
+- [Grader](https://gitlab.com/zinc-stack/grader) - Grades submissions
+  - See [Building and Running](https://docs.zinc.ust.dev/developer/install.html) to learn how to build and run the Grader daemon
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/import?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+You need to specify the URLs and port numbers of these backend services using environment variables. You should populate the `.env.local` file if you are running Console UI locally.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+Finally, run `yarn dev` to start the development server.
+
+## Production
+
+Run `yarn build` to build the project for production, followed by `yarn start` to start the production server.
+
+## Testing
+
+There are three types of tests: unit tests, component tests, and end-to-end (E2E) tests.
+
+### Unit Tests
+
+Unit tests written in [Jest](https://jestjs.io/) are located in the `**/__tests__` directory. To run the tests, run `yarn test` at the root of the project.
+
+### Component Tests
+
+Component tests written in [Cypress](https://www.cypress.io/) are located in the `cypress/components` directory. There are two ways to run the tests:
+
+- Run `yarn cypress` to open the Cypress Test Runner and run tests interactively in a browser.
+- Run `yarn cypress:run:component` to run component tests in headless mode.
+
+### E2E Tests
+
+E2E tests written in [Cypress](https://www.cypress.io/) are located in the `cypress/e2e` directory. To run the tests:
+
+1. Run `yarn dev:mocked` to start the development server with [Mock Service Worker](https://mswjs.io/) (MSW) enabled.
+   - MSW is used for mocking both server-side and client-side API requests.
+   - The mocked [handlers](https://mswjs.io/docs/basics/request-handler) are located in the `mocks/handlers` directory.
+2. In a **new** Terminal, either run:
+   - `yarn cypress` to open the Cypress Test Runner and run tests interactively in a browser.
+   - `yarn cypress:run` to run E2E tests in headless mode.
+
+## Recommended Editor Tools
+
+- [Prettier](https://prettier.io/docs/en/editors.html) - Code formatter
+- [ESLint](https://eslint.org/docs/latest/use/integrations) - Linter
+- [Tailwind CSS IntelliSense](https://tailwindcss.com/docs/editor-setup) - Auto-complete for Tailwind CSS classes

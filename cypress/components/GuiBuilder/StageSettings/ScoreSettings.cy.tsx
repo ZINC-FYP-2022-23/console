@@ -38,4 +38,13 @@ describe("GuiBuilder: Stage Settings - Score", () => {
 
     cy.get("p").contains("Min value should be smaller than Max value").should("be.visible");
   });
+
+  it("shows an alert if the pipeline does not have Grading stages", () => {
+    // In this model, the pipeline does not have Grading stages since it only has a single Score stage
+    const model = getModelWithSingleStage("Score");
+    const store = createStore(model);
+    cy.mountWithStore(store, <ScoreSettings />);
+
+    cy.get('[data-cy="no-grading-stage-alert"]').should("be.visible");
+  });
 });
