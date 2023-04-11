@@ -21,7 +21,7 @@ function Policy() {
           onChange={(value) => setPolicy({ ...policy, attemptLimits: value ?? null })}
           min={1}
           placeholder="Unlimited"
-          className="flex-1"
+          className="flex-[2]"
         />
       </div>
       <SwitchGroup
@@ -34,8 +34,7 @@ function Policy() {
       />
       <SwitchGroup
         id="showImmediateScores"
-        label="Reveal grading details"
-        description="Show all available grading information right after the submission is graded"
+        label="Show all available grading details after grading the submission"
         checked={policy.showImmediateScores}
         onChange={(value) => {
           setPolicy({ ...policy, showImmediateScores: value });

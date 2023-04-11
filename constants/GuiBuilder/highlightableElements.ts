@@ -8,13 +8,19 @@ import { BoardingStepDefinition } from "boarding.js/dist/boarding-types";
 export const highlightableElementIds = {
   addStagePanel: "add-stage-panel",
   generateExpectedOutput: "generate-expected-output",
+  langWrapper: "lang-wrapper",
   pipelineEditor: "pipeline-editor",
   useTemplateWrapper: "use-template-wrapper",
   useGeneratedWrapper: "use-generated-wrapper",
 } as const;
 
 /** Keys of the {@link highlightableElements} map. */
-export type HighlightableElementsKey = "addStageTutorial" | "generateExpectedOutput" | "useTemplate" | "useGenerated";
+export type HighlightableElementsKey =
+  | "addStageTutorial"
+  | "generateExpectedOutput"
+  | "lang"
+  | "useTemplate"
+  | "useGenerated";
 
 /**
  * There are 2 modes of highlighting (specified by the `mode` property):
@@ -87,6 +93,12 @@ const highlightableElements: HighlightableElements = {
     mode: "single",
     selector: {
       element: `#${highlightableElementIds.generateExpectedOutput}`,
+    },
+  },
+  lang: {
+    mode: "single",
+    selector: {
+      element: `#${highlightableElementIds.langWrapper}`,
     },
   },
   useTemplate: {

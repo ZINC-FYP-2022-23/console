@@ -41,6 +41,7 @@ function NextStepButton() {
     <Button
       onClick={handleClick}
       className="w-20 !text-lg bg-green-500 text-white hover:bg-green-600 disabled:bg-gray-400 disabled:cursor-not-allowed"
+      data-cy="next-step"
     >
       {isSaving ? SavingSpinner : nextStep === null ? "Done" : "Next"}
     </Button>

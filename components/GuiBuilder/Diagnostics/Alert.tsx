@@ -35,7 +35,7 @@ function Alert({ severity, children, onClose, ...props }: AlertProps) {
       <FontAwesomeIcon
         icon={["far", severityToIconName[severity]]}
         className={clsx(
-          "text-xl ",
+          "mt-0.5 text-xl",
           severity === "info" && "text-sky-600",
           severity === "warning" && "text-yellow-600",
           severity === "error" && "text-red-600",

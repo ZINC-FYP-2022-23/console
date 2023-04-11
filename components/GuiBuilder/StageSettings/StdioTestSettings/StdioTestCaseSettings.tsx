@@ -255,7 +255,7 @@ function StdioTestCaseSettings({ caseId }: StdioTestCaseSettingsProps) {
                 Command-line arguments
               </label>
               <Textarea
-                id="flags"
+                id="args"
                 value={caseConfig.args ?? ""}
                 onChange={(e) => updateTestCase((testCase) => (testCase.args = e.target.value))}
                 placeholder="e.g. 1"

@@ -32,9 +32,7 @@ describe("GuiBuilder: Stage Settings - FileStructureValidation", () => {
     const store = createStore(model);
     cy.mountWithStore(store, <FileStructureValidationSettings />);
 
-    cy.get("p")
-      .contains('Please set "Specify files that students should submit" to another value')
-      .should("be.visible");
+    cy.get('[data-cy="use-template-off-alert"]').should("be.visible");
     cy.get("button").contains("Fix this field").should("be.visible");
   });
 
