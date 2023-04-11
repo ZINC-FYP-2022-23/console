@@ -12,16 +12,6 @@ const getLocalDate = (date: string) => {
   return null;
 };
 
-type AppealConfigType = {
-  stopCollectionAt?: Date;
-  isAppealAllowed: boolean;
-  appealLimits?: Number | null;
-  appealStartAt?: Date;
-  appealStopAt?: Date;
-  isAppealStudentReplyAllowed?: boolean;
-  isAppealViewReportAllowed: boolean;
-};
-
 interface AppealConfigProps {
   assignmentConfig;
   setAssignmentConfig?; // Used when creating new config
@@ -58,8 +48,8 @@ export function AppealConfig({ assignmentConfig, setAssignmentConfig, onChange, 
   };
 
   return (
-    <fieldset>
-      <legend className="mt-10 text-base leading-6 font-medium text-gray-900">Grade Appeal-related</legend>
+    <fieldset className="mt-4">
+      <legend className="text-base leading-6 font-medium text-gray-900">Grade Appeal-related</legend>
       {/* isAppealAllowed */}
       <div className="mt-4 flex items-start">
         <div className="flex items-center h-5">
