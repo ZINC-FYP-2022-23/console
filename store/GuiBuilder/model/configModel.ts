@@ -1,6 +1,7 @@
-import { defaultConfig, defaultPolicy, defaultSchedule } from "@/constants/GuiBuilder/defaults";
+import { defaultConfig, defaultGradeAppeal, defaultPolicy, defaultSchedule } from "@/constants/GuiBuilder/defaults";
 import {
   Config,
+  GradeAppealPolicy,
   GradingPolicy,
   Schedule,
   Settings,
@@ -40,6 +41,10 @@ interface ConfigModelState {
   initConfig: Config;
   /** The pipeline config with proposed changes. */
   editingConfig: Config;
+  /** Initial grade appeal policies of the assignment. It should be immutable after initialization. */
+  initGradeAppeal: GradeAppealPolicy;
+  /** The grade appeal policies with proposed changes. */
+  editingGradeAppeal: GradeAppealPolicy;
   /** Initial grading policy of the assignment. It should be immutable after initialization. */
   initPolicy: GradingPolicy;
   /** The grading policy with proposed changes */
@@ -95,6 +100,7 @@ interface ConfigModelAction {
    * @throws A {@link YAMLException} if there is error while parsing the config YAML.
    */
   initializeConfig: Action<ConfigModel, { id: number | null; configYaml: string }>;
+  initializeGradeAppeal: Action<ConfigModel, GradeAppealPolicy>;
   initializePolicy: Action<ConfigModel, GradingPolicy>;
   initializeSchedule: Action<ConfigModel, Schedule>;
 
@@ -103,6 +109,7 @@ interface ConfigModelAction {
 
   setConfigId: Action<ConfigModel, number>;
   setCourseId: Action<ConfigModel, number>;
+  setGradeAppeal: Action<ConfigModel, GradeAppealPolicy>;
   setInitialized: Action<ConfigModel, boolean>;
   setPolicy: Action<ConfigModel, GradingPolicy>;
   setSchedule: Action<ConfigModel, Schedule>;
@@ -174,8 +181,6 @@ interface ConfigModelThunk {
   generateStageLabels: Thunk<ConfigModel, undefined, undefined, GuiBuilderModel, Config>;
   /** Lazily gets {@link ConfigModel.editingConfig}. */
   getEditingConfig: Thunk<ConfigModel, undefined, undefined, GuiBuilderModel, Config>;
-  /** Lazily gets {@link ConfigModel.editingPolicy} and {@link ConfigModel.editingSchedule}. */
-  getPolicyAndSchedule: Thunk<ConfigModel, undefined, undefined, GuiBuilderModel, GradingPolicy & Schedule>;
   /** Updates a non-readonly field of the selected stage. */
   updateSelectedStage: Thunk<
     ConfigModel,
@@ -200,6 +205,8 @@ const configModelState: ConfigModelState = {
 
   initConfig: defaultConfig,
   editingConfig: defaultConfig,
+  initGradeAppeal: defaultGradeAppeal,
+  editingGradeAppeal: defaultGradeAppeal,
   initPolicy: defaultPolicy,
   editingPolicy: defaultPolicy,
   initSchedule: defaultSchedule,
@@ -265,6 +272,10 @@ const configModelAction: ConfigModelAction = {
     state.editingConfig = cloneDeep(config);
     state.configId = id;
   }),
+  initializeGradeAppeal: action((state, gradeAppeal) => {
+    state.initGradeAppeal = gradeAppeal;
+    state.editingGradeAppeal = { ...gradeAppeal };
+  }),
   initializePolicy: action((state, gradingPolicy) => {
     state.initPolicy = gradingPolicy;
     state.editingPolicy = { ...gradingPolicy };
@@ -279,6 +290,9 @@ const configModelAction: ConfigModelAction = {
   }),
   setCourseId: action((state, courseId) => {
     state.courseId = courseId;
+  }),
+  setGradeAppeal: action((state, gradeAppeal) => {
+    state.editingGradeAppeal = gradeAppeal;
   }),
   setInitialized: action((state, initialized) => {
     state.initialized = initialized;
@@ -331,6 +345,14 @@ const configModelThunk: ConfigModelThunk = {
     if (courseId !== null) actions.setCourseId(courseId);
     if (config) {
       actions.initializeConfig({ id: configId, configYaml: config.config_yaml });
+      actions.initializeGradeAppeal({
+        isAppealAllowed: config.isAppealAllowed,
+        appealLimits: config.appealLimits,
+        appealStartAt: config.appealStartAt,
+        appealStopAt: config.appealStopAt,
+        isAppealStudentReplyAllowed: config.isAppealStudentReplyAllowed,
+        isAppealViewReportAllowed: config.isAppealViewReportAllowed,
+      });
       actions.initializePolicy({
         attemptLimits: config.attemptLimits,
         gradeImmediately: config.gradeImmediately,
@@ -359,13 +381,6 @@ const configModelThunk: ConfigModelThunk = {
   }),
   getEditingConfig: thunk((_actions, _payload, { getState }) => {
     return getState().editingConfig;
-  }),
-  getPolicyAndSchedule: thunk((_actions, _payload, { getState }) => {
-    const { editingPolicy, editingSchedule } = getState();
-    return {
-      ...editingPolicy,
-      ...editingSchedule,
-    };
   }),
   updateSelectedStage: thunk((actions, { path, value }, { getStoreState }) => {
     const selectedNode = getStoreState().pipelineEditor.nodes.find((node) => node.selected);

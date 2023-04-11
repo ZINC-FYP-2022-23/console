@@ -1,4 +1,4 @@
-import { Config, GradingPolicy, Schedule, Stage, StageKind } from "@/types/GuiBuilder";
+import { Config, GradeAppealPolicy, GradingPolicy, Schedule, Stage, StageKind } from "@/types/GuiBuilder";
 import { AssignmentConfig } from "@/types/tables";
 import * as configUtils from "@/utils/GuiBuilder/config";
 import { createStore } from "easy-peasy";
@@ -195,6 +195,26 @@ describe("GuiBuilder: Store - ConfigModel", () => {
     });
   });
 
+  describe("initializeGradeAppeal()", () => {
+    it("initializes the initGradeAppeal and editingGradeAppeal separately", () => {
+      const mockGradeAppeal: GradeAppealPolicy = {
+        isAppealAllowed: true,
+        appealLimits: null,
+        appealStartAt: "2021-01-01T00:00:00.000Z",
+        appealStopAt: "2021-01-07T00:00:00.000Z",
+        isAppealStudentReplyAllowed: true,
+        isAppealViewReportAllowed: true,
+      };
+      const store = createStore(configModel);
+      store.getActions().initializeGradeAppeal(mockGradeAppeal);
+
+      const state = store.getState();
+      expect(state.initGradeAppeal).toStrictEqual(mockGradeAppeal);
+      expect(state.editingGradeAppeal).toStrictEqual(mockGradeAppeal);
+      expect(state.initGradeAppeal).not.toBe(state.editingGradeAppeal);
+    });
+  });
+
   describe("initializePolicy()", () => {
     it("initializes the initPolicy and editingPolicy separately", () => {
       const mockPolicy: GradingPolicy = {
@@ -377,6 +397,7 @@ describe("GuiBuilder: Store - ConfigModel", () => {
       setCourseId: "@action.config.setCourseId",
       setInitialized: "@action.config.setInitialized",
       initConfig: "@action.config.initializeConfig",
+      initGradeAppeal: "@action.config.initializeGradeAppeal",
       initPolicy: "@action.config.initializePolicy",
       initSchedule: "@action.config.initializeSchedule",
       initPipelineStart: "@thunk.pipelineEditor.initializePipeline(start)",
@@ -400,6 +421,7 @@ describe("GuiBuilder: Store - ConfigModel", () => {
         type.initAssignmentStart,
         type.setCourseId,
         type.initConfig,
+        type.initGradeAppeal,
         type.initPolicy,
         type.initSchedule,
         type.initPipelineStart,

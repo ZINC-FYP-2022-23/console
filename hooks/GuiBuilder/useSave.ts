@@ -22,13 +22,15 @@ function useSave() {
 
   const currentStep = useStoreState((state) => state.layout.step);
   const configId = useStoreState((state) => state.config.configId);
+  const editingGradeAppeal = useStoreState((state) => state.config.editingGradeAppeal);
+  const editingPolicy = useStoreState((state) => state.config.editingPolicy);
+  const editingSchedule = useStoreState((state) => state.config.editingSchedule);
   const isEdited = useStoreState((state) => state.config.isEdited);
   const duplicatedStageLabel = useStoreState((state) => state.config.duplicatedStageLabel);
   const isPipelineLayoutValid = useStoreState((state) => state.config.isPipelineLayoutValid);
 
   const generateStageLabels = useStoreActions((actions) => actions.config.generateStageLabels);
   const getEditingConfig = useStoreActions((actions) => actions.config.getEditingConfig);
-  const getPolicyAndSchedule = useStoreActions((actions) => actions.config.getPolicyAndSchedule);
   const setConfigId = useStoreActions((actions) => actions.config.setConfigId);
   const setInitConfigsToEditing = useStoreActions((actions) => actions.config.setInitConfigsToEditing);
   const setStep = useStoreActions((actions) => actions.layout.setStep);
@@ -80,7 +82,9 @@ function useSave() {
             assignment_id: assignmentId,
             config_yaml: settingsYaml, // Store the `_settings` part of YAML first
             configValidated: true,
-            ...getPolicyAndSchedule(),
+            ...editingGradeAppeal,
+            ...editingPolicy,
+            ...editingSchedule,
           },
         },
       });
@@ -94,11 +98,15 @@ function useSave() {
         return false; // since `router.push()` already proceeds to next step
       }
     } else {
-      // Update existing assignment's policy and schedule
+      // Update existing assignment's policy, grade appeal, and schedule
       await updateConfig({
         variables: {
           id: configId,
-          update: getPolicyAndSchedule(),
+          update: {
+            ...editingGradeAppeal,
+            ...editingPolicy,
+            ...editingSchedule,
+          },
         },
       });
       if (isEdited.policy || isEdited.schedule) {

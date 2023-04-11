@@ -1,5 +1,6 @@
 import { Schedule } from "@/types/GuiBuilder";
 import { isEqual } from "date-fns";
+import { appendZToIsoString } from "../date";
 
 /**
  * Compares if two {@link Schedule} objects are equal.
@@ -28,14 +29,4 @@ export function isScheduleEqual(s1: Schedule, s2: Schedule) {
     }
   }
   return equal;
-}
-
-/**
- * Appends a `"Z"` to the end of an ISO date string to indicate it's UTC time if it does not end with it.
- */
-export function appendZToIsoString(isoString: string) {
-  if (isoString.endsWith("Z")) {
-    return isoString;
-  }
-  return isoString + "Z";
 }
