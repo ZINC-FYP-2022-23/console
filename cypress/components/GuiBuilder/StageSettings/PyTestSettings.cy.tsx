@@ -144,16 +144,34 @@ describe("GuiBuilder: Stage Settings - PyTest", () => {
     });
   });
 
-  it("shows an alert if language is not Python", () => {
-    const model = getModelWithSingleStage("PyTest");
-    model.config.editingConfig._settings.lang = {
-      language: "cpp",
-      compiler: "g++",
-      version: "8",
-    };
-    const store = createStore(model);
-    cy.mountWithStore(store, <PyTestSettings />);
+  describe("Diagnostics", () => {
+    it("handles language is not Python", () => {
+      const model = getModelWithSingleStage("PyTest");
+      model.config.editingConfig._settings.lang = {
+        language: "cpp",
+        compiler: "g++",
+        version: "8",
+      };
+      const store = createStore(model);
+      cy.mountWithStore(store, <PyTestSettings />);
 
-    cy.get('[data-cy="lang-not-python-alert"]').should("be.visible");
+      cy.get('[data-cy="lang-not-python-alert"]').should("be.visible").and("have.attr", "data-severity", "warning");
+
+      cy.then(() => {
+        store.getActions().config.parseDiagnostics([
+          {
+            type: "INVALID_FIELD_ERROR",
+            message: "field '_settings.lang' is invalid at [pyTest]. Your '_settings.lang' used is not python",
+            severity: "ERROR",
+            details: "Your '_settings.lang' used is not python",
+            fields: ["_settings.lang"],
+            location: {
+              stage: "pyTest",
+            },
+          },
+        ]);
+      });
+      cy.get('[data-cy="lang-not-python-alert"]').should("be.visible").and("have.attr", "data-severity", "error");
+    });
   });
 });

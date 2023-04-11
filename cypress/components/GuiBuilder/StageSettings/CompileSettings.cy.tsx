@@ -42,4 +42,27 @@ describe("GuiBuilder: Stage Settings - Compile", () => {
 
     cy.get("#output").should("be.disabled");
   });
+
+  describe("Diagnostics", () => {
+    it("handles unsupported language", () => {
+      const model = getModelWithSingleStage("Compile");
+      const store = createStore(model);
+      cy.mountWithStore(store, <CompileSettings />);
+
+      store.getActions().config.parseDiagnostics([
+        {
+          type: "INVALID_FIELD_ERROR",
+          message:
+            "field '_settings.lang' is invalid at [compile:3fe1ix]. Your '_settings.lang' used cannot be resolved into a distro for executing this pipeline stage",
+          severity: "ERROR",
+          details: "Your '_settings.lang' used cannot be resolved into a distro for executing this pipeline stage",
+          fields: ["_settings.lang"],
+          location: {
+            stage: "compile",
+          },
+        },
+      ]);
+      cy.get('[data-cy="unsupported-lang-alert"]').should("be.visible").and("have.attr", "data-severity", "error");
+    });
+  });
 });

@@ -167,7 +167,7 @@ function UnsupportedLangAlert() {
     !d.resolved && d.type === "INVALID_FIELD_ERROR" && d.fields?.includes("_settings.lang");
 
   return diagnostics.some(isUnsupportedLangError) ? (
-    <Alert severity="error">
+    <Alert severity="error" data-cy="unsupported-lang-alert">
       <div>
         <p>
           This stage is <span className="font-semibold">not supported</span> by the language of this assignment

@@ -35,11 +35,30 @@ describe("GuiBuilder: Stage Settings - Make", () => {
     });
   });
 
-  it("shows a warning if the pipeline has no StdioTest stage", () => {
-    const model = getModelWithSingleStage("Valgrind");
-    const store = createStore(model);
-    cy.mountWithStore(store, <ValgrindSettings />);
+  describe("Diagnostics", () => {
+    it("handles the pipeline has no StdioTest stage", () => {
+      const model = getModelWithSingleStage("Valgrind");
+      const store = createStore(model);
+      cy.mountWithStore(store, <ValgrindSettings />);
 
-    cy.get('[data-cy="missing-stdiotest-alert"]').should("be.visible");
+      cy.get('[data-cy="missing-stdiotest-alert"]').should("be.visible").and("have.attr", "data-severity", "warning");
+
+      cy.then(() => {
+        store.getActions().config.parseDiagnostics([
+          {
+            type: "MISSING_FIELD_ERROR",
+            severity: "ERROR",
+            message:
+              "field 'stdioTest' is required but is missing at [valgrind]. Valgrind stage depends on the StdioTest or Run stage",
+            field: "stdioTest",
+            details: "Valgrind stage depends on the StdioTest or Run stage",
+            location: {
+              stage: "valgrind",
+            },
+          },
+        ]);
+      });
+      cy.get('[data-cy="missing-stdiotest-alert"]').should("be.visible").and("have.attr", "data-severity", "error");
+    });
   });
 });

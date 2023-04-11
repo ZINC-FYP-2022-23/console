@@ -8,6 +8,9 @@ import { Config, Settings } from "@/types/GuiBuilder";
  *
  * After the Grader validates the config YAML, it returns a list `DiagnosticRaw` objects in the payload that
  * describes any problems found. This list will be processed and converted to {@link ConfigDiagnostics}.
+ *
+ * Note that we model any nullable fields as optional fields, since we convert all `null` values to `undefined`
+ * before parsing the raw diagnostics.
  */
 export interface DiagnosticRaw {
   /** An ID to identify the type of the diagnostic (e.g. `"MISSING_FIELD_ERROR"`). */
@@ -23,6 +26,8 @@ export interface DiagnosticRaw {
   severity: "WARNING" | "ERROR";
   /** Additional details. */
   details?: string;
+  /** The name of the problematic field. */
+  field?: string;
   /** List of YAML fields that causes the diagnostic. */
   fields?: string[];
   /** Location of the diagnostic if any. */

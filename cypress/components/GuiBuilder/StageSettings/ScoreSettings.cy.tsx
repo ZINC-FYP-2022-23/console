@@ -39,12 +39,31 @@ describe("GuiBuilder: Stage Settings - Score", () => {
     cy.get("p").contains("Min value should be smaller than Max value").should("be.visible");
   });
 
-  it("shows an alert if the pipeline does not have Grading stages", () => {
-    // In this model, the pipeline does not have Grading stages since it only has a single Score stage
-    const model = getModelWithSingleStage("Score");
-    const store = createStore(model);
-    cy.mountWithStore(store, <ScoreSettings />);
+  describe("Diagnostics", () => {
+    it("handles the pipeline does not have Grading stages", () => {
+      // In this model, the pipeline does not have Grading stages since it only has a single Score stage
+      const model = getModelWithSingleStage("Score");
+      const store = createStore(model);
+      cy.mountWithStore(store, <ScoreSettings />);
 
-    cy.get('[data-cy="no-grading-stage-alert"]').should("be.visible");
+      cy.get('[data-cy="no-grading-stage-alert"]').should("be.visible").and("have.attr", "data-severity", "warning");
+
+      cy.then(() => {
+        store.getActions().config.parseDiagnostics([
+          {
+            type: "MISSING_FIELD_ERROR",
+            message:
+              "field '<Grading Stage>' is required but is missing at [score]. Score stage must be used along with any Grading Stage",
+            severity: "ERROR",
+            details: "Score stage must be used along with any Grading Stage",
+            field: "<Grading Stage>",
+            location: {
+              stage: "score",
+            },
+          },
+        ]);
+      });
+      cy.get('[data-cy="no-grading-stage-alert"]').should("be.visible").and("have.attr", "data-severity", "error");
+    });
   });
 });
