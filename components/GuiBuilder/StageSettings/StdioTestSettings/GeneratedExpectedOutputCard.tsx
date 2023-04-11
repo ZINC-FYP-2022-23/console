@@ -21,7 +21,7 @@ function GeneratedExpectedOutputCard({ caseId }: GeneratedExpectedOutputCardProp
   const [config] = useSelectedStageConfig("StdioTest");
 
   const configId = useStoreState((state) => state.config.configId);
-  const [outputData, setOutputData] = useState<GetGeneratedFileResponse>();
+  const [outputData, setOutputData] = useState<GetGeneratedFileResponse | null>(null);
 
   const fetchGeneratedExpectedOutput = useMemo(
     () =>
