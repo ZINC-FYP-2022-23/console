@@ -59,7 +59,7 @@ export function AppealTextMessage({ message }: { message: DisplayMessageType }) 
 
   return (
     <>
-      <div className="h-4 border-l-2"></div>
+      <div className="h-8" />
       <div className={backgroundCSS}>
         <div className="flex flex-row space-x-2">
           <Icon name={name} type={type} />

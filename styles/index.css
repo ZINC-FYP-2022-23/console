@@ -16,6 +16,10 @@
     @apply hidden;
   }
 
+  .d2h-file-collapse {
+    @apply hidden;
+  }
+
   .d2h-file-name {
     @apply hidden;
   }
