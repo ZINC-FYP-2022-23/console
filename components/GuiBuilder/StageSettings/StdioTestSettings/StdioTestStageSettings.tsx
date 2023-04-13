@@ -97,21 +97,16 @@ function StdioTestStageSettings() {
           </div>
         </div>
       </div>
-      <div>
-        <p className="mb-3 flex items-center gap-2">
-          <span className="font-semibold text-lg">Experimental Features</span>
-          <span className="px-2 bg-green-500 font-semibold leading-5 text-xs text-white rounded-full">New</span>
-        </p>
-        <div id={highlightableElementIds.generateExpectedOutput} className="p-3 bg-gray-50 rounded-md drop-shadow">
-          <SwitchGroup
-            id="generate_expected_output"
-            label="Auto-generate expected output of test cases"
-            description={generateExpectedOutputDescription}
-            checked={config.generate_expected_output}
-            onChange={(value) => setConfig({ ...config, generate_expected_output: value })}
-          />
-          {config.generate_expected_output && <GeneratedExpectedOutputExtraContent />}
-        </div>
+      {/* TODO: Label this feature as "Experimental" */}
+      <div id={highlightableElementIds.generateExpectedOutput} className="p-3 bg-gray-50 rounded-md drop-shadow">
+        <SwitchGroup
+          id="generate_expected_output"
+          label="Auto-generate expected output of test cases"
+          description={generateExpectedOutputDescription}
+          checked={config.generate_expected_output}
+          onChange={(value) => setConfig({ ...config, generate_expected_output: value })}
+        />
+        {config.generate_expected_output && <GeneratedExpectedOutputExtraContent />}
       </div>
     </div>
   );
