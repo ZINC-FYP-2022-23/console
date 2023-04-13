@@ -6,19 +6,19 @@ describe("Grade Appeal: Utils", () => {
     it("status set as accept", () => {
       const originalStatus = "ACCEPTED";
       const transformedStatus = transformAppealStatus(originalStatus);
-      expect(transformedStatus).toStrictEqual(AppealStatus.Accept);
+      expect(transformedStatus).toStrictEqual(AppealStatus.ACCEPTED);
     });
 
     it("status set as pending", () => {
       const originalStatus = "PENDING";
       const transformedStatus = transformAppealStatus(originalStatus);
-      expect(transformedStatus).toStrictEqual(AppealStatus.Pending);
+      expect(transformedStatus).toStrictEqual(AppealStatus.PENDING);
     });
 
     it("status set as reject", () => {
       const originalStatus = "REJECTED";
       const transformedStatus = transformAppealStatus(originalStatus);
-      expect(transformedStatus).toStrictEqual(AppealStatus.Reject);
+      expect(transformedStatus).toStrictEqual(AppealStatus.REJECTED);
     });
   });
 
@@ -51,7 +51,7 @@ describe("Grade Appeal: Utils", () => {
           assignmentConfigId: 3,
           userId: 4,
           createdAt: "Tue Feb 05 2019 12:05:22",
-          latestStatus: AppealStatus.Accept,
+          latestStatus: AppealStatus.ACCEPTED,
           updatedAt: "Wed Feb 06 2019 17:00:02",
         },
       ]);
@@ -91,7 +91,7 @@ describe("Grade Appeal: Utils", () => {
           userId: 4,
           createdAt: "Tue Feb 05 2019 12:00:00",
           updatedAt: "Wed Feb 06 2019 13:00:00",
-          latestStatus: AppealStatus.Pending,
+          latestStatus: AppealStatus.PENDING,
         },
         {
           id: 5,
@@ -100,7 +100,7 @@ describe("Grade Appeal: Utils", () => {
           userId: 8,
           createdAt: "Thu Feb 07 2019 14:00:00",
           updatedAt: "Fri Feb 08 2019 15:00:00",
-          latestStatus: AppealStatus.Reject,
+          latestStatus: AppealStatus.REJECTED,
         },
       ]);
     });
@@ -134,7 +134,7 @@ describe("Grade Appeal: Utils", () => {
           assignmentConfigId: 3,
           userId: 4,
           createdAt: "Tue Feb 05 2019 12:05:22",
-          latestStatus: AppealStatus.Accept,
+          latestStatus: AppealStatus.ACCEPTED,
           updatedAt: "Wed Feb 06 2019 17:00:02",
         },
       ];
@@ -169,7 +169,7 @@ describe("Grade Appeal: Utils", () => {
           assignmentConfigId: 3,
           userId: 4,
           createdAt: "Tue Feb 05 2019 12:05:22",
-          latestStatus: AppealStatus.Accept,
+          latestStatus: AppealStatus.ACCEPTED,
           updatedAt: "Wed Feb 06 2019 17:00:02",
         },
       ];
@@ -249,7 +249,7 @@ describe("Grade Appeal: Utils", () => {
           assignmentConfigId: 3,
           userId: 4,
           createdAt: "Tue Feb 05 2019 12:05:22",
-          latestStatus: AppealStatus.Accept,
+          latestStatus: AppealStatus.ACCEPTED,
           updatedAt: "Wed Feb 06 2019 17:00:02",
         },
       ];
@@ -327,7 +327,7 @@ describe("Grade Appeal: Utils", () => {
           assignmentConfigId: 3,
           userId: 4,
           createdAt: "Tue Feb 05 2019 12:05:22",
-          latestStatus: AppealStatus.Accept,
+          latestStatus: AppealStatus.ACCEPTED,
           updatedAt: "Wed Feb 06 2019 17:00:02",
         },
       ];
@@ -469,7 +469,7 @@ describe("Grade Appeal: Utils", () => {
           assignmentConfigId: 7,
           userId: 8,
           createdAt: "Tue Feb 09 2019 12:05:22",
-          latestStatus: AppealStatus.Reject,
+          latestStatus: AppealStatus.REJECTED,
           updatedAt: "Wed Feb 10 2019 17:00:02",
         },
         {
@@ -478,7 +478,7 @@ describe("Grade Appeal: Utils", () => {
           assignmentConfigId: 3,
           userId: 4,
           createdAt: "Tue Feb 05 2019 12:05:22",
-          latestStatus: AppealStatus.Accept,
+          latestStatus: AppealStatus.ACCEPTED,
           updatedAt: "Wed Feb 06 2019 17:00:02",
         },
       ];
@@ -519,7 +519,7 @@ describe("Grade Appeal: Utils", () => {
           assignmentConfigId: 7,
           userId: 8,
           createdAt: "Tue Feb 09 2019 12:05:22",
-          latestStatus: AppealStatus.Reject,
+          latestStatus: AppealStatus.REJECTED,
           updatedAt: "Wed Feb 10 2019 17:00:02",
         },
         {
@@ -528,7 +528,7 @@ describe("Grade Appeal: Utils", () => {
           assignmentConfigId: 3,
           userId: 4,
           createdAt: "Tue Feb 05 2019 12:05:22",
-          latestStatus: AppealStatus.Accept,
+          latestStatus: AppealStatus.ACCEPTED,
           updatedAt: "Wed Feb 06 2019 17:00:02",
         },
       ];
@@ -614,7 +614,7 @@ describe("Grade Appeal: Utils", () => {
           assignmentConfigId: 7,
           userId: 8,
           createdAt: "Tue Feb 09 2024 12:05:22",
-          latestStatus: AppealStatus.Reject,
+          latestStatus: AppealStatus.REJECTED,
           updatedAt: "Wed Feb 10 2024 17:00:02",
         },
         {
@@ -623,7 +623,7 @@ describe("Grade Appeal: Utils", () => {
           assignmentConfigId: 3,
           userId: 4,
           createdAt: "Tue Feb 05 2019 12:05:22",
-          latestStatus: AppealStatus.Accept,
+          latestStatus: AppealStatus.ACCEPTED,
           updatedAt: "Wed Feb 06 2019 17:00:02",
         },
       ];
@@ -681,7 +681,7 @@ describe("Grade Appeal: Utils", () => {
           assignmentConfigId: 7,
           userId: 8,
           createdAt: "Tue Feb 09 2024 12:05:22",
-          latestStatus: AppealStatus.Reject,
+          latestStatus: AppealStatus.REJECTED,
           updatedAt: "Wed Feb 10 2024 17:00:02",
         },
         {
@@ -690,7 +690,7 @@ describe("Grade Appeal: Utils", () => {
           assignmentConfigId: 3,
           userId: 4,
           createdAt: "Tue Feb 05 2019 12:05:22",
-          latestStatus: AppealStatus.Accept,
+          latestStatus: AppealStatus.ACCEPTED,
           updatedAt: "Wed Feb 06 2019 17:00:02",
         },
       ];

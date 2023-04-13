@@ -55,7 +55,7 @@ export function AppealLogMessage({ log, showButton }: AppealLogMessageType) {
   }
 
   // Log component for `APPEAL_STATUS`-related log
-  if (log.type === ChangeLogTypes.APPEAL_STATUS && log.updatedState) {
+  if (log.type === ChangeLogTypes.APPEAL_STATUS && log.updatedState && log.updatedState.type === "status") {
     return (
       <>
         <div className="mx-12 h-8 border-l-2"></div>
@@ -77,13 +77,13 @@ export function AppealLogMessage({ log, showButton }: AppealLogMessageType) {
                   ...(logDate.getFullYear() !== now.getFullYear() && { year: "numeric" }),
                 })} at ${logDate.toLocaleTimeString().toLowerCase()}`}
               </span>
-              {log.updatedState === AppealStatus.Accept && (
+              {log.updatedState.status === AppealStatus.ACCEPTED && (
                 <p className="ml-2 text-sm text-green-600">Your appeal has been accepted</p>
               )}
-              {log.updatedState === AppealStatus.Reject && (
+              {log.updatedState.status === AppealStatus.REJECTED && (
                 <p className="ml-2 text-sm text-red-600">Your appeal has been rejected</p>
               )}
-              {log.updatedState === AppealStatus.Pending && (
+              {log.updatedState.status === AppealStatus.PENDING && (
                 <p className="ml-2 text-sm text-yellow-600">Your appeal has been set to pending</p>
               )}
               {log.reason && (
@@ -109,7 +109,13 @@ export function AppealLogMessage({ log, showButton }: AppealLogMessageType) {
   }
 
   // Log component for `SCORE`-related log
-  if (log.type === ChangeLogTypes.SCORE && log.updatedState) {
+  if (
+    log.type === ChangeLogTypes.SCORE &&
+    log.originalState &&
+    log.originalState.type === "score" &&
+    log.updatedState &&
+    log.updatedState.type === "score"
+  ) {
     return (
       <>
         <div className="mx-12 h-8 border-l-2"></div>
@@ -128,13 +134,13 @@ export function AppealLogMessage({ log, showButton }: AppealLogMessageType) {
                 {log.originalState && (
                   <>
                     {" from "}
-                    <span className="text-yellow-700">{log.originalState}</span>
+                    <span className="text-yellow-700">{log.originalState.score}</span>
                   </>
                 )}
                 {log.updatedState && (
                   <>
                     {" to "}
-                    <span className="text-yellow-700">{log.updatedState}</span>
+                    <span className="text-yellow-700">{log.updatedState.score}</span>
                   </>
                 )}
                 {" on"}
@@ -169,7 +175,13 @@ export function AppealLogMessage({ log, showButton }: AppealLogMessageType) {
   }
 
   // Log component for `SUBMISSION`-related log
-  if (log.type === ChangeLogTypes.SUBMISSION) {
+  if (
+    log.type === ChangeLogTypes.SUBMISSION &&
+    log.originalState &&
+    log.originalState.type === "submission" &&
+    log.updatedState &&
+    log.updatedState.type === "submission"
+  ) {
     return (
       <>
         <div className="mx-12 h-8 border-l-2"></div>
@@ -194,13 +206,13 @@ export function AppealLogMessage({ log, showButton }: AppealLogMessageType) {
               {log.originalState && (
                 <>
                   {" from "}
-                  <span className="text-yellow-700">{log.originalState}</span>
+                  <span className="text-yellow-700">{log.originalState.submission}</span>
                 </>
               )}
               {log.updatedState && (
                 <>
                   {" to "}
-                  <span className="text-yellow-700">{log.updatedState}</span>
+                  <span className="text-yellow-700">{log.updatedState.submission}</span>
                 </>
               )}
             </p>

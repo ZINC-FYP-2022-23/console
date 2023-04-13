@@ -51,7 +51,7 @@ const columns: ColumnDef<AppealTableType, any>[] = [
     cell: (props) => <AppealStatusBadge status={props.getValue()} />,
     sortingFn: (rowA, rowB, columnId) => {
       /** Sort status according to their orders of appearence in this array */
-      const statusSortOrder = [AppealStatus.Pending, AppealStatus.Accept, AppealStatus.Reject] as const;
+      const statusSortOrder = [AppealStatus.PENDING, AppealStatus.ACCEPTED, AppealStatus.REJECTED] as const;
 
       const rowAStatus: AppealStatus = rowA.getValue(columnId);
       const rowBStatus: AppealStatus = rowB.getValue(columnId);
@@ -134,7 +134,7 @@ interface getScoreProps {
  * Gets the latest score based on the following logic:
  * @returns {number}
  */
-function getScore({ appeals, changeLogs, submissions }: getScoreProps) {
+function getScore({ appeals, changeLogs, submissions }: getScoreProps): number | undefined {
   /* *** Logic of how to get the score: ***
    * If the `updatedAt` of the latest `ACCEPTED` appeal later than the date of any `SCORE` change:
    *    If `newFileSubmission` is available, >>>  use the score of the `newFileSubmission`.
@@ -147,7 +147,7 @@ function getScore({ appeals, changeLogs, submissions }: getScoreProps) {
 
   const acceptedAppeals: Appeal[] = appeals.filter((e) => e.status === "ACCEPTED");
   let acceptedAppealDate: Date | null = null;
-  let acceptedAppealScore: number | null = null;
+  let acceptedAppealScore: number | undefined = undefined;
 
   // Get the latest `ACCEPTED` appeal with a new score generated
   for (let i = 0; i < acceptedAppeals.length; i++) {
@@ -176,21 +176,7 @@ function getScore({ appeals, changeLogs, submissions }: getScoreProps) {
   }
 
   // If above fails, get the original submission score
-  for (let i = 0; i < submissions.length; i++) {
-    let isNewFileSubmission: boolean = false;
-
-    // Do not pick the submission that is related to the appeal
-    for (let j = 0; j < appeals.length; j++) {
-      if (submissions[i].id === appeals[j].newFileSubmissionId) {
-        isNewFileSubmission = true;
-        break;
-      }
-    }
-
-    if (!isNewFileSubmission && submissions[i].reports.length > 0 && submissions[i].reports[0].grade.score) {
-      return submissions[i].reports[0].grade.score;
-    }
-  }
+  return submissions.filter((e) => !e.isAppeal && e.reports.length > 0)[0].reports[0].grade.score;
 }
 
 interface AppealsTableProps {
@@ -231,20 +217,14 @@ function AppealsTable({ assignmentConfigId }: AppealsTableProps) {
       let status: AppealStatus = transformAppealStatus(appeal.status);
 
       // Get the Original Score
-      let originalScore: number = -1;
-      for (let i = 0; i < appeal.user.submissions.length; i++) {
-        // Do not pick the submission that is related to the appeal
-        if (appeal.user.submissions[i].id != appeal.newFileSubmissionId) {
-          originalScore = appeal.user.submissions[i].reports[0].grade.score;
-          break;
-        }
-      }
+      const originalScore: number = submissionsData!.submissions.filter((e) => !e.isAppeal && e.reports.length > 0)[0]
+        .reports[0].grade.score;
 
       // Get the Final Score
       const userAppeals: Appeal[] = appealsDetailsData.appeals
         .filter((a) => a.userId === appeal.userId)
         .slice(appealIndex);
-      const userChangeLogs: ChangeLog[] = appeal.user.change_logs.filter((c) => c.appealId === appeal.id);
+      const userChangeLogs: ChangeLog[] = appeal.user.changeLogsByUserId.filter((c) => c.appealId === appeal.id);
       const userSubmissions: SubmissionType[] = submissionsData.submissions.filter((s) => s.user_id === appeal.userId);
       const finalScore = getScore({
         appeals: userAppeals,

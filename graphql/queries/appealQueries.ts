@@ -33,7 +33,7 @@ export const GET_APPEALS_DETAILS_BY_ASSIGNMENT_ID = gql`
             grade
           }
         }
-        change_logs(where: { assignmentConfigId: { _eq: $assignmentConfigId } }, order_by: { createdAt: desc }) {
+        changeLogsByUserId(where: { assignmentConfigId: { _eq: $assignmentConfigId } }, order_by: { createdAt: desc }) {
           id
           appealId
           assignmentConfigId
@@ -92,7 +92,7 @@ export const GET_APPEAL_DETAILS_BY_APPEAL_ID = gql`
     appeal(id: $appealId) {
       id
       assignmentConfigId
-      assignment_config {
+      assignmentConfig {
         assignment {
           course_id
           id
@@ -162,6 +162,7 @@ export const GET_SUBMISSIONS_BY_ASSIGNMENT_AND_USER_ID = gql`
       order_by: { created_at: desc }
     ) {
       id
+      isAppeal
       assignment_config_id
       reports(order_by: { createdAt: desc }, limit: 1) {
         id
@@ -176,7 +177,7 @@ export const GET_IDS_BY_APPEAL_ID = gql`
     appeal(id: $appealId) {
       id
       assignmentConfigId
-      assignment_config {
+      assignmentConfig {
         id
         assignment {
           id
@@ -212,3 +213,75 @@ export const GET_APPEALS_BY_USER_ID_AND_ASSIGNMENT_ID = gql`
   }
 `;
 /* End of Queries used in `Appeal Details Page` */
+
+// Query used for Gradebook (grades.ts)
+export const GET_GRADEBOOK_DATA = gql`
+  query getSubmissionsForAssignmentConfig($id: bigint!) {
+    assignmentConfig(id: $id) {
+      dueAt
+      assignment {
+        name
+      }
+      submissions(
+        distinct_on: [user_id]
+        order_by: [{ user_id: asc }, { created_at: desc }]
+        where: { isAppeal: { _eq: false } }
+      ) {
+        id
+        isLate
+        created_at
+        reports(limit: 1, order_by: { createdAt: desc }) {
+          grade
+        }
+        user {
+          itsc
+          name
+        }
+      }
+      assignmentAppeals(
+        distinct_on: [userId]
+        where: { status: { _eq: "ACCEPTED" }, newFileSubmissionId: { _is_null: false } }
+        order_by: [{ userId: asc }, { updatedAt: desc }]
+      ) {
+        submission {
+          reports(limit: 1, order_by: { createdAt: desc }) {
+            grade
+          }
+          id
+        }
+        updatedAt
+        user {
+          itsc
+        }
+      }
+    }
+    changeLogs(
+      distinct_on: [userId]
+      order_by: [{ userId: asc }, { createdAt: desc }]
+      where: { type: { _eq: "SCORE" }, assignmentConfigId: { _eq: $id } }
+    ) {
+      createdAt
+      updatedState
+      user {
+        itsc
+      }
+    }
+  }
+`;
+
+// Validation data for sending appeal messages
+export const GET_APPEAL_MESSAGE_VALIDATION_DATA = gql`
+  query getAppealMessageValidationData($appealId: bigint!, $senderId: bigint!) {
+    appeal(id: $appealId) {
+      createdAt
+      assignmentConfig {
+        appealStartAt
+        isAppealStudentReplyAllowed
+        isAppealAllowed
+      }
+    }
+    user(id: $senderId) {
+      isAdmin
+    }
+  }
+`;

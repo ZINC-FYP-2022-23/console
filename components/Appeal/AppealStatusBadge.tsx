@@ -6,9 +6,9 @@ interface AppealStatusBadgeProps {
 }
 
 const badgeColor = {
-  [AppealStatus.Pending]: "bg-blue-100 text-blue-800",
-  [AppealStatus.Accept]: "bg-green-100 text-green-800",
-  [AppealStatus.Reject]: "bg-red-100 text-red-800",
+  [AppealStatus.PENDING]: "bg-blue-100 text-blue-800",
+  [AppealStatus.ACCEPTED]: "bg-green-100 text-green-800",
+  [AppealStatus.REJECTED]: "bg-red-100 text-red-800",
 };
 
 /**

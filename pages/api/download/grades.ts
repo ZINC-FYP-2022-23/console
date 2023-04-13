@@ -3,6 +3,7 @@ import { withSentry } from "@sentry/nextjs";
 import axios from "axios";
 import { Workbook } from "exceljs";
 import { utcToZonedTime } from "date-fns-tz";
+import { GET_GRADEBOOK_DATA } from "@/graphql/queries/appealQueries";
 
 // Helper function to determine final score from appeals and manual TA changes
 export const finalScore = (submission, report, assignment_appeals: any[], changeLogs: any[]) => {
@@ -62,89 +63,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
        *   - Returns the latest SCORE change for each student
        */
       data: {
-        query: `
-          query getSubmissionsForAssignmentConfig($id: bigint!) {
-            assignmentConfig(id: $id) {
-              dueAt
-              assignment {
-                name
-              }
-              submissions(
-                distinct_on: [user_id]
-                order_by: [
-                  { user_id: asc }
-                  { created_at: desc }
-                ]
-                where: {
-                  isAppeal: { _eq: false }
-                }
-              ) {
-                id
-                isLate
-                created_at
-                reports(
-                  limit: 1
-                  order_by: {
-                    createdAt: desc
-                  }
-                ) {
-                  grade
-                }
-                user {
-                  itsc
-                  name
-                }
-              }
-              assignment_appeals(
-                limit: 1
-                where: {
-                  status: { _eq: "ACCEPTED" }
-                  newFileSubmissionId: {_is_null: false}
-                }
-                order_by: {
-                  userId: asc
-                  updatedAt: desc
-                }
-              ) {
-                submission {
-                  reports(
-                    limit: 1
-                    order_by: {
-                      createdAt: desc
-                    }
-                  ) {
-                    grade
-                  }
-                  id
-                }
-                updatedAt
-                user {
-                  itsc
-                }
-              }
-            }
-            changeLogs(
-              order_by: {
-                createdAt: desc
-                userId: asc_nulls_first
-              }
-              where: {
-                type: { _eq: "SCORE" }
-                assignmentConfigId: { _eq: $id }
-              }
-            ) {
-              createdAt
-              updatedState
-              user {
-                itsc
-              }
-            }
-          }
-        `,
+        query: GET_GRADEBOOK_DATA.loc?.source.body,
         variables: { id: assignmentConfigId },
       },
     });
-    const { assignment, submissions, dueAt, assignment_appeals } = data.assignmentConfig;
+    const { assignment, submissions, dueAt, assignmentAppeals } = data.assignmentConfig;
     const changeLogs = data.changeLogs;
 
     // Create new Excel workbook
@@ -196,7 +119,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
             final_score: finalScore(
               submission,
               report,
-              assignment_appeals.filter((e) => e.user.itsc === itsc),
+              assignmentAppeals.filter((e) => e.user.itsc === itsc),
               changeLogs.filter((e) => e?.user.itsc === itsc),
             ),
             ...subgradeReports,
@@ -212,7 +135,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
             final_score: finalScore(
               submission,
               report,
-              assignment_appeals.filter((e) => e.user.itsc === itsc),
+              assignmentAppeals.filter((e) => e.user.itsc === itsc),
               changeLogs.filter((e) => e?.user.itsc === itsc),
             ),
           });

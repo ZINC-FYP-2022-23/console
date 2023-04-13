@@ -4,6 +4,7 @@
 
 import { NumberInputStylesNames } from "@mantine/core";
 import { GraderReport, ScoreReports } from "./report";
+import { ChangeLogState } from "./appeal";
 
 export type AppealMessage = {
   id: number;
@@ -12,7 +13,7 @@ export type AppealMessage = {
   appealId: number;
   createdAt: string;
   isRead: boolean;
-  assignment_appeal: Appeal;
+  assignmentAppeal: Appeal;
   user: User;
 };
 
@@ -24,8 +25,8 @@ export type Appeal = {
   updatedAt: string | null;
   userId: number;
   assignmentConfigId: number;
-  assignment_appeal_messages: AppealMessage[];
-  assignment_config: AssignmentConfig;
+  assignmentAppealMessages: AppealMessage[];
+  assignmentConfig: AssignmentConfig;
   submission: Submission;
   user: User;
 };
@@ -75,7 +76,7 @@ export type AssignmentConfig = {
   appealStopAt: string | null;
   isAppealStudentReplyAllowed: boolean;
   isAppealViewReportAllowed: boolean;
-  assignment_appeals: Appeal[];
+  assignmentAppeals: Appeal[];
 };
 
 export type AssignmentConfigUser = {
@@ -100,9 +101,9 @@ export type ChangeLog = {
   id: number;
   createdAt: string;
   type: string;
-  originalState: string;
-  updatedState: string;
-  initiated_by: number;
+  originalState: ChangeLogState;
+  updatedState: ChangeLogState;
+  initiatedBy: number;
   reason: string;
   appealId: number;
   userId: number;
@@ -210,6 +211,7 @@ export type Submission = {
   extracted_path: string | null;
   fail_reason: string | null;
   id: number;
+  isAppeal: boolean;
   isLate: boolean;
   remarks: object | null;
   reports: Report[];
@@ -234,5 +236,5 @@ export type User = {
   sections: SectionUser[];
   submissions: Submission[];
   updatedAt: string;
-  change_logs: ChangeLog[];
+  changeLogsByUserId: ChangeLog[];
 };

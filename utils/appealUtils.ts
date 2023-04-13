@@ -1,25 +1,33 @@
 import { Submission as SubmissionType } from "types";
-import { AppealAttempt, AppealLog, DisplayMessageType, ChangeLog, ChangeLogTypes, AppealStatus } from "@/types/appeal";
+import {
+  AppealAttempt,
+  AppealLog,
+  DisplayMessageType,
+  ChangeLog,
+  ChangeLogTypes,
+  AppealStatus,
+  ChangeLogState,
+} from "@/types/appeal";
 
 /**
  * Transform the raw data appeal status into type `AppealStatus`
  * @param originalStatus - The status to be transformed
  * @returns {AppealStatus}
  */
-export function transformAppealStatus(originalStatus) {
+export function transformAppealStatus(originalStatus: string): AppealStatus {
   let transformedStatus: AppealStatus;
   switch (originalStatus) {
     case "ACCEPTED":
-      transformedStatus = AppealStatus.Accept;
+      transformedStatus = AppealStatus.ACCEPTED;
       break;
     case "PENDING":
-      transformedStatus = AppealStatus.Pending;
+      transformedStatus = AppealStatus.PENDING;
       break;
     case "REJECTED":
-      transformedStatus = AppealStatus.Reject;
+      transformedStatus = AppealStatus.REJECTED;
       break;
     default:
-      transformedStatus = AppealStatus.Pending;
+      transformedStatus = AppealStatus.PENDING;
   }
 
   return transformedStatus;
@@ -125,33 +133,26 @@ function sort({ submissions, messages, appealLog }: sortProps) {
 
 interface transformStateType {
   type: ChangeLogTypes | "APPEAL_SUBMISSION"; // Type of the log
-  state: string; // JSON string to be transformed
+  state: ChangeLogState; // JSON string to be transformed
 }
 
 /**
- * Transforms a JSON string
+ * Transforms a JSON object of type ChangeLogState
  * @returns {AppealStatus | string} - The new transformed state
  */
 function transformState({ type, state }: transformStateType) {
-  if (type === ChangeLogTypes.APPEAL_STATUS) {
-    if (state === "[{'status':ACCEPTED}]") {
-      return AppealStatus.Accept;
-    } else if (state === "[{'status':REJECTED}]") {
-      return AppealStatus.Reject;
-    } else if (state === "[{'status':PENDING}]") {
-      return AppealStatus.Pending;
-    } else {
-      return "Error: Appeal Status is unknown: " + state;
+  if (type === ChangeLogTypes.APPEAL_STATUS && state.type === "status") {
+    if (state.status === "ACCEPTED") {
+      return AppealStatus.ACCEPTED;
+    } else if (state.status === "REJECTED") {
+      return AppealStatus.REJECTED;
+    } else if (state.status === "PENDING") {
+      return AppealStatus.PENDING;
     }
   }
 
-  if (type === ChangeLogTypes.SCORE) {
-    let score = state.match(/(\d+)/);
-    if (score && score[0]) {
-      return score[0].toString();
-    } else {
-      return "Error: Score change is unknown: " + state;
-    }
+  if (type === ChangeLogTypes.SCORE && state.type === "score") {
+    return state.score;
   }
 
   return state;
@@ -178,15 +179,12 @@ function transformToAppealLog({ appeals, changeLog }: transformToAppealLogProps)
   });
 
   changeLog.forEach((log) => {
-    let originalState: AppealStatus | string = transformState({ type: log.type, state: log.originalState });
-    let updatedStatus: AppealStatus | string = transformState({ type: log.type, state: log.updatedState });
-
     appealLog.push({
       id: log.id,
       type: log.type,
       date: log.createdAt,
-      originalState: originalState,
-      updatedState: updatedStatus,
+      originalState: log.originalState,
+      updatedState: log.updatedState,
       reason: log.reason,
     });
   });
@@ -230,8 +228,8 @@ export function mergeDataToActivityLogList({
   appealChangeLogData.changeLogs.forEach((log) => {
     // Assign a log type for each change log
     let logType: ChangeLogTypes;
-    if (log.type == "APPEAL_STATUS") logType = ChangeLogTypes.APPEAL_STATUS;
-    else if (log.type == "SCORE") logType = ChangeLogTypes.SCORE;
+    if (log.type === "APPEAL_STATUS") logType = ChangeLogTypes.APPEAL_STATUS;
+    else if (log.type === "SCORE") logType = ChangeLogTypes.SCORE;
     else logType = ChangeLogTypes.SUBMISSION;
 
     changeLogs.push({
@@ -243,6 +241,8 @@ export function mergeDataToActivityLogList({
       initiatedBy: log.initiatedBy,
       reason: log.reason,
       appealId: log.appealId || null,
+      userId: log.userId,
+      assignmentConfigId: log.assignmentConfigId,
     });
   });
 
@@ -278,4 +278,13 @@ export function mergeDataToActivityLogList({
   });
 
   return activityLogList;
+}
+
+// Check whether RichTextEditor HTML string will render to become whitespace
+// Reference: https://stackoverflow.com/questions/44675983/how-to-detect-whether-html-content-when-rendered-is-blank-whitespace
+export function isInputEmpty(html: string) {
+  const visible = ["img", "iframe", "object", "hr", "audio", "video", "form", "button", "input", "select", "textarea"];
+  const container = document.createElement("div");
+  container.innerHTML = html;
+  return !(container.innerText.trim().length > 0 || container.querySelector(visible.join(",")));
 }
