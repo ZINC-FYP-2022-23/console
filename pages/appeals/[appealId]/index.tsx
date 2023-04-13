@@ -837,8 +837,9 @@ function getScore({ appeals, changeLogs, submissions }: getScoreProps) {
 
 interface AppealDetailsProps {
   appealId: number;
-  /** The user ID of the student who submitted the appeal. */
+  /** The user ID of the teaching assistant. */
   userId: number;
+  /** The user ID of the student who submitted the appeal. */
   studentId: number;
   /** Course ID that the appeal is related to. */
   courseId: number;
@@ -1026,6 +1027,7 @@ function AppealDetails({
 export const getServerSideProps: GetServerSideProps = async ({ req, query }) => {
   const apolloClient = initializeApollo(req.headers.cookie!);
   const appealId = parseInt(query.appealId as string);
+  const userId = parseInt(req.cookies.user);
 
   // Fetch data via GraphQL
   const { data: idData } = await apolloClient.query<{ appeal: Appeal }>({
@@ -1034,15 +1036,14 @@ export const getServerSideProps: GetServerSideProps = async ({ req, query }) => 
       appealId: appealId,
     },
   });
-  const studentUserId = idData.appeal.userId;
+  const studentId = idData.appeal.userId;
   const { data: submissionsData } = await apolloClient.query<{ submissions: SubmissionType[] }>({
     query: GET_SUBMISSIONS_BY_ASSIGNMENT_AND_USER_ID,
-    variables: { assignmentConfigId: idData.appeal.assignmentConfigId, userId: studentUserId },
+    variables: { assignmentConfigId: idData.appeal.assignmentConfigId, userId: studentId },
   });
 
   // Get Ids
   const assignmentConfigId: number = idData.appeal.assignmentConfigId;
-  const studentId: number = idData.appeal.userId;
   const newSubmissionId: number = idData.appeal.newFileSubmissionId || -1;
   const oldSubmissionId: number = submissionsData.submissions.filter((e) => !e.isAppeal)[0].id;
 
@@ -1069,7 +1070,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, query }) => 
     props: {
       initialApolloState: apolloClient.cache.extract(),
       appealId,
-      userId: studentUserId,
+      userId,
       studentId,
       assignmentConfigId,
       diffSubmissionsData,

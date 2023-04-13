@@ -171,7 +171,7 @@ function getScore({ appeals, changeLogs, submissions }: getScoreProps): number |
     }
 
     if (changeLogs[i].type === "SCORE") {
-      return parseInt(changeLogs[i].updatedState.replace(/[^0-9]/g, ""));
+      return changeLogs[i].updatedState["score"];
     }
   }
 
