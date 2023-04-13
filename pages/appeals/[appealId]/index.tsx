@@ -347,7 +347,7 @@ function ChangeAppealStatus({ submissionId, appealAttempt }: ChangeAppealStatusP
       <br />
       <div className="flex-row w-full grid grid-cols-3 gap-x-5 place-items-center">
         {/* Accept Button */}
-        <a
+        <button
           className={`${appealAcceptButton} w-full px-3 py-1.5 border text-center border-gray-300 text-sm leading-4 font-medium rounded-lg focus:outline-none`}
           onClick={() => {
             if (latestStatus !== AppealStatus.ACCEPTED) {
@@ -368,9 +368,9 @@ function ChangeAppealStatus({ submissionId, appealAttempt }: ChangeAppealStatusP
             <div className="px-auto" />
             <span>Accept</span>
           </div>
-        </a>
+        </button>
         {/* Pending Button */}
-        <a
+        <button
           className={`${appealPendingButton} w-full px-3 py-1.5 border text-center border-gray-300 text-sm leading-4 font-medium rounded-lg focus:outline-none`}
           onClick={() => {
             if (latestStatus !== AppealStatus.PENDING) {
@@ -391,9 +391,9 @@ function ChangeAppealStatus({ submissionId, appealAttempt }: ChangeAppealStatusP
             <div className="px-auto" />
             <span>Pending</span>
           </div>
-        </a>
+        </button>
         {/* Reject Button */}
-        <a
+        <button
           className={`${appealRejectButton} w-full px-3 py-1.5 border text-center border-gray-300 text-sm leading-4 font-medium rounded-lg focus:outline-none`}
           onClick={() => {
             if (latestStatus !== AppealStatus.REJECTED) {
@@ -414,7 +414,7 @@ function ChangeAppealStatus({ submissionId, appealAttempt }: ChangeAppealStatusP
             <div className="px-auto" />
             <span>Reject</span>
           </div>
-        </a>
+        </button>
       </div>
     </div>
   );
@@ -472,7 +472,7 @@ function ChangeScore({ submissionId, appealAttempt, oldScore, maxScore }: Change
       />
       <div className="h-1.5" />
       <div className="flex w-full justify-center">
-        <a
+        <button
           className={`bg-white text-blue-700 hover:text-blue-500 focus:border-blue-300 focus:shadow-outline-blue active:text-blue-800 active:bg-gray-50 transition ease-in-out duration-150 w-full px-3 py-1.5 border text-center border-gray-300 text-sm leading-4 font-medium rounded-lg focus:outline-none`}
           onClick={() => {
             if (newScore === oldScore) {
@@ -502,7 +502,7 @@ function ChangeScore({ submissionId, appealAttempt, oldScore, maxScore }: Change
             <div className="px-auto" />
             <span>Update</span>
           </div>
-        </a>
+        </button>
       </div>
     </div>
   );
@@ -813,7 +813,7 @@ function getScore({ appeals, changeLogs, submissions }: getScoreProps) {
     }
 
     if (changeLogs[i].type === "SCORE") {
-      return parseInt(changeLogs[i].updatedState.replace(/[^0-9]/g, ""));
+      return changeLogs[i].updatedState["score"];
     }
   }
 
@@ -837,9 +837,11 @@ function getScore({ appeals, changeLogs, submissions }: getScoreProps) {
 
 interface AppealDetailsProps {
   appealId: number;
+  /** The user ID of the student who submitted the appeal. */
   userId: number;
   studentId: number;
-  courseId: number; // The course ID that the appeal is related to
+  /** Course ID that the appeal is related to. */
+  courseId: number;
   submissionId: number;
   assignmentConfigId: number;
   diffSubmissionsData: DiffSubmissionsData;
@@ -1023,7 +1025,6 @@ function AppealDetails({
 
 export const getServerSideProps: GetServerSideProps = async ({ req, query }) => {
   const apolloClient = initializeApollo(req.headers.cookie!);
-  const userId = parseInt(req.cookies.user);
   const appealId = parseInt(query.appealId as string);
 
   // Fetch data via GraphQL
@@ -1033,9 +1034,10 @@ export const getServerSideProps: GetServerSideProps = async ({ req, query }) => 
       appealId: appealId,
     },
   });
+  const studentUserId = idData.appeal.userId;
   const { data: submissionsData } = await apolloClient.query<{ submissions: SubmissionType[] }>({
     query: GET_SUBMISSIONS_BY_ASSIGNMENT_AND_USER_ID,
-    variables: { assignmentConfigId: idData.appeal.assignmentConfigId, userId },
+    variables: { assignmentConfigId: idData.appeal.assignmentConfigId, userId: studentUserId },
   });
 
   // Get Ids
@@ -1067,7 +1069,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, query }) => 
     props: {
       initialApolloState: apolloClient.cache.extract(),
       appealId,
-      userId,
+      userId: studentUserId,
       studentId,
       assignmentConfigId,
       diffSubmissionsData,

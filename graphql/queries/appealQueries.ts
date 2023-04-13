@@ -82,6 +82,7 @@ export const GET_SUBMISSIONS_BY_ASSIGNMENT_ID = gql`
       isLate
       remarks
       user_id
+      isAppeal
     }
   }
 `;
