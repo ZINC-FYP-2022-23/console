@@ -22,7 +22,7 @@ function StdioTestSettings() {
       <div className="h-full py-20 flex flex-col items-center gap-5">
         <p className="text-lg text-gray-500">To edit the stage settings, press the button below.</p>
         <Button
-          className="bg-cse-700 text-white text-lg hover:bg-cse-500"
+          className="bg-cse-600 text-white text-lg hover:bg-cse-700"
           icon={<FontAwesomeIcon icon={["far", "arrow-up-right-from-square"]} />}
           onClick={() => setModalOpened(true)}
         >

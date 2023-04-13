@@ -20,7 +20,7 @@ function FormatPipelineButton() {
   return (
     <Tooltip label="Layout the graph nicely" position="bottom" transition="fade" transitionDuration={200}>
       <button
-        className="h-11 w-11 flex items-center justify-center bg-cse-600 text-white rounded-full drop-shadow active:bg-cse-300 transition"
+        className="h-11 w-11 flex items-center justify-center bg-cse-600 text-white rounded-full drop-shadow hover:bg-cse-700 transition"
         onClick={() => layoutPipeline()}
       >
         <FontAwesomeIcon icon={["fad", "wand-magic-sparkles"]} className="text-xl" />

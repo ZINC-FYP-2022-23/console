@@ -89,14 +89,14 @@ function FinishedAllStepsModal() {
             />
           </div>
           <Link href={`/api/download/configs/${configId}`}>
-            <a className="mt-1 px-4 py-1 flex items-center justify-center bg-blue-100 border border-transparent font-medium rounded-md text-blue-700 transition ease-in-out duration-150 hover:bg-blue-200">
+            <a className="mt-1 px-4 py-1 flex items-center justify-center border border-cse-600 font-medium rounded-md text-cse-700 transition ease-in-out duration-150 hover:bg-blue-100">
               <FontAwesomeIcon icon={["far", "file-export"]} className="mr-3" />
               <span>Export Config as YAML</span>
             </a>
           </Link>
         </div>
         <div className="w-full mt-2 flex flex-col gap-2">
-          <Button onClick={() => closeModal("/assignments")} className="bg-indigo-600 text-white hover:bg-indigo-700">
+          <Button onClick={() => closeModal("/assignments")} className="bg-cse-600 text-white hover:bg-cse-700">
             Back to Assignments Page
           </Button>
           <Button onClick={() => closeModal()} className="bg-gray-200 text-gray-700 hover:bg-gray-300">

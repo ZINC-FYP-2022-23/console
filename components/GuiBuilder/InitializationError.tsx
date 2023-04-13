@@ -37,14 +37,14 @@ function InitializationError({ error }: InitializationErrorProps) {
       </div>
       <div className="flex items-center gap-4">
         <Link href={`/assignments/${assignmentId}/configs/${assignmentConfigId}/yaml`}>
-          <a className="px-4 py-1 flex items-center justify-center bg-cse-500 border border-transparent font-medium rounded-md text-white transition ease-in-out duration-150 hover:bg-cse-600">
+          <a className="px-4 py-1 flex items-center justify-center bg-cse-600 border border-transparent font-medium rounded-md text-white transition ease-in-out duration-150 hover:bg-cse-700">
             <FontAwesomeIcon icon={["far", "code"]} className="mr-3" />
             <span>Edit in YAML Editor Mode</span>
           </a>
         </Link>
         <a
           href="mailto:support@zinc.cse.ust.hk"
-          className="inline-flex items-center px-4 py-1 border border-transparent font-medium rounded-md text-cse-700 bg-blue-100 hover:bg-blue-50 focus:outline-none focus:border-cse-700 focus:shadow-outline-indigo active:bg-blue-200 transition ease-in-out duration-150"
+          className="inline-flex items-center px-4 py-1 border border-cse-600 font-medium rounded-md text-cse-700 hover:bg-blue-100 focus:outline-none focus:border-cse-700 focus:shadow-outline-indigo transition ease-in-out duration-150"
         >
           <FontAwesomeIcon icon={["fas", "envelope"]} className="mr-3" />
           <span>Contact Us</span>
