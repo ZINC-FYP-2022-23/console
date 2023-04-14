@@ -1,8 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import axios from "axios";
-import { utcToZonedTime, zonedTimeToUtc } from "date-fns-tz";
+import { zonedTimeToUtc } from "date-fns-tz";
 import { CREATE_APPEAL_MESSAGE } from "@/graphql/mutations/appealMutations";
 import { GET_APPEAL_MESSAGE_VALIDATION_DATA } from "@/graphql/queries/appealQueries";
+import { getLocalDateFromString } from "@/utils/date";
 
 async function handlePostAppealMessage(req: NextApiRequest, res: NextApiResponse) {
   const body = req.body;
@@ -44,11 +45,8 @@ async function handlePostAppealMessage(req: NextApiRequest, res: NextApiResponse
         error: "Appeal period not configured.",
       });
     }
-    const appealStartAt: Date = utcToZonedTime(
-      appealMessageValidationData.appeal.assignmentConfig.appealStartAt,
-      "Asia/Hong_Kong",
-    );
-    if (now.getTime() < appealStartAt.getTime()) {
+    const appealStartAt = getLocalDateFromString(appealMessageValidationData.appeal.assignmentConfig.appealStartAt);
+    if (appealStartAt && now < appealStartAt) {
       return res.status(403).json({
         status: "error",
         error: "Should not send appeal messages before appeal period.",
@@ -56,8 +54,8 @@ async function handlePostAppealMessage(req: NextApiRequest, res: NextApiResponse
     }
 
     // Appeal message cannot be sent before the corresponding appeal attempt
-    const appealCreatedAt: Date = utcToZonedTime(appealMessageValidationData.appeal.createdAt, "Asia/Hong_Kong");
-    if (now.getTime() < appealCreatedAt.getTime()) {
+    const appealCreatedAt = getLocalDateFromString(appealMessageValidationData.appeal.createdAt);
+    if (appealCreatedAt && now < appealCreatedAt) {
       return res.status(403).json({
         status: "error",
         error: "Should not send appeal messages before appeal time.",
