@@ -49,5 +49,13 @@ describe("GuiBuilder: Upload Files step", () => {
       cy.get('button[data-cy="next-step"]').click();
       cy.url().should("include", "step=test");
     });
+
+    it("moves to Generate Output step if auto-generate expected output is enabled", () => {
+      cy.addMockHandlers("cppConfigAutogen");
+      cy.visit("/assignments/1/configs/1/gui?step=upload");
+
+      cy.get('button[data-cy="next-step"]').click();
+      cy.url().should("include", "step=generate-output");
+    });
   });
 });

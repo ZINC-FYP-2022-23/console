@@ -2,7 +2,7 @@ import Button from "@/components/Button";
 import { Spinner } from "@/components/Spinner";
 import { useQueryParameters, useSave } from "@/hooks/GuiBuilder";
 import { useStoreActions, useStoreState } from "@/store/GuiBuilder";
-import { getNextStepSlug } from "@/utils/GuiBuilder";
+import guiBuilderSteps from "./GuiBuilderSteps";
 
 const SavingSpinner = <Spinner className="w-7 h-7 p-1" />;
 
@@ -14,9 +14,16 @@ function NextStepButton() {
   const { isSaving, saveData } = useSave();
 
   const currentStep = useStoreState((state) => state.layout.step);
+  const stageData = useStoreState((state) => state.config.editingConfig.stageData);
   const setModal = useStoreActions((actions) => actions.layout.setModal);
 
-  const nextStep = getNextStepSlug(currentStep);
+  const nextStep = (() => {
+    const stepsToShow = guiBuilderSteps.filter((step) => {
+      return step.showStep === undefined || step.showStep(stageData);
+    });
+    const currentIdx = stepsToShow.findIndex((step) => step.slug === currentStep);
+    return currentIdx === stepsToShow.length - 1 ? null : stepsToShow[currentIdx + 1].slug;
+  })();
 
   const handleClick = async () => {
     const shouldProceedNextStep = await saveData();

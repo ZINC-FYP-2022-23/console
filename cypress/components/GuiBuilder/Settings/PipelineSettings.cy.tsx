@@ -21,6 +21,7 @@ describe("GuiBuilder - <PipelineSettings />", () => {
 
     // Helper Files
     cy.get("#use_skeleton").click();
+    cy.get("#use_generated").click();
     cy.clickSelectInput("#use_template", "None");
 
     // Stage Settings
@@ -36,6 +37,7 @@ describe("GuiBuilder - <PipelineSettings />", () => {
         lang: "cpp/g++:8",
         use_skeleton: true,
         use_provided: true,
+        use_generated: true,
         use_template: undefined,
         early_return_on_throw: false,
         stage_wait_duration_secs: 10,

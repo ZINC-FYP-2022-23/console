@@ -302,6 +302,7 @@ export const SUBMISSION_SUBSCRIPTION = gql`
       reports(order_by: [{ createdAt: desc }]) {
         id
         is_final
+        is_test
         createdAt
       }
     }

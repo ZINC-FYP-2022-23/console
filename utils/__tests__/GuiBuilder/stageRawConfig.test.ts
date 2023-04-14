@@ -288,6 +288,8 @@ describe("GuiBuilder: Raw stage configs conversion", () => {
           diff_ignore_flags: [],
           additional_packages: [],
           additional_pip_packages: [],
+          experimentalModularize: false,
+          generate_expected_output: false,
         });
         const outputTestCaseIds = configRaw.testCases.map((testCase: TestCaseRaw) => testCase.id);
         expect(outputTestCaseIds).toEqual([1, 2, 3]);
@@ -311,9 +313,50 @@ describe("GuiBuilder: Raw stage configs conversion", () => {
           diff_ignore_flags: [],
           additional_packages: [],
           additional_pip_packages: [],
+          experimentalModularize: false,
+          generate_expected_output: false,
         });
         expect(testCaseToRawMock).toHaveBeenCalledTimes(1);
         expect(testCaseToRawMock).toHaveBeenNthCalledWith(1, testCases[0]);
+      });
+
+      test("`generate_expected_output` is true", () => {
+        const testCases: TestCase[] = [
+          {
+            id: 1,
+            file: "a.out",
+            visibility: "ALWAYS_VISIBLE",
+            score: 5,
+            _stdinInputMode: "none",
+            _expectedInputMode: "text",
+            expected: "Hello World",
+            file_expected: "1.txt",
+            _valgrindOverride: false,
+          },
+        ];
+        const baseConfig: Omit<StdioTest, "experimentalModularize" | "generate_expected_output"> = {
+          testCases,
+          diff_ignore_flags: [],
+          additional_packages: [],
+          additional_pip_packages: [],
+        };
+
+        const configRawWithGenerate = convertConfigToRaw<StdioTest, StdioTestRaw>("StdioTest", {
+          ...baseConfig,
+          experimentalModularize: false,
+          generate_expected_output: true,
+        });
+        expect(configRawWithGenerate.experimentalModularize).toBe(true);
+        expect(configRawWithGenerate.testCases[0].expected).toBeUndefined();
+        expect(configRawWithGenerate.testCases[0].file_expected).toBeUndefined();
+
+        const configRawWithoutGenerate = convertConfigToRaw<StdioTest, StdioTestRaw>("StdioTest", {
+          ...baseConfig,
+          experimentalModularize: false,
+          generate_expected_output: false,
+        });
+        expect(configRawWithoutGenerate.experimentalModularize).toBe(false);
+        expect(configRawWithoutGenerate.testCases[0].expected).toBe("Hello World");
       });
     });
   });

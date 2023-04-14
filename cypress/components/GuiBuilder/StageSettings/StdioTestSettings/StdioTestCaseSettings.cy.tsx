@@ -1,4 +1,7 @@
-import { StdioTestCaseSettings } from "@/components/GuiBuilder/StageSettings/StdioTestSettings";
+import {
+  StdioTestCaseSettings,
+  StdioTestSettingsContext,
+} from "@/components/GuiBuilder/StageSettings/StdioTestSettings";
 import { defaultTestCase } from "@/constants/GuiBuilder/defaults";
 import supportedStages from "@/constants/GuiBuilder/supportedStages";
 import { GuiBuilderModel } from "@/store/GuiBuilder";
@@ -11,6 +14,8 @@ const stdioTest: StdioTest = {
   additional_packages: [],
   additional_pip_packages: [],
   testCases: [{ ...defaultTestCase, id: 1 }],
+  experimentalModularize: false,
+  generate_expected_output: false,
 };
 
 /**
@@ -20,6 +25,22 @@ const getConfigRawFromStore = (store: Store<GuiBuilderModel>): StdioTestRaw => {
   const configActual = store.getState().config.editingConfig.stageData["stage-0"].config as StdioTest;
   const configActualRaw = supportedStages.StdioTest.configToRaw!(configActual) as StdioTestRaw;
   return configActualRaw;
+};
+
+const mountStdioTestCaseSettingsWithStore = (store: Store<GuiBuilderModel>) => {
+  cy.mountWithStore(
+    store,
+    <StdioTestSettingsContext.Provider
+      value={{
+        closeModal: cy.stub().as("closeModal"),
+        setTabIndex: cy.stub().as("setTabIndex"),
+        testCaseView: 1,
+        setTestCaseView: cy.stub().as("setTestCaseView"),
+      }}
+    >
+      <StdioTestCaseSettings caseId={1} />
+    </StdioTestSettingsContext.Provider>,
+  );
 };
 
 describe("GuiBuilder: <StdioTestCaseSettings />", () => {
@@ -35,7 +56,7 @@ describe("GuiBuilder: <StdioTestCaseSettings />", () => {
     };
     const model = getModelWithStdioTestStage(stdioTest, valgrind);
     const store = createStore(model);
-    cy.mountWithStore(store, <StdioTestCaseSettings caseId={1} closeModal={() => {}} setView={() => {}} />);
+    mountStdioTestCaseSettingsWithStore(store);
 
     // Report
     cy.get("#score").type("1");
@@ -93,12 +114,13 @@ describe("GuiBuilder: <StdioTestCaseSettings />", () => {
         { ...defaultTestCase, id: 1 },
         { ...defaultTestCase, id: 2 },
       ],
+      experimentalModularize: false,
+      generate_expected_output: false,
     };
-    const setViewMock = cy.stub().as("setView");
 
     const model = getModelWithStdioTestStage(stdioTest);
     const store = createStore(model);
-    cy.mountWithStore(store, <StdioTestCaseSettings caseId={1} closeModal={() => {}} setView={setViewMock} />);
+    mountStdioTestCaseSettingsWithStore(store);
 
     cy.get('button[data-cy="edit-id"]').click();
 
@@ -120,7 +142,7 @@ describe("GuiBuilder: <StdioTestCaseSettings />", () => {
     // Saves valid ID
     cy.get("#id").clear().type("3");
     cy.get('button[title="Save new ID"]').click();
-    cy.get("@setView").should("be.calledWith", 3);
+    cy.get("@setTestCaseView").should("be.calledWith", 3);
     cy.then(() => {
       const config = store.getState().config.editingConfig.stageData["stage-0"].config as StdioTest;
       expect(config.testCases[0].id).to.equal(3);
@@ -128,5 +150,16 @@ describe("GuiBuilder: <StdioTestCaseSettings />", () => {
 
     // The final UI would be blank because we're rendering `StdioTestCaseSettings` with prop `caseId={1}`.
     // However, we updated the ID of test case #1 to 3, so test case #1 no longer exists.
+  });
+
+  describe("Auto-generate expected output of test cases", () => {
+    it("no longer requires input of expected output", () => {
+      const model = getModelWithStdioTestStage({ ...stdioTest, generate_expected_output: true });
+      const store = createStore(model);
+      mountStdioTestCaseSettingsWithStore(store);
+
+      cy.get("#_expectedInputMode").should("not.exist");
+      cy.get("p").contains("Generated Expected Output").should("be.visible");
+    });
   });
 });

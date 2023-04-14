@@ -52,7 +52,7 @@ function TestSubmission() {
           <div className="flex items-center gap-10">
             <Tooltip label="Grades the submission as if a student submitted it" position="bottom-end">
               <div>
-                <SubmissionUploader assignmentConfigId={configId}>
+                <SubmissionUploader assignmentConfigId={configId} isTest={false}>
                   <button className="flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-cse-600 hover:bg-cse-500 focus:outline-none focus:shadow-outline-blue focus:border-cse-700 active:bg-cse-700 transition duration-150 ease-in-out">
                     <FontAwesomeIcon className="mr-2" icon={["fad", "upload"]} />
                     Test Student Submission

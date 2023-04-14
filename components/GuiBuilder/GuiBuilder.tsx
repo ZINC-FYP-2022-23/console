@@ -22,7 +22,7 @@ interface GUIAssignmentBuilderProps {
 }
 
 function GUIAssignmentBuilder({ data, configId: configIdProp }: GUIAssignmentBuilderProps) {
-  const stepIndex = useStoreState((state) => state.layout.stepIndex);
+  const step = useStoreState((state) => state.layout.step);
   const initializeAssignment = useStoreActions((actions) => actions.config.initializeAssignment);
 
   const [initializeError, setInitializeError] = useState<Error | null>(null);
@@ -48,7 +48,7 @@ function GUIAssignmentBuilder({ data, configId: configIdProp }: GUIAssignmentBui
 
   if (initializeError) return <InitializationError error={initializeError} />;
 
-  const StepComponent = guiBuilderSteps[stepIndex].component;
+  const StepComponent = guiBuilderSteps.find((s) => s.slug === step)!.component;
 
   return (
     <div className="p-4 w-full flex flex-col gap-5">

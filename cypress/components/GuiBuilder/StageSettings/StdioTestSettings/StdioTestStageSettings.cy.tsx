@@ -1,5 +1,6 @@
 import { StdioTestStageSettings } from "@/components/GuiBuilder/StageSettings/StdioTestSettings";
-import { StdioTest } from "@/types/GuiBuilder";
+import supportedStages from "@/constants/GuiBuilder/supportedStages";
+import { StdioTest, StdioTestRaw } from "@/types/GuiBuilder";
 import { createStore } from "easy-peasy";
 import { getModelWithSingleStage } from "../../utils";
 
@@ -23,6 +24,8 @@ describe("GuiBuilder: <StdioTestStageSettings />", () => {
         additional_packages: ["curl"],
         additional_pip_packages: [],
         testCases: [],
+        experimentalModularize: false,
+        generate_expected_output: false,
       };
       expect(configActual).to.deep.equal(configExpected);
     });
@@ -56,6 +59,34 @@ describe("GuiBuilder: <StdioTestStageSettings />", () => {
       cy.mountWithStore(store, <StdioTestStageSettings />);
 
       cy.get("#additional_pip_packages input").should("not.be.disabled");
+    });
+  });
+
+  describe("Auto-generate expected output of test cases", () => {
+    it("enables the feature flags when enabled", () => {
+      const model = getModelWithSingleStage("StdioTest");
+      const store = createStore(model);
+      cy.mountWithStore(store, <StdioTestStageSettings />);
+
+      cy.get("#generate_expected_output").click();
+
+      // `_settings.use_generated` is false by default so there should be an alert
+      cy.get('[data-cy="use-generated-off-alert"]').should("be.visible");
+      cy.get('[data-cy="use-generated-off-alert"] button').click();
+
+      cy.then(() => {
+        const configActual = store.getState().config.editingConfig.stageData["stage-0"].config;
+        const configActualRaw = supportedStages.StdioTest.configToRaw!(configActual) as StdioTestRaw;
+        const configExpectedRaw: StdioTestRaw = {
+          diff_ignore_flags: [],
+          additional_packages: [],
+          additional_pip_packages: [],
+          testCases: [],
+          experimentalModularize: true,
+          generate_expected_output: true,
+        };
+        expect(configActualRaw).to.deep.equal(configExpectedRaw);
+      });
     });
   });
 });
