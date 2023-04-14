@@ -26,7 +26,7 @@ import {
 } from "@/types";
 import { ChangeLog } from "@/types/tables";
 import { isInputEmpty, mergeDataToActivityLogList, transformToAppealAttempt } from "@/utils/appealUtils";
-import { useMutation, useQuery, useSubscription } from "@apollo/client";
+import { useQuery, useSubscription } from "@apollo/client";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Tab } from "@headlessui/react";
 import { Alert, Modal, clsx, createStyles } from "@mantine/core";
@@ -183,26 +183,37 @@ function ChangeConfirmModal({ changeLog, modalOpen, setModalOpen, appealAttempt 
             changeLog.reason = reason;
 
             if (type === ChangeLogTypes.APPEAL_STATUS) {
-              // TODO: fix logic
               try {
                 await axios({
                   method: "POST",
                   url: `/api/changes/status`,
                   data: {
-                    newChangeLog: changeLog,
+                    reason: reason,
                     appealId: appealAttempt.id,
-                    status: changeLog.updatedState.type === "status" && changeLog.updatedState.status,
+                    updatedState: changeLog.updatedState,
                   },
                 });
+
+                setReason("");
+                setModalOpen(false);
+
+                dispatch({
+                  type: "showNotification",
+                  payload: {
+                    title: "Appeal status change successful",
+                    success: true,
+                  },
+                });
+
                 return;
               } catch (error: any) {
                 const { status: statusCode, data: responseJson } = error.response;
-                if (statusCode === 403) {
-                  // 403 Forbidden
+                if (statusCode === 403 || statusCode === 422) {
+                  // 403 Forbidden OR 422 Unprocessable Content
                   dispatch({
                     type: "showNotification",
                     payload: {
-                      title: "Appeal message denied",
+                      title: "Appeal status change denied",
                       message: responseJson.error,
                       success: false,
                     },
@@ -212,30 +223,46 @@ function ChangeConfirmModal({ changeLog, modalOpen, setModalOpen, appealAttempt 
                 dispatch({
                   type: "showNotification",
                   payload: {
-                    title: "Unable to send appeal message",
+                    title: "Unable to change appeal status",
                     message:
-                      "Failed to send appeal message due to network/server issues. Please submit again.\n" + error,
+                      "Failed to change appeal status due to network/server issues. Please submit again.\n" + error,
                     success: false,
                   },
                 });
               }
             } else if (type === ChangeLogTypes.SCORE) {
-              // TODO: fix logic
               try {
                 await axios({
                   method: "POST",
                   url: `/api/changes/score`,
-                  data: changeLog,
+                  data: {
+                    appealId: appealAttempt.id,
+                    originalState: changeLog.originalState,
+                    updatedState: changeLog.updatedState,
+                    reason: reason,
+                  },
                 });
+
+                setReason("");
+                setModalOpen(false);
+
+                dispatch({
+                  type: "showNotification",
+                  payload: {
+                    title: "Score change successful",
+                    success: true,
+                  },
+                });
+
                 return;
               } catch (error: any) {
                 const { status: statusCode, data: responseJson } = error.response;
-                if (statusCode === 403) {
-                  // 403 Forbidden
+                if (statusCode === 403 || statusCode === 422) {
+                  // 403 Forbidden OR 422 Unprocessable Content
                   dispatch({
                     type: "showNotification",
                     payload: {
-                      title: "Appeal message denied",
+                      title: "Score change denied",
                       message: responseJson.error,
                       success: false,
                     },
@@ -245,16 +272,13 @@ function ChangeConfirmModal({ changeLog, modalOpen, setModalOpen, appealAttempt 
                 dispatch({
                   type: "showNotification",
                   payload: {
-                    title: "Unable to send appeal message",
-                    message:
-                      "Failed to send appeal message due to network/server issues. Please submit again.\n" + error,
+                    title: "Unable to change student score",
+                    message: "Failed to change student score due to network/server issues. Please try again.\n" + error,
                     success: false,
                   },
                 });
               }
             }
-
-            setModalOpen(false);
           }
         }}
       >
@@ -779,6 +803,7 @@ function getScore({ appeals, changeLogs, submissions }: getScoreProps) {
 
   // If above fails, get the original submission score
   for (let i = 0; i < submissions.length; i++) {
+    if (submissions[i].isAppeal) continue;
     let isNewFileSubmission: boolean = false;
 
     // Do not pick the submission that is related to the appeal

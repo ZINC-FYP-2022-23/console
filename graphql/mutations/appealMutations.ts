@@ -26,7 +26,7 @@ export const CREATE_CHANGE_LOG = gql`
 
 export const UPDATE_APPEAL_STATUS = gql`
   mutation updateAppealStatus(
-    $newChangeLog: change_logs_insert_input!
+    $changeLogInput: change_logs_insert_input!
     $status: String!
     $updatedAt: timestamp!
     $appealId: bigint!
@@ -34,7 +34,7 @@ export const UPDATE_APPEAL_STATUS = gql`
     updateAppeal(pk_columns: { id: $appealId }, _set: { status: $status, updatedAt: $updatedAt }) {
       id
     }
-    createLog(object: $newChangeLog) {
+    createLog(object: $changeLogInput) {
       id
     }
   }

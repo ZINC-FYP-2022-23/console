@@ -286,3 +286,61 @@ export const GET_APPEAL_MESSAGE_VALIDATION_DATA = gql`
     }
   }
 `;
+
+// Validation data for score change log (with appeal ID)
+export const GET_SCORE_CHANGE_VALIDATION_DATA_WITH_APPEAL_ID = gql`
+  query getScoreChangeValidationDataWithAppealId($appealId: bigint!) {
+    appeal(id: $appealId) {
+      createdAt
+      assignmentConfig {
+        isAppealAllowed
+      }
+      userId
+      assignmentConfigId
+    }
+  }
+`;
+
+// Validation data for score change log (with appeal ID)
+export const GET_SCORE_CHANGE_VALIDATION_DATA_WITHOUT_APPEAL_ID = gql`
+  query getScoreChangeValidationDataWithoutAppealId($userId: bigint!, $assignmentConfigId: bigint!) {
+    assignment_config_user_aggregate(
+      where: { user_id: { _eq: $userId }, assignment_config_id: { _eq: $assignmentConfigId } }
+    ) {
+      aggregate {
+        count
+      }
+    }
+    assignmentConfig(id: $assignmentConfigId) {
+      stopCollectionAt
+    }
+  }
+`;
+
+// Validation data for updating appeal status
+export const GET_UPDATE_APPEAL_STATUS_VALIDATION_DATA = gql`
+  query getUpdateAppealStatusValidationData1($appealId: bigint!) {
+    appeal(id: $appealId) {
+      createdAt
+      updatedAt
+      assignmentConfigId
+      userId
+      status
+      assignmentConfig {
+        isAppealAllowed
+      }
+    }
+  }
+`;
+
+export const GET_LATEST_APPEAL = gql`
+  query getLatestAppeal($userId: bigint!, $assignmentConfigId: bigint!) {
+    appeals(
+      order_by: { createdAt: desc }
+      where: { assignmentConfigId: { _eq: $assignmentConfigId }, userId: { _eq: $userId } }
+      limit: 1
+    ) {
+      id
+    }
+  }
+`;
