@@ -4,7 +4,6 @@ import { AppealTextMessage } from "@/components/Appeal/AppealTextMessage";
 import { NumberInput } from "@/components/Input";
 import RichTextEditor from "@/components/RichTextEditor";
 import { LayoutProvider, useLayoutDispatch } from "@/contexts/layout";
-import { CREATE_CHANGE_LOG, UPDATE_APPEAL_STATUS } from "@/graphql/mutations/appealMutations";
 import {
   GET_APPEALS_BY_USER_ID_AND_ASSIGNMENT_ID,
   GET_APPEAL_CHANGE_LOGS_BY_APPEAL_ID,
@@ -48,11 +47,9 @@ type NewChangeLog = {
   appealId: number;
   userId: number;
   assignmentConfigId: number;
-  submissionId: number;
 };
 
 interface createNewChangeLogProps {
-  submissionId: number;
   appealAttempt: AppealAttempt;
   type: string;
   newStatus?: AppealStatus;
@@ -62,16 +59,9 @@ interface createNewChangeLogProps {
 
 /**
  * Returns a new change log to create a Change Log with `CREATE_CHANGE_LOG`
- * @returns {(ChangeLog & { userId: number, assignmentConfigId: number, submissionId: number })}
+ * @returns {(ChangeLog & { userId: number, assignmentConfigId: number })}
  */
-function createNewChangeLog({
-  submissionId,
-  appealAttempt,
-  type,
-  newStatus,
-  oldScore,
-  newScore,
-}: createNewChangeLogProps) {
+function createNewChangeLog({ appealAttempt, type, newStatus, oldScore, newScore }: createNewChangeLogProps) {
   let originalState, updatedState;
 
   // Set the `originalState` and `updatedState` according to the change log type
@@ -106,7 +96,6 @@ function createNewChangeLog({
     appealId: appealAttempt.id,
     userId: appealAttempt.userId,
     assignmentConfigId: appealAttempt.assignmentConfigId,
-    submissionId,
   };
 
   return newLog;
@@ -128,8 +117,7 @@ interface ChangeConfirmModalProps {
  * */
 function ChangeConfirmModal({ changeLog, modalOpen, setModalOpen, appealAttempt }: ChangeConfirmModalProps) {
   const [reason, setReason] = useState("");
-  const [createChangeLog] = useMutation(CREATE_CHANGE_LOG);
-  const [updateAppealStatus] = useMutation(UPDATE_APPEAL_STATUS);
+  const dispatch = useLayoutDispatch();
 
   let type: ChangeLogTypes;
   let mutationText: string | null = null;
@@ -196,83 +184,74 @@ function ChangeConfirmModal({ changeLog, modalOpen, setModalOpen, appealAttempt 
 
             if (type === ChangeLogTypes.APPEAL_STATUS) {
               // TODO: fix logic
-              // try {
-              //   await axios({
-              //     method: "POST",
-              //     url: `/api/changes/status`,
-              //     data: {
-
-              //     },
-              //   });
-              //   return;
-              // } catch (error: any) {
-              //   const { status: statusCode, data: responseJson } = error.response;
-              //   if (statusCode === 403) {
-              //     // 403 Forbidden
-              //     dispatch({
-              //       type: "showNotification",
-              //       payload: {
-              //         title: "Appeal message denied",
-              //         message: responseJson.error,
-              //         success: false,
-              //       },
-              //     });
-              //     return;
-              //   }
-              //   dispatch({
-              //     type: "showNotification",
-              //     payload: {
-              //       title: "Unable to send appeal message",
-              //       message: "Failed to send appeal message due to network/server issues. Please submit again.\n" + error,
-              //       success: false,
-              //     },
-              //   });
-              // }
-              await updateAppealStatus({
-                variables: {
-                  newChangeLog: changeLog,
-                  appealId: appealAttempt.id,
-                  status: changeLog.updatedState.type === "status" && changeLog.updatedState.status,
-                  updatedAt: zonedTimeToUtc(new Date(), "Asia/Hong_Kong"),
-                },
-              });
+              try {
+                await axios({
+                  method: "POST",
+                  url: `/api/changes/status`,
+                  data: {
+                    newChangeLog: changeLog,
+                    appealId: appealAttempt.id,
+                    status: changeLog.updatedState.type === "status" && changeLog.updatedState.status,
+                  },
+                });
+                return;
+              } catch (error: any) {
+                const { status: statusCode, data: responseJson } = error.response;
+                if (statusCode === 403) {
+                  // 403 Forbidden
+                  dispatch({
+                    type: "showNotification",
+                    payload: {
+                      title: "Appeal message denied",
+                      message: responseJson.error,
+                      success: false,
+                    },
+                  });
+                  return;
+                }
+                dispatch({
+                  type: "showNotification",
+                  payload: {
+                    title: "Unable to send appeal message",
+                    message:
+                      "Failed to send appeal message due to network/server issues. Please submit again.\n" + error,
+                    success: false,
+                  },
+                });
+              }
             } else if (type === ChangeLogTypes.SCORE) {
               // TODO: fix logic
-              // try {
-              //   await axios({
-              //     method: "POST",
-              //     url: `/api/changes/score`,
-              //     data: changeLog,
-              //   });
-              //   return;
-              // } catch (error: any) {
-              //   const { status: statusCode, data: responseJson } = error.response;
-              //   if (statusCode === 403) {
-              //     // 403 Forbidden
-              //     dispatch({
-              //       type: "showNotification",
-              //       payload: {
-              //         title: "Appeal message denied",
-              //         message: responseJson.error,
-              //         success: false,
-              //       },
-              //     });
-              //     return;
-              //   }
-              //   dispatch({
-              //     type: "showNotification",
-              //     payload: {
-              //       title: "Unable to send appeal message",
-              //       message: "Failed to send appeal message due to network/server issues. Please submit again.\n" + error,
-              //       success: false,
-              //     },
-              //   });
-              // }
-              await createChangeLog({
-                variables: {
-                  input: changeLog,
-                },
-              });
+              try {
+                await axios({
+                  method: "POST",
+                  url: `/api/changes/score`,
+                  data: changeLog,
+                });
+                return;
+              } catch (error: any) {
+                const { status: statusCode, data: responseJson } = error.response;
+                if (statusCode === 403) {
+                  // 403 Forbidden
+                  dispatch({
+                    type: "showNotification",
+                    payload: {
+                      title: "Appeal message denied",
+                      message: responseJson.error,
+                      success: false,
+                    },
+                  });
+                  return;
+                }
+                dispatch({
+                  type: "showNotification",
+                  payload: {
+                    title: "Unable to send appeal message",
+                    message:
+                      "Failed to send appeal message due to network/server issues. Please submit again.\n" + error,
+                    success: false,
+                  },
+                });
+              }
             }
 
             setModalOpen(false);
@@ -286,16 +265,14 @@ function ChangeConfirmModal({ changeLog, modalOpen, setModalOpen, appealAttempt 
 }
 
 interface ChangeAppealStatusProps {
-  submissionId: number;
   appealAttempt: AppealAttempt;
 }
 
 /**
  * Returns a box that shows the latest appeal status and allow TAs to change the status
  */
-function ChangeAppealStatus({ submissionId, appealAttempt }: ChangeAppealStatusProps) {
+function ChangeAppealStatus({ appealAttempt }: ChangeAppealStatusProps) {
   const initialLog: NewChangeLog = createNewChangeLog({
-    submissionId,
     appealAttempt,
     type: ChangeLogTypes.APPEAL_STATUS,
     newStatus: AppealStatus.PENDING,
@@ -340,7 +317,6 @@ function ChangeAppealStatus({ submissionId, appealAttempt }: ChangeAppealStatusP
             if (latestStatus !== AppealStatus.ACCEPTED) {
               setNewLog(
                 createNewChangeLog({
-                  submissionId,
                   appealAttempt,
                   type: ChangeLogTypes.APPEAL_STATUS,
                   newStatus: AppealStatus.ACCEPTED,
@@ -363,7 +339,6 @@ function ChangeAppealStatus({ submissionId, appealAttempt }: ChangeAppealStatusP
             if (latestStatus !== AppealStatus.PENDING) {
               setNewLog(
                 createNewChangeLog({
-                  submissionId,
                   appealAttempt,
                   type: ChangeLogTypes.APPEAL_STATUS,
                   newStatus: AppealStatus.PENDING,
@@ -386,7 +361,6 @@ function ChangeAppealStatus({ submissionId, appealAttempt }: ChangeAppealStatusP
             if (latestStatus !== AppealStatus.REJECTED) {
               setNewLog(
                 createNewChangeLog({
-                  submissionId,
                   appealAttempt,
                   type: ChangeLogTypes.APPEAL_STATUS,
                   newStatus: AppealStatus.REJECTED,
@@ -408,7 +382,6 @@ function ChangeAppealStatus({ submissionId, appealAttempt }: ChangeAppealStatusP
 }
 
 interface ChangeScoreProps {
-  submissionId: number;
   appealAttempt: AppealAttempt;
   oldScore: number;
   maxScore: number;
@@ -417,10 +390,9 @@ interface ChangeScoreProps {
 /**
  * Returns a box that shows the score and allow TAs to change the score
  */
-function ChangeScore({ submissionId, appealAttempt, oldScore, maxScore }: ChangeScoreProps) {
+function ChangeScore({ appealAttempt, oldScore, maxScore }: ChangeScoreProps) {
   const [newScore, setNewScore] = useState(oldScore);
   const initialLog: NewChangeLog = createNewChangeLog({
-    submissionId,
     appealAttempt,
     type: ChangeLogTypes.SCORE,
     oldScore: oldScore!,
@@ -443,7 +415,7 @@ function ChangeScore({ submissionId, appealAttempt, oldScore, maxScore }: Change
         Current Score: {oldScore} / {maxScore}
       </p>
       <br />
-      <p className="font-medium flex justify-self-center text-lg bold">Update Final Score To:</p>
+      <p className="font-medium flex justify-self-center text-lg bold">New Final Score:</p>
       <div className="h-1.5" />
       <NumberInput
         value={oldScore}
@@ -475,7 +447,6 @@ function ChangeScore({ submissionId, appealAttempt, oldScore, maxScore }: Change
             } else {
               setNewLog(
                 createNewChangeLog({
-                  submissionId,
                   appealAttempt,
                   type: ChangeLogTypes.SCORE,
                   oldScore,
@@ -840,14 +811,7 @@ interface AppealDetailsProps {
 /**
  * Returns the entire Appeal Details page
  */
-function AppealDetails({
-  appealId,
-  userId,
-  studentId,
-  submissionId,
-  assignmentConfigId,
-  diffSubmissionsData,
-}: AppealDetailsProps) {
+function AppealDetails({ appealId, userId, studentId, assignmentConfigId, diffSubmissionsData }: AppealDetailsProps) {
   // Fetch data with GraphQL
   const {
     data: appealsDetailsData,
@@ -947,16 +911,11 @@ function AppealDetails({
               <>
                 {/* Appeal Status */}
                 <div className="max-w-md px-5">
-                  <ChangeAppealStatus submissionId={submissionId} appealAttempt={appealAttempt[0]} />
+                  <ChangeAppealStatus appealAttempt={appealAttempt[0]} />
                 </div>
                 {/* Score */}
                 <div className="max-w-md mr-4 px-5 y-full">
-                  <ChangeScore
-                    submissionId={submissionId}
-                    appealAttempt={appealAttempt[0]}
-                    oldScore={score}
-                    maxScore={maxScore}
-                  />
+                  <ChangeScore appealAttempt={appealAttempt[0]} oldScore={score} maxScore={maxScore} />
                 </div>
               </>
             )}
