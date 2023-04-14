@@ -4,14 +4,14 @@ import { AppealTextMessage } from "@/components/Appeal/AppealTextMessage";
 import { NumberInput } from "@/components/Input";
 import RichTextEditor from "@/components/RichTextEditor";
 import { LayoutProvider, useLayoutDispatch } from "@/contexts/layout";
-import { CREATE_APPEAL_MESSAGE, CREATE_CHANGE_LOG, UPDATE_APPEAL_STATUS } from "@/graphql/mutations/appealMutations";
+import { CREATE_CHANGE_LOG, UPDATE_APPEAL_STATUS } from "@/graphql/mutations/appealMutations";
 import {
   GET_APPEALS_BY_USER_ID_AND_ASSIGNMENT_ID,
   GET_APPEAL_CHANGE_LOGS_BY_APPEAL_ID,
   GET_APPEAL_DETAILS_BY_APPEAL_ID,
   GET_APPEAL_MESSAGES,
-  GET_SUBMISSIONS_BY_ASSIGNMENT_AND_USER_ID,
   GET_IDS_BY_APPEAL_ID,
+  GET_SUBMISSIONS_BY_ASSIGNMENT_AND_USER_ID,
 } from "@/graphql/queries/appealQueries";
 import { Layout } from "@/layout";
 import {
@@ -30,26 +30,14 @@ import { isInputEmpty, mergeDataToActivityLogList, transformToAppealAttempt } fr
 import { useMutation, useQuery, useSubscription } from "@apollo/client";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Tab } from "@headlessui/react";
-import { Alert, clsx, createStyles, Modal } from "@mantine/core";
+import { Alert, Modal, clsx, createStyles } from "@mantine/core";
+import axios from "axios";
 import { zonedTimeToUtc } from "date-fns-tz";
 import { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { ReactGhLikeDiff } from "react-gh-like-diff";
 import { initializeApollo } from "../../../lib/apollo";
-import axios from "axios";
-
-/**
- * Return a state to be uploaded to database (for mutation) according to the appeal status
- * @param status - The status to be transformed to a state to upload to database
- * @returns {string} The state that corresponds to the status
- */
-function statusToState(status: AppealStatus): ChangeLogState {
-  return {
-    type: "status",
-    status: status,
-  };
-}
 
 type NewChangeLog = {
   createdAt: Date;
@@ -96,7 +84,7 @@ function createNewChangeLog({
       type: "status",
       status: newStatus,
     };
-  } else if (type === ChangeLogTypes.SCORE && oldScore && newScore) {
+  } else if (type === ChangeLogTypes.SCORE && oldScore !== undefined && newScore !== undefined) {
     originalState = {
       type: "score",
       score: oldScore,
@@ -106,7 +94,7 @@ function createNewChangeLog({
       score: newScore,
     };
   } else {
-    alert("Error: `createNewChangeLog` cannot be runned without `newStatus` or `newScore`");
+    alert("Error: `createNewChangeLog` cannot be run without `newStatus` or `newScore`");
   }
 
   const newLog: NewChangeLog = {
@@ -142,7 +130,6 @@ function ChangeConfirmModal({ changeLog, modalOpen, setModalOpen, appealAttempt 
   const [reason, setReason] = useState("");
   const [createChangeLog] = useMutation(CREATE_CHANGE_LOG);
   const [updateAppealStatus] = useMutation(UPDATE_APPEAL_STATUS);
-  const dispatch = useLayoutDispatch();
 
   let type: ChangeLogTypes;
   let mutationText: string | null = null;
@@ -168,7 +155,7 @@ function ChangeConfirmModal({ changeLog, modalOpen, setModalOpen, appealAttempt 
       onClose={() => {
         setModalOpen(false);
       }}
-      title="Type the reasoning for the following change:"
+      title="Please enter the reason for the following change:"
     >
       {/* Display change */}
       <div className="flex items-center">
@@ -318,11 +305,11 @@ function ChangeAppealStatus({ submissionId, appealAttempt }: ChangeAppealStatusP
   const latestStatus = appealAttempt.latestStatus;
 
   // Set CSS style for the appeal status buttons
-  const defaultappealButton: string =
+  const defaultAppealButton =
     "bg-white text-blue-700 hover:text-blue-500 focus:border-blue-300 focus:shadow-outline-blue active:text-blue-800 active:bg-gray-50 transition ease-in-out duration-150";
-  let appealAcceptButton: string = defaultappealButton;
-  let appealPendingButton: string = defaultappealButton;
-  let appealRejectButton: string = defaultappealButton;
+  let appealAcceptButton = defaultAppealButton;
+  let appealPendingButton = defaultAppealButton;
+  let appealRejectButton = defaultAppealButton;
   if (latestStatus === AppealStatus.ACCEPTED) {
     appealAcceptButton = "bg-green-600 text-white";
   } else if (latestStatus === AppealStatus.PENDING) {
@@ -347,7 +334,7 @@ function ChangeAppealStatus({ submissionId, appealAttempt }: ChangeAppealStatusP
       <br />
       <div className="flex-row w-full grid grid-cols-3 gap-x-5 place-items-center">
         {/* Accept Button */}
-        <a
+        <button
           className={`${appealAcceptButton} w-full px-3 py-1.5 border text-center border-gray-300 text-sm leading-4 font-medium rounded-lg focus:outline-none`}
           onClick={() => {
             if (latestStatus !== AppealStatus.ACCEPTED) {
@@ -368,9 +355,9 @@ function ChangeAppealStatus({ submissionId, appealAttempt }: ChangeAppealStatusP
             <div className="px-auto" />
             <span>Accept</span>
           </div>
-        </a>
+        </button>
         {/* Pending Button */}
-        <a
+        <button
           className={`${appealPendingButton} w-full px-3 py-1.5 border text-center border-gray-300 text-sm leading-4 font-medium rounded-lg focus:outline-none`}
           onClick={() => {
             if (latestStatus !== AppealStatus.PENDING) {
@@ -391,9 +378,9 @@ function ChangeAppealStatus({ submissionId, appealAttempt }: ChangeAppealStatusP
             <div className="px-auto" />
             <span>Pending</span>
           </div>
-        </a>
+        </button>
         {/* Reject Button */}
-        <a
+        <button
           className={`${appealRejectButton} w-full px-3 py-1.5 border text-center border-gray-300 text-sm leading-4 font-medium rounded-lg focus:outline-none`}
           onClick={() => {
             if (latestStatus !== AppealStatus.REJECTED) {
@@ -414,7 +401,7 @@ function ChangeAppealStatus({ submissionId, appealAttempt }: ChangeAppealStatusP
             <div className="px-auto" />
             <span>Reject</span>
           </div>
-        </a>
+        </button>
       </div>
     </div>
   );
@@ -441,7 +428,8 @@ function ChangeScore({ submissionId, appealAttempt, oldScore, maxScore }: Change
   });
   const [newLog, setNewLog] = useState(initialLog);
   const [modalOpen, setModalOpen] = useState(false);
-  let isBlank: boolean = false; // The number input field is blank
+  /** Whether the input box is blank. */
+  const [isBlank, setIsBlank] = useState(false);
 
   return (
     <div className="w-auto h-full px-5 py-4 bg-white text-gray-700 shadow rounded-md">
@@ -452,28 +440,29 @@ function ChangeScore({ submissionId, appealAttempt, oldScore, maxScore }: Change
         appealAttempt={appealAttempt}
       />
       <p className="font-medium flex justify-self-center text-lg bold">
-        Score: {oldScore} / {maxScore}
+        Current Score: {oldScore} / {maxScore}
       </p>
       <br />
-      <p className="font-medium flex justify-self-center text-lg bold">Score Update:</p>
+      <p className="font-medium flex justify-self-center text-lg bold">Update Final Score To:</p>
       <div className="h-1.5" />
       <NumberInput
         value={oldScore}
         max={maxScore}
         min={0}
         onChange={(score) => {
-          if (score) {
-            setNewScore(score);
-            isBlank = false;
+          if (score === undefined) {
+            setIsBlank(true);
           } else {
-            isBlank = true;
+            setNewScore(score);
+            setIsBlank(false);
           }
         }}
       />
       <div className="h-1.5" />
       <div className="flex w-full justify-center">
-        <a
-          className={`bg-white text-blue-700 hover:text-blue-500 focus:border-blue-300 focus:shadow-outline-blue active:text-blue-800 active:bg-gray-50 transition ease-in-out duration-150 w-full px-3 py-1.5 border text-center border-gray-300 text-sm leading-4 font-medium rounded-lg focus:outline-none`}
+        <button
+          className={`bg-white text-blue-700 hover:text-blue-500 focus:border-blue-300 focus:shadow-outline-blue active:text-blue-800 active:bg-gray-50 transition ease-in-out duration-150 w-full px-3 py-1.5 border text-center border-gray-300 text-sm leading-4 font-medium rounded-lg focus:outline-none disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed`}
+          disabled={isBlank}
           onClick={() => {
             if (newScore === oldScore) {
               alert("Updated score cannot be the same as old score");
@@ -502,7 +491,7 @@ function ChangeScore({ submissionId, appealAttempt, oldScore, maxScore }: Change
             <div className="px-auto" />
             <span>Update</span>
           </div>
-        </a>
+        </button>
       </div>
     </div>
   );
@@ -610,7 +599,7 @@ function ActivityLogTab({ userId, activityLogList, allowChange }: ActivityLogTab
             if (log._type === "appealLog") {
               return (
                 <div className="px-3">
-                  <AppealLogMessage key={log.id} log={log} showButton={false} />
+                  <AppealLogMessage key={log.id} log={log} showReason />
                 </div>
               );
             } else if (log._type === "appealMessage") {
@@ -813,7 +802,7 @@ function getScore({ appeals, changeLogs, submissions }: getScoreProps) {
     }
 
     if (changeLogs[i].type === "SCORE") {
-      return parseInt(changeLogs[i].updatedState.replace(/[^0-9]/g, ""));
+      return changeLogs[i].updatedState["score"];
     }
   }
 
@@ -837,9 +826,12 @@ function getScore({ appeals, changeLogs, submissions }: getScoreProps) {
 
 interface AppealDetailsProps {
   appealId: number;
+  /** The user ID of the teaching assistant. */
   userId: number;
+  /** The user ID of the student who submitted the appeal. */
   studentId: number;
-  courseId: number; // The course ID that the appeal is related to
+  /** Course ID that the appeal is related to. */
+  courseId: number;
   submissionId: number;
   assignmentConfigId: number;
   diffSubmissionsData: DiffSubmissionsData;
@@ -895,21 +887,14 @@ function AppealDetails({
   }
 
   // Display error if it occurred
-  if (appealDetailsError) {
-    const errorMessage = "Unable to fetch appeal details with `GET_APPEAL_DETAILS_BY_APPEAL_ID`";
-    return <DisplayError errorMessage={errorMessage} />;
-  } else if (appealChangeLogError) {
-    const errorMessage = "Unable to fetch appeal details with `GET_APPEAL_CHANGE_LOGS_BY_APPEAL_ID`";
-    return <DisplayError errorMessage={errorMessage} />;
-  } else if (appealMessagesError) {
-    const errorMessage = "Unable to fetch appeal details with `GET_APPEAL_MESSAGES`";
-    return <DisplayError errorMessage={errorMessage} />;
-  } else if (submissionsError) {
-    const errorMessage = "Unable to fetch appeal details with `GET_ASSIGNMENT_SUBMISSIONS`";
-    return <DisplayError errorMessage={errorMessage} />;
+  let errorMessage: string | null = null;
+  if (appealDetailsError || appealChangeLogError || appealMessagesError || submissionsError) {
+    errorMessage = "Failed to fetch appeal details.";
   } else if (!appealsDetailsData || !appealsDetailsData.appeal) {
     // Check if the appeal details is available, if not, there is no such appeal
-    const errorMessage = "Invalid appeal. Please check the appeal number.";
+    errorMessage = "Invalid appeal. Please check the appeal number.";
+  }
+  if (errorMessage) {
     return <DisplayError errorMessage={errorMessage} />;
   }
 
@@ -946,9 +931,9 @@ function AppealDetails({
             {/* Appeal Information */}
             <div className="max-w-md mr-4 px-5 py-4 grid grid-cols-3 gap-4 bg-white text-gray-700 shadow rounded-md">
               <p className="font-medium">Name:</p>
-              <p className="col-span-2">{appealsDetailsData.appeal.user.name}</p>
+              <p className="col-span-2">{appealsDetailsData!.appeal.user.name}</p>
               <p className="font-medium">ITSC:</p>
-              <p className="col-span-2">{appealsDetailsData.appeal.user.itsc}</p>
+              <p className="col-span-2">{appealsDetailsData!.appeal.user.itsc}</p>
               {!allowChange && (
                 <>
                   <p className="font-medium">Score:</p>
@@ -961,7 +946,7 @@ function AppealDetails({
             {allowChange && (
               <>
                 {/* Appeal Status */}
-                <div className="max-w-md mr-4 px-5">
+                <div className="max-w-md px-5">
                   <ChangeAppealStatus submissionId={submissionId} appealAttempt={appealAttempt[0]} />
                 </div>
                 {/* Score */}
@@ -1023,8 +1008,8 @@ function AppealDetails({
 
 export const getServerSideProps: GetServerSideProps = async ({ req, query }) => {
   const apolloClient = initializeApollo(req.headers.cookie!);
-  const userId = parseInt(req.cookies.user);
   const appealId = parseInt(query.appealId as string);
+  const userId = parseInt(req.cookies.user);
 
   // Fetch data via GraphQL
   const { data: idData } = await apolloClient.query<{ appeal: Appeal }>({
@@ -1033,14 +1018,14 @@ export const getServerSideProps: GetServerSideProps = async ({ req, query }) => 
       appealId: appealId,
     },
   });
+  const studentId = idData.appeal.userId;
   const { data: submissionsData } = await apolloClient.query<{ submissions: SubmissionType[] }>({
     query: GET_SUBMISSIONS_BY_ASSIGNMENT_AND_USER_ID,
-    variables: { assignmentConfigId: idData.appeal.assignmentConfigId, userId },
+    variables: { assignmentConfigId: idData.appeal.assignmentConfigId, userId: studentId },
   });
 
   // Get Ids
   const assignmentConfigId: number = idData.appeal.assignmentConfigId;
-  const studentId: number = idData.appeal.userId;
   const newSubmissionId: number = idData.appeal.newFileSubmissionId || -1;
   const oldSubmissionId: number = submissionsData.submissions.filter((e) => !e.isAppeal)[0].id;
 

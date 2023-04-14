@@ -52,7 +52,6 @@ export type ChangeLogState =
   | { type: "status"; status: "ACCEPTED" | "REJECTED" | "PENDING" }
   | { type: "submission"; submission: number };
 
-// Unique types in student-ui
 export type AppealLog = {
   id: number;
   type: ChangeLogTypes | "APPEAL_SUBMISSION";
