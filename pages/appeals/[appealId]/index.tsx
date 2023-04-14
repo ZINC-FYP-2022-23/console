@@ -37,6 +37,7 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { ReactGhLikeDiff } from "react-gh-like-diff";
 import { initializeApollo } from "../../../lib/apollo";
+import { getLocalDateFromString } from "@/utils/date";
 
 type NewChangeLog = {
   createdAt: Date;
@@ -419,8 +420,8 @@ function ChangeScore({ appealAttempt, oldScore, maxScore }: ChangeScoreProps) {
   const initialLog: NewChangeLog = createNewChangeLog({
     appealAttempt,
     type: ChangeLogTypes.SCORE,
-    oldScore: oldScore!,
-    newScore: newScore!,
+    oldScore: oldScore,
+    newScore: newScore,
   });
   const [newLog, setNewLog] = useState(initialLog);
   const [modalOpen, setModalOpen] = useState(false);
@@ -760,7 +761,7 @@ interface getScoreProps {
  * Gets the latest score based on the following logic:
  * @returns {number}
  */
-function getScore({ appeals, changeLogs, submissions }: getScoreProps) {
+function getScore({ appeals, changeLogs, submissions }: getScoreProps): number {
   /* *** Logic of how to get the score: ***
    * If the `updatedAt` of the latest `ACCEPTED` appeal later than the date of any `SCORE` change:
    *    If `newFileSubmission` is available, >>>  use the score of the `newFileSubmission`.
@@ -771,53 +772,56 @@ function getScore({ appeals, changeLogs, submissions }: getScoreProps) {
    * If there are NO `SCORE` change log AND `ACCEPTED` appeal >>> use the score of the original submission
    */
 
-  const acceptedAppeals: Appeal[] = appeals.filter((e) => e.status === "ACCEPTED");
+  const acceptedAppeals: Appeal[] = appeals.filter((e) => e.status === AppealStatus.ACCEPTED);
   let acceptedAppealDate: Date | null = null;
   let acceptedAppealScore: number | null = null;
 
   // Get the latest `ACCEPTED` appeal with a new score generated
-  for (let i = 0; i < acceptedAppeals.length; i++) {
+  for (const acceptedAppeal of acceptedAppeals) {
     if (
-      acceptedAppeals[i].updatedAt &&
-      acceptedAppeals[i].submission &&
-      acceptedAppeals[i].submission.reports.length > 0
+      acceptedAppeal.updatedAt &&
+      acceptedAppeal.submission &&
+      acceptedAppeal.submission.reports.length &&
+      acceptedAppeal.submission.reports[0].grade
     ) {
-      acceptedAppealDate = new Date(acceptedAppeals[i].updatedAt!);
-      acceptedAppealScore = acceptedAppeals[i].submission.reports[0].grade.score;
+      acceptedAppealDate = getLocalDateFromString(acceptedAppeal.updatedAt!);
+      acceptedAppealScore = acceptedAppeal.submission.reports[0].grade.score;
       break;
     }
   }
 
+  let scoreChangeDate: Date | null = null;
+  let scoreChangeScore: number | null = null;
+
   // Get the latest `SCORE` change log
-  for (let i = 0; i < changeLogs.length; i++) {
-    const changeLogDate: Date = new Date(changeLogs[i].createdAt);
-
-    if (acceptedAppealDate && acceptedAppealDate > changeLogDate) {
-      return acceptedAppealScore;
+  for (const changeLog of changeLogs.filter((e) => e.type === ChangeLogTypes.SCORE)) {
+    scoreChangeDate = getLocalDateFromString(changeLog.createdAt)!;
+    if (changeLog.updatedState.type === "score") {
+      scoreChangeScore = changeLog.updatedState.score;
+      break;
     }
+  }
 
-    if (changeLogs[i].type === "SCORE") {
-      return changeLogs[i].updatedState["score"];
-    }
+  if (acceptedAppealDate && scoreChangeDate) {
+    return acceptedAppealDate > scoreChangeDate ? acceptedAppealScore! : scoreChangeScore!;
+  }
+  if (acceptedAppealDate && !scoreChangeDate) {
+    return acceptedAppealScore!;
+  }
+  if (scoreChangeDate && !acceptedAppealDate) {
+    return scoreChangeScore!;
   }
 
   // If above fails, get the original submission score
-  for (let i = 0; i < submissions.length; i++) {
-    if (submissions[i].isAppeal) continue;
-    let isNewFileSubmission: boolean = false;
-
-    // Do not pick the submission that is related to the appeal
-    for (let j = 0; j < appeals.length; j++) {
-      if (submissions[i].id === appeals[j].newFileSubmissionId) {
-        isNewFileSubmission = true;
-        break;
-      }
-    }
-
-    if (!isNewFileSubmission && submissions[i].reports.length > 0 && submissions[i].reports[0].grade.score) {
-      return submissions[i].reports[0].grade.score;
+  for (const submission of submissions.filter((e) => !e.isAppeal)) {
+    if (submission.reports.length && submission.reports[0].grade) {
+      return submission.reports[0].grade.score;
     }
   }
+
+  // TODO: see if this is good practice
+  // Rare error case, may arise from none of the submissions having valid reports
+  return -1;
 }
 
 interface AppealDetailsProps {
