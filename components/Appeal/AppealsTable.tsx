@@ -3,7 +3,7 @@ import {
   GET_APPEAL_CONFIG,
   GET_SUBMISSIONS_BY_ASSIGNMENT_ID,
 } from "@/graphql/queries/appealQueries";
-import { AppealStatus, AssignmentConfig, Appeal, Submission as SubmissionType } from "@/types";
+import { AppealStatus, AssignmentConfig, Appeal, Submission as SubmissionType, ChangeLogTypes } from "@/types";
 import { ChangeLog } from "@/types/tables";
 import { useQuery, useSubscription } from "@apollo/client";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -24,6 +24,7 @@ import { useState } from "react";
 import AppealStatusBadge from "./AppealStatusBadge";
 import { transformAppealStatus } from "@/utils/appealUtils";
 import { utcToZonedTime } from "date-fns-tz";
+import { getLocalDateFromString } from "@/utils/date";
 
 /** Type definition of each row in the Appeals Table. */
 type AppealTableType = {
@@ -132,51 +133,61 @@ interface getScoreProps {
 
 /**
  * Gets the latest score based on the following logic:
- * @returns {number}
+ * @returns {number | undefined}
  */
 function getScore({ appeals, changeLogs, submissions }: getScoreProps): number | undefined {
   /* *** Logic of how to get the score: ***
-   * If the `updatedAt` of the latest `ACCEPTED` appeal later than the date of any `SCORE` change:
-   *    If `newFileSubmission` is available, >>>  use the score of the `newFileSubmission`.
-   *    If `newFileSubmission` is NOT available:
-   *        If there is a `SCORE` change log >>> use the score of latest `SCORE` change.
-   *        If there is NO `SCORE` change log >>> use the score of the original submission.
-   * If there is the date of the latest `SCORE` change than is later than the `updatedAt` of the latest `ACCEPTED` appeal >>> use the score of latest `SCORE` change
-   * If there are NO `SCORE` change log AND `ACCEPTED` appeal >>> use the score of the original submission
+   * Note: latest valid appeal refers to latest `ACCEPTED` appeal containing file submission, i.e. newFileSubmission is not null
+   * If the `updatedAt` of the latest valid appeal later than the date of the latest `SCORE` change:
+   *    >>> use the score of the `newFileSubmission`.
+   * If the date of the latest `SCORE` change later than the `updatedAt` of the latest valid appeal:
+   *    >>> use the score of latest `SCORE` change.
+   * If there is a valid appeal AND NO `SCORE` change log:
+   *    >>> use the score of the `newFileSubmission`.
+   * If there is a `SCORE` change log AND NO valid appeal:
+   *    >>> use the score of latest `SCORE` change.
+   * Finally, if there are NO `SCORE` change log AND NO valid appeal:
+   *    >>> use the score of the original submission.
    */
 
-  const acceptedAppeals: Appeal[] = appeals.filter((e) => e.status === "ACCEPTED");
-  let acceptedAppealDate: Date | null = null;
-  let acceptedAppealScore: number | undefined = undefined;
-
   // Get the latest `ACCEPTED` appeal with a new score generated
-  for (let i = 0; i < acceptedAppeals.length; i++) {
-    if (
-      acceptedAppeals[i].updatedAt &&
-      acceptedAppeals[i].submission &&
-      acceptedAppeals[i].submission.reports.length > 0
-    ) {
-      acceptedAppealDate = new Date(acceptedAppeals[i].updatedAt!);
-      acceptedAppealScore = acceptedAppeals[i].submission.reports[0].grade.score;
-      break;
-    }
-  }
+  const latestValidAppeal: Appeal | undefined = appeals.find(
+    (appeal) =>
+      appeal.status === AppealStatus.ACCEPTED &&
+      appeal.updatedAt &&
+      appeal.submission &&
+      appeal.submission.reports.length &&
+      appeal.submission.reports[0].grade,
+  );
 
   // Get the latest `SCORE` change log
-  for (let i = 0; i < changeLogs.length; i++) {
-    const changeLogDate: Date = new Date(changeLogs[i].createdAt);
+  const latestScoreLog: ChangeLog | undefined = changeLogs.find(
+    (log) => log.type === ChangeLogTypes.SCORE && log.updatedState.type === "score",
+  );
 
-    if (acceptedAppealDate && acceptedAppealDate > changeLogDate) {
-      return acceptedAppealScore;
-    }
+  // Both appeal and score change log exist
+  if (latestValidAppeal && latestScoreLog && latestScoreLog.updatedState.type === "score") {
+    const acceptedAppealDate = getLocalDateFromString(latestValidAppeal.updatedAt)!;
+    const scoreChangeDate = getLocalDateFromString(latestScoreLog.createdAt)!;
 
-    if (changeLogs[i].type === "SCORE") {
-      return changeLogs[i].updatedState["score"];
-    }
+    // return score of the latest
+    return acceptedAppealDate > scoreChangeDate
+      ? latestValidAppeal.submission.reports[0].grade.score
+      : latestScoreLog.updatedState.score;
+  }
+  // Only appeal exists
+  if (latestValidAppeal && !latestScoreLog) {
+    return latestValidAppeal.submission.reports[0].grade.score;
+  }
+  // Only score change exists
+  if (latestScoreLog && !latestValidAppeal && latestScoreLog.updatedState.type === "score") {
+    return latestScoreLog.updatedState.score;
   }
 
   // If above fails, get the original submission score
-  return submissions.filter((e) => !e.isAppeal && e.reports.length > 0)[0].reports[0].grade.score;
+  return submissions.find(
+    (submission) => !submission.isAppeal && submission.reports.length && submission.reports[0].grade,
+  )?.reports[0].grade.score;
 }
 
 interface AppealsTableProps {
