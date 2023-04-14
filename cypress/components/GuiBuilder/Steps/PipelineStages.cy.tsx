@@ -1,8 +1,9 @@
 import PipelineStages from "@/components/GuiBuilder/Steps/PipelineStages";
 import supportedStages from "@/constants/GuiBuilder/supportedStages";
 import { GuiBuilderModel, guiBuilderModel } from "@/store/GuiBuilder";
+import { getThreeStageModel } from "@/store/GuiBuilder/__tests__/utils/storeTestUtils";
 import { StageDependencyGraph } from "@/types/GuiBuilder";
-import { createStore, Store } from "easy-peasy";
+import { Store, createStore } from "easy-peasy";
 import cloneDeep from "lodash/cloneDeep";
 
 const mountPipelineStagesWithStore = (store: Store<GuiBuilderModel>) => {
@@ -107,5 +108,28 @@ describe("GuiBuilder: Pipeline Stages step", () => {
       };
       expect(stageDepsActual).to.deep.equal(stageDepsExpected);
     });
+  });
+
+  it("shows an error icon on stages with diagnostics", () => {
+    const model = getThreeStageModel();
+    const store = createStore(model);
+    mountPipelineStagesWithStore(store);
+
+    store.getActions().config.parseDiagnostics([
+      {
+        type: "MISSING_FIELD_ERROR",
+        message: "field '_settings.use_skeleton' is required but is missing. use_skeleton requires to be true",
+        severity: "ERROR",
+        location: { stage: "diffWithSkeleton" },
+      },
+    ]);
+
+    const shouldExistErrorIcon = (label: string, exist: boolean) => {
+      cy.get(`[data-label="${label}"] + [data-cy="error-icon"]`).should(exist ? "exist" : "not.exist");
+    };
+
+    shouldExistErrorIcon("Diff With Skeleton", true);
+    shouldExistErrorIcon("File Structure Validation", false);
+    shouldExistErrorIcon("Compile", false);
   });
 });

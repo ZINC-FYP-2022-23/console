@@ -150,7 +150,10 @@ function YAMLConfigEditor({ yamlString }) {
     try {
       const configYamlTrimmed = configYaml.trim();
       const { configError } = await validateAssignmentConfig(configYamlTrimmed, assignmentConfigId as string);
-      if (!configError) {
+      if (configError && configError !== "[]") {
+        console.error("Error while validating config", JSON.parse(configError));
+      }
+      if (!configError || configError === "[]") {
         await updatePipelineConfig({
           variables: {
             id: parseInt(assignmentConfigId as string, 10),

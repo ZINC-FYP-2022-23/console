@@ -100,4 +100,36 @@ describe("GuiBuilder - <PipelineSettings />", () => {
       expect(settingsRaw.enable_features?.gpu_device).to.deep.members(["NVIDIA", "INTEL"]);
     });
   });
+
+  describe("Diagnostics", () => {
+    it("handles language related diagnostics", () => {
+      const model = cloneDeep(guiBuilderModel);
+      const store = createStore(model);
+      cy.mountWithStore(store, <PipelineSettings />);
+
+      // Missing Version
+      store.getActions().config.parseDiagnostics([
+        {
+          type: "LANG_FORMAT_ERROR",
+          message: "field '_settings.lang' is invalid. Correct format: $lang[$/compiler]:$version",
+          severity: "ERROR",
+          location: { stage: "_settings" },
+        },
+      ]);
+      cy.get('[data-cy="lang-format-error"]').should("be.visible");
+
+      // Unsupported language
+      cy.then(() => {
+        store.getActions().config.parseDiagnostics([
+          {
+            type: "LANG_UNSUPPORTED_ERROR",
+            message: "field '_settings.lang' is invalid at [_settings]. Language unsupported. cpp null g++",
+            severity: "ERROR",
+            location: { stage: "_settings" },
+          },
+        ]);
+      });
+      cy.get('[data-cy="lang-unsupported-error"]').should("be.visible");
+    });
+  });
 });

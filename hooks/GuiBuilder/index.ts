@@ -5,4 +5,5 @@ export { default as useQueryParameters } from "./useQueryParameters";
 export { default as useReactFlowFitView } from "./useReactFlowFitView";
 export { default as useSave } from "./useSave";
 export { default as useSelectedStageConfig } from "./useSelectedStageConfig";
+export { default as useSelectedStageDiagnostics } from "./useSelectedStageDiagnostics";
 export { default as useWarnUnsavedChanges } from "./useWarnUnsavedChanges";

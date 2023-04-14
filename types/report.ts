@@ -14,6 +14,7 @@ export type GraderReport = {
   scoreReports?: ScoreReports;
 };
 
+// TODO(Anson): Update the docs to include the new `DiagnosticRaw` type
 export type ConfigError = {
   configFormatError?: {
     errorField: string;

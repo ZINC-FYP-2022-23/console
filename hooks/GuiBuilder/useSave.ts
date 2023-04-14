@@ -2,8 +2,10 @@ import { useLayoutDispatch } from "@/contexts/layout";
 import { useZinc } from "@/contexts/zinc";
 import { CREATE_ASSIGNMENT_CONFIG, UPDATE_ASSIGNMENT_CONFIG } from "@/graphql/mutations/user";
 import { useStoreActions, useStoreState } from "@/store/GuiBuilder";
+import { DiagnosticRaw } from "@/types/GuiBuilder";
 import { AssignmentConfig } from "@/types/tables";
 import { configToYaml } from "@/utils/GuiBuilder";
+import { nullToUndefined } from "@/utils/object";
 import { useMutation } from "@apollo/client";
 import { useRouter } from "next/router";
 import { useState } from "react";
@@ -29,6 +31,7 @@ function useSave() {
   const generateStageLabels = useStoreActions((actions) => actions.config.generateStageLabels);
   const getEditingConfig = useStoreActions((actions) => actions.config.getEditingConfig);
   const getPolicyAndSchedule = useStoreActions((actions) => actions.config.getPolicyAndSchedule);
+  const parseDiagnostics = useStoreActions((actions) => actions.config.parseDiagnostics);
   const setConfigId = useStoreActions((actions) => actions.config.setConfigId);
   const setInitConfigsToEditing = useStoreActions((actions) => actions.config.setInitConfigsToEditing);
   const setStep = useStoreActions((actions) => actions.layout.setStep);
@@ -42,6 +45,34 @@ function useSave() {
   const isNewAssignment = configId === null;
 
   /**
+   * Updates the store and dispatch error notification based on the config diagnostics.
+   *
+   * @param diagnosticsRaw Raw string returned from the payload of the Grader.
+   * @param step The step that performs the validation.
+   * @returns Whether the diagnostics is empty.
+   */
+  const handleConfigDiagnostics = (diagnosticsRaw: string | undefined, step: "general" | "pipeline"): boolean => {
+    const configDiagnosticsRawJson = JSON.parse(diagnosticsRaw ?? "[]");
+    const configDiagnosticsRaw = nullToUndefined(configDiagnosticsRawJson) as DiagnosticRaw[];
+    parseDiagnostics(configDiagnosticsRaw);
+
+    if (configDiagnosticsRaw.length === 0) return true;
+
+    console.error("Error while validating config", configDiagnosticsRawJson);
+    dispatch({
+      type: "showNotification",
+      payload: {
+        success: false,
+        title: `Error in ${step === "general" ? "General Settings" : "Pipeline Stages"}`,
+        message: `Please fix the errors in ${
+          step === "general" ? "General Settings" : "your pipeline stages settings"
+        }.`,
+      },
+    });
+    return false;
+  };
+
+  /**
    * Save handler for the "General Settings" step.
    *
    * It will create a new assignment config if current config ID is null. This ensures the subsequent steps
@@ -53,24 +84,12 @@ function useSave() {
     // Validate `_settings` part of YAML first
     const editingConfig = getEditingConfig();
     const settingsYaml = configToYaml(editingConfig, true);
-    const { configError } = await validateAssignmentConfig(settingsYaml, configId?.toString() ?? "draft");
-    if (configError) {
-      const configErrorJson = JSON.parse(configError);
-      console.error("Error while validating config", configErrorJson);
-
-      // TODO(Anson): Parse the config error and display it in UI
-
-      dispatch({
-        type: "showNotification",
-        payload: {
-          success: false,
-          title: "Error in General Settings",
-          // TODO(Anson): Show proper error message instead of the raw JSON
-          message: configError,
-        },
-      });
-      return false;
-    }
+    const { configError: configDiagnosticsRaw } = await validateAssignmentConfig(
+      settingsYaml,
+      configId?.toString() ?? "draft",
+    );
+    const hasEmptyDiagnostics = handleConfigDiagnostics(configDiagnosticsRaw, "general");
+    if (!hasEmptyDiagnostics) return false;
 
     if (isNewAssignment) {
       // Create new assignment to ensure that subsequent steps have a non-null config ID
@@ -155,24 +174,9 @@ function useSave() {
     // Validate config YAML first
     const editingConfig = generateStageLabels();
     const configYaml = configToYaml(editingConfig);
-    const { configError } = await validateAssignmentConfig(configYaml, configId.toString());
-    if (configError) {
-      const configErrorJson = JSON.parse(configError);
-      console.error("Error while validating config", configErrorJson);
-
-      // TODO(Anson): Parse the config error and display it in UI
-
-      dispatch({
-        type: "showNotification",
-        payload: {
-          success: false,
-          title: "Error in Pipeline Settings",
-          // TODO(Anson): Show proper error message instead of the raw JSON
-          message: configError,
-        },
-      });
-      return false;
-    }
+    const { configError: configDiagnosticsRaw } = await validateAssignmentConfig(configYaml, configId.toString());
+    const hasEmptyDiagnostics = handleConfigDiagnostics(configDiagnosticsRaw, "pipeline");
+    if (!hasEmptyDiagnostics) return false;
 
     // Update config YAML
     await updateConfig({

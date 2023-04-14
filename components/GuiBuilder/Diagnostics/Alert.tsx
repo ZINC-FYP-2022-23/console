@@ -30,6 +30,7 @@ function Alert({ severity, children, onClose, ...props }: AlertProps) {
         severity === "warning" && "bg-yellow-100 text-yellow-800",
         severity === "error" && "bg-red-100 text-red-800",
       )}
+      data-severity={severity}
       {...props}
     >
       <FontAwesomeIcon

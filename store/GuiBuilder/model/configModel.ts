@@ -1,6 +1,8 @@
 import { defaultConfig, defaultPolicy, defaultSchedule } from "@/constants/GuiBuilder/defaults";
 import {
   Config,
+  ConfigDiagnostics,
+  DiagnosticRaw,
   GradingPolicy,
   Schedule,
   Settings,
@@ -10,6 +12,7 @@ import {
 } from "@/types/GuiBuilder";
 import { AssignmentConfig } from "@/types/tables";
 import { generateStageLabels, isConfigEqual, isLinkedList, isScheduleEqual, parseConfigYaml } from "@/utils/GuiBuilder";
+import { configDiagnosticsFromRaw } from "@/utils/GuiBuilder/diagnostics";
 import { Action, Computed, Thunk, action, computed, thunk } from "easy-peasy";
 import { YAMLException } from "js-yaml";
 import cloneDeep from "lodash/cloneDeep";
@@ -48,6 +51,9 @@ interface ConfigModelState {
   initSchedule: Schedule;
   /** The scheduling with proposed changes. */
   editingSchedule: Schedule;
+
+  /** Diagnostics found in the {@link Config} after validation by the Grader. */
+  diagnostics: ConfigDiagnostics;
 }
 
 interface ConfigModelComputed {
@@ -131,6 +137,11 @@ interface ConfigModelAction {
   setInitConfigsToEditing: Action<ConfigModel>;
 
   /**
+   * Updates the {@link ConfigModel.diagnostics} state. To specify how the field shall be updated,
+   * directly mutate the `diagnostics` parameter in the callback function of the payload.
+   */
+  updateDiagnostics: Action<ConfigModel, (diagnostics: ConfigDiagnostics) => void>;
+  /**
    * Updates the `_settings` field in {@link ConfigModel.editingConfig}.
    *
    * To specify how the field shall be updated, directly mutate the `_settings` parameter in the
@@ -147,6 +158,12 @@ interface ConfigModelAction {
       value: any;
     }
   >;
+
+  /**
+   * Parses the diagnostics from the Grader after validating the config. It will overwrite the previous
+   * {@link ConfigModel.diagnostics} state.
+   */
+  parseDiagnostics: Action<ConfigModel, DiagnosticRaw[]>;
 }
 
 interface ConfigModelThunk {
@@ -204,6 +221,12 @@ const configModelState: ConfigModelState = {
   editingPolicy: defaultPolicy,
   initSchedule: defaultSchedule,
   editingSchedule: defaultSchedule,
+
+  diagnostics: {
+    _settings: [],
+    stages: {},
+    others: [],
+  },
 };
 
 const configModelComputed: ConfigModelComputed = {
@@ -311,6 +334,9 @@ const configModelAction: ConfigModelAction = {
     state.initSchedule = cloneDeep(state.editingSchedule);
   }),
 
+  updateDiagnostics: action((state, callback) => {
+    callback(state.diagnostics);
+  }),
   updateSettings: action((state, callback) => {
     callback(state.editingConfig._settings);
   }),
@@ -321,6 +347,10 @@ const configModelAction: ConfigModelAction = {
       return;
     }
     stage[path] = value;
+  }),
+
+  parseDiagnostics: action((state, diagnosticsRaw) => {
+    state.diagnostics = configDiagnosticsFromRaw(diagnosticsRaw, state.editingConfig.stageData);
   }),
 };
 

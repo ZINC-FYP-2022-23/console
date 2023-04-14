@@ -99,7 +99,10 @@ function AssignmentConfigCreation({ assignment }) {
   async function handleAssignmentConfigCreation() {
     try {
       const { configError } = await validateAssignmentConfig(assignmentConfig.config_yaml, "draft");
-      if (!configError) {
+      if (configError && configError !== "[]") {
+        console.error("Error while validating config", JSON.parse(configError));
+      }
+      if (!configError || configError === "[]") {
         const { data } = await createAssignmentConfig({
           variables: {
             input: {

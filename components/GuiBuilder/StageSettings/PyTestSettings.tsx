@@ -1,8 +1,9 @@
 import Button from "@/components/Button";
 import { NumberInput, TagsInput, Textarea } from "@/components/Input";
 import { defaultXUnitOverride } from "@/constants/GuiBuilder/defaults";
-import { useQueryParameters, useSelectedStageConfig } from "@/hooks/GuiBuilder";
+import { useQueryParameters, useSelectedStageConfig, useSelectedStageDiagnostics } from "@/hooks/GuiBuilder";
 import { useStoreActions, useStoreState } from "@/store/GuiBuilder";
+import { Diagnostic } from "@/types/GuiBuilder";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ScrollArea, Tooltip } from "@mantine/core";
 import cloneDeep from "lodash/cloneDeep";
@@ -188,24 +189,39 @@ function PyTestSettings() {
  */
 function LangNotPythonAlert() {
   const { updateStep } = useQueryParameters();
+  const [diagnostics] = useSelectedStageDiagnostics();
   const setElementToHighlight = useStoreActions((actions) => actions.layout.setElementToHighlight);
+  const setModal = useStoreActions((actions) => actions.layout.setModal);
+
+  const isLangNotPythonError = (d: Diagnostic) =>
+    d.type === "INVALID_FIELD_ERROR" && d.fields?.includes("_settings.lang");
+  const hasLangNotPythonError = diagnostics.some(isLangNotPythonError);
 
   return (
-    <Alert severity="warning" data-cy="lang-not-python-alert">
+    <Alert severity={hasLangNotPythonError ? "error" : "warning"} data-cy="lang-not-python-alert">
       <div>
         <p>
           You must set the language to <span className="font-semibold">Python</span> in order to use PyTest.
         </p>
-        <Button
-          icon={<FontAwesomeIcon icon={["fas", "edit"]} />}
-          onClick={() => {
-            updateStep("settings");
-            setElementToHighlight("lang");
-          }}
-          className="mt-1 bg-cse-600 text-sm text-white hover:bg-cse-500 active:bg-cse-400"
-        >
-          Fix this field
-        </Button>
+        <div className="mt-2 flex items-center gap-3">
+          <Button
+            icon={<FontAwesomeIcon icon={["fas", "edit"]} />}
+            onClick={() => {
+              updateStep("settings");
+              setElementToHighlight("lang");
+            }}
+            className="bg-cse-600 text-sm text-white hover:bg-cse-500 active:bg-cse-400"
+          >
+            Change language
+          </Button>
+          <Button
+            icon={<FontAwesomeIcon icon={["far", "trash-can"]} />}
+            onClick={() => setModal({ path: "deleteStage", value: true })}
+            className="bg-red-500 text-sm text-white hover:bg-red-600"
+          >
+            Delete this stage
+          </Button>
+        </div>
       </div>
     </Alert>
   );

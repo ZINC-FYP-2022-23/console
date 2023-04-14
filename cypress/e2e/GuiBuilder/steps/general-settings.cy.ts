@@ -1,3 +1,4 @@
+import { DiagnosticRaw } from "@/types/GuiBuilder";
 import { aliasGqlOperation } from "cypress/e2e/utils/graphql";
 import { assignmentConfig } from "mocks/handlers/configs/cppConfig";
 
@@ -40,7 +41,15 @@ describe("GuiBuilder: General Settings step", () => {
       cy.addMockHandlers("newConfig");
       cy.visit("/assignments/1/configs/new/gui?step=settings");
 
-      cy.intercept("/api/configs/draft/validate", { id: "1", configError: JSON.stringify({ error: "dummy error" }) });
+      const diagnosticsRaw: DiagnosticRaw[] = [
+        {
+          type: "LANG_FORMAT_ERROR",
+          message: "field '_settings.lang' is invalid. Correct format: $lang[$/compiler]:$version",
+          severity: "ERROR",
+          location: { stage: "_settings" },
+        },
+      ];
+      cy.intercept("/api/configs/draft/validate", { id: "1", configError: JSON.stringify(diagnosticsRaw) });
 
       cy.get("#lang_version").clear();
       cy.get('button[data-cy="next-step"]').click();

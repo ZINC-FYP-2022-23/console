@@ -1,6 +1,7 @@
 import { Settings, SettingsLang, SettingsRaw } from "@/types/GuiBuilder";
 import * as uuid from "uuid";
 import {
+  getSettingsLangLabel,
   isSettingsEqual,
   parseLangString,
   settingsLangToString,
@@ -130,6 +131,24 @@ describe("GuiBuilder: Utils - Settings", () => {
 
       tidySettings(settingsUgly);
       expect(settingsUgly.lang.version).toBe("  8  ");
+    });
+  });
+
+  describe("getSettingsLangLabel()", () => {
+    it("returns the language label if it is supported", () => {
+      const cpp: SettingsLang = {
+        language: "cpp",
+        compiler: "g++",
+        version: "8",
+      };
+      expect(getSettingsLangLabel(cpp)).toBe("C++ (g++)");
+
+      const unsupported: SettingsLang = {
+        language: "foo",
+        compiler: "",
+        version: "8",
+      };
+      expect(getSettingsLangLabel(unsupported)).toBeNull();
     });
   });
 

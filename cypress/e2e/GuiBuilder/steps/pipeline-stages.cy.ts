@@ -1,3 +1,4 @@
+import { DiagnosticRaw } from "@/types/GuiBuilder";
 import { aliasGqlOperation } from "cypress/e2e/utils/graphql";
 
 describe("GuiBuilder: Pipeline Stages step", () => {
@@ -64,10 +65,20 @@ describe("GuiBuilder: Pipeline Stages step", () => {
       cy.visit("/assignments/1/configs/1/gui?step=pipeline");
 
       // Test when config YAML fails validation
-      cy.intercept("/api/configs/1/validate", { id: "1", configError: JSON.stringify({ error: "dummy error" }) });
+
+      /** Simulate that the first stage (`diffWithSkeleton`) has an error. */
+      const diagnosticsRaw: DiagnosticRaw[] = [
+        {
+          type: "MISSING_FIELD_ERROR",
+          message: "field '_settings.use_skeleton' is required but is missing. use_skeleton requires to be true",
+          severity: "ERROR",
+          location: { stage: "diffWithSkeleton" },
+        },
+      ];
+      cy.intercept("/api/configs/1/validate", { id: "1", configError: JSON.stringify(diagnosticsRaw) });
       cy.get('button[data-cy="next-step"]').click();
 
-      cy.get("p").contains("Error in Pipeline Settings").should("be.visible");
+      cy.get("p").contains("Error in Pipeline Stages").should("be.visible");
       cy.url().should("include", "step=pipeline");
 
       // Test invalid pipeline layout (disconnected nodes)
@@ -82,7 +93,7 @@ describe("GuiBuilder: Pipeline Stages step", () => {
       cy.addMockHandlers("cppConfig");
       cy.visit("/assignments/1/configs/1/gui?step=pipeline");
 
-      cy.intercept("/api/configs/1/validate", { id: "1", configError: null });
+      cy.intercept("/api/configs/1/validate", { id: "1", configError: "[]" });
       cy.intercept("POST", "/v1/graphql", (req) => {
         aliasGqlOperation(req, "updateAssignmentConfig", () => {
           req.reply({

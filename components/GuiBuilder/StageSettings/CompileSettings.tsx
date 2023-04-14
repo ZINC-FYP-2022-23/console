@@ -1,11 +1,15 @@
+import Button from "@/components/Button";
 import { TagsInput, Textarea, TextInput } from "@/components/Input";
 import { cFamilyCompileDefault } from "@/constants/GuiBuilder/supportedLanguages";
-import { useSelectedStageConfig } from "@/hooks/GuiBuilder";
-import { useStoreState } from "@/store/GuiBuilder";
+import { useQueryParameters, useSelectedStageConfig, useSelectedStageDiagnostics } from "@/hooks/GuiBuilder";
+import { useStoreActions, useStoreState } from "@/store/GuiBuilder";
+import { Diagnostic } from "@/types/GuiBuilder";
+import { getSettingsLangLabel } from "@/utils/GuiBuilder";
 import { getCompilePreviewCommand } from "@/utils/GuiBuilder/stageConfig";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { FocusEventHandler, memo } from "react";
 import { DeepReadonly } from "utility-types";
-import { InfoTooltip } from "../Diagnostics";
+import { Alert, InfoTooltip } from "../Diagnostics";
 import { AdditionalPackagesTooltip } from "./common";
 
 type ConfigMetadata = DeepReadonly<{
@@ -77,6 +81,7 @@ function CompileSettings() {
 
   return (
     <div className="p-3 flex flex-col gap-4">
+      <UnsupportedLangAlert />
       <div className="flex gap-3">
         <label htmlFor="input" className="mt-2 flex-1">
           Input files <span className="text-red-600 text-xs">(required)</span>
@@ -143,6 +148,53 @@ function CompileSettings() {
       )}
     </div>
   );
+}
+
+/**
+ * Alert to show when the language specified in `_settings.lang` does not require compilation (e.g. Python).
+ */
+function UnsupportedLangAlert() {
+  const { updateStep } = useQueryParameters();
+  const [diagnostics] = useSelectedStageDiagnostics();
+
+  const lang = useStoreState((state) => state.config.editingConfig._settings.lang);
+  const setElementToHighlight = useStoreActions((actions) => actions.layout.setElementToHighlight);
+  const setModal = useStoreActions((actions) => actions.layout.setModal);
+
+  const langLabel = getSettingsLangLabel(lang);
+
+  const isUnsupportedLangError = (d: Diagnostic) =>
+    !d.resolved && d.type === "INVALID_FIELD_ERROR" && d.fields?.includes("_settings.lang");
+
+  return diagnostics.some(isUnsupportedLangError) ? (
+    <Alert severity="error" data-cy="unsupported-lang-alert">
+      <div>
+        <p>
+          This stage is <span className="font-semibold">not supported</span> by the language of this assignment
+          {langLabel ? ` (${langLabel})` : ""}.
+        </p>
+        <div className="mt-2 flex items-center gap-3">
+          <Button
+            icon={<FontAwesomeIcon icon={["far", "trash-can"]} />}
+            onClick={() => setModal({ path: "deleteStage", value: true })}
+            className="bg-red-500 text-sm text-white hover:bg-red-600"
+          >
+            Delete this stage
+          </Button>
+          <Button
+            icon={<FontAwesomeIcon icon={["fas", "edit"]} />}
+            onClick={() => {
+              updateStep("settings");
+              setElementToHighlight("lang");
+            }}
+            className="bg-cse-600 text-sm text-white hover:bg-cse-500 active:bg-cse-400"
+          >
+            Change language
+          </Button>
+        </div>
+      </div>
+    </Alert>
+  ) : null;
 }
 
 const FlagsTooltip = memo(() => (

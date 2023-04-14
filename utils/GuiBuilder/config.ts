@@ -5,6 +5,7 @@
 import { Config, ConfigRaw } from "@/types/GuiBuilder";
 import { dump, load, YAMLException } from "js-yaml";
 import isEqual from "lodash/isEqual";
+import { nullToUndefined, undefinedToNull } from "../object";
 import { isSettingsEqual, settingsRawToSettings, settingsToSettingsRaw } from "./settings";
 import { isStageDependencyEqual, parseStages, stagesToYamlObj } from "./stage";
 
@@ -15,11 +16,7 @@ import { isStageDependencyEqual, parseStages, stagesToYamlObj } from "./stage";
  */
 export function parseConfigYaml(yaml: string): Config {
   const parsedYaml = load(yaml); // `load()` throws YAMLException if YAML is invalid
-
-  // Recursively convert fields with value `null` to `undefined`. This makes it easier to model the YAML
-  // schema with TypeScript type definitions because we can simply mark nullable fields with `?:` operator
-  // instead of `| null`.
-  const configRaw = JSON.parse(JSON.stringify(parsedYaml), (_, v) => (v === null ? undefined : v)) as ConfigRaw;
+  const configRaw = nullToUndefined(parsedYaml) as ConfigRaw;
 
   const { _settings: settingsRaw, ...stagesRaw } = configRaw;
   const _settings = settingsRawToSettings(settingsRaw);
@@ -37,10 +34,8 @@ export function configToYaml(config: Config, settingsOnly = false): string {
     _settings: settingsToSettingsRaw(config._settings),
     ...(settingsOnly ? {} : stagesToYamlObj(config.stageDeps, config.stageData)),
   };
-
-  // Recursively convert fields with value `undefined` to `null` as js-yaml cannot parse `undefined` fields
-  const outputObjString = JSON.stringify(input, (_, v) => (v === undefined ? null : v));
-  return dump(JSON.parse(outputObjString));
+  const outputConfig = undefinedToNull(input);
+  return dump(outputConfig);
 }
 
 /**

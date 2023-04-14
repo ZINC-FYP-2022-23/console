@@ -3,8 +3,9 @@ import ListInput from "@/components/Input/ListInput";
 import { highlightableElementIds } from "@/constants/GuiBuilder/highlightableElements";
 import supportedLanguages from "@/constants/GuiBuilder/supportedLanguages";
 import { useStoreActions, useStoreState } from "@/store/GuiBuilder";
-import { Settings, SettingsGpuDevice, SettingsUseTemplate } from "@/types/GuiBuilder";
+import { Diagnostic, Settings, SettingsGpuDevice, SettingsUseTemplate } from "@/types/GuiBuilder";
 import { settingsLangToString } from "@/utils/GuiBuilder";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { memo } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { InfoTooltip } from "../Diagnostics";
@@ -69,7 +70,16 @@ const gpuVendorSelectOptions: { label: string; value: SettingsGpuDevice }[] = [
 
 function PipelineSettings() {
   const _settings = useStoreState((state) => state.config.editingConfig._settings);
+  const settingsDiagnostics = useStoreState((state) => state.config.diagnostics._settings);
   const updateSettings = useStoreActions((actions) => actions.config.updateSettings);
+
+  /** Whether there is a language format error. This occurs when the "Version" field is left blank. */
+  const hasLangFormatError = settingsDiagnostics.some((d) => d.type === "LANG_FORMAT_ERROR");
+  /**
+   * Whether there is a language unsupported error. This occurs when the version is invalid (e.g.
+   * Python version 8).
+   */
+  const hasLangUnsupportedError = settingsDiagnostics.some((d) => d.type === "LANG_UNSUPPORTED_ERROR");
 
   return (
     <div className="px-1 flex flex-col gap-8 text-sm">
@@ -99,22 +109,36 @@ function PipelineSettings() {
               className="flex-[2]"
             />
           </div>
-          <div className="flex items-center gap-4">
-            <div className="flex-1 flex items-center gap-1">
+          <div className="flex items-start gap-4">
+            <div className="mt-1 flex-1 flex items-center gap-1">
               <label htmlFor="lang_version">
                 Version <span className="text-red-600 text-xs">(required)</span>
               </label>
               <LangVersionTooltip />
             </div>
-            <TextInput
-              id="lang_version"
-              value={_settings.lang.version}
-              onChange={(event) => {
-                const value = event.target.value;
-                updateSettings((_settings) => (_settings.lang.version = value));
-              }}
-              classNames={{ root: "flex-[2]" }}
-            />
+            <div className="flex-[2] relative space-y-1">
+              <TextInput
+                id="lang_version"
+                value={_settings.lang.version}
+                onChange={(event) => {
+                  const value = event.target.value;
+                  updateSettings((_settings) => (_settings.lang.version = value));
+                }}
+                alertLevel={hasLangFormatError || hasLangUnsupportedError ? "error" : undefined}
+              />
+              {hasLangFormatError && (
+                <div className="font-medium text-red-500 text-sm" data-cy="lang-format-error">
+                  <FontAwesomeIcon icon={["far", "circle-exclamation"]} className="mr-2" />
+                  Please fill out this field
+                </div>
+              )}
+              {hasLangUnsupportedError && !hasLangFormatError && (
+                <div className="font-medium text-red-500 text-sm" data-cy="lang-unsupported-error">
+                  <FontAwesomeIcon icon={["far", "circle-exclamation"]} className="mr-2" />
+                  This language version is not supported
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

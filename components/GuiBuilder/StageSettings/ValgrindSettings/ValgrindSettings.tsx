@@ -1,35 +1,22 @@
 import { MultiSelect, NumberInput, Select, SwitchGroup, Textarea } from "@/components/Input";
 import { defaultValgrindConfig } from "@/constants/GuiBuilder/defaults";
 import supportedStages from "@/constants/GuiBuilder/supportedStages";
-import { useSelectedStageConfig } from "@/hooks/GuiBuilder";
+import { useSelectedStageConfig, useSelectedStageDiagnostics } from "@/hooks/GuiBuilder";
 import { useStoreActions, useStoreState } from "@/store/GuiBuilder";
 import { memo } from "react";
 import { Alert, InfoTooltip } from "../../Diagnostics";
 import { checksFilterOptions, visibilityOptions } from "./inputOptions";
+import { Diagnostic } from "@/types/GuiBuilder";
 
 function ValgrindSettings() {
   const [config, setConfig] = useSelectedStageConfig("Valgrind");
   const hasStdioTestStage = useStoreState((state) => state.config.hasStage("StdioTest"));
-  const setAddStageSearchString = useStoreActions((actions) => actions.layout.setAddStageSearchString);
 
   if (!config) return null;
 
   return (
     <div className="p-3 flex flex-col gap-4">
-      {!hasStdioTestStage && (
-        <Alert severity="warning" data-cy="missing-stdiotest-alert">
-          <p>
-            Your grading pipeline is missing a{" "}
-            <button
-              className="text-blue-700 underline"
-              onClick={() => setAddStageSearchString(supportedStages.StdioTest.nameInUI)}
-            >
-              Standard I/O Test stage
-            </button>
-            . Please add it back.
-          </p>
-        </Alert>
-      )}
+      {!hasStdioTestStage && <MissingStdioTestAlert />}
       <SwitchGroup
         id="enabled"
         label='Run Valgrind on all test cases in "Standard I/O Test" stage'
@@ -96,6 +83,35 @@ function ValgrindSettings() {
         />
       </div>
     </div>
+  );
+}
+
+/**
+ * Alert to show when the pipeline is missing a `StdioTest` stage, since Valgrind depends on it.
+ */
+function MissingStdioTestAlert() {
+  const [diagnostics, resolveDiagnostics] = useSelectedStageDiagnostics();
+  const setAddStageSearchString = useStoreActions((actions) => actions.layout.setAddStageSearchString);
+
+  const isMissingStdioTestError = (d: Diagnostic) => d.type === "MISSING_FIELD_ERROR" && d.field === "stdioTest";
+  const hasMissingStdioTestError = diagnostics.some(isMissingStdioTestError);
+
+  return (
+    <Alert severity={hasMissingStdioTestError ? "error" : "warning"} data-cy="missing-stdiotest-alert">
+      <p>
+        This stage depends on a{" "}
+        <button
+          className="text-blue-700 underline"
+          onClick={() => {
+            resolveDiagnostics(isMissingStdioTestError);
+            setAddStageSearchString(supportedStages.StdioTest.nameInUI);
+          }}
+        >
+          Standard I/O Test stage
+        </button>
+        . Please add it back to your pipeline.
+      </p>
+    </Alert>
   );
 }
 
