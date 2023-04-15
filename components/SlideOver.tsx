@@ -6,7 +6,9 @@ interface SlideOverProps {
 }
 
 export function SlideOver({ children }: SlideOverProps) {
-  const { showSlideOver } = useLayoutState();
+  const { showSlideOver, slideOverMaxWidth } = useLayoutState();
+  const _slideOverMaxWidth = slideOverMaxWidth || "max-w-md";
+
   return (
     <div className="fixed inset-0 overflow-hidden pointer-events-none z-20">
       <div className="absolute inset-0 overflow-hidden">
@@ -19,7 +21,7 @@ export function SlideOver({ children }: SlideOverProps) {
             leave="transform transition ease-in-out duration-500 sm:duration-700"
             leaveFrom="translate-x-0"
             leaveTo="translate-x-full"
-            className="w-screen max-w-md pointer-events-auto"
+            className={`w-screen ${_slideOverMaxWidth} pointer-events-auto`}
           >
             {children}
           </Transition>

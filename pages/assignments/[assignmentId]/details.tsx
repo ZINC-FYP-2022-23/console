@@ -114,6 +114,7 @@ function AssignmentForm({ initialAssignmentState }: AssignmentFormProps) {
             </label>
             <AssignmentDescriptionEditor
               id="rte"
+              className="description-editor"
               controls={[
                 ["h1", "h2", "h3"],
                 ["bold", "italic", "underline", "strike"],

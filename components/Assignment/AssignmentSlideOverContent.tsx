@@ -1,12 +1,13 @@
-import { useLayoutDispatch, useLayoutState } from "../../contexts/layout";
 import { useQuery } from "@apollo/client";
-import Link from "next/link";
+import AppealsTable from "@/components/Appeal/AppealsTable";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { GET_SUBMISSIONS_FOR_ASSIGNMENT_CONFIG } from "../../graphql/queries/user";
-import { Menu, Transition } from "@headlessui/react";
-import { useState } from "react";
-import { useRouter } from "next/router";
+import { Menu, Tab, Transition } from "@headlessui/react";
 import DotsVerticalIcon from "@heroicons/react/solid/DotsVerticalIcon";
+import { useClickOutside } from "@mantine/hooks";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import { LayoutState, useLayoutDispatch, useLayoutState } from "../../contexts/layout";
+import { GET_SUBMISSIONS_FOR_ASSIGNMENT_CONFIG } from "../../graphql/queries/user";
 
 function LoadingStudentSubmissionListItems() {
   return (
@@ -28,14 +29,20 @@ function LoadingStudentSubmissionListItems() {
   );
 }
 
+const tabs: LayoutState["submissionDefaultTab"][] = ["submissions", "appeals"];
+
 export function AssignmentSlideOverContent() {
   const dispatch = useLayoutDispatch();
-  const { assignmentConfigId, viewingTaskAssignedGroups } = useLayoutState();
+  const { assignmentConfigId, viewingTaskAssignedGroups, submissionDefaultTab } = useLayoutState();
+  const ref = useClickOutside(() => dispatch({ type: "closeSlideOver" }));
+
   const { data, loading } = useQuery(GET_SUBMISSIONS_FOR_ASSIGNMENT_CONFIG, {
     variables: {
       id: assignmentConfigId,
     },
   });
+
+  const defaultTabIndex = tabs.indexOf(submissionDefaultTab!);
 
   // Clone the read-only submissions array so we can sort later
   let submissions: any[] = [];
@@ -44,7 +51,7 @@ export function AssignmentSlideOverContent() {
   }
 
   return (
-    <div className="h-full flex flex-col bg-cool-gray-50 shadow-xl overflow-y-scroll">
+    <div ref={ref} className="h-full flex flex-col bg-cool-gray-50 shadow-xl overflow-y-auto">
       <header className="space-y-1 py-6 px-4 bg-cse-600 sm:px-6">
         <div className="flex items-center justify-between space-x-3">
           <h2 className="text-lg leading-7 font-medium text-white">Submission Summary</h2>
@@ -94,34 +101,56 @@ export function AssignmentSlideOverContent() {
       </div>
       <div className="relative flex-1">
         <div className="flex flex-col h-full">
-          <div className="border-b border-gray-200">
-            <div className="px-6">
-              <nav className="-mb-px flex space-x-6">
-                <a
-                  className="whitespace-no-wrap pb-4 px-1 border-b-2 border-cse-500 font-medium text-sm leading-5 text-cse-600 focus:outline-none focus:text-cse-800 focus:border-cse-700"
-                  aria-current="page"
-                >
-                  Submissions
-                </a>
-                <a className="whitespace-no-wrap pb-4 px-1 border-b-2 border-transparent font-medium text-sm leading-5 text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:outline-none focus:text-gray-700 focus:border-gray-300">
-                  Appeal Cases (Not Available)
-                </a>
-              </nav>
-            </div>
-          </div>
-          <ul className="divide-y divide-gray-200">
-            {!loading &&
-              submissions
-                .sort((a, b) => (a.user.name > b.user.name ? 1 : -1))
-                .map((submission) => (
-                  <IndividualSubmissionRow
-                    key={submission.id}
-                    submission={submission}
-                    assignmentConfigId={assignmentConfigId}
-                  />
-                ))}
-            {loading && <LoadingStudentSubmissionListItems />}
-          </ul>
+          <Tab.Group defaultIndex={defaultTabIndex}>
+            <Tab.List className="mt-3 px-6 flex gap-6 text-sm border-b border-gray-200">
+              <Tab
+                className={({ selected }) =>
+                  `pb-3 px-1 border-b-2 font-medium text-sm leading-5 focus:outline-none transition ${
+                    selected
+                      ? "border-cse-500 text-cse-600"
+                      : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                  }`
+                }
+              >
+                Submissions
+              </Tab>
+              <Tab
+                className={({ selected }) =>
+                  `pb-3 px-1 border-b-2 font-medium text-sm leading-5 focus:outline-none transition ${
+                    selected
+                      ? "border-cse-500 text-cse-600"
+                      : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                  }`
+                }
+              >
+                Appeal Cases
+              </Tab>
+            </Tab.List>
+            <Tab.Panels>
+              {/* "Submissions" tab panel */}
+              <Tab.Panel>
+                <ul className="divide-y divide-gray-200">
+                  {!loading &&
+                    submissions
+                      .sort((a, b) => (a.user.name > b.user.name ? 1 : -1))
+                      .map((submission) => (
+                        <IndividualSubmissionRow
+                          key={submission.id}
+                          submission={submission}
+                          assignmentConfigId={assignmentConfigId}
+                        />
+                      ))}
+                  {loading && <LoadingStudentSubmissionListItems />}
+                </ul>
+              </Tab.Panel>
+              {/* "Appeal Cases" tab panel */}
+              <Tab.Panel>
+                <div className="px-6 py-5">
+                  <AppealsTable assignmentConfigId={assignmentConfigId || -1} />
+                </div>
+              </Tab.Panel>
+            </Tab.Panels>
+          </Tab.Group>
         </div>
       </div>
     </div>
@@ -131,7 +160,6 @@ export function AssignmentSlideOverContent() {
 function IndividualSubmissionRow({ submission, assignmentConfigId }) {
   const router = useRouter();
   const { courseId } = router.query;
-  const [showDropdown, setDropdownState] = useState(false);
   const [report] = submission.reports;
 
   return (
@@ -170,9 +198,12 @@ function IndividualSubmissionRow({ submission, assignmentConfigId }) {
                 <Menu.Item>
                   <Link href={`/api/download/submissions/${submission.id}`}>
                     <a
-                      className="block px-4 py-2 text-sm leading-5 text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900"
+                      className="px-4 py-2 flex items-center text-sm leading-5 text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900"
                       role="menuitem"
                     >
+                      <span className="w-5 h-5 mr-3 flex items-center">
+                        <FontAwesomeIcon icon={["fad", "download"]} size="lg" />
+                      </span>
                       Download
                     </a>
                   </Link>
@@ -182,9 +213,12 @@ function IndividualSubmissionRow({ submission, assignmentConfigId }) {
                     href={`/courses/${courseId}/assignments/${assignmentConfigId}/submissions?userId=${submission.user.id}`}
                   >
                     <a
-                      className="block px-4 py-2 text-sm leading-5 text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900"
+                      className="px-4 py-2 flex items-center text-sm leading-5 text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900"
                       role="menuitem"
                     >
+                      <span className="w-5 h-5 mr-3 flex items-center">
+                        <FontAwesomeIcon icon={["fad", "clock-rotate-left"]} size="lg" />
+                      </span>
                       Submission History
                     </a>
                   </Link>

@@ -262,6 +262,12 @@ export const GET_PIPELINE_CONFIG_FOR_ASSIGNMENT = gql`
       dueAt
       stopCollectionAt
       releaseGradeAt
+      isAppealAllowed
+      appealLimits
+      isAppealStudentReplyAllowed
+      appealStartAt
+      appealStopAt
+      isAppealViewReportAllowed
     }
     assignment(id: $assignmentId) {
       course {

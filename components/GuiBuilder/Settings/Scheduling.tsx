@@ -1,15 +1,6 @@
 import { DateInput } from "@/components/Input";
 import { useStoreActions, useStoreState } from "@/store/GuiBuilder";
-import { appendZToIsoString } from "@/utils/GuiBuilder";
-import { utcToZonedTime, zonedTimeToUtc } from "date-fns-tz";
-
-const getLocalDateFromString = (date: string | null) => {
-  return date ? utcToZonedTime(appendZToIsoString(date), "Asia/Hong_Kong") : null;
-};
-
-const getDateStringFromLocalDate = (date: Date | null) => {
-  return date ? zonedTimeToUtc(date, "Asia/Hong_Kong").toISOString() : null;
-};
+import { getDateStringFromLocalDate, getLocalDateFromString } from "@/utils/date";
 
 function Scheduling() {
   const schedule = useStoreState((state) => state.config.editingSchedule);

@@ -2,7 +2,34 @@
  * @file Types for the database tables.
  */
 
+import { NumberInputStylesNames } from "@mantine/core";
 import { GraderReport, ScoreReports } from "./report";
+import { ChangeLogState } from "./appeal";
+
+export type AppealMessage = {
+  id: number;
+  message: string;
+  senderId: number;
+  appealId: number;
+  createdAt: string;
+  isRead: boolean;
+  assignmentAppeal: Appeal;
+  user: User;
+};
+
+export type Appeal = {
+  id: number;
+  createdAt: string;
+  status: string;
+  newFileSubmissionId: number | null;
+  updatedAt: string | null;
+  userId: number;
+  assignmentConfigId: number;
+  assignmentAppealMessages: AppealMessage[];
+  assignmentConfig: AssignmentConfig;
+  submission: Submission;
+  user: User;
+};
 
 export type Assignment = {
   configs: AssignmentConfig[];
@@ -42,6 +69,14 @@ export type AssignmentConfig = {
   /** Whether the current time is after `stopCollectionAt`. */
   submissionWindowPassed: boolean;
   updatedAt: string;
+  /** Appeal-related */
+  isAppealAllowed: boolean;
+  appealLimits: number | null;
+  appealStartAt: string | null;
+  appealStopAt: string | null;
+  isAppealStudentReplyAllowed: boolean;
+  isAppealViewReportAllowed: boolean;
+  assignmentAppeals: Appeal[];
 };
 
 export type AssignmentConfigUser = {
@@ -60,6 +95,22 @@ export type AssignmentType = {
   id: number;
   name: string;
   updated_at: string;
+};
+
+export type ChangeLog = {
+  id: number;
+  createdAt: string;
+  type: string;
+  originalState: ChangeLogState;
+  updatedState: ChangeLogState;
+  initiatedBy: number;
+  reason: string;
+  appealId: number;
+  userId: number;
+  assignmentConfigId: number;
+  reportId: number;
+  submissionId: number;
+  user: User;
 };
 
 export type Course = {
@@ -160,6 +211,7 @@ export type Submission = {
   extracted_path: string | null;
   fail_reason: string | null;
   id: number;
+  isAppeal: boolean;
   isLate: boolean;
   remarks: object | null;
   reports: Report[];
@@ -180,8 +232,9 @@ export type User = {
   initials: string;
   isAdmin: boolean;
   itsc: string;
-  name: String;
+  name: string;
   sections: SectionUser[];
   submissions: Submission[];
   updatedAt: string;
+  changeLogsByUserId: ChangeLog[];
 };

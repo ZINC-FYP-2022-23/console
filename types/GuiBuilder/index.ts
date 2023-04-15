@@ -1,6 +1,7 @@
 export * from "./Config";
 export type { default as Config } from "./Config";
 export * from "./Diagnostics";
+export type { default as GradeAppealPolicy } from "./GradeAppealPolicy";
 export * from "./GradingPolicy";
 export type { default as GradingPolicy } from "./GradingPolicy";
 export * from "./Graph";

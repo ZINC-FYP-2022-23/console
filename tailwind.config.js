@@ -55,6 +55,7 @@ module.exports = {
   },
   plugins: [],
   safelist: [
-    { pattern: /section-*/ }
+    { pattern: /section-*/ },
+    { pattern: /max-w-*/ }
   ]
 }

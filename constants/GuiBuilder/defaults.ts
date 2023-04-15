@@ -1,5 +1,6 @@
 import {
   Config,
+  GradeAppealPolicy,
   GradingPolicy,
   JoinPolicy,
   Predicate,
@@ -48,6 +49,15 @@ export const defaultConfig: Config = {
   _settings: defaultSettings,
   stageDeps: {},
   stageData: {},
+};
+
+export const defaultGradeAppeal: GradeAppealPolicy = {
+  isAppealAllowed: false,
+  appealLimits: null,
+  appealStartAt: null,
+  appealStopAt: null,
+  isAppealStudentReplyAllowed: true,
+  isAppealViewReportAllowed: true,
 };
 
 export const defaultJoinPolicy: JoinPolicy = "AND";
