@@ -1,9 +1,8 @@
-import { Submission as SubmissionType } from "types";
+import { ChangeLog, Submission as SubmissionType } from "@/types/tables";
 import {
   AppealAttempt,
   AppealLog,
   DisplayMessageType,
-  ChangeLog,
   ChangeLogTypes,
   AppealStatus,
   ChangeLogState,
@@ -181,6 +180,7 @@ function transformToAppealLog({ appeals, changeLog }: transformToAppealLogProps)
   changeLog.forEach((log) => {
     appealLog.push({
       id: log.id,
+      // @ts-ignore
       type: log.type,
       date: log.createdAt,
       originalState: log.originalState,
@@ -243,6 +243,9 @@ export function mergeDataToActivityLogList({
       appealId: log.appealId || null,
       userId: log.userId,
       assignmentConfigId: log.assignmentConfigId,
+      reportId: log.reportId,
+      submissionId: log.submissionId,
+      user: log.user,
     });
   });
 

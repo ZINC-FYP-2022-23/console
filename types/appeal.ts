@@ -19,28 +19,6 @@ export type AppealAttempt = {
   updatedAt: string;
 };
 
-export type AppealMessage = {
-  id: number;
-  message: string;
-  createdAt: string;
-  senderId: number;
-  attemptId: number;
-  isRead: boolean;
-};
-
-export type ChangeLog = {
-  id: number;
-  createdAt: string;
-  type: ChangeLogTypes;
-  originalState: ChangeLogState;
-  updatedState: ChangeLogState;
-  initiatedBy: number; // User ID
-  reason?: string;
-  appealId?: number;
-  userId: number;
-  assignmentConfigId: number;
-};
-
 export enum ChangeLogTypes {
   APPEAL_STATUS = "APPEAL_STATUS",
   SCORE = "SCORE",
