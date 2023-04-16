@@ -39,6 +39,18 @@ export type AppealLog = {
   reason?: string;
 };
 
+/**
+ * Data returned by the webhook `/diffSubmissions` endpoint, which compares two assignment submissions.
+ */
+export type DiffSubmissionsData = {
+  /** Diff output between the old submission and the new submission. */
+  diff: string;
+  /** Error message if any. */
+  error: string | null;
+  /** HTTP status of the API call. */
+  status: number;
+};
+
 export type DisplayMessageType = {
   id: number;
   content: string;
