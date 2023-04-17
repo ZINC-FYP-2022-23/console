@@ -64,7 +64,7 @@ export function AppealTextMessage({ message }: { message: DisplayMessageType }) 
         <div className="flex flex-row space-x-2">
           <Icon name={name} type={type} />
           <div className="overflow-x-auto">
-            <div className="flex flex-row space-x-2">
+            <div className="mb-1 flex flex-row space-x-2">
               <p className="ml-2 text-sm text-gray-600 font-bold">{name}</p>
               <p className="ml-2 text-sm text-gray-500">({type})</p>
               <p className="ml-1 text-sm text-gray-600">
@@ -75,7 +75,7 @@ export function AppealTextMessage({ message }: { message: DisplayMessageType }) 
                 })} at ${logDate.toLocaleTimeString().toLowerCase()}`}
               </p>
             </div>
-            <div className="ml-2 text-m text-gray-900" dangerouslySetInnerHTML={{ __html: content }} />
+            <div className="appeal-msg ml-2 text-m text-gray-900" dangerouslySetInnerHTML={{ __html: content }} />
           </div>
         </div>
       </div>

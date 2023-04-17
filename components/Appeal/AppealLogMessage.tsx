@@ -77,7 +77,7 @@ export function AppealLogMessage({ log, showReason }: AppealLogMessageType) {
         </span>
         {showReason ? " with the following message:" : ""}
         {showReason && log.reason && (
-          <div className="mt-1 text-xs text-gray-500" dangerouslySetInnerHTML={{ __html: log.reason }} />
+          <div className="appeal-msg mt-1 text-xs text-gray-500" dangerouslySetInnerHTML={{ __html: log.reason }} />
         )}
       </p>
     );
@@ -124,7 +124,7 @@ export function AppealLogMessage({ log, showReason }: AppealLogMessageType) {
         </span>
         {showReason && " with the following message:"}
         {showReason && log.reason && (
-          <div className="mt-1 text-xs text-gray-500" dangerouslySetInnerHTML={{ __html: log.reason }} />
+          <div className="appeal-msg mt-1 text-xs text-gray-500" dangerouslySetInnerHTML={{ __html: log.reason }} />
         )}
       </p>
     );
