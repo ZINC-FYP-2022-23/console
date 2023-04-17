@@ -1,3 +1,5 @@
+import AppealChangeConfirmModal from "@/components/Appeal/AppealChangeConfirmModal";
+import AppealCodeComparison from "@/components/Appeal/AppealCodeComparison";
 import { AppealLogMessage } from "@/components/Appeal/AppealLogMessage";
 import { AppealResult } from "@/components/Appeal/AppealResult";
 import { AppealTextMessage } from "@/components/Appeal/AppealTextMessage";
@@ -21,25 +23,26 @@ import {
   AppealStatus,
   ChangeLogState,
   ChangeLogTypes,
+  DiffSubmissionsData,
   DisplayMessageType,
   Submission as SubmissionType,
 } from "@/types";
 import { ChangeLog } from "@/types/tables";
 import { isInputEmpty, mergeDataToActivityLogList, transformToAppealAttempt } from "@/utils/appealUtils";
+import { getLocalDateFromString } from "@/utils/date";
 import { useQuery, useSubscription } from "@apollo/client";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Tab } from "@headlessui/react";
-import { Alert, Modal, clsx, createStyles } from "@mantine/core";
+import { Alert } from "@mantine/core";
 import axios from "axios";
 import { zonedTimeToUtc } from "date-fns-tz";
 import { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import { ReactGhLikeDiff } from "react-gh-like-diff";
 import { initializeApollo } from "../../../lib/apollo";
-import { getLocalDateFromString } from "@/utils/date";
+import { Spinner } from "@/components/Spinner";
 
-type NewChangeLog = {
+export type NewChangeLog = {
   createdAt: Date;
   type: string;
   originalState: ChangeLogState;
@@ -50,7 +53,7 @@ type NewChangeLog = {
   assignmentConfigId: number;
 };
 
-interface createNewChangeLogProps {
+interface CreateNewChangeLogProps {
   appealAttempt: AppealAttempt;
   type: string;
   newStatus?: AppealStatus;
@@ -62,7 +65,7 @@ interface createNewChangeLogProps {
  * Returns a new change log to create a Change Log with `CREATE_CHANGE_LOG`
  * @returns {(ChangeLog & { userId: number, assignmentConfigId: number })}
  */
-function createNewChangeLog({ appealAttempt, type, newStatus, oldScore, newScore }: createNewChangeLogProps) {
+function createNewChangeLog({ appealAttempt, type, newStatus, oldScore, newScore }: CreateNewChangeLogProps) {
   let originalState, updatedState;
 
   // Set the `originalState` and `updatedState` according to the change log type
@@ -102,193 +105,6 @@ function createNewChangeLog({ appealAttempt, type, newStatus, oldScore, newScore
   return newLog;
 }
 
-interface ChangeConfirmModalProps {
-  /** New Appeal Log to be inputted */
-  changeLog: NewChangeLog;
-  /** Modal (i.e. pop-up window) appears or not */
-  modalOpen: boolean;
-  /** Function that sets the bollean of `modalOpen` */
-  setModalOpen;
-  /** Details of the appeal attempt */
-  appealAttempt: AppealAttempt;
-}
-
-/**
- * Returns a custom Modal that confirms the appeal changes made by the TA
- * */
-function ChangeConfirmModal({ changeLog, modalOpen, setModalOpen, appealAttempt }: ChangeConfirmModalProps) {
-  const [reason, setReason] = useState("");
-  const dispatch = useLayoutDispatch();
-
-  let type: ChangeLogTypes;
-  let mutationText: string | null = null;
-  let text: string;
-
-  if (changeLog.type === ChangeLogTypes.APPEAL_STATUS && changeLog.updatedState.type === "status") {
-    text = "The appeal status will be updated to ";
-    type = ChangeLogTypes.APPEAL_STATUS;
-    mutationText = changeLog.updatedState.status;
-  } else if (changeLog.type === ChangeLogTypes.SCORE && changeLog.updatedState.type === "score") {
-    text = "The score will be updated to ";
-    type = ChangeLogTypes.SCORE;
-    mutationText = changeLog.updatedState.score.toString();
-  } else {
-    text = "There will be an update in submission ";
-    type = ChangeLogTypes.SUBMISSION;
-  }
-
-  return (
-    <Modal
-      size="60%"
-      opened={modalOpen}
-      onClose={() => {
-        setModalOpen(false);
-      }}
-      title="Please enter the reason for the following change:"
-    >
-      {/* Display change */}
-      <div className="flex items-center">
-        <div className="w-8 h-8 bg-yellow-300 rounded-full flex justify-center items-center">
-          {changeLog.type === ChangeLogTypes.APPEAL_STATUS && <FontAwesomeIcon icon={["fad", "gavel"]} />}
-          {changeLog.type === ChangeLogTypes.SCORE && <FontAwesomeIcon icon={["fad", "star"]} />}
-          {changeLog.type === ChangeLogTypes.SUBMISSION && <FontAwesomeIcon icon={["fad", "inbox-in"]} />}
-        </div>
-        <p className="ml-2 text-sm text-gray-600">
-          {text}
-          <p className="text-green-600 font-bold">
-            {mutationText === AppealStatus.ACCEPTED && <p>Accepted</p>}
-            {mutationText === AppealStatus.REJECTED && <p className="text-red-600">Rejected</p>}
-            {mutationText === AppealStatus.PENDING && <p className="text-yellow-600">Pending</p>}
-            {changeLog.type === ChangeLogTypes.SCORE && <p>{mutationText}</p>}
-          </p>
-        </p>
-      </div>
-      <div className="py-1" />
-      {/* @ts-ignore */}
-      <RichTextEditor
-        id="rte"
-        value={reason}
-        onChange={setReason}
-        controls={[
-          ["bold", "italic", "underline"],
-          ["h1", "h2", "h3", "unorderedList", "orderedList"],
-        ]}
-      />
-      <div className="py-1" />
-      <button
-        className="w-full px-4 py-1 rounded-md text-sm bg-green-500 text-white hover:bg-green-600 active:bg-green-700 transition ease-in-out duration-150"
-        onClick={async () => {
-          if (isInputEmpty(reason)) {
-            alert("Please fill in the reasoning for the change.");
-          } else {
-            changeLog.reason = reason;
-
-            if (type === ChangeLogTypes.APPEAL_STATUS) {
-              try {
-                await axios({
-                  method: "POST",
-                  url: `/api/changes/status`,
-                  data: {
-                    reason: reason,
-                    appealId: appealAttempt.id,
-                    updatedState: changeLog.updatedState,
-                  },
-                });
-
-                setReason("");
-                setModalOpen(false);
-
-                dispatch({
-                  type: "showNotification",
-                  payload: {
-                    title: "Appeal status change successful",
-                    success: true,
-                  },
-                });
-
-                return;
-              } catch (error: any) {
-                const { status: statusCode, data: responseJson } = error.response;
-                if (statusCode === 403 || statusCode === 422) {
-                  // 403 Forbidden OR 422 Unprocessable Content
-                  dispatch({
-                    type: "showNotification",
-                    payload: {
-                      title: "Appeal status change denied",
-                      message: responseJson.error,
-                      success: false,
-                    },
-                  });
-                  return;
-                }
-                dispatch({
-                  type: "showNotification",
-                  payload: {
-                    title: "Unable to change appeal status",
-                    message:
-                      "Failed to change appeal status due to network/server issues. Please submit again.\n" + error,
-                    success: false,
-                  },
-                });
-              }
-            } else if (type === ChangeLogTypes.SCORE) {
-              try {
-                await axios({
-                  method: "POST",
-                  url: `/api/changes/score`,
-                  data: {
-                    appealId: appealAttempt.id,
-                    originalState: changeLog.originalState,
-                    updatedState: changeLog.updatedState,
-                    reason: reason,
-                  },
-                });
-
-                setReason("");
-                setModalOpen(false);
-
-                dispatch({
-                  type: "showNotification",
-                  payload: {
-                    title: "Score change successful",
-                    success: true,
-                  },
-                });
-
-                return;
-              } catch (error: any) {
-                const { status: statusCode, data: responseJson } = error.response;
-                if (statusCode === 403 || statusCode === 422) {
-                  // 403 Forbidden OR 422 Unprocessable Content
-                  dispatch({
-                    type: "showNotification",
-                    payload: {
-                      title: "Score change denied",
-                      message: responseJson.error,
-                      success: false,
-                    },
-                  });
-                  return;
-                }
-                dispatch({
-                  type: "showNotification",
-                  payload: {
-                    title: "Unable to change student score",
-                    message: "Failed to change student score due to network/server issues. Please try again.\n" + error,
-                    success: false,
-                  },
-                });
-              }
-            }
-          }
-        }}
-      >
-        Confirm
-      </button>
-    </Modal>
-  );
-}
-
 interface ChangeAppealStatusProps {
   appealAttempt: AppealAttempt;
 }
@@ -322,7 +138,7 @@ function ChangeAppealStatus({ appealAttempt }: ChangeAppealStatusProps) {
 
   return (
     <div className="w-auto h-full px-5 py-4 bg-white text-gray-700 shadow rounded-md">
-      <ChangeConfirmModal
+      <AppealChangeConfirmModal
         changeLog={newLog}
         modalOpen={modalOpen}
         setModalOpen={setModalOpen}
@@ -430,7 +246,7 @@ function ChangeScore({ appealAttempt, oldScore, maxScore }: ChangeScoreProps) {
 
   return (
     <div className="w-auto h-full px-5 py-4 bg-white text-gray-700 shadow rounded-md">
-      <ChangeConfirmModal
+      <AppealChangeConfirmModal
         changeLog={newLog}
         modalOpen={modalOpen}
         setModalOpen={setModalOpen}
@@ -594,12 +410,12 @@ function ActivityLogTab({ userId, activityLogList, allowChange }: ActivityLogTab
           ) => {
             if (log._type === "appealLog") {
               return (
-                <div className="px-3">
+                <div key={`log-${log.id}`} className="px-3">
                   <AppealLogMessage key={log.id} log={log} showReason />
                 </div>
               );
             } else if (log._type === "appealMessage") {
-              return <AppealTextMessage key={log.id} message={log} />;
+              return <AppealTextMessage key={`msg-${log.id}`} message={log} />;
             }
           },
         )}
@@ -625,71 +441,6 @@ function ActivityLogTab({ userId, activityLogList, allowChange }: ActivityLogTab
           )}
         </div>
       )}
-    </div>
-  );
-}
-
-type CodeComparisonTabProps = {
-  diffData: DiffSubmissionsData;
-};
-
-/**
- * Data returned by the webhook `/diffSubmissions` endpoint, which compares two assignment submissions.
- */
-type DiffSubmissionsData = {
-  /** Diff output between the old submission and the new submission. */
-  diff: string;
-  /** Error message if any. */
-  error: string | null;
-  /** HTTP status of the API call. */
-  status: number;
-};
-
-/**
- * Show the difference between new and old file submissions under the Code Comparison Tab by using ReactGhLikeDiff
- */
-function CodeComparisonTab({ diffData }: CodeComparisonTabProps) {
-  const useStyles = createStyles(() => ({
-    diffView: {
-      "& .d2h-file-name": {
-        // Overrides the hidden file name in `index.css`
-        display: "block !important",
-      },
-    },
-  }));
-
-  const { classes } = useStyles();
-  const { diff, error, status } = diffData;
-
-  if (status === -1) {
-    return <p className="mt-8 text-center text-gray-600">This appeal attempt does not include a file submission.</p>;
-  }
-
-  if (status !== 200) {
-    return (
-      <div className="mt-8 flex flex-col items-center space-y-5 text-red-500">
-        <FontAwesomeIcon icon={["far", "circle-exclamation"]} size="3x" />
-        <div className="space-y-2 text-center">
-          <p>An error occurred while comparing old and new submissions.</p>
-          <p>{error}</p>
-        </div>
-      </div>
-    );
-  }
-  if (diff === "") {
-    return (
-      <p className="mt-8 text-center text-gray-600">The new appeal submission is the same as the old submission.</p>
-    );
-  }
-  return (
-    <div className={clsx("relative", classes.diffView)}>
-      <ReactGhLikeDiff
-        options={{
-          outputFormat: "side-by-side",
-          showFiles: true,
-        }}
-        diffString={diff}
-      />
     </div>
   );
 }
@@ -735,17 +486,10 @@ function DisplayError({ errorMessage }: DisplayErrorProps) {
 function DisplayLoading() {
   return (
     <LayoutProvider>
-      <Layout title="Grade Appeal Details">
-        <main className="flex-1 flex bg-gray-200 overflow-y-auto">
-          <div className="p-5 flex flex-1 flex-col h-full w-max">
-            <div className="pb-3">
-              <div className="my-1 flex items-center">
-                <h1 className="flex-1 font-semibold text-2xl text-center">Grade Appeal</h1>
-              </div>
-              <div>Loading Data...</div>
-            </div>
-          </div>
-        </main>
+      <Layout title="Appeal Details">
+        <div className="w-full my-20 flex justify-center">
+          <Spinner className="h-16 w-16 text-cse-500" />
+        </div>
       </Layout>
     </LayoutProvider>
   );
@@ -910,14 +654,44 @@ function AppealDetails({ appealId, userId, studentId, assignmentConfigId, diffSu
 
   // Determine if new changes and messages can be submitted
   let allowChange: boolean = true;
-  if (appealsData!.appeals[0].id != appealAttempt[0].id) allowChange = false;
+  if (appealsData!.appeals[0].id !== appealAttempt[0].id) allowChange = false;
+
+  let appealTextStyle: any = null;
+  if (!allowChange) {
+    switch (appealsDetailsData?.appeal.status) {
+      case AppealStatus.ACCEPTED: {
+        appealTextStyle = {
+          textColor: "text-green-600",
+          iconName: "check",
+          status: "Accepted",
+        };
+        break;
+      }
+      case AppealStatus.REJECTED: {
+        appealTextStyle = {
+          textColor: "text-red-600",
+          iconName: "xmark",
+          status: "Rejected",
+        };
+        break;
+      }
+      case AppealStatus.PENDING: {
+        appealTextStyle = {
+          textColor: "text-yellow-600",
+          iconName: "clock",
+          status: "Pending",
+        };
+        break;
+      }
+    }
+  }
 
   return (
     <LayoutProvider>
       <Layout title="Appeal Detail">
         <div className="p-6 w-full flex flex-col overflow-y-auto">
           <h1 className="text-2xl text-gray-900 font-bold leading-7">Appeal Details</h1>
-          <div className="flex flex-row mt-8">
+          <div className="flex flex-row mt-6">
             {/* Appeal Information */}
             <div className="max-w-md mr-4 px-5 py-4 grid grid-cols-3 gap-4 bg-white text-gray-700 shadow rounded-md">
               <p className="font-medium">Name:</p>
@@ -929,6 +703,18 @@ function AppealDetails({ appealId, userId, studentId, assignmentConfigId, diffSu
                   <p className="font-medium">Score:</p>
                   <p className="col-span-2">
                     {score} / {maxScore}
+                  </p>
+                </>
+              )}
+              {appealTextStyle && (
+                <>
+                  <p className="font-medium">Status:</p>
+                  <p className="col-span-2">
+                    <FontAwesomeIcon
+                      icon={["far", appealTextStyle.iconName]}
+                      className={`${appealTextStyle.textColor} mr-2`}
+                    />
+                    <span className={appealTextStyle.textColor}>{appealTextStyle.status}</span>
                   </p>
                 </>
               )}
@@ -980,7 +766,7 @@ function AppealDetails({ appealId, userId, studentId, assignmentConfigId, diffSu
                 </Tab.Panel>
                 {/* "Code Comparison" tab panel */}
                 <Tab.Panel>
-                  <CodeComparisonTab diffData={diffSubmissionsData} />
+                  <AppealCodeComparison diffData={diffSubmissionsData} />
                 </Tab.Panel>
               </Tab.Panels>
             </Tab.Group>
@@ -1021,9 +807,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, query }) => 
     try {
       const response = await fetch(
         `http://${process.env.WEBHOOK_ADDR}/diffSubmissions?oldId=${oldSubmissionId}&newId=${newSubmissionId}`,
-        {
-          method: "GET",
-        },
+        { method: "GET" },
       );
       const { status } = response;
       const { diff, error } = await response.json();

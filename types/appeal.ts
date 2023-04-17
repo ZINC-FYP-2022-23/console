@@ -11,7 +11,7 @@ export enum AppealStatus {
 
 export type AppealAttempt = {
   id: number;
-  newFileSubmissionId?: number | string;
+  newFileSubmissionId?: number;
   assignmentConfigId: number;
   userId: number;
   createdAt: string;
@@ -37,6 +37,19 @@ export type AppealLog = {
   originalState?: ChangeLogState;
   updatedState?: ChangeLogState;
   reason?: string;
+  newFileSubmissionId?: number;
+};
+
+/**
+ * Data returned by the webhook `/diffSubmissions` endpoint, which compares two assignment submissions.
+ */
+export type DiffSubmissionsData = {
+  /** Diff output between the old submission and the new submission. */
+  diff: string;
+  /** Error message if any. */
+  error: string | null;
+  /** HTTP status of the API call. */
+  status: number;
 };
 
 export type DisplayMessageType = {

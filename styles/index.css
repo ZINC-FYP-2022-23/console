@@ -200,3 +200,24 @@
 .boarding-popover-title {
   @apply mb-3 font-sans font-semibold text-lg !important;
 }
+
+/* Appeal messages */
+.appeal-msg h1 {
+  @apply mb-2 font-semibold text-2xl;
+}
+
+.appeal-msg h2 {
+  @apply mb-1 font-semibold text-xl;
+}
+
+.appeal-msg h3 {
+  @apply font-semibold text-lg;
+}
+
+.appeal-msg ul {
+  @apply ml-5 list-disc;
+}
+
+.appeal-msg ol {
+  @apply ml-5 list-decimal;
+}
