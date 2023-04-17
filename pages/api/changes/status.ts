@@ -1,6 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import axios from "axios";
-import { zonedTimeToUtc } from "date-fns-tz";
 import { UPDATE_APPEAL_STATUS } from "@/graphql/mutations/appealMutations";
 import { GET_LATEST_APPEAL, GET_UPDATE_APPEAL_STATUS_VALIDATION_DATA } from "@/graphql/queries/appealQueries";
 import { parse } from "cookie";
@@ -112,7 +111,6 @@ async function handlePostUpdateAppealStatus(req: NextApiRequest, res: NextApiRes
     }
 
     const changeLogInput = {
-      createdAt: zonedTimeToUtc(now, "Asia/Hong_Kong"),
       type: ChangeLogTypes.APPEAL_STATUS,
       originalState: {
         type: "status",
@@ -138,7 +136,6 @@ async function handlePostUpdateAppealStatus(req: NextApiRequest, res: NextApiRes
         variables: {
           changeLogInput,
           status,
-          updatedAt: zonedTimeToUtc(now, "Asia/Hong_Kong"),
           appealId,
         },
       },

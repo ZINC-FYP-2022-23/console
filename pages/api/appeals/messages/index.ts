@@ -1,6 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import axios from "axios";
-import { zonedTimeToUtc } from "date-fns-tz";
 import { CREATE_APPEAL_MESSAGE } from "@/graphql/mutations/appealMutations";
 import { GET_APPEAL_MESSAGE_VALIDATION_DATA } from "@/graphql/queries/appealQueries";
 import { getLocalDateFromString } from "@/utils/date";
@@ -11,7 +10,6 @@ async function handlePostAppealMessage(req: NextApiRequest, res: NextApiResponse
   const appealId = body.appealId;
 
   const now: Date = new Date();
-  body.createdAt = zonedTimeToUtc(now, "Asia/Hong_Kong");
 
   try {
     // Search for assignment config, sender identity and

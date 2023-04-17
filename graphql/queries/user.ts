@@ -124,6 +124,7 @@ export const GET_SUBMISSIONS_FOR_ASSIGNMENT_CONFIG = gql`
         order_by: [{ user_id: asc }, { created_at: desc }]
       ) {
         id
+        isAppeal
         reports(order_by: { createdAt: desc }, limit: 1) {
           grade
         }
@@ -301,6 +302,7 @@ export const SUBMISSION_SUBSCRIPTION = gql`
       where: { user_id: { _eq: $userId }, assignment_config_id: { _eq: $assignmentConfigId } }
     ) {
       id
+      isAppeal
       created_at
       upload_name
       extracted_path

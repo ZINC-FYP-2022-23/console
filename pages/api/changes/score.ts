@@ -1,6 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import axios from "axios";
-import { zonedTimeToUtc } from "date-fns-tz";
 import { CREATE_CHANGE_LOG } from "@/graphql/mutations/appealMutations";
 import {
   GET_SCORE_CHANGE_VALIDATION_DATA_WITHOUT_APPEAL_ID,
@@ -108,7 +107,6 @@ async function handlePostScoreChange(req: NextApiRequest, res: NextApiResponse) 
     }
 
     const changeLogInput = {
-      createdAt: zonedTimeToUtc(now, "Asia/Hong_Kong"),
       type: ChangeLogTypes.SCORE,
       originalState: body.originalState,
       updatedState: body.updatedState,

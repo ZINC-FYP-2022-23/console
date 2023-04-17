@@ -1,5 +1,6 @@
 import { AppealLog, ChangeLogTypes } from "@/types/appeal";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Link from "next/link";
 
 interface AppealLogMessageType {
   /** Log to be displayed. */
@@ -29,16 +30,26 @@ export function AppealLogMessage({ log, showReason }: AppealLogMessageType) {
       </div>
     );
     content = (
-      <p className="ml-2 text-sm text-gray-600">
-        Your appeal was submitted on
-        <span className="ml-1">
-          {`${logDate.toLocaleDateString("en-HK", {
-            month: "short",
-            day: "numeric",
-            ...(logDate.getFullYear() !== now.getFullYear() && { year: "numeric" }),
-          })} at ${logDate.toLocaleTimeString().toLowerCase()}`}
-        </span>
-      </p>
+      // TODO: fix button position
+      <div className="">
+        <p className="ml-2 text-sm text-gray-600">
+          The appeal was submitted on
+          <span className="ml-1">
+            {`${logDate.toLocaleDateString("en-HK", {
+              month: "short",
+              day: "numeric",
+              ...(logDate.getFullYear() !== now.getFullYear() && { year: "numeric" }),
+            })} at ${logDate.toLocaleTimeString().toLowerCase()}`}
+          </span>
+        </p>
+        {log.newFileSubmissionId && (
+          <Link href={`/api/download/submissions/${log.newFileSubmissionId}`}>
+            <a className="-ml-px relative inline-flex items-center px-3 py-1.5 rounded-lg border border-gray-300 bg-white text-xs leading-5 font-medium text-blue-700 hover:text-blue-500 focus:z-10 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-gray-100 active:text-blue-500 transition ease-in-out duration-150">
+              Download submission
+            </a>
+          </Link>
+        )}
+      </div>
     );
   }
   // `APPEAL_STATUS`-related log

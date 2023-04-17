@@ -228,15 +228,18 @@ function AppealsTable({ assignmentConfigId }: AppealsTableProps) {
       let status: AppealStatus = transformAppealStatus(appeal.status);
 
       // Get the Original Score
-      const originalScore: number = submissionsData!.submissions.filter((e) => !e.isAppeal && e.reports.length > 0)[0]
-        .reports[0].grade.score;
+      const originalScore: number = submissionsData!.submissions.filter(
+        (e) => e.user_id === appeal.userId && !e.isAppeal && e.reports.length && e.reports[0].grade,
+      )[0].reports[0].grade.score;
 
       // Get the Final Score
       const userAppeals: Appeal[] = appealsDetailsData.appeals
-        .filter((a) => a.userId === appeal.userId)
-        .slice(appealIndex);
+        .slice(appealIndex)
+        .filter((a) => a.userId === appeal.userId);
       const userChangeLogs: ChangeLog[] = appeal.user.changeLogsByUserId.filter((c) => c.appealId === appeal.id);
-      const userSubmissions: SubmissionType[] = submissionsData.submissions.filter((s) => s.user_id === appeal.userId);
+      const userSubmissions: SubmissionType[] = submissionsData.submissions.filter(
+        (s) => !s.isAppeal && s.user_id === appeal.userId,
+      );
       const finalScore = getScore({
         appeals: userAppeals,
         changeLogs: userChangeLogs,
