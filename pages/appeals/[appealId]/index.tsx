@@ -654,7 +654,37 @@ function AppealDetails({ appealId, userId, studentId, assignmentConfigId, diffSu
 
   // Determine if new changes and messages can be submitted
   let allowChange: boolean = true;
-  if (appealsData!.appeals[0].id != appealAttempt[0].id) allowChange = false;
+  if (appealsData!.appeals[0].id !== appealAttempt[0].id) allowChange = false;
+
+  let appealTextStyle: any = null;
+  if (!allowChange) {
+    switch (appealsDetailsData?.appeal.status) {
+      case AppealStatus.ACCEPTED: {
+        appealTextStyle = {
+          textColor: "text-green-600",
+          iconName: "check",
+          status: "Accepted",
+        };
+        break;
+      }
+      case AppealStatus.REJECTED: {
+        appealTextStyle = {
+          textColor: "text-red-600",
+          iconName: "xmark",
+          status: "Rejected",
+        };
+        break;
+      }
+      case AppealStatus.PENDING: {
+        appealTextStyle = {
+          textColor: "text-yellow-600",
+          iconName: "clock",
+          status: "Pending",
+        };
+        break;
+      }
+    }
+  }
 
   return (
     <LayoutProvider>
@@ -673,6 +703,18 @@ function AppealDetails({ appealId, userId, studentId, assignmentConfigId, diffSu
                   <p className="font-medium">Score:</p>
                   <p className="col-span-2">
                     {score} / {maxScore}
+                  </p>
+                </>
+              )}
+              {appealTextStyle && (
+                <>
+                  <p className="font-medium">Status:</p>
+                  <p className="col-span-2">
+                    <FontAwesomeIcon
+                      icon={["far", appealTextStyle.iconName]}
+                      className={`${appealTextStyle.textColor} mr-2`}
+                    />
+                    <span className={appealTextStyle.textColor}>{appealTextStyle.status}</span>
                   </p>
                 </>
               )}
