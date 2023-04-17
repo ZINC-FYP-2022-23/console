@@ -32,7 +32,6 @@ export function AppealLogMessage({ log, showReason }: AppealLogMessageType) {
       </div>
     );
     content = (
-      // TODO: fix button position
       <div className="">
         <p className="ml-2 text-sm text-gray-600">
           The appeal was submitted on
