@@ -85,14 +85,14 @@ async function handlePostUpdateAppealStatus(req: NextApiRequest, res: NextApiRes
       });
     }
 
-    // Appeal status change cannot be performed before the previous update
-    const appealUpdatedAt = getLocalDateFromString(updateAppealStatusValidationData.appeal.updatedAt);
-    if (appealUpdatedAt && now < appealUpdatedAt) {
-      return res.status(403).json({
-        status: "error",
-        error: "Should not update appeal status before appeal time.",
-      });
-    }
+    // // Appeal status change cannot be performed before the previous update
+    // const appealUpdatedAt = getLocalDateFromString(updateAppealStatusValidationData.appeal.updatedAt);
+    // if (appealUpdatedAt && now < appealUpdatedAt) {
+    //   return res.status(403).json({
+    //     status: "error",
+    //     error: "Should not update appeal status before appeal time.",
+    //   });
+    // }
 
     // Validate updatedState different from originalState
     if (updateAppealStatusValidationData.appeal.status === body.updatedState.status) {
