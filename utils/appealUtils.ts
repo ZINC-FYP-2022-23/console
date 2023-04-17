@@ -9,6 +9,17 @@ import {
 } from "@/types/appeal";
 
 /**
+ * Compute the maximum score of the assignment from the submissions.
+ */
+export function getMaxScore(submissions: SubmissionType[] | undefined): number | undefined {
+  const nonAppealSubmission = submissions?.find((s) => !s.isAppeal && s.reports.length > 0);
+  if (nonAppealSubmission) {
+    return nonAppealSubmission.reports.find((r) => r.grade)?.grade.maxTotal;
+  }
+  return undefined;
+}
+
+/**
  * Transform the raw data appeal status into type `AppealStatus`
  * @param originalStatus - The status to be transformed
  * @returns {AppealStatus}

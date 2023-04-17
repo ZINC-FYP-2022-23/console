@@ -28,7 +28,7 @@ import {
   Submission as SubmissionType,
 } from "@/types";
 import { ChangeLog } from "@/types/tables";
-import { isInputEmpty, mergeDataToActivityLogList, transformToAppealAttempt } from "@/utils/appealUtils";
+import { getMaxScore, isInputEmpty, mergeDataToActivityLogList, transformToAppealAttempt } from "@/utils/appealUtils";
 import { getLocalDateFromString } from "@/utils/date";
 import { useQuery, useSubscription } from "@apollo/client";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -605,7 +605,7 @@ function AppealDetails({ appealId, userId, studentId, assignmentConfigId, diffSu
     loading: submissionsLoading,
     error: submissionsError,
   } = useQuery<{ submissions: SubmissionType[] }>(GET_SUBMISSIONS_BY_ASSIGNMENT_AND_USER_ID, {
-    variables: { assignmentConfigId, userId },
+    variables: { assignmentConfigId, userId: studentId },
   });
   const {
     data: appealsData,
@@ -620,6 +620,8 @@ function AppealDetails({ appealId, userId, studentId, assignmentConfigId, diffSu
     return <DisplayLoading />;
   }
 
+  const maxScore = getMaxScore(submissionsData?.submissions);
+
   // Display error if it occurred
   let errorMessage: string | null = null;
   if (appealDetailsError || appealChangeLogError || appealMessagesError || submissionsError) {
@@ -627,6 +629,8 @@ function AppealDetails({ appealId, userId, studentId, assignmentConfigId, diffSu
   } else if (!appealsDetailsData || !appealsDetailsData.appeal) {
     // Check if the appeal details is available, if not, there is no such appeal
     errorMessage = "Invalid appeal. Please check the appeal number.";
+  } else if (maxScore === undefined) {
+    errorMessage = "Failed to fetch submission scores. Please check if this student is eligible for grade appeal.";
   }
   if (errorMessage) {
     return <DisplayError errorMessage={errorMessage} />;
@@ -648,9 +652,6 @@ function AppealDetails({ appealId, userId, studentId, assignmentConfigId, diffSu
     changeLogs: appealChangeLogData!.changeLogs,
     submissions: submissionsData!.submissions,
   });
-
-  const maxScore: number = submissionsData!.submissions.filter((e) => !e.isAppeal && e.reports.length > 0)[0].reports[0]
-    .grade.maxTotal;
 
   // Determine if new changes and messages can be submitted
   let allowChange: boolean = true;
@@ -702,7 +703,7 @@ function AppealDetails({ appealId, userId, studentId, assignmentConfigId, diffSu
                 <>
                   <p className="font-medium">Score:</p>
                   <p className="col-span-2">
-                    {score} / {maxScore}
+                    {score} / {maxScore!}
                   </p>
                 </>
               )}
@@ -727,7 +728,7 @@ function AppealDetails({ appealId, userId, studentId, assignmentConfigId, diffSu
                 </div>
                 {/* Score */}
                 <div className="max-w-md mr-4 px-5 y-full">
-                  <ChangeScore appealAttempt={appealAttempt[0]} oldScore={score} maxScore={maxScore} />
+                  <ChangeScore appealAttempt={appealAttempt[0]} oldScore={score} maxScore={maxScore!} />
                 </div>
               </>
             )}
