@@ -1,5 +1,7 @@
 import { AppealLog, ChangeLogTypes } from "@/types/appeal";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Link from "next/link";
+import React from "react";
 
 interface AppealLogMessageType {
   /** Log to be displayed. */
@@ -20,6 +22,8 @@ export function AppealLogMessage({ log, showReason }: AppealLogMessageType) {
   let icon: React.ReactNode | null = null;
   /** The content to render. */
   let content: React.ReactNode | null = null;
+  /** Button to show at the right. */
+  let button: React.ReactNode | null = null;
 
   // `APPEAL_SUBMISSION`-related log
   if (log.type === "APPEAL_SUBMISSION") {
@@ -40,6 +44,13 @@ export function AppealLogMessage({ log, showReason }: AppealLogMessageType) {
         </span>
       </p>
     );
+    button = log.newFileSubmissionId ? (
+      <Link href={`/api/download/submissions/${log.newFileSubmissionId}`}>
+        <a className="self-start inline-flex items-center px-3 py-1.5 border border-gray-300 text-xs leading-4 font-medium rounded-lg text-blue-700 bg-white hover:text-blue-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:text-blue-800 active:bg-gray-50 transition ease-in-out duration-150">
+          Download submission
+        </a>
+      </Link>
+    ) : null;
   }
   // `APPEAL_STATUS`-related log
   else if (log.type === ChangeLogTypes.APPEAL_STATUS && log.updatedState && log.updatedState.type === "status") {
@@ -193,6 +204,7 @@ export function AppealLogMessage({ log, showReason }: AppealLogMessageType) {
           {icon}
           <div className="mt-1.5">{content}</div>
         </div>
+        {button}
       </div>
     </>
   );
