@@ -130,33 +130,6 @@ function sort({ submissions, messages, appealLog }: sortProps) {
   return allLog;
 }
 
-interface transformStateType {
-  type: ChangeLogTypes | "APPEAL_SUBMISSION"; // Type of the log
-  state: ChangeLogState; // JSON string to be transformed
-}
-
-/**
- * Transforms a JSON object of type ChangeLogState
- * @returns {AppealStatus | string} - The new transformed state
- */
-function transformState({ type, state }: transformStateType) {
-  if (type === ChangeLogTypes.APPEAL_STATUS && state.type === "status") {
-    if (state.status === "ACCEPTED") {
-      return AppealStatus.ACCEPTED;
-    } else if (state.status === "REJECTED") {
-      return AppealStatus.REJECTED;
-    } else if (state.status === "PENDING") {
-      return AppealStatus.PENDING;
-    }
-  }
-
-  if (type === ChangeLogTypes.SCORE && state.type === "score") {
-    return state.score;
-  }
-
-  return state;
-}
-
 interface transformToAppealLogProps {
   appeals: AppealAttempt[]; // List of appeal attempts
   changeLog: ChangeLog[]; // List of change logs related to appeals
@@ -164,7 +137,7 @@ interface transformToAppealLogProps {
 
 /**
  * Transforms and merges a list of `AppealAttempt` and `ChangeLog` into one list of `AppealLog`
- * @returns {AppealLog[]} - List of transformed and merged appeal logs, ordered from newest to oldest
+ * @returns List of transformed and merged appeal logs, ordered from newest to oldest
  */
 function transformToAppealLog({ appeals, changeLog }: transformToAppealLogProps): AppealLog[] {
   let appealLog: AppealLog[] = [];

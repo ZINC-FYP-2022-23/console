@@ -21,6 +21,8 @@ export function AppealLogMessage({ log, showReason }: AppealLogMessageType) {
   let icon: React.ReactNode | null = null;
   /** The content to render. */
   let content: React.ReactNode | null = null;
+  /** Button to show at the right. */
+  let button: React.ReactNode | null = null;
 
   // `APPEAL_SUBMISSION`-related log
   if (log.type === "APPEAL_SUBMISSION") {
@@ -42,15 +44,15 @@ export function AppealLogMessage({ log, showReason }: AppealLogMessageType) {
             })} at ${logDate.toLocaleTimeString().toLowerCase()}`}
           </span>
         </p>
-        {log.newFileSubmissionId && (
-          <Link href={`/api/download/submissions/${log.newFileSubmissionId}`}>
-            <a className="-ml-px relative inline-flex items-center px-3 py-1.5 rounded-lg border border-gray-300 bg-white text-xs leading-5 font-medium text-blue-700 hover:text-blue-500 focus:z-10 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-gray-100 active:text-blue-500 transition ease-in-out duration-150">
-              Download submission
-            </a>
-          </Link>
-        )}
       </div>
     );
+    button = log.newFileSubmissionId ? (
+      <Link href={`/api/download/submissions/${log.newFileSubmissionId}`}>
+        <a className="self-start inline-flex items-center px-3 py-1.5 border border-gray-300 text-xs leading-4 font-medium rounded-lg text-blue-700 bg-white hover:text-blue-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:text-blue-800 active:bg-gray-50 transition ease-in-out duration-150">
+          Download submission
+        </a>
+      </Link>
+    ) : null;
   }
   // `APPEAL_STATUS`-related log
   else if (log.type === ChangeLogTypes.APPEAL_STATUS && log.updatedState && log.updatedState.type === "status") {
@@ -204,6 +206,7 @@ export function AppealLogMessage({ log, showReason }: AppealLogMessageType) {
           {icon}
           <div className="mt-1.5">{content}</div>
         </div>
+        {button}
       </div>
     </>
   );
