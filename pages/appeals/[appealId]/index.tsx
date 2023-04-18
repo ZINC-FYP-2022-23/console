@@ -41,6 +41,8 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { initializeApollo } from "../../../lib/apollo";
 import { Spinner } from "@/components/Spinner";
+import { SlideOver } from "@/components/SlideOver";
+import { ReportSlideOver } from "@/components/Report";
 
 export type NewChangeLog = {
   createdAt: Date;
@@ -781,6 +783,9 @@ function AppealDetails({ appealId, userId, studentId, assignmentConfigId, diffSu
           </div>
         </div>
       </Layout>
+      <SlideOver>
+        <ReportSlideOver />
+      </SlideOver>
     </LayoutProvider>
   );
 }

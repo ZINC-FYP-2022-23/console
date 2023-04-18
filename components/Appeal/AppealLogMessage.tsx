@@ -58,7 +58,6 @@ export function AppealLogMessage({ log, showReason }: AppealLogMessageProps) {
         {log.reportId !== undefined ? (
           <span className="inline-flex">
             <button
-              // TODO: make report pop out, fix dispatch
               onClick={() => dispatch({ type: "viewReport", payload: log.reportId! })}
               type="button"
               className="px-3 py-1.5 border border-gray-300 text-xs leading-4 font-medium rounded-r-lg text-blue-700 bg-white hover:text-blue-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:text-blue-800 active:bg-gray-50 transition ease-in-out duration-150"
