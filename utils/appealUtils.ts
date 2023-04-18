@@ -129,7 +129,7 @@ export function transformToAppealAttempt({ appealsDetailsData }: transformToAppe
       createdAt: appealsDetailsData.appeal.createdAt,
       latestStatus: latestStatus,
       updatedAt: appealsDetailsData.appeal.updatedAt,
-      reportId: appealsDetailsData.appeal?.submission.reports.find((r) => r.grade)?.id,
+      reportId: appealsDetailsData.appeal.submission?.reports.find((r) => r.grade)?.id,
     });
   }
 
@@ -146,7 +146,7 @@ export function transformToAppealAttempt({ appealsDetailsData }: transformToAppe
         createdAt: appeal.createdAt,
         latestStatus: latestStatus,
         updatedAt: appeal.updatedAt,
-        reportId: appealsDetailsData.appeal?.submission.reports.find((r) => r.grade)?.id,
+        reportId: appealsDetailsData.appeal.submission?.reports.find((r) => r.grade)?.id,
       });
     });
   }
