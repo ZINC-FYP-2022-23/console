@@ -247,11 +247,9 @@ function ChangeScore({ appealAttempt, oldScore, maxScore }: ChangeScoreProps) {
   /** Whether the input box is blank. */
   const [isBlank, setIsBlank] = useState(false);
 
-  // TODO: make sure oldScore actually refreshes
   // Refresh score values if scores are changed from appeal or other change logs
   useEffect(() => {
     setNewScore(oldScore);
-    console.log("Lmao");
   }, [oldScore]);
 
   return (

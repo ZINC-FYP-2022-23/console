@@ -210,6 +210,11 @@ export const GET_APPEALS_BY_USER_ID_AND_ASSIGNMENT_ID = gql`
       status
       updatedAt
       userId
+      submission {
+        reports(order_by: { createdAt: desc }, limit: 1) {
+          grade
+        }
+      }
     }
   }
 `;
