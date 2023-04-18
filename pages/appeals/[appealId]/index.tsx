@@ -97,7 +97,6 @@ function createNewChangeLog({ appealAttempt, type, newStatus, oldScore, newScore
     // } else {
     //   alert("Error: `createNewChangeLog` cannot be run without `newStatus` or `newScore`");
   }
-  console.log(oldScore, newScore);
 
   const newLog: NewChangeLog = {
     createdAt: zonedTimeToUtc(new Date(), "Asia/Hong_Kong"),
@@ -565,10 +564,12 @@ function AppealDetails({ appealId, userId, studentId, assignmentConfigId, diffSu
 
   const maxScore = getMaxScore(submissionsData?.submissions);
 
+  const changeLogs = appealsDetailsData?.appeal.user.changeLogsByUserId;
+
   // Get the original score
   const score = getScore({
     appeals: appealsData?.appeals,
-    changeLogs: appealChangeLogData?.changeLogs,
+    changeLogs,
     submissions: submissionsData?.submissions,
   });
 

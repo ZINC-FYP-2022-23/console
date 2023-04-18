@@ -24,6 +24,7 @@ import { utcToZonedTime } from "date-fns-tz";
 import Link from "next/link";
 import { useState } from "react";
 import AppealStatusBadge from "./AppealStatusBadge";
+import { getLocalDateFromString } from "@/utils/date";
 
 /** Type definition of each row in the Appeals Table. */
 type AppealTableType = {
@@ -170,7 +171,10 @@ function AppealsTable({ assignmentConfigId }: AppealsTableProps) {
       const userAppeals: Appeal[] = appealsDetailsData.appeals
         .slice(appealIndex)
         .filter((a) => a.userId === appeal.userId);
-      const userChangeLogs: ChangeLog[] = appeal.user.changeLogsByUserId.filter((c) => c.appealId === appeal.id);
+      const userChangeLogs: ChangeLog[] = appeal.user.changeLogsByUserId.filter(
+        (c) =>
+          c.appealId === appeal.id || getLocalDateFromString(c.createdAt)! <= getLocalDateFromString(appeal.updatedAt)!,
+      );
       const userSubmissions: SubmissionType[] = submissionsData.submissions.filter(
         (s) => !s.isAppeal && s.user_id === appeal.userId,
       );
