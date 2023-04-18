@@ -171,6 +171,7 @@ function AppealsTable({ assignmentConfigId }: AppealsTableProps) {
       const userAppeals: Appeal[] = appealsDetailsData.appeals
         .slice(appealIndex)
         .filter((a) => a.userId === appeal.userId);
+      // Get change logs that are not in future appeals
       const userChangeLogs: ChangeLog[] = appeal.user.changeLogsByUserId.filter(
         (c) =>
           c.appealId === appeal.id || getLocalDateFromString(c.createdAt)! <= getLocalDateFromString(appeal.updatedAt)!,

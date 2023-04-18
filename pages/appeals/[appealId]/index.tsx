@@ -48,6 +48,7 @@ import { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { initializeApollo } from "../../../lib/apollo";
+import { getLocalDateFromString } from "@/utils/date";
 
 export type NewChangeLog = {
   createdAt: Date;
@@ -564,7 +565,13 @@ function AppealDetails({ appealId, userId, studentId, assignmentConfigId, diffSu
 
   const maxScore = getMaxScore(submissionsData?.submissions);
 
-  const changeLogs = appealsDetailsData?.appeal.user.changeLogsByUserId;
+  const appeal = appealsDetailsData?.appeal;
+
+  // Get change logs that are not for future appeals
+  const changeLogs = appeal?.user.changeLogsByUserId.filter(
+    (c) =>
+      c.appealId === appeal.id || getLocalDateFromString(c.createdAt)! <= getLocalDateFromString(appeal.updatedAt)!,
+  );
 
   // Get the original score
   const score = getScore({
