@@ -1,8 +1,9 @@
+import { useLayoutDispatch } from "@/contexts/layout";
 import { AppealLog, ChangeLogTypes } from "@/types/appeal";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
 
-interface AppealLogMessageType {
+interface AppealLogMessageProps {
   /** Log to be displayed. */
   log: AppealLog;
   /** Whether to show the reason given by the TA for making that decision in the log. */
@@ -12,17 +13,19 @@ interface AppealLogMessageType {
 /**
  * Returns a component that shows a log message based on the log type
  */
-export function AppealLogMessage({ log, showReason }: AppealLogMessageType) {
+export function AppealLogMessage({ log, showReason }: AppealLogMessageProps) {
   const now = new Date();
   const logDate = new Date(log.date);
   logDate.setTime(logDate.getTime() + 8 * 60 * 60 * 1000);
+
+  const dispatch = useLayoutDispatch();
 
   /** The icon to show at the left. */
   let icon: React.ReactNode | null = null;
   /** The content to render. */
   let content: React.ReactNode | null = null;
   /** Button to show at the right. */
-  let button: React.ReactNode | null = null;
+  let submissionButtons: React.ReactNode | null = null;
 
   // `APPEAL_SUBMISSION`-related log
   if (log.type === "APPEAL_SUBMISSION") {
@@ -45,12 +48,27 @@ export function AppealLogMessage({ log, showReason }: AppealLogMessageType) {
         </p>
       </div>
     );
-    button = log.newFileSubmissionId ? (
-      <Link href={`/api/download/submissions/${log.newFileSubmissionId}`}>
-        <a className="self-start inline-flex items-center px-3 py-1.5 border border-gray-300 text-xs leading-4 font-medium rounded-lg text-blue-700 bg-white hover:text-blue-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:text-blue-800 active:bg-gray-50 transition ease-in-out duration-150">
-          Download submission
-        </a>
-      </Link>
+    submissionButtons = log.newFileSubmissionId ? (
+      <div className="self-start inline-flex items-center">
+        <Link href={`/api/download/submissions/${log.newFileSubmissionId}`}>
+          <a className="px-3 py-1.5 border border-gray-300 text-xs leading-4 font-medium rounded-l-lg text-blue-700 bg-white hover:text-blue-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:text-blue-800 active:bg-gray-50 transition ease-in-out duration-150">
+            Download submission
+          </a>
+        </Link>
+        {log.reportId !== undefined ? (
+          <span className="inline-flex">
+            <button
+              onClick={() => dispatch({ type: "viewReport", payload: log.reportId! })}
+              type="button"
+              className="px-3 py-1.5 border border-gray-300 text-xs leading-4 font-medium rounded-r-lg text-blue-700 bg-white hover:text-blue-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:text-blue-800 active:bg-gray-50 transition ease-in-out duration-150"
+            >
+              View report
+            </button>
+          </span>
+        ) : (
+          <></>
+        )}
+      </div>
     ) : null;
   }
   // `APPEAL_STATUS`-related log
@@ -205,7 +223,7 @@ export function AppealLogMessage({ log, showReason }: AppealLogMessageType) {
           {icon}
           <div className="mt-1.5">{content}</div>
         </div>
-        {button}
+        {submissionButtons}
       </div>
     </>
   );

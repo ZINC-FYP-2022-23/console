@@ -1,12 +1,74 @@
-import { ChangeLog, Submission as SubmissionType } from "@/types/tables";
-import {
-  AppealAttempt,
-  AppealLog,
-  DisplayMessageType,
-  ChangeLogTypes,
-  AppealStatus,
-  ChangeLogState,
-} from "@/types/appeal";
+import { Appeal, ChangeLog, Submission as SubmissionType } from "@/types/tables";
+import { AppealAttempt, AppealLog, DisplayMessageType, ChangeLogTypes, AppealStatus } from "@/types/appeal";
+import { getLocalDateFromString } from "./date";
+
+/**
+ * Gets the latest score.
+ *
+ * The logic is as follows:
+ * (Note: latest valid appeal refers to latest `ACCEPTED` appeal containing file submission, i.e. newFileSubmission is not null)
+ * - If the `updatedAt` of the latest valid appeal later than the date of the latest `SCORE` change:
+ *   - use the score of the `newFileSubmission`.
+ * - If the date of the latest `SCORE` change later than the `updatedAt` of the latest valid appeal:
+ *   - use the score of latest `SCORE` change.
+ * - If there is a valid appeal AND NO `SCORE` change log:
+ *   - use the score of the `newFileSubmission`.
+ * - If there is a `SCORE` change log AND NO valid appeal:
+ *   - use the score of latest `SCORE` change.
+ * - Finally, if there are NO `SCORE` change log AND NO valid appeal:
+ *   - use the score of the original submission.
+ */
+export function getScore({
+  appeals,
+  changeLogs,
+  submissions,
+}: {
+  appeals?: Appeal[];
+  changeLogs?: ChangeLog[];
+  submissions?: SubmissionType[];
+}): number | undefined {
+  if (appeals === undefined || changeLogs === undefined || submissions === undefined) return undefined;
+
+  // Get the latest `ACCEPTED` appeal with a new score generated
+  const latestValidAppeal: Appeal | undefined = appeals.find(
+    (appeal) =>
+      appeal.status === AppealStatus.ACCEPTED &&
+      appeal.updatedAt &&
+      appeal.submission &&
+      appeal.submission.reports.length &&
+      appeal.submission.reports[0].grade,
+  );
+
+  // Get the latest `SCORE` change log
+  const latestScoreLog: ChangeLog | undefined = changeLogs.find(
+    (log) => log.type === ChangeLogTypes.SCORE && log.updatedState.type === "score",
+  );
+
+  // Both appeal and score change log exist
+  if (latestValidAppeal && latestScoreLog && latestScoreLog.updatedState.type === "score") {
+    const acceptedAppealDate = getLocalDateFromString(latestValidAppeal.updatedAt)!;
+    const scoreChangeDate = getLocalDateFromString(latestScoreLog.createdAt)!;
+
+    // return score of the latest
+    return acceptedAppealDate > scoreChangeDate
+      ? latestValidAppeal.submission.reports[0].grade.score
+      : latestScoreLog.updatedState.score;
+  }
+  // Only appeal exists
+  if (latestValidAppeal && !latestScoreLog) {
+    return latestValidAppeal.submission.reports[0].grade.score;
+  }
+  // Only score change exists
+  if (latestScoreLog && !latestValidAppeal && latestScoreLog.updatedState.type === "score") {
+    return latestScoreLog.updatedState.score;
+  }
+
+  // If above fails, get the original submission score
+  const originalSubmission = submissions.find(
+    (submission) => !submission.isAppeal && submission.reports.length && submission.reports[0].grade,
+  );
+  return originalSubmission?.reports[0].grade.score;
+}
 
 /**
  * Compute the maximum score of the assignment from the submissions.
@@ -67,6 +129,7 @@ export function transformToAppealAttempt({ appealsDetailsData }: transformToAppe
       createdAt: appealsDetailsData.appeal.createdAt,
       latestStatus: latestStatus,
       updatedAt: appealsDetailsData.appeal.updatedAt,
+      reportId: appealsDetailsData.appeal?.submission.reports.find((r) => r.grade)?.id,
     });
   }
 
@@ -83,6 +146,7 @@ export function transformToAppealAttempt({ appealsDetailsData }: transformToAppe
         createdAt: appeal.createdAt,
         latestStatus: latestStatus,
         updatedAt: appeal.updatedAt,
+        reportId: appealsDetailsData.appeal?.submission.reports.find((r) => r.grade)?.id,
       });
     });
   }
@@ -159,6 +223,7 @@ function transformToAppealLog({ appeals, changeLog }: transformToAppealLogProps)
       type: "APPEAL_SUBMISSION",
       date: appeal.createdAt,
       newFileSubmissionId: appeal.newFileSubmissionId,
+      reportId: appeal.reportId,
     });
   });
 
