@@ -109,7 +109,10 @@ export const GET_APPEAL_DETAILS_BY_APPEAL_ID = gql`
         id
         name
         itsc
-        changeLogsByUserId(where: { assignmentConfig: { assignmentAppeals: { id: { _eq: $appealId } } } }) {
+        changeLogsByUserId(
+          where: { assignmentConfig: { assignmentAppeals: { id: { _eq: $appealId } } } }
+          order_by: { createdAt: desc }
+        ) {
           appealId
           assignmentConfigId
           createdAt
