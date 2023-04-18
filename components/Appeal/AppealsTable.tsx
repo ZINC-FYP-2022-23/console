@@ -3,28 +3,27 @@ import {
   GET_APPEAL_CONFIG,
   GET_SUBMISSIONS_BY_ASSIGNMENT_ID,
 } from "@/graphql/queries/appealQueries";
-import { AppealStatus, AssignmentConfig, Appeal, Submission as SubmissionType, ChangeLogTypes } from "@/types";
+import { Appeal, AppealStatus, AssignmentConfig, Submission as SubmissionType } from "@/types";
 import { ChangeLog } from "@/types/tables";
+import { getScore, transformAppealStatus } from "@/utils/appealUtils";
 import { useQuery, useSubscription } from "@apollo/client";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Alert } from "@mantine/core";
 import {
   ColumnDef,
+  SortDirection,
+  SortingState,
   createColumnHelper,
   flexRender,
   getCoreRowModel,
   getSortedRowModel,
-  SortDirection,
-  SortingState,
   useReactTable,
 } from "@tanstack/react-table";
 import { format } from "date-fns";
+import { utcToZonedTime } from "date-fns-tz";
 import Link from "next/link";
 import { useState } from "react";
 import AppealStatusBadge from "./AppealStatusBadge";
-import { transformAppealStatus } from "@/utils/appealUtils";
-import { utcToZonedTime } from "date-fns-tz";
-import { getLocalDateFromString } from "@/utils/date";
 
 /** Type definition of each row in the Appeals Table. */
 type AppealTableType = {
@@ -123,71 +122,6 @@ function DisplayError({ errorMessage }: DisplayErrorProps) {
       </Alert>
     </div>
   );
-}
-
-interface getScoreProps {
-  appeals: Appeal[];
-  changeLogs: ChangeLog[];
-  submissions: SubmissionType[];
-}
-
-/**
- * Gets the latest score based on the following logic:
- * @returns {number | undefined}
- */
-function getScore({ appeals, changeLogs, submissions }: getScoreProps): number | undefined {
-  /* *** Logic of how to get the score: ***
-   * Note: latest valid appeal refers to latest `ACCEPTED` appeal containing file submission, i.e. newFileSubmission is not null
-   * If the `updatedAt` of the latest valid appeal later than the date of the latest `SCORE` change:
-   *    >>> use the score of the `newFileSubmission`.
-   * If the date of the latest `SCORE` change later than the `updatedAt` of the latest valid appeal:
-   *    >>> use the score of latest `SCORE` change.
-   * If there is a valid appeal AND NO `SCORE` change log:
-   *    >>> use the score of the `newFileSubmission`.
-   * If there is a `SCORE` change log AND NO valid appeal:
-   *    >>> use the score of latest `SCORE` change.
-   * Finally, if there are NO `SCORE` change log AND NO valid appeal:
-   *    >>> use the score of the original submission.
-   */
-
-  // Get the latest `ACCEPTED` appeal with a new score generated
-  const latestValidAppeal: Appeal | undefined = appeals.find(
-    (appeal) =>
-      appeal.status === AppealStatus.ACCEPTED &&
-      appeal.updatedAt &&
-      appeal.submission &&
-      appeal.submission.reports.length &&
-      appeal.submission.reports[0].grade,
-  );
-
-  // Get the latest `SCORE` change log
-  const latestScoreLog: ChangeLog | undefined = changeLogs.find(
-    (log) => log.type === ChangeLogTypes.SCORE && log.updatedState.type === "score",
-  );
-
-  // Both appeal and score change log exist
-  if (latestValidAppeal && latestScoreLog && latestScoreLog.updatedState.type === "score") {
-    const acceptedAppealDate = getLocalDateFromString(latestValidAppeal.updatedAt)!;
-    const scoreChangeDate = getLocalDateFromString(latestScoreLog.createdAt)!;
-
-    // return score of the latest
-    return acceptedAppealDate > scoreChangeDate
-      ? latestValidAppeal.submission.reports[0].grade.score
-      : latestScoreLog.updatedState.score;
-  }
-  // Only appeal exists
-  if (latestValidAppeal && !latestScoreLog) {
-    return latestValidAppeal.submission.reports[0].grade.score;
-  }
-  // Only score change exists
-  if (latestScoreLog && !latestValidAppeal && latestScoreLog.updatedState.type === "score") {
-    return latestScoreLog.updatedState.score;
-  }
-
-  // If above fails, get the original submission score
-  return submissions.find(
-    (submission) => !submission.isAppeal && submission.reports.length && submission.reports[0].grade,
-  )?.reports[0].grade.score;
 }
 
 interface AppealsTableProps {
