@@ -67,6 +67,7 @@ export function transformToAppealAttempt({ appealsDetailsData }: transformToAppe
       createdAt: appealsDetailsData.appeal.createdAt,
       latestStatus: latestStatus,
       updatedAt: appealsDetailsData.appeal.updatedAt,
+      reportId: appealsDetailsData.appeal?.submission.reports.find((r) => r.grade)?.id,
     });
   }
 
@@ -83,6 +84,7 @@ export function transformToAppealAttempt({ appealsDetailsData }: transformToAppe
         createdAt: appeal.createdAt,
         latestStatus: latestStatus,
         updatedAt: appeal.updatedAt,
+        reportId: appealsDetailsData.appeal?.submission.reports.find((r) => r.grade)?.id,
       });
     });
   }
@@ -159,6 +161,7 @@ function transformToAppealLog({ appeals, changeLog }: transformToAppealLogProps)
       type: "APPEAL_SUBMISSION",
       date: appeal.createdAt,
       newFileSubmissionId: appeal.newFileSubmissionId,
+      reportId: appeal.reportId,
     });
   });
 

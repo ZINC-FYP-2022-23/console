@@ -38,7 +38,7 @@ import axios from "axios";
 import { zonedTimeToUtc } from "date-fns-tz";
 import { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { initializeApollo } from "../../../lib/apollo";
 import { Spinner } from "@/components/Spinner";
 
@@ -90,6 +90,7 @@ function createNewChangeLog({ appealAttempt, type, newStatus, oldScore, newScore
     // } else {
     //   alert("Error: `createNewChangeLog` cannot be run without `newStatus` or `newScore`");
   }
+  console.log(oldScore, newScore);
 
   const newLog: NewChangeLog = {
     createdAt: zonedTimeToUtc(new Date(), "Asia/Hong_Kong"),
@@ -244,6 +245,13 @@ function ChangeScore({ appealAttempt, oldScore, maxScore }: ChangeScoreProps) {
   /** Whether the input box is blank. */
   const [isBlank, setIsBlank] = useState(false);
 
+  // TODO: make sure oldScore actually refreshes
+  // Refresh score values if scores are changed from appeal or other change logs
+  useEffect(() => {
+    setNewScore(oldScore);
+    console.log("Lmao");
+  }, [oldScore]);
+
   return (
     <div className="w-auto h-full px-5 py-4 bg-white text-gray-700 shadow rounded-md">
       <AppealChangeConfirmModal
@@ -259,7 +267,7 @@ function ChangeScore({ appealAttempt, oldScore, maxScore }: ChangeScoreProps) {
       <p className="font-medium flex justify-self-center text-lg bold">New Final Score:</p>
       <div className="h-1.5" />
       <NumberInput
-        value={oldScore}
+        value={newScore}
         max={maxScore}
         min={0}
         onChange={(score) => {
@@ -496,16 +504,16 @@ function DisplayLoading() {
 }
 
 interface getScoreProps {
-  appeals: Appeal[];
-  changeLogs: ChangeLog[];
-  submissions: SubmissionType[];
+  appeals?: Appeal[];
+  changeLogs?: ChangeLog[];
+  submissions?: SubmissionType[];
 }
 
 /**
  * Gets the latest score based on the following logic:
  * @returns {number}
  */
-function getScore({ appeals, changeLogs, submissions }: getScoreProps): number {
+function getScore({ appeals, changeLogs, submissions }: getScoreProps): number | undefined {
   /* *** Logic of how to get the score: ***
    * Note: latest valid appeal refers to latest `ACCEPTED` appeal containing file submission, i.e. newFileSubmission is not null
    * If the `updatedAt` of the latest valid appeal later than the date of the latest `SCORE` change:
@@ -519,6 +527,8 @@ function getScore({ appeals, changeLogs, submissions }: getScoreProps): number {
    * Finally, if there are NO `SCORE` change log AND NO valid appeal:
    *    >>> use the score of the original submission.
    */
+
+  if (appeals === undefined || changeLogs === undefined || submissions === undefined) return undefined;
 
   // Get the latest `ACCEPTED` appeal with a new score generated
   const latestValidAppeal: Appeal | undefined = appeals.find(
@@ -559,10 +569,6 @@ function getScore({ appeals, changeLogs, submissions }: getScoreProps): number {
     (submission) => !submission.isAppeal && submission.reports.length && submission.reports[0].grade,
   );
   if (originalSubmission) return originalSubmission.reports[0].grade.score;
-
-  // TODO: see if this is good practice
-  // Rare error case, may arise from none of the submissions having valid reports
-  return -1;
 }
 
 interface AppealDetailsProps {
@@ -622,6 +628,13 @@ function AppealDetails({ appealId, userId, studentId, assignmentConfigId, diffSu
 
   const maxScore = getMaxScore(submissionsData?.submissions);
 
+  // Get the original score
+  const score = getScore({
+    appeals: appealsData?.appeals,
+    changeLogs: appealChangeLogData?.changeLogs,
+    submissions: submissionsData?.submissions,
+  });
+
   // Display error if it occurred
   let errorMessage: string | null = null;
   if (appealDetailsError || appealChangeLogError || appealMessagesError || submissionsError) {
@@ -629,8 +642,9 @@ function AppealDetails({ appealId, userId, studentId, assignmentConfigId, diffSu
   } else if (!appealsDetailsData || !appealsDetailsData.appeal) {
     // Check if the appeal details is available, if not, there is no such appeal
     errorMessage = "Invalid appeal. Please check the appeal number.";
-  } else if (maxScore === undefined) {
-    errorMessage = "Failed to fetch submission scores. Please check if this student is eligible for grade appeal.";
+  } else if (score === undefined || maxScore === undefined) {
+    errorMessage =
+      "Failed to fetch submission scores. Please check if this student is eligible for grade appeal. Alternatively, please regenerate reports for this student.";
   }
   if (errorMessage) {
     return <DisplayError errorMessage={errorMessage} />;
@@ -645,13 +659,6 @@ function AppealDetails({ appealId, userId, studentId, assignmentConfigId, diffSu
     | (DisplayMessageType & { _type: "appealMessage" })
     | (AppealLog & { _type: "appealLog" })
   )[] = mergeDataToActivityLogList({ appealAttempt, appealChangeLogData, appealMessagesData });
-
-  // Get the original score
-  const score = getScore({
-    appeals: appealsData!.appeals,
-    changeLogs: appealChangeLogData!.changeLogs,
-    submissions: submissionsData!.submissions,
-  });
 
   // Determine if new changes and messages can be submitted
   let allowChange: boolean = true;
@@ -728,7 +735,7 @@ function AppealDetails({ appealId, userId, studentId, assignmentConfigId, diffSu
                 </div>
                 {/* Score */}
                 <div className="max-w-md mr-4 px-5 y-full">
-                  <ChangeScore appealAttempt={appealAttempt[0]} oldScore={score} maxScore={maxScore!} />
+                  <ChangeScore appealAttempt={appealAttempt[0]} oldScore={score!} maxScore={maxScore!} />
                 </div>
               </>
             )}

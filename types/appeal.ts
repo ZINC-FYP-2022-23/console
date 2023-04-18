@@ -17,6 +17,7 @@ export type AppealAttempt = {
   createdAt: string;
   latestStatus: AppealStatus;
   updatedAt: string;
+  reportId?: number;
 };
 
 export enum ChangeLogTypes {
@@ -38,6 +39,7 @@ export type AppealLog = {
   updatedState?: ChangeLogState;
   reason?: string;
   newFileSubmissionId?: number;
+  reportId?: number;
 };
 
 /**
