@@ -56,7 +56,7 @@ async function handlePostAppealMessage(req: NextApiRequest, res: NextApiResponse
     if (appealCreatedAt && now < appealCreatedAt) {
       return res.status(403).json({
         status: "error",
-        error: "Should not send appeal messages before appeal time.",
+        error: "Should not send appeal messages before creation of this appeal.",
       });
     }
 
