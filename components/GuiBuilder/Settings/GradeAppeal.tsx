@@ -20,14 +20,14 @@ function GradeAppeal() {
       />
       <div className="flex items-center gap-2">
         <label
-          htmlFor="attemptLimits"
+          htmlFor="appealLimits"
           className={clsx("flex-1 flex items-center gap-1", !gradeAppeal.isAppealAllowed && "text-gray-400")}
         >
-          Attempt Limits
+          Appeal Limits
         </label>
         <NumberInput
-          id="attemptLimits"
-          value={gradeAppeal.appealLimits ?? undefined}
+          id="appealLimits"
+          value={gradeAppeal.appealLimits ?? 3}
           onChange={(value) => setGradeAppeal({ ...gradeAppeal, appealLimits: value ?? null })}
           min={1}
           placeholder="Unlimited"
