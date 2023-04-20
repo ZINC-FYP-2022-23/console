@@ -15,7 +15,7 @@ export type AppealAttempt = {
   assignmentConfigId: number;
   userId: number;
   createdAt: string;
-  latestStatus: AppealStatus;
+  status: AppealStatus;
   updatedAt: string;
   reportId?: number;
 };

@@ -1,7 +1,14 @@
 import { transformAppealStatus, transformToAppealAttempt, mergeDataToActivityLogList } from "../appealUtils";
-import { AppealAttempt, AppealStatus } from "@/types/appeal";
+import { AppealAttempt, AppealStatus, ChangeLogTypes } from "@/types/appeal";
 
 describe("Grade Appeal: Utils", () => {
+  // TODO(Owen): write test for getScore()
+  describe.skip("getScore()", () => {
+    it.skip("", () => {
+      // TODO
+    });
+  });
+
   describe("transformAppealStatus()", () => {
     it("status set as accept", () => {
       const originalStatus = "ACCEPTED";
@@ -51,8 +58,9 @@ describe("Grade Appeal: Utils", () => {
           assignmentConfigId: 3,
           userId: 4,
           createdAt: "Tue Feb 05 2019 12:05:22",
-          latestStatus: AppealStatus.ACCEPTED,
+          status: AppealStatus.ACCEPTED,
           updatedAt: "Wed Feb 06 2019 17:00:02",
+          reportId: undefined,
         },
       ]);
     });
@@ -91,7 +99,8 @@ describe("Grade Appeal: Utils", () => {
           userId: 4,
           createdAt: "Tue Feb 05 2019 12:00:00",
           updatedAt: "Wed Feb 06 2019 13:00:00",
-          latestStatus: AppealStatus.PENDING,
+          status: AppealStatus.PENDING,
+          reportId: undefined,
         },
         {
           id: 5,
@@ -100,7 +109,8 @@ describe("Grade Appeal: Utils", () => {
           userId: 8,
           createdAt: "Thu Feb 07 2019 14:00:00",
           updatedAt: "Fri Feb 08 2019 15:00:00",
-          latestStatus: AppealStatus.REJECTED,
+          status: AppealStatus.REJECTED,
+          reportId: undefined,
         },
       ]);
     });
@@ -130,11 +140,11 @@ describe("Grade Appeal: Utils", () => {
       const appealAttempt: AppealAttempt[] = [
         {
           id: 1,
-          newFileSubmissionId: "2",
+          newFileSubmissionId: 2,
           assignmentConfigId: 3,
           userId: 4,
           createdAt: "Tue Feb 05 2019 12:05:22",
-          latestStatus: AppealStatus.ACCEPTED,
+          status: AppealStatus.ACCEPTED,
           updatedAt: "Wed Feb 06 2019 17:00:02",
         },
       ];
@@ -154,6 +164,8 @@ describe("Grade Appeal: Utils", () => {
           _type: "appealLog",
           date: "Tue Feb 05 2019 12:05:22",
           id: 1,
+          newFileSubmissionId: 2,
+          reportId: undefined,
           type: "APPEAL_SUBMISSION",
         },
       ];
@@ -165,11 +177,11 @@ describe("Grade Appeal: Utils", () => {
       const appealAttempt: AppealAttempt[] = [
         {
           id: 1,
-          newFileSubmissionId: "2",
+          newFileSubmissionId: 2,
           assignmentConfigId: 3,
           userId: 4,
           createdAt: "Tue Feb 05 2019 12:05:22",
-          latestStatus: AppealStatus.ACCEPTED,
+          status: AppealStatus.ACCEPTED,
           updatedAt: "Wed Feb 06 2019 17:00:02",
         },
       ];
@@ -181,12 +193,18 @@ describe("Grade Appeal: Utils", () => {
             createdAt: "2023-03-26T13:03:29.497",
             id: 67,
             initiatedBy: 6,
-            originalState: "[{'status':PENDING}]",
+            originalState: {
+              type: "status",
+              status: AppealStatus.PENDING,
+            },
             reason: "<p>234</p>",
             reportId: null,
             submissionId: 1,
             type: "APPEAL_STATUS",
-            updatedState: "[{'status':ACCEPTED}]",
+            updatedState: {
+              type: "status",
+              status: AppealStatus.ACCEPTED,
+            },
             userId: 6,
           },
           {
@@ -194,12 +212,18 @@ describe("Grade Appeal: Utils", () => {
             createdAt: "2023-03-24T16:20:12.27",
             id: 66,
             initiatedBy: 6,
-            originalState: "[{'status':ACCEPTED}]",
+            originalState: {
+              type: "status",
+              status: AppealStatus.ACCEPTED,
+            },
             reason: "<p>5</p>",
             reportId: null,
             submissionId: 1,
             type: "APPEAL_STATUS",
-            updatedState: "[{'status':PENDING}]",
+            updatedState: {
+              type: "status",
+              status: AppealStatus.PENDING,
+            },
             userId: 6,
           },
         ],
@@ -216,24 +240,38 @@ describe("Grade Appeal: Utils", () => {
           _type: "appealLog",
           date: "2023-03-26T13:03:29.497",
           id: 67,
-          originalState: "Pending",
+          originalState: {
+            type: "status",
+            status: AppealStatus.PENDING,
+          },
           reason: "<p>234</p>",
-          type: 0,
-          updatedState: "Accepted",
+          type: ChangeLogTypes.APPEAL_STATUS,
+          updatedState: {
+            type: "status",
+            status: AppealStatus.ACCEPTED,
+          },
         },
         {
           _type: "appealLog",
           date: "2023-03-24T16:20:12.27",
           id: 66,
-          originalState: "Accepted",
+          originalState: {
+            type: "status",
+            status: AppealStatus.ACCEPTED,
+          },
           reason: "<p>5</p>",
-          type: 0,
-          updatedState: "Pending",
+          type: ChangeLogTypes.APPEAL_STATUS,
+          updatedState: {
+            type: "status",
+            status: AppealStatus.PENDING,
+          },
         },
         {
           _type: "appealLog",
           date: "Tue Feb 05 2019 12:05:22",
           id: 1,
+          newFileSubmissionId: 2,
+          reportId: undefined,
           type: "APPEAL_SUBMISSION",
         },
       ];
@@ -245,11 +283,11 @@ describe("Grade Appeal: Utils", () => {
       const appealAttempt: AppealAttempt[] = [
         {
           id: 1,
-          newFileSubmissionId: "2",
+          newFileSubmissionId: 2,
           assignmentConfigId: 3,
           userId: 4,
           createdAt: "Tue Feb 05 2019 12:05:22",
-          latestStatus: AppealStatus.ACCEPTED,
+          status: AppealStatus.ACCEPTED,
           updatedAt: "Wed Feb 06 2019 17:00:02",
         },
       ];
@@ -312,6 +350,8 @@ describe("Grade Appeal: Utils", () => {
           _type: "appealLog",
           date: "Tue Feb 05 2019 12:05:22",
           id: 1,
+          newFileSubmissionId: 2,
+          reportId: undefined,
           type: "APPEAL_SUBMISSION",
         },
       ];
@@ -323,11 +363,11 @@ describe("Grade Appeal: Utils", () => {
       const appealAttempt: AppealAttempt[] = [
         {
           id: 1,
-          newFileSubmissionId: "2",
+          newFileSubmissionId: 2,
           assignmentConfigId: 3,
           userId: 4,
           createdAt: "Tue Feb 05 2019 12:05:22",
-          latestStatus: AppealStatus.ACCEPTED,
+          status: AppealStatus.ACCEPTED,
           updatedAt: "Wed Feb 06 2019 17:00:02",
         },
       ];
@@ -339,12 +379,18 @@ describe("Grade Appeal: Utils", () => {
             createdAt: "2023-03-26T13:03:29.497",
             id: 67,
             initiatedBy: 6,
-            originalState: "[{'status':PENDING}]",
+            originalState: {
+              type: "status",
+              status: AppealStatus.PENDING,
+            },
             reason: "<p>234</p>",
             reportId: null,
             submissionId: 1,
             type: "APPEAL_STATUS",
-            updatedState: "[{'status':ACCEPTED}]",
+            updatedState: {
+              type: "status",
+              status: AppealStatus.ACCEPTED,
+            },
             userId: 6,
           },
           {
@@ -352,12 +398,18 @@ describe("Grade Appeal: Utils", () => {
             createdAt: "2023-03-24T16:20:12.27",
             id: 66,
             initiatedBy: 6,
-            originalState: "[{'status':ACCEPTED}]",
+            originalState: {
+              type: "status",
+              status: AppealStatus.ACCEPTED,
+            },
             reason: "<p>5</p>",
             reportId: null,
             submissionId: 1,
             type: "APPEAL_STATUS",
-            updatedState: "[{'status':PENDING}]",
+            updatedState: {
+              type: "status",
+              status: AppealStatus.PENDING,
+            },
             userId: 6,
           },
         ],
@@ -409,19 +461,31 @@ describe("Grade Appeal: Utils", () => {
           _type: "appealLog",
           date: "2023-03-26T13:03:29.497",
           id: 67,
-          originalState: "Pending",
+          originalState: {
+            type: "status",
+            status: AppealStatus.PENDING,
+          },
           reason: "<p>234</p>",
-          type: 0,
-          updatedState: "Accepted",
+          type: ChangeLogTypes.APPEAL_STATUS,
+          updatedState: {
+            type: "status",
+            status: AppealStatus.ACCEPTED,
+          },
         },
         {
           _type: "appealLog",
           date: "2023-03-24T16:20:12.27",
           id: 66,
-          originalState: "Accepted",
+          originalState: {
+            type: "status",
+            status: AppealStatus.ACCEPTED,
+          },
           reason: "<p>5</p>",
-          type: 0,
-          updatedState: "Pending",
+          type: ChangeLogTypes.APPEAL_STATUS,
+          updatedState: {
+            type: "status",
+            status: AppealStatus.PENDING,
+          },
         },
         {
           _type: "appealMessage",
@@ -435,6 +499,8 @@ describe("Grade Appeal: Utils", () => {
           _type: "appealLog",
           date: "Tue Feb 05 2019 12:05:22",
           id: 1,
+          newFileSubmissionId: 2,
+          reportId: undefined,
           type: "APPEAL_SUBMISSION",
         },
       ];
@@ -465,20 +531,20 @@ describe("Grade Appeal: Utils", () => {
       const appealAttempt: AppealAttempt[] = [
         {
           id: 5,
-          newFileSubmissionId: "6",
+          newFileSubmissionId: 6,
           assignmentConfigId: 7,
           userId: 8,
           createdAt: "Tue Feb 09 2019 12:05:22",
-          latestStatus: AppealStatus.REJECTED,
+          status: AppealStatus.REJECTED,
           updatedAt: "Wed Feb 10 2019 17:00:02",
         },
         {
           id: 1,
-          newFileSubmissionId: "2",
+          newFileSubmissionId: 2,
           assignmentConfigId: 3,
           userId: 4,
           createdAt: "Tue Feb 05 2019 12:05:22",
-          latestStatus: AppealStatus.ACCEPTED,
+          status: AppealStatus.ACCEPTED,
           updatedAt: "Wed Feb 06 2019 17:00:02",
         },
       ];
@@ -498,12 +564,16 @@ describe("Grade Appeal: Utils", () => {
           _type: "appealLog",
           date: "Tue Feb 09 2019 12:05:22",
           id: 5,
+          newFileSubmissionId: 6,
+          reportId: undefined,
           type: "APPEAL_SUBMISSION",
         },
         {
           _type: "appealLog",
           date: "Tue Feb 05 2019 12:05:22",
           id: 1,
+          newFileSubmissionId: 2,
+          reportId: undefined,
           type: "APPEAL_SUBMISSION",
         },
       ];
@@ -515,20 +585,20 @@ describe("Grade Appeal: Utils", () => {
       const appealAttempt: AppealAttempt[] = [
         {
           id: 5,
-          newFileSubmissionId: "6",
+          newFileSubmissionId: 6,
           assignmentConfigId: 7,
           userId: 8,
           createdAt: "Tue Feb 09 2019 12:05:22",
-          latestStatus: AppealStatus.REJECTED,
+          status: AppealStatus.REJECTED,
           updatedAt: "Wed Feb 10 2019 17:00:02",
         },
         {
           id: 1,
-          newFileSubmissionId: "2",
+          newFileSubmissionId: 2,
           assignmentConfigId: 3,
           userId: 4,
           createdAt: "Tue Feb 05 2019 12:05:22",
-          latestStatus: AppealStatus.ACCEPTED,
+          status: AppealStatus.ACCEPTED,
           updatedAt: "Wed Feb 06 2019 17:00:02",
         },
       ];
@@ -540,12 +610,18 @@ describe("Grade Appeal: Utils", () => {
             createdAt: "2023-03-26T13:03:29.497",
             id: 67,
             initiatedBy: 6,
-            originalState: "[{'status':PENDING}]",
+            originalState: {
+              type: "status",
+              status: AppealStatus.PENDING,
+            },
             reason: "<p>234</p>",
             reportId: null,
             submissionId: 1,
             type: "APPEAL_STATUS",
-            updatedState: "[{'status':ACCEPTED}]",
+            updatedState: {
+              type: "status",
+              status: AppealStatus.ACCEPTED,
+            },
             userId: 6,
           },
           {
@@ -553,12 +629,18 @@ describe("Grade Appeal: Utils", () => {
             createdAt: "2023-03-24T16:20:12.27",
             id: 66,
             initiatedBy: 6,
-            originalState: "[{'status':ACCEPTED}]",
+            originalState: {
+              type: "status",
+              status: AppealStatus.ACCEPTED,
+            },
             reason: "<p>5</p>",
             reportId: null,
             submissionId: 1,
             type: "APPEAL_STATUS",
-            updatedState: "[{'status':PENDING}]",
+            updatedState: {
+              type: "status",
+              status: AppealStatus.PENDING,
+            },
             userId: 6,
           },
         ],
@@ -575,30 +657,46 @@ describe("Grade Appeal: Utils", () => {
           _type: "appealLog",
           date: "2023-03-26T13:03:29.497",
           id: 67,
-          originalState: "Pending",
+          originalState: {
+            type: "status",
+            status: AppealStatus.PENDING,
+          },
           reason: "<p>234</p>",
-          type: 0,
-          updatedState: "Accepted",
+          type: ChangeLogTypes.APPEAL_STATUS,
+          updatedState: {
+            type: "status",
+            status: AppealStatus.ACCEPTED,
+          },
         },
         {
           _type: "appealLog",
           date: "2023-03-24T16:20:12.27",
           id: 66,
-          originalState: "Accepted",
+          originalState: {
+            type: "status",
+            status: AppealStatus.ACCEPTED,
+          },
           reason: "<p>5</p>",
-          type: 0,
-          updatedState: "Pending",
+          type: ChangeLogTypes.APPEAL_STATUS,
+          updatedState: {
+            type: "status",
+            status: AppealStatus.PENDING,
+          },
         },
         {
           _type: "appealLog",
           date: "Tue Feb 09 2019 12:05:22",
           id: 5,
+          newFileSubmissionId: 6,
+          reportId: undefined,
           type: "APPEAL_SUBMISSION",
         },
         {
           _type: "appealLog",
           date: "Tue Feb 05 2019 12:05:22",
           id: 1,
+          newFileSubmissionId: 2,
+          reportId: undefined,
           type: "APPEAL_SUBMISSION",
         },
       ];
@@ -610,20 +708,20 @@ describe("Grade Appeal: Utils", () => {
       const appealAttempt: AppealAttempt[] = [
         {
           id: 5,
-          newFileSubmissionId: "6",
+          newFileSubmissionId: 6,
           assignmentConfigId: 7,
           userId: 8,
           createdAt: "Tue Feb 09 2024 12:05:22",
-          latestStatus: AppealStatus.REJECTED,
+          status: AppealStatus.REJECTED,
           updatedAt: "Wed Feb 10 2024 17:00:02",
         },
         {
           id: 1,
-          newFileSubmissionId: "2",
+          newFileSubmissionId: 2,
           assignmentConfigId: 3,
           userId: 4,
           createdAt: "Tue Feb 05 2019 12:05:22",
-          latestStatus: AppealStatus.ACCEPTED,
+          status: AppealStatus.ACCEPTED,
           updatedAt: "Wed Feb 06 2019 17:00:02",
         },
       ];
@@ -633,39 +731,57 @@ describe("Grade Appeal: Utils", () => {
       };
 
       const submissionData = {
-        data: {
-          submissions: [
-            {
-              id: 1,
-              created_at: "2023-03-15T16:51:52.244546",
-              upload_name: "aggregated.zip",
-              fail_reason: null,
-              reports: [],
-            },
-            {
-              id: 2,
-              created_at: "2025-03-15T16:51:52.244546",
-              upload_name: "aggregated.zip",
-              fail_reason: null,
-              reports: [],
-            },
-          ],
-        },
+        submissions: [
+          {
+            id: 1,
+            created_at: "2023-03-15T16:51:52.244546",
+            upload_name: "aggregated.zip",
+            fail_reason: null,
+            reports: [],
+          },
+          {
+            id: 2,
+            created_at: "2025-03-15T16:51:52.244546",
+            upload_name: "aggregated.zip",
+            fail_reason: null,
+            reports: [],
+          },
+        ],
       };
 
       const logList = mergeDataToActivityLogList({ appealAttempt, appealChangeLogData, submissionData });
 
       const expectedList = [
         {
+          _type: "submission",
+          id: 2,
+          created_at: "2025-03-15T16:51:52.244546",
+          upload_name: "aggregated.zip",
+          fail_reason: null,
+          reports: [],
+        },
+        {
           _type: "appealLog",
           date: "Tue Feb 09 2024 12:05:22",
           id: 5,
+          newFileSubmissionId: 6,
+          reportId: undefined,
           type: "APPEAL_SUBMISSION",
+        },
+        {
+          _type: "submission",
+          id: 1,
+          created_at: "2023-03-15T16:51:52.244546",
+          upload_name: "aggregated.zip",
+          fail_reason: null,
+          reports: [],
         },
         {
           _type: "appealLog",
           date: "Tue Feb 05 2019 12:05:22",
           id: 1,
+          newFileSubmissionId: 2,
+          reportId: undefined,
           type: "APPEAL_SUBMISSION",
         },
       ];
@@ -677,20 +793,20 @@ describe("Grade Appeal: Utils", () => {
       const appealAttempt: AppealAttempt[] = [
         {
           id: 5,
-          newFileSubmissionId: "6",
+          newFileSubmissionId: 6,
           assignmentConfigId: 7,
           userId: 8,
           createdAt: "Tue Feb 09 2024 12:05:22",
-          latestStatus: AppealStatus.REJECTED,
+          status: AppealStatus.REJECTED,
           updatedAt: "Wed Feb 10 2024 17:00:02",
         },
         {
           id: 1,
-          newFileSubmissionId: "2",
+          newFileSubmissionId: 2,
           assignmentConfigId: 3,
           userId: 4,
           createdAt: "Tue Feb 05 2019 12:05:22",
-          latestStatus: AppealStatus.ACCEPTED,
+          status: AppealStatus.ACCEPTED,
           updatedAt: "Wed Feb 06 2019 17:00:02",
         },
       ];
@@ -702,12 +818,18 @@ describe("Grade Appeal: Utils", () => {
             createdAt: "2023-03-26T13:03:29.497",
             id: 67,
             initiatedBy: 6,
-            originalState: "[{'status':PENDING}]",
+            originalState: {
+              type: "status",
+              status: AppealStatus.PENDING,
+            },
             reason: "<p>234</p>",
             reportId: null,
             submissionId: 1,
             type: "APPEAL_STATUS",
-            updatedState: "[{'status':ACCEPTED}]",
+            updatedState: {
+              type: "status",
+              status: AppealStatus.ACCEPTED,
+            },
             userId: 6,
           },
           {
@@ -715,69 +837,105 @@ describe("Grade Appeal: Utils", () => {
             createdAt: "2023-03-24T16:20:12.27",
             id: 66,
             initiatedBy: 6,
-            originalState: "[{'status':ACCEPTED}]",
+            originalState: {
+              type: "status",
+              status: AppealStatus.ACCEPTED,
+            },
             reason: "<p>5</p>",
             reportId: null,
             submissionId: 1,
             type: "APPEAL_STATUS",
-            updatedState: "[{'status':PENDING}]",
+            updatedState: {
+              type: "status",
+              status: AppealStatus.PENDING,
+            },
             userId: 6,
           },
         ],
       };
 
       const submissionData = {
-        data: {
-          submissions: [
-            {
-              id: 1,
-              created_at: "2023-03-15T16:51:52.244546",
-              upload_name: "aggregated.zip",
-              fail_reason: null,
-              reports: [],
-            },
-            {
-              id: 2,
-              created_at: "2025-03-15T16:51:52.244546",
-              upload_name: "aggregated.zip",
-              fail_reason: null,
-              reports: [],
-            },
-          ],
-        },
+        submissions: [
+          {
+            id: 1,
+            created_at: "2023-03-15T16:51:52.244546",
+            upload_name: "aggregated.zip",
+            fail_reason: null,
+            reports: [],
+          },
+          {
+            id: 2,
+            created_at: "2025-03-15T16:51:52.244546",
+            upload_name: "aggregated.zip",
+            fail_reason: null,
+            reports: [],
+          },
+        ],
       };
 
       const logList = mergeDataToActivityLogList({ appealAttempt, appealChangeLogData, submissionData });
 
       const expectedList = [
         {
+          _type: "submission",
+          id: 2,
+          created_at: "2025-03-15T16:51:52.244546",
+          upload_name: "aggregated.zip",
+          fail_reason: null,
+          reports: [],
+        },
+        {
           _type: "appealLog",
           date: "Tue Feb 09 2024 12:05:22",
           id: 5,
+          newFileSubmissionId: 6,
+          reportId: undefined,
           type: "APPEAL_SUBMISSION",
         },
         {
           _type: "appealLog",
           date: "2023-03-26T13:03:29.497",
           id: 67,
-          originalState: "Pending",
+          originalState: {
+            type: "status",
+            status: AppealStatus.PENDING,
+          },
           reason: "<p>234</p>",
-          type: 0,
-          updatedState: "Accepted",
+          type: ChangeLogTypes.APPEAL_STATUS,
+          updatedState: {
+            type: "status",
+            status: AppealStatus.ACCEPTED,
+          },
         },
         {
           _type: "appealLog",
           date: "2023-03-24T16:20:12.27",
           id: 66,
-          originalState: "Accepted",
+          originalState: {
+            type: "status",
+            status: AppealStatus.ACCEPTED,
+          },
           reason: "<p>5</p>",
-          type: 0,
-          updatedState: "Pending",
+          type: ChangeLogTypes.APPEAL_STATUS,
+          updatedState: {
+            type: "status",
+            status: AppealStatus.PENDING,
+          },
+        },
+        {
+          _type: "submission",
+          id: 1,
+          created_at: "2023-03-15T16:51:52.244546",
+          upload_name: "aggregated.zip",
+          fail_reason: null,
+          reports: [],
         },
         {
           _type: "appealLog",
           date: "Tue Feb 05 2019 12:05:22",
           id: 1,
+          newFileSubmissionId: 2,
+          reportId: undefined,
           type: "APPEAL_SUBMISSION",
         },
       ];

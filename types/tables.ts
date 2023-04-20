@@ -77,6 +77,7 @@ export type AssignmentConfig = {
   isAppealStudentReplyAllowed: boolean;
   isAppealViewReportAllowed: boolean;
   assignmentAppeals: Appeal[];
+  submissions: Submission[];
 };
 
 export type AssignmentConfigUser = {

@@ -127,7 +127,7 @@ export function transformToAppealAttempt({ appealsDetailsData }: transformToAppe
       assignmentConfigId: appealsDetailsData.appeal.assignmentConfigId,
       userId: appealsDetailsData.appeal.userId,
       createdAt: appealsDetailsData.appeal.createdAt,
-      latestStatus: latestStatus,
+      status: latestStatus,
       updatedAt: appealsDetailsData.appeal.updatedAt,
       reportId: appealsDetailsData.appeal.submission?.reports.find((r) => r.grade)?.id,
     });
@@ -144,9 +144,9 @@ export function transformToAppealAttempt({ appealsDetailsData }: transformToAppe
         assignmentConfigId: appeal.assignmentConfigId,
         userId: appeal.userId,
         createdAt: appeal.createdAt,
-        latestStatus: latestStatus,
+        status: latestStatus,
         updatedAt: appeal.updatedAt,
-        reportId: appealsDetailsData.appeal.submission?.reports.find((r) => r.grade)?.id,
+        reportId: appeal.submission?.reports.find((r) => r.grade)?.id,
       });
     });
   }
