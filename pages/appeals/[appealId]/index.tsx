@@ -39,7 +39,7 @@ import {
   transformToAppealAttempt,
 } from "@/utils/appealUtils";
 import { getLocalDateFromString } from "@/utils/date";
-import { useQuery } from "@apollo/client";
+import { useQuery, useSubscription } from "@apollo/client";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Tab } from "@headlessui/react";
 import { Alert, clsx } from "@mantine/core";
