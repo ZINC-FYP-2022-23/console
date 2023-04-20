@@ -38,17 +38,17 @@ import {
   mergeDataToActivityLogList,
   transformToAppealAttempt,
 } from "@/utils/appealUtils";
-import { useQuery, useSubscription } from "@apollo/client";
+import { getLocalDateFromString } from "@/utils/date";
+import { useQuery } from "@apollo/client";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Tab } from "@headlessui/react";
-import { Alert } from "@mantine/core";
+import { Alert, clsx } from "@mantine/core";
 import axios from "axios";
 import { zonedTimeToUtc } from "date-fns-tz";
 import { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { initializeApollo } from "../../../lib/apollo";
-import { getLocalDateFromString } from "@/utils/date";
 
 export type NewChangeLog = {
   createdAt: Date;
@@ -145,20 +145,16 @@ function ChangeAppealStatus({ appealAttempt }: ChangeAppealStatusProps) {
   }
 
   return (
-    <div className="w-auto h-full px-5 py-4 bg-white text-gray-700 shadow rounded-md">
+    <div className="w-auto h-full px-5 py-3 bg-white text-gray-700 shadow rounded-md">
       <AppealChangeConfirmModal
         changeLog={newLog}
         modalOpen={modalOpen}
         setModalOpen={setModalOpen}
         appealAttempt={appealAttempt}
       />
-      <p className="font-medium flex justify-self-center text-lg bold">Appeal Status:</p>
-      <br />
-      <div className="col-span-2">
-        <AppealResult appealResult={latestStatus || AppealStatus.PENDING} />
-      </div>
-      <br />
-      <div className="flex-row w-full grid grid-cols-3 gap-x-5 place-items-center">
+      <p className="mb-5 font-semibold text-lg">Appeal Status</p>
+      <AppealResult appealResult={latestStatus || AppealStatus.PENDING} />
+      <div className="mt-5 flex-row w-full grid grid-cols-3 gap-x-5 place-items-center">
         {/* Accept Button */}
         <button
           className={`${appealAcceptButton} w-full px-3 py-1.5 border text-center border-gray-300 text-sm leading-4 font-medium rounded-lg focus:outline-none`}
@@ -258,36 +254,39 @@ function ChangeScore({ appealAttempt, oldScore, maxScore }: ChangeScoreProps) {
   }, [oldScore]);
 
   return (
-    <div className="w-auto h-full px-5 py-4 bg-white text-gray-700 shadow rounded-md">
+    <div className="w-auto h-full px-5 py-3 bg-white text-gray-700 shadow rounded-md">
       <AppealChangeConfirmModal
         changeLog={newLog}
         modalOpen={modalOpen}
         setModalOpen={setModalOpen}
         appealAttempt={appealAttempt}
       />
-      <p className="font-medium flex justify-self-center text-lg bold">
-        Current Score: {oldScore} / {maxScore}
-      </p>
-      <br />
-      <p className="font-medium flex justify-self-center text-lg bold">New Final Score:</p>
-      <div className="h-1.5" />
-      <NumberInput
-        value={newScore}
-        max={maxScore}
-        min={0}
-        onChange={(score) => {
-          if (score === undefined) {
-            setIsBlank(true);
-          } else {
-            setNewScore(score);
-            setIsBlank(false);
-          }
-        }}
-      />
-      <div className="h-1.5" />
-      <div className="flex w-full justify-center">
+      <p className="mb-5 font-semibold text-lg">Score Adjustment</p>
+      <div className="mb-4">
+        <span className="font-medium">Current score:</span>{" "}
+        <span className="ml-2">
+          {oldScore} / {maxScore}
+        </span>
+      </div>
+      <p className="mb-1 font-medium">Update final score to:</p>
+      <div className="flex gap-2">
+        <div className="flex-[2]">
+          <NumberInput
+            value={newScore}
+            max={maxScore}
+            min={0}
+            onChange={(score) => {
+              if (score === undefined) {
+                setIsBlank(true);
+              } else {
+                setNewScore(score);
+                setIsBlank(false);
+              }
+            }}
+          />
+        </div>
         <button
-          className={`bg-white text-blue-700 hover:text-blue-500 focus:border-blue-300 focus:shadow-outline-blue active:text-blue-800 active:bg-gray-50 transition ease-in-out duration-150 w-full px-3 py-1.5 border text-center border-gray-300 text-sm leading-4 font-medium rounded-lg focus:outline-none disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed`}
+          className="flex-1 bg-white text-blue-700 hover:text-blue-500 focus:border-blue-300 focus:shadow-outline-blue active:text-blue-800 active:bg-gray-50 transition ease-in-out duration-150 px-3 py-2 border text-center border-gray-300 text-sm font-medium rounded-lg focus:outline-none disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
           disabled={isBlank}
           onClick={() => {
             if (newScore === oldScore) {
@@ -338,12 +337,13 @@ interface MessageButtonProps {
 function MessageButton({ userId, comments, setComments }: MessageButtonProps) {
   const router = useRouter();
   const { appealId } = router.query;
-  const now = new Date();
   const dispatch = useLayoutDispatch();
 
   return (
     <button
-      className="px-4 py-1 rounded-md text-lg bg-green-500 text-white hover:bg-green-600 active:bg-green-700 transition ease-in-out duration-150"
+      className="px-4 py-1 rounded-md bg-green-500 text-white hover:bg-green-600 active:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition ease-in-out duration-150"
+      // Disable the Send Message Button if the text editor is empty
+      disabled={isInputEmpty(comments)}
       onClick={async () => {
         // Check if the text message blank. The student should filled in something for the appeal.
         if (isInputEmpty(comments)) {
@@ -394,23 +394,18 @@ function MessageButton({ userId, comments, setComments }: MessageButtonProps) {
 }
 
 type ActivityLogTabProps = {
-  userId: number;
   /** A list of logs that may include appeal messages and appeal logs */
   activityLogList: (
     | (SubmissionType & { _type: "submission" })
     | (DisplayMessageType & { _type: "appealMessage" })
     | (AppealLog & { _type: "appealLog" })
   )[];
-  /** Allow message to be sent or not */
-  allowChange: boolean;
 };
 
 /**
  * Return a component that shows the Activity Log under the Activity Log Tab to show all appeal messages and appeal logs
  */
-function ActivityLogTab({ userId, activityLogList, allowChange }: ActivityLogTabProps) {
-  const [comments, setComments] = useState("");
-
+function ActivityLogTab({ activityLogList }: ActivityLogTabProps) {
   return (
     <div className="flex flex-col space-y-2">
       <div>
@@ -433,27 +428,7 @@ function ActivityLogTab({ userId, activityLogList, allowChange }: ActivityLogTab
           },
         )}
       </div>
-      {allowChange && (
-        <div className="mb-6 sticky bottom-0 object-bottom">
-          {/* @ts-ignore */}
-          <RichTextEditor
-            id="rte"
-            value={comments}
-            onChange={setComments}
-            controls={[
-              ["bold", "italic", "underline"],
-              ["h1", "h2", "h3", "unorderedList", "orderedList"],
-            ]}
-          />
-          <div className="py-1" />
-          {/* Hide the Send Message Button if the text editor is empty */}
-          {comments && comments !== "<p><br></p>" && (
-            <div className="flex justify-center">
-              <MessageButton userId={userId} comments={comments} setComments={setComments} />
-            </div>
-          )}
-        </div>
-      )}
+      <div className="h-6" />
     </div>
   );
 }
@@ -558,6 +533,8 @@ function AppealDetails({ appealId, userId, studentId, assignmentConfigId, diffSu
     variables: { userId: studentId, assignmentConfigId },
   });
 
+  const [comments, setComments] = useState("");
+
   // Display Loading if data fetching is still in-progress
   if (appealDetailsLoading || appealChangeLogLoading || appealMessagesLoading || submissionsLoading || appealsLoading) {
     return <DisplayLoading />;
@@ -639,83 +616,123 @@ function AppealDetails({ appealId, userId, studentId, assignmentConfigId, diffSu
     }
   }
 
+  /** The UTC string timestamp of when this appeal is submitted. */
+  const appealSubmissionDateRaw: string | undefined = activityLogList.find(
+    (log) => log._type === "appealLog" && log.type === "APPEAL_SUBMISSION",
+  )?.["date"];
+  let appealSubmissionDate: Date | null = null;
+  if (appealSubmissionDateRaw) {
+    appealSubmissionDate = getLocalDateFromString(appealSubmissionDateRaw);
+  }
+
   return (
     <LayoutProvider>
       <Layout title="Appeal Detail">
         <div className="p-6 w-full flex flex-col overflow-y-auto">
           <h1 className="text-2xl text-gray-900 font-bold leading-7">Appeal Details</h1>
-          <div className="flex flex-row mt-6">
+          <div className="flex flex-row my-4 gap-4 max-w-6xl">
             {/* Appeal Information */}
-            <div className="max-w-md mr-4 px-5 py-4 grid grid-cols-3 gap-4 bg-white text-gray-700 shadow rounded-md">
-              <p className="font-medium">Name:</p>
-              <p className="col-span-2">{appealsDetailsData!.appeal.user.name}</p>
-              <p className="font-medium">ITSC:</p>
-              <p className="col-span-2">{appealsDetailsData!.appeal.user.itsc}</p>
-              {!allowChange && (
-                <>
-                  <p className="font-medium">Score:</p>
-                  <p className="col-span-2">
-                    {score} / {maxScore!}
-                  </p>
-                </>
-              )}
-              {appealTextStyle && (
-                <>
-                  <p className="font-medium">Status:</p>
-                  <p className="col-span-2">
-                    <FontAwesomeIcon
-                      icon={["far", appealTextStyle.iconName]}
-                      className={`${appealTextStyle.textColor} mr-2`}
-                    />
-                    <span className={appealTextStyle.textColor}>{appealTextStyle.status}</span>
-                  </p>
-                </>
-              )}
+            <div className="flex-1 max-w-sm">
+              <div className="h-full px-5 py-3 bg-white text-gray-700 shadow rounded-md">
+                <p className="mb-5 font-semibold text-lg">General Info</p>
+                <div className="grid grid-cols-3 gap-1">
+                  <p className="font-medium">Name:</p>
+                  <p className="col-span-2">{appealsDetailsData!.appeal.user.name}</p>
+                  <p className="font-medium">ITSC:</p>
+                  <p className="col-span-2">{appealsDetailsData!.appeal.user.itsc}</p>
+                  {appealSubmissionDate && (
+                    <>
+                      <p className="font-medium">Created on:</p>
+                      <p className="col-span-2">{appealSubmissionDate.toLocaleString("en-HK")}</p>
+                    </>
+                  )}
+                  {!allowChange && (
+                    <>
+                      <p className="font-medium">Score:</p>
+                      <p className="col-span-2">
+                        {score} / {maxScore!}
+                      </p>
+                    </>
+                  )}
+                  {appealTextStyle && (
+                    <>
+                      <p className="font-medium">Status:</p>
+                      <p className="col-span-2">
+                        <FontAwesomeIcon
+                          icon={["far", appealTextStyle.iconName]}
+                          className={`${appealTextStyle.textColor} mr-2`}
+                        />
+                        <span className={appealTextStyle.textColor}>{appealTextStyle.status}</span>
+                      </p>
+                    </>
+                  )}
+                </div>
+              </div>
             </div>
             {allowChange && (
               <>
                 {/* Appeal Status */}
-                <div className="max-w-md px-5">
+                <div className="flex-1">
                   <ChangeAppealStatus appealAttempt={appealAttempt[0]} />
                 </div>
                 {/* Score */}
-                <div className="max-w-md mr-4 px-5 y-full">
+                <div className="flex-1">
                   <ChangeScore appealAttempt={appealAttempt[0]} oldScore={score!} maxScore={maxScore!} />
                 </div>
               </>
             )}
           </div>
+          {allowChange && (
+            <div className="p-3 flex-row justify-between bg-white rounded-md shadow">
+              {/* FIXME: The control bar should not be sticky */}
+              <RichTextEditor
+                id="rte"
+                value={comments}
+                onChange={setComments}
+                controls={[
+                  ["bold", "italic", "underline"],
+                  ["h1", "h2", "h3", "unorderedList", "orderedList"],
+                ]}
+              />
+              <div className="mt-2 flex justify-end">
+                <MessageButton userId={userId} comments={comments} setComments={setComments} />
+              </div>
+            </div>
+          )}
           {/* Tabs */}
-          <div className="py-2 flex-1 space-y-2">
+          <div className="py-4 flex-1">
             <Tab.Group>
-              <Tab.List className="mt-3 px-6 flex gap-6 text-sm border-b w-full">
+              {/* <Tab.List className="mt-3 px-6 flex gap-6 text-sm border-b w-full"> */}
+              <Tab.List className="flex bg-blue-100 text-sm">
                 <Tab
                   className={({ selected }) =>
-                    `pb-3 px-1 border-b-2 font-medium text-sm leading-5 focus:outline-none transition ${
+                    clsx(
+                      "py-3 px-5 border-b-2 font-semibold transition rounded-md rounded-b-none",
                       selected
-                        ? "border-cse-500 text-cse-600"
-                        : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                    }`
+                        ? "bg-blue-200 text-cse-600 border-cse-600"
+                        : "text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:outline-none",
+                    )
                   }
                 >
                   Activity Log
                 </Tab>
                 <Tab
                   className={({ selected }) =>
-                    `pb-3 px-1 border-b-2 font-medium text-sm leading-5 focus:outline-none transition ${
+                    clsx(
+                      "py-3 px-5 border-b-2 font-semibold transition rounded-md rounded-b-none",
                       selected
-                        ? "border-cse-500 text-cse-600"
-                        : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                    }`
+                        ? "bg-blue-200 text-cse-600 border-cse-600"
+                        : "text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:outline-none",
+                    )
                   }
                 >
                   Code Comparison
                 </Tab>
               </Tab.List>
-              <Tab.Panels>
+              <Tab.Panels className="bg-gray-100 rounded-b-md shadow">
                 {/* "Activity Log" tab panel */}
                 <Tab.Panel>
-                  <ActivityLogTab userId={userId} activityLogList={activityLogList} allowChange={allowChange} />
+                  <ActivityLogTab activityLogList={activityLogList} />
                 </Tab.Panel>
                 {/* "Code Comparison" tab panel */}
                 <Tab.Panel>

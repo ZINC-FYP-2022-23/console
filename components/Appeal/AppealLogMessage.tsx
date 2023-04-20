@@ -1,6 +1,7 @@
 import { useLayoutDispatch } from "@/contexts/layout";
 import { AppealLog, ChangeLogTypes } from "@/types/appeal";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { clsx } from "@mantine/core";
 import Link from "next/link";
 
 interface AppealLogMessageProps {
@@ -51,8 +52,12 @@ export function AppealLogMessage({ log, showReason }: AppealLogMessageProps) {
     submissionButtons = log.newFileSubmissionId ? (
       <div className="self-start inline-flex items-center">
         <Link href={`/api/download/submissions/${log.newFileSubmissionId}`}>
-          {/* TODO: fix buttons shape conditionally on reportId */}
-          <a className="px-3 py-1.5 border border-gray-300 text-xs leading-4 font-medium rounded-l-lg text-blue-700 bg-white hover:text-blue-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:text-blue-800 active:bg-gray-50 transition ease-in-out duration-150">
+          <a
+            className={clsx(
+              "self-start inline-flex items-center px-3 py-1.5 border border-gray-300 text-xs leading-4 font-medium rounded-l-lg text-blue-700 bg-white hover:text-blue-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:text-blue-800 active:bg-gray-50 transition ease-in-out duration-150",
+              log.reportId ? "border-r-0" : "border-r-1 rounded-r-lg",
+            )}
+          >
             Download submission
           </a>
         </Link>
@@ -218,7 +223,7 @@ export function AppealLogMessage({ log, showReason }: AppealLogMessageProps) {
 
   return (
     <>
-      <div className="mx-12 h-12 border-l-2" />
+      <div className="h-12" />
       <div className="mx-8 flex justify-between">
         <div className="flex">
           {icon}
