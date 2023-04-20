@@ -49,7 +49,7 @@ export function AppealConfig({ assignmentConfig, setAssignmentConfig, onChange, 
 
   return (
     <fieldset className="mt-4">
-      <legend className="text-base leading-6 font-medium text-gray-900">Grade Appeal-related</legend>
+      <legend className="text-base leading-6 font-medium text-gray-900">Grade Appeal</legend>
       {/* isAppealAllowed */}
       <div className="mt-4 flex items-start">
         <div className="flex items-center h-5">

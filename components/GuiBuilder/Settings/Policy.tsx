@@ -10,7 +10,7 @@ function Policy() {
 
   return (
     <div className="px-1 pt-1 flex flex-col gap-5 text-sm">
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-3">
         <div className="flex-1 flex items-center gap-1">
           <label htmlFor="attemptLimits">Attempt Limits</label>
           <AttemptLimitsTooltip />

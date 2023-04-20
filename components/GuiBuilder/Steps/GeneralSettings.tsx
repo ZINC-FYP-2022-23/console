@@ -14,11 +14,11 @@ function GeneralSettings() {
         <GeneralSettingsCard className="flex-shrink-0" title="Policy">
           <Policy />
         </GeneralSettingsCard>
-        <GeneralSettingsCard className="flex-1" title="Grade Appeal">
-          <GradeAppeal />
-        </GeneralSettingsCard>
         <GeneralSettingsCard className="flex-shrink-0" title="Scheduling">
           <Scheduling />
+        </GeneralSettingsCard>
+        <GeneralSettingsCard className="flex-1" title="Grade Appeal">
+          <GradeAppeal />
         </GeneralSettingsCard>
       </div>
     </div>

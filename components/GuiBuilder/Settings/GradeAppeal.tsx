@@ -18,38 +18,24 @@ function GradeAppeal() {
         onChange={(value) => setGradeAppeal({ ...gradeAppeal, isAppealAllowed: value })}
         label="Allow grade appeals after releasing grades"
       />
-      <div className="flex items-center gap-2">
-        <label
-          htmlFor="appealLimits"
-          className={clsx("flex-1 flex items-center gap-1", !gradeAppeal.isAppealAllowed && "text-gray-400")}
-        >
-          Appeal Limits
-        </label>
-        <NumberInput
-          id="appealLimits"
-          value={gradeAppeal.appealLimits ?? 3}
-          onChange={(value) => setGradeAppeal({ ...gradeAppeal, appealLimits: value ?? null })}
-          min={1}
-          placeholder="Unlimited"
-          disabled={!gradeAppeal.isAppealAllowed}
-          className="flex-[2]"
-        />
-      </div>
-      <SwitchGroup
-        id="isAppealStudentReplyAllowed"
-        checked={gradeAppeal.isAppealStudentReplyAllowed}
-        onChange={(value) => setGradeAppeal({ ...gradeAppeal, isAppealStudentReplyAllowed: value })}
-        label="Allow students to reply after submitting an appeal"
-        disabled={!gradeAppeal.isAppealAllowed}
-      />
-      <SwitchGroup
-        id="isAppealViewReportAllowed"
-        checked={gradeAppeal.isAppealViewReportAllowed}
-        onChange={(value) => setGradeAppeal({ ...gradeAppeal, isAppealViewReportAllowed: value })}
-        label="Allow students to view appeal report"
-        disabled={!gradeAppeal.isAppealAllowed}
-      />
-      <div className="space-y-3">
+      <div className="space-y-2">
+        <div className="flex items-center gap-3">
+          <label
+            htmlFor="appealLimits"
+            className={clsx("flex-1 flex items-center gap-1", !gradeAppeal.isAppealAllowed && "text-gray-400")}
+          >
+            Appeal Limits
+          </label>
+          <NumberInput
+            id="appealLimits"
+            value={gradeAppeal.appealLimits ?? 3}
+            onChange={(value) => setGradeAppeal({ ...gradeAppeal, appealLimits: value ?? null })}
+            min={1}
+            placeholder="Unlimited"
+            disabled={!gradeAppeal.isAppealAllowed}
+            className="flex-[2]"
+          />
+        </div>
         <div className="flex items-center gap-3">
           <label
             htmlFor="appealStartAt"
@@ -97,6 +83,20 @@ function GradeAppeal() {
           </div>
         </div>
       </div>
+      <SwitchGroup
+        id="isAppealStudentReplyAllowed"
+        checked={gradeAppeal.isAppealStudentReplyAllowed}
+        onChange={(value) => setGradeAppeal({ ...gradeAppeal, isAppealStudentReplyAllowed: value })}
+        label="Allow students to reply after submitting an appeal"
+        disabled={!gradeAppeal.isAppealAllowed}
+      />
+      <SwitchGroup
+        id="isAppealViewReportAllowed"
+        checked={gradeAppeal.isAppealViewReportAllowed}
+        onChange={(value) => setGradeAppeal({ ...gradeAppeal, isAppealViewReportAllowed: value })}
+        label="Allow students to view appeal report"
+        disabled={!gradeAppeal.isAppealAllowed}
+      />
     </div>
   );
 }

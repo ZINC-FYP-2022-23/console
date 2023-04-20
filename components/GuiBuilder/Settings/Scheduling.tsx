@@ -8,7 +8,7 @@ function Scheduling() {
   const setSchedule = useStoreActions((state) => state.config.setSchedule);
 
   return (
-    <div className="p-1 space-y-3">
+    <div className="p-1 space-y-2">
       <div className="flex items-center gap-3">
         <label htmlFor="showAt" className="flex-1 text-sm">
           Announce
