@@ -53,7 +53,7 @@ export const defaultConfig: Config = {
 
 export const defaultGradeAppeal: GradeAppealPolicy = {
   isAppealAllowed: false,
-  appealLimits: null,
+  appealLimits: 3,
   appealStartAt: null,
   appealStopAt: null,
   isAppealStudentReplyAllowed: true,
