@@ -80,7 +80,7 @@ function createNewChangeLog({ appealAttempt, type, newStatus, oldScore, newScore
   if (type === ChangeLogTypes.APPEAL_STATUS && newStatus) {
     originalState = {
       type: "status",
-      status: appealAttempt.latestStatus,
+      status: appealAttempt.status,
     };
     updatedState = {
       type: "status",
@@ -128,7 +128,7 @@ function ChangeAppealStatus({ appealAttempt }: ChangeAppealStatusProps) {
   });
   const [newLog, setNewLog] = useState(initialLog);
   const [modalOpen, setModalOpen] = useState(false);
-  const latestStatus = appealAttempt.latestStatus;
+  const latestStatus = appealAttempt.status;
 
   // Set CSS style for the appeal status buttons
   const defaultAppealButton =
