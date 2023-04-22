@@ -47,6 +47,7 @@ import axios from "axios";
 import { zonedTimeToUtc } from "date-fns-tz";
 import { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
+import { ModalContent } from "pages/courses/[courseId]/assignments/[assignmentConfigId]/submissions";
 import { useEffect, useState } from "react";
 import { initializeApollo } from "../../../lib/apollo";
 
@@ -746,6 +747,7 @@ function AppealDetails({ appealId, userId, studentId, assignmentConfigId, diffSu
       <SlideOver>
         <ReportSlideOver />
       </SlideOver>
+      <ModalContent />
     </LayoutProvider>
   );
 }
