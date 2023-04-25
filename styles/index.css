@@ -221,3 +221,7 @@
 .appeal-msg ol {
   @apply ml-5 list-decimal;
 }
+
+.appeal-msg pre {
+  @apply my-1 text-sm;
+}

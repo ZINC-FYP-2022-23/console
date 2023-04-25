@@ -47,6 +47,7 @@ import axios from "axios";
 import { zonedTimeToUtc } from "date-fns-tz";
 import { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
+import { ModalContent } from "pages/courses/[courseId]/assignments/[assignmentConfigId]/submissions";
 import { useEffect, useState } from "react";
 import { initializeApollo } from "../../../lib/apollo";
 
@@ -684,15 +685,15 @@ function AppealDetails({ appealId, userId, studentId, assignmentConfigId, diffSu
           </div>
           {allowChange && (
             <div className="p-3 flex-row justify-between bg-white rounded-md shadow">
-              {/* FIXME: The control bar should not be sticky */}
               <RichTextEditor
                 id="rte"
                 value={comments}
                 onChange={setComments}
                 controls={[
                   ["bold", "italic", "underline"],
-                  ["h1", "h2", "h3", "unorderedList", "orderedList"],
+                  ["h1", "h2", "h3", "unorderedList", "orderedList", "codeBlock"],
                 ]}
+                styles={{ toolbar: { position: "relative" } }}
               />
               <div className="mt-2 flex justify-end">
                 <MessageButton userId={userId} comments={comments} setComments={setComments} />
@@ -746,6 +747,7 @@ function AppealDetails({ appealId, userId, studentId, assignmentConfigId, diffSu
       <SlideOver>
         <ReportSlideOver />
       </SlideOver>
+      <ModalContent />
     </LayoutProvider>
   );
 }
