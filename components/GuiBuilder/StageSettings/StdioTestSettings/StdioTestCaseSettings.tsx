@@ -17,6 +17,7 @@ import {
   visibilityOptions as valgrindVisibilityOptions,
 } from "../ValgrindSettings";
 import { hiddenItemOptions, inputModeOptions, visibilityOptions } from "./inputOptions";
+import StdioTestCaseDeleteModal from "./StdioTestCaseDeleteModal";
 
 interface StdioTestCaseSettingsProps {
   /** Test case ID. It's `null` when no test case is selected. */
@@ -34,6 +35,9 @@ function StdioTestCaseSettings({ caseId, closeModal, setView }: StdioTestCaseSet
   const [config, setConfig] = useSelectedStageConfig("StdioTest");
   const hasValgrindStage = useStoreState((state) => state.config.hasStage("Valgrind"));
   const setAddStageSearchString = useStoreActions((actions) => actions.layout.setAddStageSearchString);
+
+  /** Which test case to delete. It shows a confirmation modal if it's value is not null. */
+  const [testCaseIdToDelete, setTestCaseIdToDelete] = useState<number | null>(null);
 
   const [isEditingId, setIsEditingId] = useState(false);
   const [newId, setNewId] = useState(caseId);
@@ -178,7 +182,7 @@ function StdioTestCaseSettings({ caseId, closeModal, setView }: StdioTestCaseSet
             Duplicate
           </Button>
           <Button
-            onClick={deleteTestCase}
+            onClick={() => setTestCaseIdToDelete(caseId)}
             icon={<FontAwesomeIcon icon={["far", "trash-can"]} />}
             className="bg-red-500 text-white hover:bg-red-600 active:bg-red-700"
           >
@@ -473,6 +477,11 @@ function StdioTestCaseSettings({ caseId, closeModal, setView }: StdioTestCaseSet
           </div>
         </div>
       </div>
+      <StdioTestCaseDeleteModal
+        testCaseIdToDelete={testCaseIdToDelete}
+        setTestCaseIdToDelete={setTestCaseIdToDelete}
+        onDelete={deleteTestCase}
+      />
     </div>
   );
 }
