@@ -207,7 +207,7 @@ const supportedStages: SupportedStages = {
     description: "Grades an executable's standard output against test cases",
     defaultConfig: {
       testCases: [],
-      diff_ignore_flags: [],
+      diff_ignore_flags: ["TRAILING_WHITESPACE"],
       additional_packages: [],
       additional_pip_packages: [],
       experimentalModularize: false,

@@ -18,6 +18,7 @@ import {
 } from "../ValgrindSettings";
 import GeneratedExpectedOutputCard from "./GeneratedExpectedOutputCard";
 import { hiddenItemOptions, inputModeOptions, visibilityOptions } from "./inputOptions";
+import StdioTestCaseDeleteModal from "./StdioTestCaseDeleteModal";
 import { useStdioTestSettingsContext } from "./StdioTestSettingsContext";
 
 interface StdioTestCaseSettingsProps {
@@ -35,6 +36,9 @@ function StdioTestCaseSettings({ caseId }: StdioTestCaseSettingsProps) {
   const hasValgrindStage = useStoreState((state) => state.config.hasStage("Valgrind"));
   const setAddStageSearchString = useStoreActions((actions) => actions.layout.setAddStageSearchString);
   const setElementToHighlight = useStoreActions((actions) => actions.layout.setElementToHighlight);
+
+  /** Which test case to delete. It shows a confirmation modal if it's value is not null. */
+  const [testCaseIdToDelete, setTestCaseIdToDelete] = useState<number | null>(null);
 
   const [isEditingId, setIsEditingId] = useState(false);
   const [newId, setNewId] = useState<number | null>(caseId);
@@ -179,7 +183,7 @@ function StdioTestCaseSettings({ caseId }: StdioTestCaseSettingsProps) {
             Duplicate
           </Button>
           <Button
-            onClick={deleteTestCase}
+            onClick={() => setTestCaseIdToDelete(caseId)}
             icon={<FontAwesomeIcon icon={["far", "trash-can"]} />}
             className="bg-red-500 text-white hover:bg-red-600 active:bg-red-700"
           >
@@ -492,6 +496,11 @@ function StdioTestCaseSettings({ caseId }: StdioTestCaseSettingsProps) {
           </div>
         </div>
       </div>
+      <StdioTestCaseDeleteModal
+        testCaseIdToDelete={testCaseIdToDelete}
+        setTestCaseIdToDelete={setTestCaseIdToDelete}
+        onDelete={deleteTestCase}
+      />
     </div>
   );
 }

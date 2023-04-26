@@ -9,6 +9,7 @@ import cloneDeep from "lodash/cloneDeep";
 import { useMemo, useState } from "react";
 import StdioTestCaseSettings from "./StdioTestCaseSettings";
 import StdioTestCasesTable from "./StdioTestCasesTable";
+import StdioTestCaseDeleteModal from "./StdioTestCaseDeleteModal";
 import { useStdioTestSettingsContext } from "./StdioTestSettingsContext";
 
 /**
@@ -83,32 +84,11 @@ function StdioTestTestCasesPanel() {
           onVisit={(testCaseId) => setTestCaseView(testCaseId)}
         />
         {/* Confirmation modal for Delete Single Test Case */}
-        <Modal
-          title={`Delete test case #${testCaseIdToDelete}?`}
-          opened={testCaseIdToDelete !== null}
-          onClose={() => setTestCaseIdToDelete(null)}
-          centered
-          size="md"
-          classNames={classes}
-        >
-          <div className="space-y-5">
-            <p className="text-gray-800">Are you sure you want to delete test case #{testCaseIdToDelete}?</p>
-            <div className="w-full flex items-center justify-end gap-3">
-              <Button
-                onClick={() => setTestCaseIdToDelete(null)}
-                className="!font-normal text-gray-600 hover:bg-gray-200"
-              >
-                Cancel
-              </Button>
-              <Button
-                onClick={() => deleteTestCase(testCaseIdToDelete!)}
-                className="bg-red-500 text-white hover:bg-red-600 active:bg-red-700"
-              >
-                Delete
-              </Button>
-            </div>
-          </div>
-        </Modal>
+        <StdioTestCaseDeleteModal
+          testCaseIdToDelete={testCaseIdToDelete}
+          setTestCaseIdToDelete={setTestCaseIdToDelete}
+          onDelete={(id) => deleteTestCase(id)}
+        />
         {/* Confirmation modal for Delete All Test Cases */}
         <Modal
           title="Delete all test cases?"
